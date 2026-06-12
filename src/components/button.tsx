@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * options; `defaultVariants` apply when a prop is omitted.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius)] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -23,12 +23,24 @@ const buttonVariants = cva(
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
       },
       size: {
+        // text sizes (horizontal padding for label)
         sm: "h-8 px-3 text-sm",
         md: "h-10 px-4 text-sm",
         lg: "h-12 px-6 text-base",
+        // icon-only sizes (square: equal height/width, no horizontal padding)
+        iconSm: "h-8 w-8",
+        icon: "h-10 w-10",
+        iconLg: "h-12 w-12",
+      },
+      // shape owns the full border-radius (only ONE radius class is ever applied,
+      // so there is no tailwind-merge conflict). `round` makes a square icon
+      // button a circle, or a text button a pill.
+      shape: {
+        default: "rounded-[var(--radius)]",
+        round: "rounded-full",
       },
     },
-    defaultVariants: { variant: "primary", size: "md" },
+    defaultVariants: { variant: "primary", size: "md", shape: "default" },
   },
 );
 
@@ -40,12 +52,12 @@ export interface ButtonProps
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, shape, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
         ref={ref}
-        className={cn(buttonVariants({ variant, size }), className)}
+        className={cn(buttonVariants({ variant, size, shape }), className)}
         {...props}
       />
     );
