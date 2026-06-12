@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 28" width="124" height="28" fill="none">
+  <!-- The <Bpdm /> wordmark — accent brackets + white name (matches bpdm.dev) -->
+  <text x="0" y="21"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    font-size="20" font-weight="600" letter-spacing="-0.5">
+    <tspan fill="#ff7a3c">&lt;</tspan><tspan fill="#f7f6f3">Bpdm</tspan><tspan fill="#ff7a3c"> /&gt;</tspan>
+  </text>
+</svg>
