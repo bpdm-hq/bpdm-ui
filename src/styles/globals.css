@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   @bpdm/ui — design tokens (single source of truth)
+   Defined in Tailwind 4's @theme → auto-generates utilities like
+   bg-primary, text-foreground, border-border, rounded-[var(--radius)].
+   Theme: warm amber on deep charcoal (the bpdm brand).
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  /* surfaces */
+  --color-background: #0e0e11;
+  --color-foreground: #f7f6f3;
+  --color-card: #16161a;
+  --color-card-foreground: #f7f6f3;
+  --color-popover: #16161a;
+  --color-popover-foreground: #f7f6f3;
+  --color-muted: #1f1f23;
+  --color-muted-foreground: #a5a3ad;
+
+  /* lines & focus */
+  --color-border: #27272a;
+  --color-input: #2a2a31;
+  --color-ring: #f5a623;
+
+  /* brand / semantic */
+  --color-primary: #f5a623; /* amber */
+  --color-primary-foreground: #1a1205;
+  --color-secondary: #1f1f23;
+  --color-secondary-foreground: #f7f6f3;
+  --color-accent: #ff7a3c; /* warm orange */
+  --color-accent-foreground: #1a1205;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  /* radius */
+  --radius: 0.625rem;
+}
