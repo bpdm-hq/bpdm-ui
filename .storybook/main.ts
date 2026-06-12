@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 const config: StorybookConfig = {
   // where Storybook finds component stories
   stories: ["../src/**/*.stories.@(ts|tsx)"],
+  // addon-docs: enables the "Docs" pages (autodocs) + per-story "Show code"
+  addons: ["@storybook/addon-docs"],
   framework: { name: "@storybook/react-vite", options: {} },
   // inject the Tailwind 4 Vite plugin so utility classes are generated
   async viteFinal(viteConfig) {

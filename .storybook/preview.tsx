@@ -5,13 +5,20 @@ const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
   },
-  // every story renders on our dark, branded surface
+  // Canvas = full-height surface; Docs previews = fit content (no min-h-screen,
+  // otherwise every doc preview block becomes 100vh tall).
   decorators: [
-    (Story) => (
-      <div className="min-h-screen bg-background p-10 font-sans text-foreground">
-        <Story />
-      </div>
-    ),
+    (Story, context) => {
+      const isDocs = context.viewMode === "docs";
+      const surface = "bg-background font-sans text-foreground";
+      return (
+        <div
+          className={isDocs ? `${surface} p-6` : `${surface} min-h-screen p-10`}
+        >
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
