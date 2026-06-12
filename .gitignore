@@ -1,0 +1,9 @@
+node_modules
+dist
+storybook-static
+*.log
+.DS_Store
+.env*
+
+# personal learning notes — kept out of the (eventually public) repo
+DEVELOPER_NOTES.md
