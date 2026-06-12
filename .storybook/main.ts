@@ -7,6 +7,12 @@ const config: StorybookConfig = {
   // addon-docs: enables the "Docs" pages (autodocs) + per-story "Show code"
   addons: ["@storybook/addon-docs"],
   framework: { name: "@storybook/react-vite", options: {} },
+  // serve /public (favicon) at the root
+  staticDirs: ["../public"],
+  // brand the browser tab: title + favicon
+  managerHead: (head) => `${head}
+    <title>@bpdm/ui — Component Library</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />`,
   // inject the Tailwind 4 Vite plugin so utility classes are generated
   async viteFinal(viteConfig) {
     const { mergeConfig } = await import("vite");
