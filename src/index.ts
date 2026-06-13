@@ -6,4 +6,5 @@ export * from "./components/input";
 export * from "./components/input-otp";
 export * from "./components/number-input";
 export * from "./components/radio-group";
+export * from "./components/select";
 export * from "./components/switch";
