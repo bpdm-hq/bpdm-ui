@@ -4,6 +4,7 @@ export * from "./components/checkbox";
 export * from "./components/float-label";
 export * from "./components/input";
 export * from "./components/input-otp";
+export * from "./components/money-input";
 export * from "./components/number-input";
 export * from "./components/radio-group";
 export * from "./components/select";
