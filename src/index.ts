@@ -9,4 +9,5 @@ export * from "./components/number-input";
 export * from "./components/radio-group";
 export * from "./components/secure-field";
 export * from "./components/select";
+export * from "./components/stat-card";
 export * from "./components/switch";

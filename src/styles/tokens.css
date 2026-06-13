@@ -39,6 +39,8 @@
   --accent-foreground: #1a1205;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
+  --success: #15803d; /* gains / positive deltas */
+  --success-foreground: #ffffff;
 }
 
 /* ── LIGHT · Cool Mist ────────────────────────────────────────── */
@@ -62,6 +64,8 @@
   --accent-foreground: #1a1205;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
+  --success: #15803d;
+  --success-foreground: #ffffff;
 }
 
 /* ── DARK · Charcoal (default dark) ───────────────────────────── */
@@ -69,13 +73,13 @@
   color-scheme: dark;
   --background: #0e0e11; /* warm near-black */
   --foreground: #f7f6f3;
-  --card: #16161a;
+  --card: #1b1b21; /* lifted off the page so cards read on dark */
   --card-foreground: #f7f6f3;
-  --popover: #16161a;
+  --popover: #1b1b21;
   --popover-foreground: #f7f6f3;
-  --muted: #1f1f23;
+  --muted: #242429;
   --muted-foreground: #a5a3ad;
-  --border: #27272a;
+  --border: #2e2e35; /* a touch brighter so edges are visible */
   --input: #2a2a31;
   --ring: #f5a623;
   --primary: #f5a623;
@@ -86,6 +90,8 @@
   --accent-foreground: #1a1205;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
+  --success: #4ade80; /* brighter green reads on dark */
+  --success-foreground: #052e16;
 }
 
 /* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
@@ -110,6 +116,8 @@
   --accent-foreground: #1a1205;
   --destructive: #f0616d;
   --destructive-foreground: #0d1117;
+  --success: #3fb950;
+  --success-foreground: #052e16;
 }
 
 /* Map Tailwind utilities → raw vars (resolved at runtime). */
@@ -135,4 +143,6 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
 }
