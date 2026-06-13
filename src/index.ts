@@ -7,5 +7,6 @@ export * from "./components/input-otp";
 export * from "./components/money-input";
 export * from "./components/number-input";
 export * from "./components/radio-group";
+export * from "./components/secure-field";
 export * from "./components/select";
 export * from "./components/switch";
