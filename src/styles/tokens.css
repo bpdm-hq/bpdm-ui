@@ -1,0 +1,138 @@
+/* @bpdm/ui design tokens — shipped as @bpdm/ui/styles.css.
+   Import this AFTER `@import "tailwindcss"` in your app's CSS. No Tailwind import
+   here (your app already has it), so it won't duplicate utilities.
+
+   FOUR built-in themes, selected with a `data-theme` attribute on <html> (or any
+   ancestor). Light: "paper" (default) · "mist".  Dark: "charcoal" · "slate".
+     <html data-theme="paper">     <!-- warm, default light -->
+     <html data-theme="slate">     <!-- cool enterprise dark -->
+   Re-theme by overriding any --token (globally or scoped). */
+
+/* dark-mode utilities (dark:*) apply under the dark themes */
+@custom-variant dark
+  (&:where([data-theme="charcoal"], [data-theme="charcoal"] *, [data-theme="slate"], [data-theme="slate"] *));
+
+/* ── tokens shared by every theme ── */
+:root {
+  --radius: 0.625rem;
+}
+
+/* ── LIGHT · Warm Paper (default) ─────────────────────────────── */
+:root,
+[data-theme="paper"] {
+  --background: #faf9f6; /* warm paper page */
+  --foreground: #1c1a17;
+  --card: #ffffff; /* white cards lift off the page */
+  --card-foreground: #1c1a17;
+  --popover: #ffffff;
+  --popover-foreground: #1c1a17;
+  --muted: #f0eee9;
+  --muted-foreground: #6b6862;
+  --border: #e7e3dc;
+  --input: #dcd7cd;
+  --ring: #f5a623;
+  --primary: #f5a623; /* amber — the bpdm brand, in every theme */
+  --primary-foreground: #1a1205;
+  --secondary: #f0eee9;
+  --secondary-foreground: #1c1a17;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+}
+
+/* ── LIGHT · Cool Mist ────────────────────────────────────────── */
+[data-theme="mist"] {
+  --background: #f7f8fa; /* cool grey page */
+  --foreground: #1a1d24;
+  --card: #ffffff;
+  --card-foreground: #1a1d24;
+  --popover: #ffffff;
+  --popover-foreground: #1a1d24;
+  --muted: #eef0f4;
+  --muted-foreground: #646b78;
+  --border: #e2e6ec;
+  --input: #d6dbe4;
+  --ring: #f5a623;
+  --primary: #f5a623;
+  --primary-foreground: #1a1205;
+  --secondary: #eef0f4;
+  --secondary-foreground: #1a1d24;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+}
+
+/* ── DARK · Charcoal (default dark) ───────────────────────────── */
+[data-theme="charcoal"] {
+  color-scheme: dark;
+  --background: #0e0e11; /* warm near-black */
+  --foreground: #f7f6f3;
+  --card: #16161a;
+  --card-foreground: #f7f6f3;
+  --popover: #16161a;
+  --popover-foreground: #f7f6f3;
+  --muted: #1f1f23;
+  --muted-foreground: #a5a3ad;
+  --border: #27272a;
+  --input: #2a2a31;
+  --ring: #f5a623;
+  --primary: #f5a623;
+  --primary-foreground: #1a1205;
+  --secondary: #1f1f23;
+  --secondary-foreground: #f7f6f3;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+}
+
+/* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
+[data-theme="slate"] {
+  color-scheme: dark;
+  --background: #0d1117; /* deep cool slate */
+  --foreground: #e6e8eb;
+  --card: #161b22; /* raised slate surface */
+  --card-foreground: #e6e8eb;
+  --popover: #161b22;
+  --popover-foreground: #e6e8eb;
+  --muted: #1c2128;
+  --muted-foreground: #8b949e;
+  --border: #2a313c;
+  --input: #30363d;
+  --ring: #f5a623;
+  --primary: #f5a623; /* warm amber pops on cool slate */
+  --primary-foreground: #1a1205;
+  --secondary: #1c2128;
+  --secondary-foreground: #e6e8eb;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #f0616d;
+  --destructive-foreground: #0d1117;
+}
+
+/* Map Tailwind utilities → raw vars (resolved at runtime). */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+}

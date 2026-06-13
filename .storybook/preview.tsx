@@ -5,7 +5,7 @@ const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
   },
-  // a "Theme" dropdown in the toolbar — toggles the .dark class live
+  // a "Theme" dropdown — 2 light + 2 dark, applied via data-theme
   globalTypes: {
     theme: {
       description: "Theme",
@@ -13,23 +13,26 @@ const preview: Preview = {
         title: "Theme",
         icon: "paintbrush",
         items: [
-          { value: "dark", title: "Dark", icon: "circle" },
-          { value: "light", title: "Light", icon: "circlehollow" },
+          { value: "paper", title: "Paper · light", icon: "circlehollow" },
+          { value: "mist", title: "Mist · light", icon: "circlehollow" },
+          { value: "charcoal", title: "Charcoal · dark", icon: "circle" },
+          { value: "slate", title: "Slate · dark", icon: "circle" },
         ],
         dynamicTitle: true,
       },
     },
   },
-  initialGlobals: { theme: "light" },
-  // render every story on the selected theme surface (.dark adds the dark vars).
-  // Canvas = full-height; Docs previews = fit content (no 100vh blocks).
+  initialGlobals: { theme: "paper" },
+  // render every story on the selected theme surface. Canvas = full-height;
+  // Docs previews = fit content (no 100vh blocks).
   decorators: [
     (Story, context) => {
-      const isDark = (context.globals.theme ?? "light") === "dark";
+      const theme = (context.globals.theme as string) ?? "paper";
       const isDocs = context.viewMode === "docs";
-      const surface = `${isDark ? "dark " : ""}bg-background font-sans text-foreground`;
+      const surface = "bg-background font-sans text-foreground";
       return (
         <div
+          data-theme={theme}
           className={isDocs ? `${surface} p-6` : `${surface} min-h-screen p-10`}
         >
           <Story />
