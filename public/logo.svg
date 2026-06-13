@@ -3,6 +3,6 @@
   <text x="0" y="21"
     font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
     font-size="20" font-weight="600" letter-spacing="-0.5">
-    <tspan fill="#ff7a3c">&lt;</tspan><tspan fill="#f7f6f3">Bpdm</tspan><tspan fill="#ff7a3c"> /&gt;</tspan>
+    <tspan fill="#f5a623">&lt;</tspan><tspan fill="#f7f6f3">Bpdm</tspan><tspan fill="#f5a623"> /&gt;</tspan>
   </text>
 </svg>
