@@ -1,0 +1,101 @@
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+export type TimelineStatus = "complete" | "current" | "pending" | "failed";
+
+export type TimelineItem = {
+  title: string;
+  status?: TimelineStatus;
+  /** Short timestamp / meta shown on the right, e.g. "12:04". */
+  timestamp?: string;
+  description?: React.ReactNode;
+};
+
+export interface StatusTimelineProps {
+  items: TimelineItem[];
+  className?: string;
+}
+
+function Check() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
+      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function Cross() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
+      <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const dotByStatus: Record<TimelineStatus, string> = {
+  complete: "bg-success text-success-foreground",
+  current: "bg-primary text-primary-foreground ring-4 ring-primary/20",
+  pending: "border-2 border-border bg-background text-transparent",
+  failed: "bg-destructive text-destructive-foreground",
+};
+
+/**
+ * Vertical status timeline for lifecycles (payment, order, shipment, …). Each step
+ * has a status — complete (✓), current (pulsing), pending (hollow), failed (✗) —
+ * with an optional timestamp and description.
+ */
+export function StatusTimeline({ items, className }: StatusTimelineProps) {
+  return (
+    <ol className={cn("relative", className)}>
+      {items.map((item, i) => {
+        const status = item.status ?? "pending";
+        const last = i === items.length - 1;
+        const muted = status === "pending";
+        return (
+          <li key={i} className="relative flex gap-3 pb-6 last:pb-0">
+            {!last && (
+              <span
+                className={cn(
+                  "absolute left-3 top-6 bottom-0 w-px -translate-x-1/2",
+                  status === "complete" ? "bg-success/40" : "bg-border",
+                )}
+                aria-hidden
+              />
+            )}
+            <span
+              className={cn(
+                "z-10 grid size-6 shrink-0 place-items-center rounded-full",
+                dotByStatus[status],
+              )}
+            >
+              {status === "complete" && <Check />}
+              {status === "failed" && <Cross />}
+            </span>
+
+            <div className="-mt-0.5 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <p
+                  className={cn(
+                    "text-sm font-medium",
+                    muted ? "text-muted-foreground" : "text-foreground",
+                  )}
+                >
+                  {item.title}
+                </p>
+                {item.timestamp && (
+                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                    {item.timestamp}
+                  </span>
+                )}
+              </div>
+              {item.description && (
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {item.description}
+                </p>
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
