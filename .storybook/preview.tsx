@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react-vite";
+import { useEffect } from "react";
 import "../src/styles/globals.css";
 
 const preview: Preview = {
@@ -28,6 +29,11 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const theme = (context.globals.theme as string) ?? "paper";
+      // also set on <html> so PORTALED content (Select/MultiSelect popovers,
+      // which render at <body>) inherits the theme — not just the wrapper.
+      useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+      }, [theme]);
       const isDocs = context.viewMode === "docs";
       const surface = "bg-background font-sans text-foreground";
       return (
