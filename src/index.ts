@@ -15,3 +15,4 @@ export * from "./components/stat-card";
 export * from "./components/status-timeline";
 export * from "./components/switch";
 export * from "./components/textarea";
+export * from "./components/tree-select";
