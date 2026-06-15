@@ -14,3 +14,4 @@ export * from "./components/select";
 export * from "./components/stat-card";
 export * from "./components/status-timeline";
 export * from "./components/switch";
+export * from "./components/textarea";
