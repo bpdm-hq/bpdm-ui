@@ -5,6 +5,11 @@ import "../src/styles/globals.css";
 const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    options: {
+      storySort: {
+        order: ["Actions", "Inputs", "Selection", "Data Display"],
+      },
+    },
   },
   // a "Theme" dropdown — 2 light + 2 dark, applied via data-theme
   globalTypes: {

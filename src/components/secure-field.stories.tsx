@@ -23,7 +23,7 @@ import { SecureField } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof SecureField> = {
-  title: "Fintech/SecureField",
+  title: "Inputs/SecureField",
   component: SecureField,
   tags: ["autodocs"],
   parameters: {

@@ -121,7 +121,7 @@ const TREE: TreeNode[] = [
 ];
 
 const meta: Meta<typeof TreeSelect> = {
-  title: "Components/TreeSelect",
+  title: "Selection/TreeSelect",
   component: TreeSelect,
   tags: ["autodocs"],
   parameters: {

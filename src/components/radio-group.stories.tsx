@@ -30,7 +30,7 @@ import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof RadioGroup> = {
-  title: "Components/RadioGroup",
+  title: "Selection/RadioGroup",
   component: RadioGroup,
   tags: ["autodocs"],
   parameters: {

@@ -23,7 +23,7 @@ import { Textarea } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof Textarea> = {
-  title: "Components/Textarea",
+  title: "Inputs/Textarea",
   component: Textarea,
   tags: ["autodocs"],
   parameters: {

@@ -81,6 +81,60 @@ function StatusBadge({ status }: { status: Txn["status"] }) {
   );
 }
 
+// a richer expanded panel: settlement breakdown + transaction metadata
+function TxnDetails({ txn }: { txn: Txn }) {
+  const gross = txn.amount;
+  const fee = Math.round((Math.abs(gross) * 0.029 + 0.3) * 100) / 100;
+  const net = Math.round((gross - fee) * 100) / 100;
+  const authCode = txn.id.replace("tx_", "").toUpperCase().padEnd(6, "0").slice(0, 6);
+  const arn = `74${txn.id.replace(/[^0-9a-f]/gi, "")}${txn.date.replace(/-/g, "")}`.slice(0, 18);
+  const meta: [string, React.ReactNode][] = [
+    ["Authorization", <span className="font-mono">{authCode}</span>],
+    ["Network", txn.method.split(" ")[0]],
+    ["Card / account", txn.method],
+    ["Reference (ARN)", <span className="font-mono text-xs">{arn}</span>],
+  ];
+  return (
+    <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+      <section className="rounded-lg border border-border bg-card p-4">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Settlement breakdown
+        </p>
+        <dl className="space-y-2 text-sm tabular-nums">
+          <div className="flex items-center justify-between">
+            <dt className="text-muted-foreground">Gross</dt>
+            <dd>{money(gross)}</dd>
+          </div>
+          <div className="flex items-center justify-between">
+            <dt className="text-muted-foreground">Processing fee · 2.9% + $0.30</dt>
+            <dd className="text-destructive">−{money(fee)}</dd>
+          </div>
+          <div className="mt-1 flex items-center justify-between border-t border-border pt-2 text-base font-semibold">
+            <dt>Net settlement</dt>
+            <dd>{money(net)}</dd>
+          </div>
+        </dl>
+      </section>
+      <section className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Details
+          </p>
+          <StatusBadge status={txn.status} />
+        </div>
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          {meta.map(([label, value]) => (
+            <div key={label} className="flex flex-col gap-0.5">
+              <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  );
+}
+
 const columns: DataTableColumn<Txn>[] = [
   { id: "id", header: "Txn ID", accessor: (r) => <span className="font-mono text-xs">{r.id}</span> },
   { id: "date", header: "Date", sortable: true, accessor: (r) => r.date, sortAccessor: (r) => r.date },
@@ -91,7 +145,7 @@ const columns: DataTableColumn<Txn>[] = [
 ];
 
 const meta: Meta<typeof DataTable<Txn>> = {
-  title: "Components/DataTable",
+  title: "Data Display/DataTable",
   component: DataTable,
   tags: ["autodocs"],
   parameters: {
@@ -120,10 +174,12 @@ const meta: Meta<typeof DataTable<Txn>> = {
     multiSort: { control: "boolean" },
     selectable: { control: "boolean" },
     selectionMode: { control: "inline-radio", options: ["multiple", "single"] },
+    expandMode: { control: "inline-radio", options: ["single", "multiple"] },
     columns: { table: { disable: true } },
     data: { table: { disable: true } },
     rowKey: { table: { disable: true } },
     pagination: { table: { disable: true } },
+    renderExpanded: { table: { disable: true } },
   },
   // rowKey keeps selection stable across re-sorts (keyed by id, not row position)
   args: { columns, data: TXNS, size: "md", rowKey: (r: Txn) => r.id },
@@ -437,6 +493,30 @@ export const CursorPaging: Story = {
       );
     };
     return <Demo />;
+  },
+};
+
+// each row expands to a detail panel; keyed by rowKey so it survives sorting.
+// Use expandMode="single" to keep only one row open at a time.
+export const ExpandableRows: Story = {
+  args: {
+    rowKey: (r: Txn) => r.id,
+    defaultExpandedKeys: ["tx_a17d"],
+    renderExpanded: (row: Txn) => <TxnDetails txn={row} />,
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  rowKey={(r) => r.id}
+  renderExpanded={(row) => <TxnDetails txn={row} />}
+  defaultExpandedKeys={["tx_a17d"]}
+  // expandMode="single" to keep only one row open
+/>`,
+      },
+    },
   },
 };
 

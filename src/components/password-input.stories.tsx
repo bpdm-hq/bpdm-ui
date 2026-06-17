@@ -22,7 +22,7 @@ import { PasswordInput } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof PasswordInput> = {
-  title: "Components/PasswordInput",
+  title: "Inputs/PasswordInput",
   component: PasswordInput,
   tags: ["autodocs"],
   parameters: {

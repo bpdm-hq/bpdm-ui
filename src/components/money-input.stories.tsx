@@ -24,7 +24,7 @@ import { MoneyInput } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof MoneyInput> = {
-  title: "Fintech/MoneyInput",
+  title: "Inputs/MoneyInput",
   component: MoneyInput,
   tags: ["autodocs"],
   parameters: {

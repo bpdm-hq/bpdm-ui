@@ -134,6 +134,18 @@ export interface DataTableProps<T> {
   onSelectionChange?: (keys: React.Key[], rows: T[]) => void;
   /** Pagination config — client, server (offset), or cursor. Omit for no paging. */
   pagination?: DataTablePagination;
+  /** Render an expandable detail panel under a row. Presence enables expansion. */
+  renderExpanded?: (row: T, index: number) => React.ReactNode;
+  /** Only one row open at a time, or many. Default "multiple". */
+  expandMode?: "single" | "multiple";
+  /** Hide the expander for rows where this returns false. */
+  rowExpandable?: (row: T) => boolean;
+  /** Controlled expanded row keys. */
+  expandedKeys?: React.Key[];
+  /** Initial expanded rows for the uncontrolled case. */
+  defaultExpandedKeys?: React.Key[];
+  /** Fired when the set of expanded rows changes. */
+  onExpandedChange?: (keys: React.Key[]) => void;
   className?: string;
 }
 
@@ -432,6 +444,12 @@ export function DataTable<T>({
   defaultSelectedKeys,
   onSelectionChange,
   pagination,
+  renderExpanded,
+  expandMode = "multiple",
+  rowExpandable,
+  expandedKeys,
+  defaultExpandedKeys,
+  onExpandedChange,
   className,
 }: DataTableProps<T>) {
   const clickable = typeof onRowClick === "function";
@@ -606,7 +624,33 @@ export function DataTable<T>({
 
   const toggleAll = () => applySelection(allSelected ? [] : allKeys);
 
-  const colCount = columns.length + (selectable ? 1 : 0);
+  // --- expandable rows (keyed by rowKey, like selection) ---
+  const expandable = typeof renderExpanded === "function";
+  const isExpandControlled = expandedKeys !== undefined;
+  const [internalExpanded, setInternalExpanded] = React.useState<React.Key[]>(
+    defaultExpandedKeys ?? [],
+  );
+  const expandedArr = isExpandControlled ? expandedKeys! : internalExpanded;
+  const expandedSet = React.useMemo(() => new Set(expandedArr), [expandedArr]);
+
+  const applyExpanded = (nextKeys: React.Key[]) => {
+    if (!isExpandControlled) setInternalExpanded(nextKeys);
+    onExpandedChange?.(nextKeys);
+  };
+  const toggleExpand = (key: React.Key) => {
+    if (expandMode === "single") {
+      applyExpanded(expandedSet.has(key) ? [] : [key]);
+      return;
+    }
+    applyExpanded(
+      expandedSet.has(key)
+        ? expandedArr.filter((k) => k !== key)
+        : [...expandedArr, key],
+    );
+  };
+
+  const colCount =
+    columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0);
 
   return (
     <div
@@ -622,6 +666,18 @@ export function DataTable<T>({
       <table className="w-full border-collapse text-card-foreground">
         <thead>
           <tr>
+            {expandable && (
+              <th
+                scope="col"
+                aria-label="Expand"
+                className={cn(
+                  cellPad({ size }),
+                  "w-[1%] bg-muted shadow-[inset_0_-1px_0_var(--border)]",
+                  bordered && "border-r border-border",
+                  stickyHeader && "sticky top-0 z-10",
+                )}
+              />
+            )}
             {selectable && (
               <th
                 scope="col"
@@ -720,10 +776,13 @@ export function DataTable<T>({
             rows.map((row, rowIndex) => {
               const key = keyOf(row, rowIndex);
               const selected = selectedSet.has(key);
+              const expanded = expandable && expandedSet.has(key);
+              const canExpand = expandable && (!rowExpandable || rowExpandable(row));
               return (
+              <React.Fragment key={key}>
               <tr
-                key={key}
                 data-selected={selected || undefined}
+                data-expanded={expanded || undefined}
                 onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
                 className={cn(
                   "border-t border-border transition-colors",
@@ -733,6 +792,31 @@ export function DataTable<T>({
                   clickable && "cursor-pointer",
                 )}
               >
+                {expandable && (
+                  <td
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {canExpand && (
+                      <button
+                        type="button"
+                        aria-label={expanded ? "Collapse row" : "Expand row"}
+                        aria-expanded={expanded}
+                        onClick={() => toggleExpand(key)}
+                        className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        <svg
+                          viewBox="0 0 16 16"
+                          className={cn("size-4 transition-transform", expanded && "rotate-90")}
+                          fill="none"
+                          aria-hidden
+                        >
+                          <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    )}
+                  </td>
+                )}
                 {selectable && (
                   <td
                     className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border")}
@@ -778,6 +862,14 @@ export function DataTable<T>({
                   );
                 })}
               </tr>
+              {expanded && (
+                <tr className="border-t border-border bg-muted/30">
+                  <td colSpan={colCount} className={cellPad({ size })}>
+                    {renderExpanded!(row, rowIndex)}
+                  </td>
+                </tr>
+              )}
+              </React.Fragment>
               );
             })
           )}

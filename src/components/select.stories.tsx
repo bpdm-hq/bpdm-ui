@@ -35,7 +35,7 @@ const FRAMEWORKS: SelectItems = [
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
 const meta: Meta<typeof Select> = {
-  title: "Components/Select",
+  title: "Selection/Select",
   component: Select,
   tags: ["autodocs"],
   parameters: {
