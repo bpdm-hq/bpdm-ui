@@ -25,7 +25,7 @@ import { Input } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof Input> = {
-  title: "Components/Input",
+  title: "Inputs/Input",
   component: Input,
   tags: ["autodocs"],
   parameters: {

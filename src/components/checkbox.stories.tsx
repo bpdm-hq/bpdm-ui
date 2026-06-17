@@ -26,7 +26,7 @@ import { Checkbox } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof Checkbox> = {
-  title: "Components/Checkbox",
+  title: "Selection/Checkbox",
   component: Checkbox,
   tags: ["autodocs"],
   parameters: {

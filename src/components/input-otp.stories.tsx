@@ -23,7 +23,7 @@ import { InputOtp } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof InputOtp> = {
-  title: "Components/InputOtp",
+  title: "Inputs/InputOtp",
   component: InputOtp,
   tags: ["autodocs"],
   parameters: {

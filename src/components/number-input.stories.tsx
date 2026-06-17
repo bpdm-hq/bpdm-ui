@@ -31,7 +31,7 @@ import { NumberInput } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof NumberInput> = {
-  title: "Components/NumberInput",
+  title: "Inputs/NumberInput",
   component: NumberInput,
   tags: ["autodocs"],
   parameters: {

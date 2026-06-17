@@ -32,7 +32,7 @@ import { StatCard } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof StatCard> = {
-  title: "Fintech/StatCard",
+  title: "Data Display/StatCard",
   component: StatCard,
   tags: ["autodocs"],
   parameters: {

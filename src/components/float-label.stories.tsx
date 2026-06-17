@@ -27,7 +27,7 @@ placeholder are injected for you.
 `;
 
 const meta: Meta<typeof FloatLabel> = {
-  title: "Components/FloatLabel",
+  title: "Inputs/FloatLabel",
   component: FloatLabel,
   tags: ["autodocs"],
   parameters: {

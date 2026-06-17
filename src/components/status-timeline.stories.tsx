@@ -27,7 +27,7 @@ import { StatusTimeline } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof StatusTimeline> = {
-  title: "Fintech/StatusTimeline",
+  title: "Data Display/StatusTimeline",
   component: StatusTimeline,
   tags: ["autodocs"],
   parameters: {

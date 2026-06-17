@@ -24,7 +24,7 @@ import { Switch } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof Switch> = {
-  title: "Components/Switch",
+  title: "Selection/Switch",
   component: Switch,
   tags: ["autodocs"],
   parameters: {

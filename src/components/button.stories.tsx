@@ -31,7 +31,7 @@ import { Button } from "@bpdm/ui";
 `;
 
 const meta: Meta<typeof Button> = {
-  title: "Components/Button",
+  title: "Actions/Button",
   component: Button,
   tags: ["autodocs"],
   parameters: {

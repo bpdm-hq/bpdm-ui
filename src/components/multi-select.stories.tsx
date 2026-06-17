@@ -33,7 +33,7 @@ const FRAMEWORKS: SelectItems = [
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
 const meta: Meta<typeof MultiSelect> = {
-  title: "Components/MultiSelect",
+  title: "Selection/MultiSelect",
   component: MultiSelect,
   tags: ["autodocs"],
   parameters: {
