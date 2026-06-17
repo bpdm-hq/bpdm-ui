@@ -15,6 +15,54 @@ export interface DataTableSort {
   dir: SortDirection;
 }
 
+/** Client-side paging — the table slices `data` itself. */
+export interface ClientPagination {
+  mode?: "client";
+  /** Rows per page. Default 10. */
+  pageSize?: number;
+  /** Offer these page sizes in a selector (omit to hide it). */
+  pageSizeOptions?: number[];
+  /** Controlled current page (1-based); leave unset to let the table track it. */
+  page?: number;
+  /** Initial page for the uncontrolled case. */
+  defaultPage?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+}
+
+/** Server-side offset paging — `data` is already the current page. */
+export interface ServerPagination {
+  mode: "server";
+  /** Current page (1-based). */
+  page: number;
+  /** Rows per page. */
+  pageSize: number;
+  /** Total rows on the server — drives the page count. */
+  total: number;
+  onPageChange: (page: number) => void;
+  pageSizeOptions?: number[];
+  onPageSizeChange?: (size: number) => void;
+}
+
+/**
+ * Server-side cursor paging — there are no page numbers, only prev/next, since
+ * cursors can't jump to an arbitrary page.
+ */
+export interface CursorPagination {
+  mode: "cursor";
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
+  /** Optional left-side label, e.g. "Showing 20 results". */
+  rangeLabel?: React.ReactNode;
+}
+
+export type DataTablePagination =
+  | ClientPagination
+  | ServerPagination
+  | CursorPagination;
+
 /**
  * A single column definition. The table is fully data-driven: you describe the
  * columns once and pass an array of rows — no markup per cell.
@@ -84,6 +132,8 @@ export interface DataTableProps<T> {
   defaultSelectedKeys?: React.Key[];
   /** Fired when the selection changes — gives the keys and the selected rows. */
   onSelectionChange?: (keys: React.Key[], rows: T[]) => void;
+  /** Pagination config — client, server (offset), or cursor. Omit for no paging. */
+  pagination?: DataTablePagination;
   className?: string;
 }
 
@@ -188,6 +238,167 @@ function RowRadio({
   );
 }
 
+// Compact page list with ellipses: 1 … 4 5 6 … 20
+function pageList(current: number, count: number): (number | "ellipsis")[] {
+  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);
+  const out: (number | "ellipsis")[] = [1];
+  const start = Math.max(2, current - 1);
+  const end = Math.min(count - 1, current + 1);
+  if (start > 2) out.push("ellipsis");
+  for (let i = start; i <= end; i++) out.push(i);
+  if (end < count - 1) out.push("ellipsis");
+  out.push(count);
+  return out;
+}
+
+const footerBar =
+  "flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-sm";
+const navBtn =
+  "inline-flex h-8 min-w-8 cursor-pointer items-center justify-center gap-1 rounded-lg px-2 text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40";
+
+function ChevronButton({
+  dir,
+  label,
+  text,
+  disabled,
+  onClick,
+}: {
+  dir: "left" | "right";
+  label: string;
+  text?: string;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const path = dir === "left" ? "M9.5 3.5 5 8l4.5 4.5" : "M6.5 3.5 11 8l-4.5 4.5";
+  return (
+    <button type="button" className={navBtn} aria-label={label} disabled={disabled} onClick={onClick}>
+      {dir === "left" && (
+        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
+          <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+      {text}
+      {dir === "right" && (
+        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
+          <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+function PageSizeSelect({
+  value,
+  options,
+  onChange,
+}: {
+  value: number;
+  options: number[];
+  onChange: (n: number) => void;
+}) {
+  return (
+    <label className="flex items-center gap-2 text-muted-foreground">
+      <span>Rows</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-8 cursor-pointer rounded-lg border border-input bg-background px-2 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function NumberedFooter({
+  page,
+  pageCount,
+  total,
+  rangeFrom,
+  rangeTo,
+  onPage,
+  sizeOptions,
+  pageSize,
+  onSize,
+}: {
+  page: number;
+  pageCount: number;
+  total: number;
+  rangeFrom: number;
+  rangeTo: number;
+  onPage: (p: number) => void;
+  sizeOptions?: number[];
+  pageSize: number;
+  onSize?: (n: number) => void;
+}) {
+  return (
+    <div className={footerBar}>
+      <span className="text-muted-foreground">
+        {total === 0 ? "No results" : `Showing ${rangeFrom}–${rangeTo} of ${total}`}
+      </span>
+      <div className="flex items-center gap-3">
+        {sizeOptions && onSize && (
+          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} />
+        )}
+        <div className="flex items-center gap-1">
+          <ChevronButton dir="left" label="Previous page" disabled={page <= 1} onClick={() => onPage(page - 1)} />
+          {pageList(page, pageCount).map((p, i) =>
+            p === "ellipsis" ? (
+              <span key={`e${i}`} className="px-1 text-muted-foreground">
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                aria-current={p === page ? "page" : undefined}
+                onClick={() => onPage(p)}
+                className={cn(
+                  "grid h-8 min-w-8 cursor-pointer place-items-center rounded-lg px-2 text-sm transition-colors",
+                  p === page
+                    ? "bg-primary font-medium text-primary-foreground"
+                    : "text-foreground hover:bg-muted",
+                )}
+              >
+                {p}
+              </button>
+            ),
+          )}
+          <ChevronButton dir="right" label="Next page" disabled={page >= pageCount} onClick={() => onPage(page + 1)} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CursorFooter({
+  hasPrev,
+  hasNext,
+  onPrev,
+  onNext,
+  rangeLabel,
+}: {
+  hasPrev: boolean;
+  hasNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  rangeLabel?: React.ReactNode;
+}) {
+  return (
+    <div className={footerBar}>
+      <span className="text-muted-foreground">{rangeLabel}</span>
+      <div className="flex items-center gap-1">
+        <ChevronButton dir="left" label="Previous page" text="Prev" disabled={!hasPrev} onClick={onPrev} />
+        <ChevronButton dir="right" label="Next page" text="Next" disabled={!hasNext} onClick={onNext} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Data-driven table. Describe `columns` and pass `data`; everything else
  * (density, striping, borders, sticky header, vertical/horizontal scroll, empty
@@ -220,6 +431,7 @@ export function DataTable<T>({
   selectedKeys,
   defaultSelectedKeys,
   onSelectionChange,
+  pagination,
   className,
 }: DataTableProps<T>) {
   const clickable = typeof onRowClick === "function";
@@ -254,7 +466,7 @@ export function DataTable<T>({
   };
 
   // Only sort internally in the uncontrolled case — a controlled parent owns order.
-  const rows = React.useMemo(() => {
+  const sortedRows = React.useMemo(() => {
     if (isControlled || sortState.length === 0) return data;
     const indexed = data.map((row, i) => ({ row, i }));
     indexed.sort((a, b) => {
@@ -270,6 +482,81 @@ export function DataTable<T>({
   }, [data, sortState, colById, isControlled]);
 
   const showSortOrder = multiSort && sortState.length > 1;
+
+  // --- pagination (client slices; server/cursor leave order to the parent) ---
+  const pMode = !pagination ? "none" : (pagination.mode ?? "client");
+  const [internalPage, setInternalPage] = React.useState(
+    pagination && pMode === "client" && "defaultPage" in pagination
+      ? (pagination.defaultPage ?? 1)
+      : 1,
+  );
+  const [internalPageSize, setInternalPageSize] = React.useState(
+    pagination && "pageSize" in pagination && typeof pagination.pageSize === "number"
+      ? pagination.pageSize
+      : 10,
+  );
+
+  let rows = sortedRows;
+  let footer: React.ReactNode = null;
+
+  if (pMode === "client") {
+    const pg = pagination as ClientPagination;
+    const pageSize = pg.pageSizeOptions ? internalPageSize : pg.pageSize ?? internalPageSize;
+    const total = sortedRows.length;
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(Math.max(1, pg.page ?? internalPage), pageCount);
+    const setPage = (p: number) => {
+      const np = Math.min(Math.max(1, p), pageCount);
+      if (pg.page === undefined) setInternalPage(np);
+      pg.onPageChange?.(np);
+    };
+    const setSize = (s: number) => {
+      setInternalPageSize(s);
+      setInternalPage(1);
+      pg.onPageSizeChange?.(s);
+    };
+    rows = sortedRows.slice((page - 1) * pageSize, page * pageSize);
+    footer = (
+      <NumberedFooter
+        page={page}
+        pageCount={pageCount}
+        total={total}
+        rangeFrom={total === 0 ? 0 : (page - 1) * pageSize + 1}
+        rangeTo={Math.min(page * pageSize, total)}
+        onPage={setPage}
+        sizeOptions={pg.pageSizeOptions}
+        pageSize={pageSize}
+        onSize={pg.pageSizeOptions ? setSize : undefined}
+      />
+    );
+  } else if (pMode === "server") {
+    const pg = pagination as ServerPagination;
+    const pageCount = Math.max(1, Math.ceil(pg.total / pg.pageSize));
+    footer = (
+      <NumberedFooter
+        page={pg.page}
+        pageCount={pageCount}
+        total={pg.total}
+        rangeFrom={pg.total === 0 ? 0 : (pg.page - 1) * pg.pageSize + 1}
+        rangeTo={Math.min(pg.page * pg.pageSize, pg.total)}
+        onPage={(p) => pg.onPageChange(Math.min(Math.max(1, p), pageCount))}
+        sizeOptions={pg.pageSizeOptions}
+        pageSize={pg.pageSize}
+        onSize={pg.onPageSizeChange}
+      />
+    );
+  } else if (pMode === "cursor") {
+    const pg = pagination as CursorPagination;
+    footer = (
+      <CursorFooter
+        hasPrev={pg.hasPreviousPage}
+        hasNext={pg.hasNextPage}
+        onPrev={pg.onPreviousPage}
+        onNext={pg.onNextPage}
+        rangeLabel={pg.rangeLabel}
+      />
+    );
+  }
 
   // --- selection (keyed by rowKey so it survives sorting) ---
   const keyOf = (row: T, index: number): React.Key =>
@@ -298,9 +585,11 @@ export function DataTable<T>({
   const applySelection = (nextKeys: React.Key[]) => {
     if (!isSelectionControlled) setInternalSelection(nextKeys);
     const set = new Set(nextKeys);
+    // resolve against all rows (not just the current page) so cross-page
+    // selections are reported in full
     onSelectionChange?.(
       nextKeys,
-      rows.filter((r, i) => set.has(keyOf(r, i))),
+      sortedRows.filter((r, i) => set.has(keyOf(r, i))),
     );
   };
 
@@ -322,11 +611,14 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        "w-full overflow-auto rounded-xl border border-border bg-card",
+        "w-full overflow-hidden rounded-xl border border-border bg-card",
         className,
       )}
-      style={maxHeight !== undefined ? { maxHeight } : undefined}
     >
+      <div
+        className="overflow-auto"
+        style={maxHeight !== undefined ? { maxHeight } : undefined}
+      >
       <table className="w-full border-collapse text-card-foreground">
         <thead>
           <tr>
@@ -491,6 +783,8 @@ export function DataTable<T>({
           )}
         </tbody>
       </table>
+      </div>
+      {footer}
     </div>
   );
 }

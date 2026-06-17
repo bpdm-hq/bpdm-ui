@@ -54,6 +54,13 @@ const TXNS: Txn[] = [
   { id: "tx_4e7b", date: "2026-06-09", merchant: "Tyrell Corp", method: "Mastercard •9981", status: "settled", amount: 3075.5 },
 ];
 
+// a larger dataset for the paging demos
+const MANY: Txn[] = Array.from({ length: 23 }, (_, i) => {
+  const base = TXNS[i % TXNS.length];
+  const amt = Math.round((base.amount + i * 137.5) * 100) / 100;
+  return { ...base, id: `tx_p${(i + 1).toString().padStart(2, "0")}`, amount: amt };
+});
+
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
@@ -116,6 +123,7 @@ const meta: Meta<typeof DataTable<Txn>> = {
     columns: { table: { disable: true } },
     data: { table: { disable: true } },
     rowKey: { table: { disable: true } },
+    pagination: { table: { disable: true } },
   },
   // rowKey keeps selection stable across re-sorts (keyed by id, not row position)
   args: { columns, data: TXNS, size: "md", rowKey: (r: Txn) => r.id },
@@ -323,6 +331,109 @@ export const SelectionToolbar: Story = {
             onSelectionChange={(keys) => setSelected(keys)}
           />
         </div>
+      );
+    };
+    return <Demo />;
+  },
+};
+
+// client-side: the table slices the data itself — numbered pages, a range
+// summary, and a page-size selector
+export const ClientSidePaging: Story = {
+  args: {
+    data: MANY,
+    pagination: { pageSize: 5, pageSizeOptions: [5, 10, 25] },
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
+/>`,
+      },
+    },
+  },
+};
+
+// server-side offset paging: the parent owns the page and passes only that
+// page's rows; total drives the page count
+export const ServerSidePaging: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `const pageSize = 5;
+const [page, setPage] = useState(1);
+const rows = await fetchPage(page, pageSize); // your server call
+
+<DataTable
+  columns={columns}
+  data={rows}
+  rowKey={(r) => r.id}
+  pagination={{ mode: "server", page, pageSize, total, onPageChange: setPage }}
+/>`,
+      },
+    },
+  },
+  render: (args) => {
+    const Demo = () => {
+      const pageSize = 5;
+      const [page, setPage] = useState(1);
+      const rows = MANY.slice((page - 1) * pageSize, page * pageSize);
+      return (
+        <DataTable
+          {...args}
+          data={rows}
+          rowKey={(r) => r.id}
+          pagination={{ mode: "server", page, pageSize, total: MANY.length, onPageChange: setPage }}
+        />
+      );
+    };
+    return <Demo />;
+  },
+};
+
+// cursor paging: no page numbers — only Prev / Next, driven by hasNext/hasPrev
+export const CursorPaging: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={rows}
+  rowKey={(r) => r.id}
+  pagination={{
+    mode: "cursor",
+    hasPreviousPage: !!prevCursor,
+    hasNextPage: !!nextCursor,
+    onPreviousPage: () => loadBefore(prevCursor),
+    onNextPage: () => loadAfter(nextCursor),
+    rangeLabel: "Showing 1–5",
+  }}
+/>`,
+      },
+    },
+  },
+  render: (args) => {
+    const Demo = () => {
+      const pageSize = 5;
+      const [start, setStart] = useState(0);
+      const rows = MANY.slice(start, start + pageSize);
+      return (
+        <DataTable
+          {...args}
+          data={rows}
+          rowKey={(r) => r.id}
+          pagination={{
+            mode: "cursor",
+            hasPreviousPage: start > 0,
+            hasNextPage: start + pageSize < MANY.length,
+            onPreviousPage: () => setStart(Math.max(0, start - pageSize)),
+            onNextPage: () => setStart(start + pageSize),
+            rangeLabel: `Showing ${start + 1}–${Math.min(start + pageSize, MANY.length)}`,
+          }}
+        />
       );
     };
     return <Demo />;
