@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "./checkbox";
 
 /** A value the table can compare when sorting a column. */
 export type SortValue = string | number | boolean | Date | null | undefined;
@@ -73,6 +74,16 @@ export interface DataTableProps<T> {
   defaultSort?: DataTableSort[];
   /** Fired whenever the sort changes (both controlled and uncontrolled). */
   onSortChange?: (sort: DataTableSort[]) => void;
+  /** Show a selection column (checkboxes, or radios in single mode). */
+  selectable?: boolean;
+  /** "multiple" (checkbox + select-all) or "single" (radio). Default "multiple". */
+  selectionMode?: "multiple" | "single";
+  /** Controlled selected row keys (use with `rowKey` for stable identity). */
+  selectedKeys?: React.Key[];
+  /** Initial selection for the uncontrolled case. */
+  defaultSelectedKeys?: React.Key[];
+  /** Fired when the selection changes — gives the keys and the selected rows. */
+  onSelectionChange?: (keys: React.Key[], rows: T[]) => void;
   className?: string;
 }
 
@@ -150,6 +161,33 @@ function SortIcon({ dir }: { dir: SortDirection | null }) {
   );
 }
 
+// Lightweight radio for single-select mode (no extra dependency).
+function RowRadio({
+  checked,
+  onSelect,
+  label,
+}: {
+  checked: boolean;
+  onSelect: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={onSelect}
+      className={cn(
+        "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        checked ? "border-primary" : "border-muted-foreground/60",
+      )}
+    >
+      {checked && <span className="size-2.5 rounded-full bg-primary" />}
+    </button>
+  );
+}
+
 /**
  * Data-driven table. Describe `columns` and pass `data`; everything else
  * (density, striping, borders, sticky header, vertical/horizontal scroll, empty
@@ -177,6 +215,11 @@ export function DataTable<T>({
   sort,
   defaultSort,
   onSortChange,
+  selectable = false,
+  selectionMode = "multiple",
+  selectedKeys,
+  defaultSelectedKeys,
+  onSelectionChange,
   className,
 }: DataTableProps<T>) {
   const clickable = typeof onRowClick === "function";
@@ -228,6 +271,54 @@ export function DataTable<T>({
 
   const showSortOrder = multiSort && sortState.length > 1;
 
+  // --- selection (keyed by rowKey so it survives sorting) ---
+  const keyOf = (row: T, index: number): React.Key =>
+    rowKey ? rowKey(row, index) : index;
+
+  const isSelectionControlled = selectedKeys !== undefined;
+  const [internalSelection, setInternalSelection] = React.useState<React.Key[]>(
+    defaultSelectedKeys ?? [],
+  );
+  const selectionArr = isSelectionControlled ? selectedKeys! : internalSelection;
+  const selectedSet = React.useMemo(() => new Set(selectionArr), [selectionArr]);
+
+  const allKeys = React.useMemo(
+    () => rows.map((r, i) => keyOf(r, i)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, rowKey],
+  );
+  const allSelected = rows.length > 0 && allKeys.every((k) => selectedSet.has(k));
+  const someSelected = !allSelected && allKeys.some((k) => selectedSet.has(k));
+  const headerChecked: boolean | "indeterminate" = allSelected
+    ? true
+    : someSelected
+      ? "indeterminate"
+      : false;
+
+  const applySelection = (nextKeys: React.Key[]) => {
+    if (!isSelectionControlled) setInternalSelection(nextKeys);
+    const set = new Set(nextKeys);
+    onSelectionChange?.(
+      nextKeys,
+      rows.filter((r, i) => set.has(keyOf(r, i))),
+    );
+  };
+
+  const toggleRow = (key: React.Key) => {
+    if (selectionMode === "single") {
+      applySelection([key]);
+      return;
+    }
+    const next = selectedSet.has(key)
+      ? selectionArr.filter((k) => k !== key)
+      : [...selectionArr, key];
+    applySelection(next);
+  };
+
+  const toggleAll = () => applySelection(allSelected ? [] : allKeys);
+
+  const colCount = columns.length + (selectable ? 1 : 0);
+
   return (
     <div
       className={cn(
@@ -239,6 +330,28 @@ export function DataTable<T>({
       <table className="w-full border-collapse text-card-foreground">
         <thead>
           <tr>
+            {selectable && (
+              <th
+                scope="col"
+                className={cn(
+                  cellPad({ size }),
+                  "w-[1%] bg-muted text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
+                  bordered && "border-r border-border",
+                  stickyHeader && "sticky top-0 z-10",
+                )}
+              >
+                {selectionMode === "multiple" && (
+                  <div className="flex justify-center">
+                    <Checkbox
+                      size="sm"
+                      aria-label="Select all rows"
+                      checked={headerChecked}
+                      onCheckedChange={toggleAll}
+                    />
+                  </div>
+                )}
+              </th>
+            )}
             {columns.map((col) => {
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
@@ -302,7 +415,7 @@ export function DataTable<T>({
           {rows.length === 0 ? (
             <tr>
               <td
-                colSpan={columns.length}
+                colSpan={colCount}
                 className={cn(
                   cellPad({ size }),
                   "text-center text-muted-foreground",
@@ -312,17 +425,45 @@ export function DataTable<T>({
               </td>
             </tr>
           ) : (
-            rows.map((row, rowIndex) => (
+            rows.map((row, rowIndex) => {
+              const key = keyOf(row, rowIndex);
+              const selected = selectedSet.has(key);
+              return (
               <tr
-                key={rowKey ? rowKey(row, rowIndex) : rowIndex}
+                key={key}
+                data-selected={selected || undefined}
                 onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
                 className={cn(
                   "border-t border-border transition-colors",
                   striped && "even:bg-muted/40",
                   hoverable && "hover:bg-muted/60",
+                  selected && "bg-primary/10",
                   clickable && "cursor-pointer",
                 )}
               >
+                {selectable && (
+                  <td
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-center">
+                      {selectionMode === "single" ? (
+                        <RowRadio
+                          checked={selected}
+                          onSelect={() => toggleRow(key)}
+                          label="Select row"
+                        />
+                      ) : (
+                        <Checkbox
+                          size="sm"
+                          aria-label="Select row"
+                          checked={selected}
+                          onCheckedChange={() => toggleRow(key)}
+                        />
+                      )}
+                    </div>
+                  </td>
+                )}
                 {columns.map((col) => {
                   const align = col.align ?? (col.numeric ? "right" : "left");
                   return (
@@ -345,7 +486,8 @@ export function DataTable<T>({
                   );
                 })}
               </tr>
-            ))
+              );
+            })
           )}
         </tbody>
       </table>

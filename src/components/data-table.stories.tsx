@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Controls,
@@ -110,10 +111,14 @@ const meta: Meta<typeof DataTable<Txn>> = {
     hoverable: { control: "boolean" },
     stickyHeader: { control: "boolean" },
     multiSort: { control: "boolean" },
+    selectable: { control: "boolean" },
+    selectionMode: { control: "inline-radio", options: ["multiple", "single"] },
     columns: { table: { disable: true } },
     data: { table: { disable: true } },
+    rowKey: { table: { disable: true } },
   },
-  args: { columns, data: TXNS, size: "md" },
+  // rowKey keeps selection stable across re-sorts (keyed by id, not row position)
+  args: { columns, data: TXNS, size: "md", rowKey: (r: Txn) => r.id },
 };
 export default meta;
 
@@ -228,6 +233,100 @@ export const MultiColumnSort: Story = {
       <DataTable {...args} />
     </div>
   ),
+};
+
+// checkbox column + header select-all (indeterminate when only some are picked).
+// Selection is keyed by `rowKey`, so it survives sorting.
+export const RowSelection: Story = {
+  args: { selectable: true, defaultSelectedKeys: ["tx_a17d", "tx_2da6"] },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  rowKey={(r) => r.id}
+  selectable
+  defaultSelectedKeys={["tx_a17d", "tx_2da6"]}
+  onSelectionChange={(keys, rows) => console.log(keys, rows)}
+/>`,
+      },
+    },
+  },
+};
+
+// single-select: radios instead of checkboxes, no select-all
+export const SingleSelection: Story = {
+  args: { selectable: true, selectionMode: "single", defaultSelectedKeys: ["tx_a17d"] },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable selectionMode="single" />`,
+      },
+    },
+  },
+};
+
+// controlled selection driving a bulk-action toolbar
+export const SelectionToolbar: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `const [selected, setSelected] = useState<React.Key[]>([]);
+
+<DataTable
+  columns={columns}
+  data={data}
+  rowKey={(r) => r.id}
+  selectable
+  selectedKeys={selected}
+  onSelectionChange={(keys) => setSelected(keys)}
+/>`,
+      },
+    },
+  },
+  render: (args) => {
+    const Demo = () => {
+      const [selected, setSelected] = useState<React.Key[]>([]);
+      return (
+        <div className="flex flex-col gap-3">
+          <div className="flex h-9 items-center gap-3">
+            {selected.length > 0 ? (
+              <>
+                <span className="text-sm font-medium">
+                  {selected.length} selected
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelected([])}
+                  className="rounded-lg border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground"
+                >
+                  Refund
+                </button>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Select rows to act on them.
+              </span>
+            )}
+          </div>
+          <DataTable
+            {...args}
+            selectable
+            selectedKeys={selected}
+            onSelectionChange={(keys) => setSelected(keys)}
+          />
+        </div>
+      );
+    };
+    return <Demo />;
+  },
 };
 
 export const Empty: Story = {
