@@ -45,6 +45,12 @@ const TXNS: Txn[] = [
   { id: "tx_5e21", date: "2026-06-13", merchant: "Initech", method: "Visa •1099", status: "failed", amount: 312.0 },
   { id: "tx_c84f", date: "2026-06-12", merchant: "Soylent Corp", method: "ACH", status: "refunded", amount: -57.2 },
   { id: "tx_2da6", date: "2026-06-12", merchant: "Umbrella Inc.", method: "Visa •7781", status: "settled", amount: 980.0 },
+  { id: "tx_9b40", date: "2026-06-12", merchant: "Stark Industries", method: "Mastercard •3320", status: "pending", amount: 2310.4 },
+  { id: "tx_61cd", date: "2026-06-11", merchant: "Wayne Enterprises", method: "SEPA", status: "settled", amount: 156.0 },
+  { id: "tx_7ae2", date: "2026-06-11", merchant: "Cyberdyne", method: "Visa •5567", status: "failed", amount: 1899.99 },
+  { id: "tx_d3f8", date: "2026-06-10", merchant: "Hooli", method: "ACH", status: "pending", amount: 640.25 },
+  { id: "tx_0c19", date: "2026-06-10", merchant: "Pied Piper", method: "Visa •2204", status: "refunded", amount: -420.0 },
+  { id: "tx_4e7b", date: "2026-06-09", merchant: "Tyrell Corp", method: "Mastercard •9981", status: "settled", amount: 3075.5 },
 ];
 
 const money = (n: number) =>
@@ -69,11 +75,11 @@ function StatusBadge({ status }: { status: Txn["status"] }) {
 
 const columns: DataTableColumn<Txn>[] = [
   { id: "id", header: "Txn ID", accessor: (r) => <span className="font-mono text-xs">{r.id}</span> },
-  { id: "date", header: "Date", accessor: (r) => r.date },
-  { id: "merchant", header: "Merchant", accessor: (r) => r.merchant },
+  { id: "date", header: "Date", sortable: true, accessor: (r) => r.date, sortAccessor: (r) => r.date },
+  { id: "merchant", header: "Merchant", sortable: true, accessor: (r) => r.merchant },
   { id: "method", header: "Method", accessor: (r) => r.method },
-  { id: "status", header: "Status", align: "center", cell: (r) => <StatusBadge status={r.status} /> },
-  { id: "amount", header: "Amount", numeric: true, cell: (r) => money(r.amount) },
+  { id: "status", header: "Status", align: "center", sortable: true, cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
+  { id: "amount", header: "Amount", numeric: true, sortable: true, cell: (r) => money(r.amount), sortAccessor: (r) => r.amount },
 ];
 
 const meta: Meta<typeof DataTable<Txn>> = {
@@ -103,6 +109,7 @@ const meta: Meta<typeof DataTable<Txn>> = {
     bordered: { control: "boolean" },
     hoverable: { control: "boolean" },
     stickyHeader: { control: "boolean" },
+    multiSort: { control: "boolean" },
     columns: { table: { disable: true } },
     data: { table: { disable: true } },
   },
@@ -159,6 +166,67 @@ export const Clickable: Story = {
   },
   render: (args) => (
     <DataTable {...args} onRowClick={(row) => window.alert(`Opened ${row.id}`)} />
+  ),
+};
+
+// click a sortable header (Date / Merchant / Status / Amount) to cycle
+// unsorted → ascending → descending → unsorted
+// Single-column: starts unsorted. Click a header to cycle asc → desc → off.
+// Clicking a different header REPLACES the sort — only one arrow is ever active.
+export const Sorting: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable columns={columns} data={data} />
+// columns marked { sortable: true } — click a header to sort`,
+      },
+    },
+  },
+  render: (args) => (
+    <div className="flex flex-col gap-2">
+      <p className="font-mono text-xs text-muted-foreground">
+        Click any sortable header (Date / Merchant / Status / Amount). Only one
+        column sorts at a time.
+      </p>
+      <DataTable {...args} />
+    </div>
+  ),
+};
+
+// Multi-column: pre-sorted by Status, then Amount — note the numbered badges
+// (1, 2) showing the order. Shift+click another header to add it to the sort.
+export const MultiColumnSort: Story = {
+  args: {
+    multiSort: true,
+    bordered: true,
+    defaultSort: [
+      { id: "status", dir: "asc" },
+      { id: "amount", dir: "desc" },
+    ],
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  multiSort
+  defaultSort={[{ id: "status", dir: "asc" }, { id: "amount", dir: "desc" }]}
+/>
+// Shift+click another header to add it to the sort`,
+      },
+    },
+  },
+  render: (args) => (
+    <div className="flex flex-col gap-2">
+      <p className="max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">
+        Sorted by Status ➊, then Amount ➋ — rows group by status, and Amount
+        orders the rows <em>within</em> each status block (that is what a
+        secondary sort does). Shift+click a header to add a column; click without
+        Shift to reset to one.
+      </p>
+      <DataTable {...args} />
+    </div>
   ),
 };
 
