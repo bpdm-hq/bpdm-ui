@@ -59,7 +59,7 @@ const meta: Meta<typeof Button> = {
     },
     size: {
       control: "select",
-      options: ["sm", "md", "lg", "iconSm", "icon", "iconLg"],
+      options: ["sm", "md", "lg", "iconSm", "icon", "iconLg", "none"],
     },
     shape: { control: "select", options: ["default", "round"] },
   },
@@ -192,6 +192,41 @@ export const RoundIcon: Story = {
       </Button>
       <Button size="iconLg" shape="round" variant="secondary" aria-label="Like">
         <Heart className="size-5" />
+      </Button>
+    </div>
+  ),
+};
+
+// `size="none"` drops the preset height/padding so you own the sizing entirely
+// via className — handy for compact icon affordances inside other components.
+export const CustomSize: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `// preset sizing
+<Button size="icon" aria-label="Search"><SearchIcon /></Button>
+
+// bring your own dimensions
+<Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search">
+  <SearchIcon className="size-3.5" />
+</Button>
+<Button size="none" variant="outline" className="h-7 px-2 text-xs rounded-md">Tiny</Button>`,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button size="icon" variant="outline" aria-label="Search (preset)">
+        <Search className="size-5" />
+      </Button>
+      <Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search (size-6)">
+        <Search className="size-3.5" />
+      </Button>
+      <Button size="none" variant="outline" className="h-7 rounded-md px-2 text-xs">
+        Tiny
+      </Button>
+      <Button size="none" variant="primary" className="h-14 rounded-2xl px-8 text-lg">
+        Chunky
       </Button>
     </div>
   ),

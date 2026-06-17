@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 import { Checkbox } from "./checkbox";
 
 /** A value the table can compare when sorting a column. */
@@ -15,9 +16,13 @@ export interface DataTableSort {
   dir: SortDirection;
 }
 
+/** Where the footer controls sit. Default "between". */
+export type PaginationAlign = "between" | "center" | "end";
+
 /** Client-side paging — the table slices `data` itself. */
 export interface ClientPagination {
   mode?: "client";
+  align?: PaginationAlign;
   /** Rows per page. Default 10. */
   pageSize?: number;
   /** Offer these page sizes in a selector (omit to hide it). */
@@ -33,6 +38,7 @@ export interface ClientPagination {
 /** Server-side offset paging — `data` is already the current page. */
 export interface ServerPagination {
   mode: "server";
+  align?: PaginationAlign;
   /** Current page (1-based). */
   page: number;
   /** Rows per page. */
@@ -50,12 +56,17 @@ export interface ServerPagination {
  */
 export interface CursorPagination {
   mode: "cursor";
+  align?: PaginationAlign;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   onNextPage: () => void;
   onPreviousPage: () => void;
-  /** Optional left-side label, e.g. "Showing 20 results". */
+  /** Optional label shown beside the buttons, e.g. "Showing 20 results". */
   rangeLabel?: React.ReactNode;
+  /** Optional page-size selector. */
+  pageSize?: number;
+  pageSizeOptions?: number[];
+  onPageSizeChange?: (size: number) => void;
 }
 
 export type DataTablePagination =
@@ -104,6 +115,20 @@ export interface DataTableProps<T> {
   striped?: boolean;
   /** Vertical dividers between columns. */
   bordered?: boolean;
+  /** Outer border + rounded container. Default true; set false for a bare table. */
+  frame?: boolean;
+  /** Horizontal dividers between rows. Default true. */
+  divided?: boolean;
+  /** Extra classes on every body cell — e.g. "py-4" for taller rows. */
+  cellClassName?: string;
+  /** Extra classes per body row — a string, or a fn for conditional styling. */
+  rowClassName?: string | ((row: T, index: number) => string);
+  /**
+   * Vertical gap (px) between rows. Renders rows as separated filled blocks
+   * (rounded, no dividers). Each row gets a default `bg-muted/50` fill —
+   * override the colour with `rowClassName`.
+   */
+  rowSpacing?: number;
   /** Highlight the row under the cursor. Default true. */
   hoverable?: boolean;
   /** Keep the header visible while the body scrolls (pair with `maxHeight`). */
@@ -146,6 +171,8 @@ export interface DataTableProps<T> {
   defaultExpandedKeys?: React.Key[];
   /** Fired when the set of expanded rows changes. */
   onExpandedChange?: (keys: React.Key[]) => void;
+  /** Accessible name for the table (maps to `aria-label`). */
+  label?: string;
   className?: string;
 }
 
@@ -263,11 +290,23 @@ function pageList(current: number, count: number): (number | "ellipsis")[] {
   return out;
 }
 
-const footerBar =
-  "flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-sm";
-const navBtn =
-  "inline-flex h-8 min-w-8 cursor-pointer items-center justify-center gap-1 rounded-lg px-2 text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40";
+const footerBar = "flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm";
+const footerJustify = {
+  between: "justify-between",
+  center: "justify-center",
+  end: "justify-end",
+} as const;
 
+// shared wrapper: alignment + attached (border-t) vs detached (top gap)
+function footerClass(align: PaginationAlign, attached: boolean) {
+  return cn(
+    footerBar,
+    footerJustify[align],
+    attached ? "border-t border-border" : "pt-4",
+  );
+}
+
+// dogfoods the library's own Button — icon-only when there is no text label
 function ChevronButton({
   dir,
   label,
@@ -282,20 +321,23 @@ function ChevronButton({
   onClick: () => void;
 }) {
   const path = dir === "left" ? "M9.5 3.5 5 8l4.5 4.5" : "M6.5 3.5 11 8l-4.5 4.5";
+  const icon = (
+    <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
+      <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
   return (
-    <button type="button" className={navBtn} aria-label={label} disabled={disabled} onClick={onClick}>
-      {dir === "left" && (
-        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
-          <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
+    <Button
+      variant="ghost"
+      size={text ? "sm" : "iconSm"}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {dir === "left" && icon}
       {text}
-      {dir === "right" && (
-        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
-          <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-    </button>
+      {dir === "right" && icon}
+    </Button>
   );
 }
 
@@ -336,6 +378,8 @@ function NumberedFooter({
   sizeOptions,
   pageSize,
   onSize,
+  align,
+  attached,
 }: {
   page: number;
   pageCount: number;
@@ -346,9 +390,11 @@ function NumberedFooter({
   sizeOptions?: number[];
   pageSize: number;
   onSize?: (n: number) => void;
+  align: PaginationAlign;
+  attached: boolean;
 }) {
   return (
-    <div className={footerBar}>
+    <div className={footerClass(align, attached)}>
       <span className="text-muted-foreground">
         {total === 0 ? "No results" : `Showing ${rangeFrom}–${rangeTo} of ${total}`}
       </span>
@@ -364,20 +410,16 @@ function NumberedFooter({
                 …
               </span>
             ) : (
-              <button
+              <Button
                 key={p}
-                type="button"
+                variant={p === page ? "primary" : "ghost"}
+                size="sm"
                 aria-current={p === page ? "page" : undefined}
                 onClick={() => onPage(p)}
-                className={cn(
-                  "grid h-8 min-w-8 cursor-pointer place-items-center rounded-lg px-2 text-sm transition-colors",
-                  p === page
-                    ? "bg-primary font-medium text-primary-foreground"
-                    : "text-foreground hover:bg-muted",
-                )}
+                className="min-w-8 px-2.5"
               >
                 {p}
-              </button>
+              </Button>
             ),
           )}
           <ChevronButton dir="right" label="Next page" disabled={page >= pageCount} onClick={() => onPage(page + 1)} />
@@ -393,19 +435,36 @@ function CursorFooter({
   onPrev,
   onNext,
   rangeLabel,
+  align,
+  attached,
+  sizeOptions,
+  pageSize,
+  onSize,
 }: {
   hasPrev: boolean;
   hasNext: boolean;
   onPrev: () => void;
   onNext: () => void;
   rangeLabel?: React.ReactNode;
+  align: PaginationAlign;
+  attached: boolean;
+  sizeOptions?: number[];
+  pageSize?: number;
+  onSize?: (n: number) => void;
 }) {
   return (
-    <div className={footerBar}>
-      <span className="text-muted-foreground">{rangeLabel}</span>
-      <div className="flex items-center gap-1">
+    <div className={footerClass(align, attached)}>
+      {rangeLabel ? (
+        <span className="text-muted-foreground">{rangeLabel}</span>
+      ) : align === "between" ? (
+        <span />
+      ) : null}
+      <div className="flex items-center gap-2">
         <ChevronButton dir="left" label="Previous page" text="Prev" disabled={!hasPrev} onClick={onPrev} />
         <ChevronButton dir="right" label="Next page" text="Next" disabled={!hasNext} onClick={onNext} />
+        {sizeOptions && onSize && pageSize !== undefined && (
+          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} />
+        )}
       </div>
     </div>
   );
@@ -429,6 +488,11 @@ export function DataTable<T>({
   size = "md",
   striped = false,
   bordered = false,
+  frame = true,
+  divided = true,
+  cellClassName,
+  rowClassName,
+  rowSpacing,
   hoverable = true,
   stickyHeader = false,
   maxHeight,
@@ -450,6 +514,7 @@ export function DataTable<T>({
   expandedKeys,
   defaultExpandedKeys,
   onExpandedChange,
+  label,
   className,
 }: DataTableProps<T>) {
   const clickable = typeof onRowClick === "function";
@@ -486,17 +551,28 @@ export function DataTable<T>({
   // Only sort internally in the uncontrolled case — a controlled parent owns order.
   const sortedRows = React.useMemo(() => {
     if (isControlled || sortState.length === 0) return data;
-    const indexed = data.map((row, i) => ({ row, i }));
-    indexed.sort((a, b) => {
-      for (const s of sortState) {
-        const col = colById.get(s.id);
-        if (!col) continue;
-        const c = compareValues(getSortValue(col, a.row), getSortValue(col, b.row));
-        if (c !== 0) return s.dir === "asc" ? c : -c;
+    // resolve the active sort columns once
+    const active = sortState
+      .map((s) => ({ dir: s.dir, col: colById.get(s.id) }))
+      .filter((a): a is { dir: SortDirection; col: DataTableColumn<T> } => !!a.col);
+    if (active.length === 0) return data;
+    // decorate → sort → undecorate: read each row's sort values ONCE (O(n)),
+    // then compare the cached values. Avoids calling accessors inside the
+    // O(n log n) comparator, which is the difference between snappy and sluggish
+    // on large client-side datasets.
+    const decorated = data.map((row, i) => ({
+      row,
+      i,
+      keys: active.map((a) => getSortValue(a.col, row)),
+    }));
+    decorated.sort((x, y) => {
+      for (let k = 0; k < active.length; k++) {
+        const c = compareValues(x.keys[k], y.keys[k]);
+        if (c !== 0) return active[k].dir === "asc" ? c : -c;
       }
-      return a.i - b.i; // stable tie-break
+      return x.i - y.i; // stable tie-break
     });
-    return indexed.map((x) => x.row);
+    return decorated.map((d) => d.row);
   }, [data, sortState, colById, isControlled]);
 
   const showSortOrder = multiSort && sortState.length > 1;
@@ -545,6 +621,8 @@ export function DataTable<T>({
         sizeOptions={pg.pageSizeOptions}
         pageSize={pageSize}
         onSize={pg.pageSizeOptions ? setSize : undefined}
+        align={pg.align ?? "between"}
+        attached={frame}
       />
     );
   } else if (pMode === "server") {
@@ -561,6 +639,8 @@ export function DataTable<T>({
         sizeOptions={pg.pageSizeOptions}
         pageSize={pg.pageSize}
         onSize={pg.onPageSizeChange}
+        align={pg.align ?? "between"}
+        attached={frame}
       />
     );
   } else if (pMode === "cursor") {
@@ -572,6 +652,11 @@ export function DataTable<T>({
         onPrev={pg.onPreviousPage}
         onNext={pg.onNextPage}
         rangeLabel={pg.rangeLabel}
+        align={pg.align ?? "between"}
+        attached={frame}
+        sizeOptions={pg.pageSizeOptions}
+        pageSize={pg.pageSize}
+        onSize={pg.onPageSizeChange}
       />
     );
   }
@@ -655,7 +740,8 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        "w-full overflow-hidden rounded-xl border border-border bg-card",
+        "w-full",
+        frame && "overflow-hidden rounded-xl border border-border bg-card",
         className,
       )}
     >
@@ -663,7 +749,14 @@ export function DataTable<T>({
         className="overflow-auto"
         style={maxHeight !== undefined ? { maxHeight } : undefined}
       >
-      <table className="w-full border-collapse text-card-foreground">
+      <table
+        aria-label={label}
+        className={cn(
+          "w-full text-card-foreground",
+          rowSpacing ? "border-separate" : "border-collapse",
+        )}
+        style={rowSpacing ? { borderSpacing: `0 ${rowSpacing}px` } : undefined}
+      >
         <thead>
           <tr>
             {expandable && (
@@ -784,17 +877,35 @@ export function DataTable<T>({
                 data-selected={selected || undefined}
                 data-expanded={expanded || undefined}
                 onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
+                tabIndex={clickable ? 0 : undefined}
+                onKeyDown={
+                  clickable
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick!(row, rowIndex);
+                        }
+                      }
+                    : undefined
+                }
                 className={cn(
-                  "border-t border-border transition-colors",
+                  "transition-colors",
+                  divided && !rowSpacing && "border-t border-border",
+                  rowSpacing &&
+                    "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
                   striped && "even:bg-muted/40",
                   hoverable && "hover:bg-muted/60",
                   selected && "bg-primary/10",
-                  clickable && "cursor-pointer",
+                  clickable &&
+                    "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                  typeof rowClassName === "function"
+                    ? rowClassName(row, rowIndex)
+                    : rowClassName,
                 )}
               >
                 {expandable && (
                   <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border")}
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
                     onClick={(e) => e.stopPropagation()}
                   >
                     {canExpand && (
@@ -819,7 +930,7 @@ export function DataTable<T>({
                 )}
                 {selectable && (
                   <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border")}
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex justify-center">
@@ -850,6 +961,7 @@ export function DataTable<T>({
                         alignClass[align],
                         col.numeric && "tabular-nums",
                         bordered && "border-r border-border last:border-r-0",
+                        cellClassName,
                         col.className,
                       )}
                     >
@@ -863,7 +975,7 @@ export function DataTable<T>({
                 })}
               </tr>
               {expanded && (
-                <tr className="border-t border-border bg-muted/30">
+                <tr className={cn("bg-muted/30", divided && "border-t border-border")}>
                   <td colSpan={colCount} className={cellPad({ size })}>
                     {renderExpanded!(row, rowIndex)}
                   </td>
