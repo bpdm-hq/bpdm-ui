@@ -31,6 +31,9 @@ const buttonVariants = cva(
         iconSm: "h-8 w-8",
         icon: "h-10 w-10",
         iconLg: "h-12 w-12",
+        // opt out of preset sizing entirely — bring your own h/w/padding via
+        // className when you need a custom-sized button
+        none: "",
       },
       // shape owns the full border-radius (only ONE radius class is ever applied,
       // so there is no tailwind-merge conflict). `round` makes a square icon

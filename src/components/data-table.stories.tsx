@@ -169,6 +169,8 @@ const meta: Meta<typeof DataTable<Txn>> = {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     striped: { control: "boolean" },
     bordered: { control: "boolean" },
+    frame: { control: "boolean" },
+    divided: { control: "boolean" },
     hoverable: { control: "boolean" },
     stickyHeader: { control: "boolean" },
     multiSort: { control: "boolean" },
@@ -517,6 +519,66 @@ export const ExpandableRows: Story = {
 />`,
       },
     },
+  },
+};
+
+// borderless look: no outer frame, no striping, no hover, taller rows — every
+// appearance knob is configurable. Pagination centered + detached below.
+export const Borderless: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={rows}
+  rowKey={(r) => r.id}
+  frame={false}          // no outer border / rounding
+  hoverable={false}      // no row hover
+  rowSpacing={4}         // thin gap between filled row blocks
+  cellClassName="py-4"   // taller rows
+  // default fill is bg-muted/50 — override with rowClassName
+  pagination={{
+    mode: "cursor",
+    align: "center",
+    hasPreviousPage, hasNextPage, onPreviousPage, onNextPage,
+    pageSize, pageSizeOptions: [10, 25, 50], onPageSizeChange,
+  }}
+/>`,
+      },
+    },
+  },
+  render: (args) => {
+    const Demo = () => {
+      const [start, setStart] = useState(0);
+      const [size, setSize] = useState(10);
+      const rows = MANY.slice(start, start + size);
+      return (
+        <DataTable
+          {...args}
+          data={rows}
+          rowKey={(r) => r.id}
+          frame={false}
+          hoverable={false}
+          rowSpacing={4}
+          cellClassName="py-4"
+          pagination={{
+            mode: "cursor",
+            align: "center",
+            hasPreviousPage: start > 0,
+            hasNextPage: start + size < MANY.length,
+            onPreviousPage: () => setStart(Math.max(0, start - size)),
+            onNextPage: () => setStart(start + size),
+            pageSize: size,
+            pageSizeOptions: [10, 25, 50],
+            onPageSizeChange: (s) => {
+              setSize(s);
+              setStart(0);
+            },
+          }}
+        />
+      );
+    };
+    return <Demo />;
   },
 };
 
