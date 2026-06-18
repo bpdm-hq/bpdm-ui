@@ -1,9 +1,11 @@
 // Public entry point of @bpdm/ui — everything consumers can import.
 export * from "./components/button";
 export * from "./components/checkbox";
+export * from "./components/confirm-dialog";
 export * from "./components/data-table";
 export * from "./components/dialog";
 export * from "./components/drawer";
+export * from "./components/dynamic-dialog";
 export * from "./components/float-label";
 export * from "./components/input";
 export * from "./components/input-otp";
@@ -17,6 +19,7 @@ export * from "./components/secure-field";
 export * from "./components/select";
 export * from "./components/stat-card";
 export * from "./components/status-timeline";
+export * from "./components/step-dialog";
 export * from "./components/switch";
 export * from "./components/textarea";
 export * from "./components/tooltip";
