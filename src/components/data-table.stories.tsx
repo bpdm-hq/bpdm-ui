@@ -12,23 +12,56 @@ import { Button } from "./button";
 
 const usage = `
 Data-driven table. Describe \`columns\` once and pass an array of \`data\` — the
-table renders the rest. Columns support custom \`cell\` renderers, alignment,
-fixed widths, and a \`numeric\` flag (right-aligned, tabular figures) for counts.
-Density (\`sm\`/\`md\`/\`lg\`), \`striped\`, \`bordered\`, \`hoverable\`,
-\`stickyHeader\` + \`maxHeight\`, an empty state, and \`onRowClick\` are all props.
-The wrapper scrolls horizontally on narrow screens, so it is responsive by default.
+table renders the rest. Density (\`sm\`/\`md\`/\`lg\`), \`striped\`, \`bordered\`,
+\`hoverable\`, \`frame\`, \`divided\`, \`rowSpacing\`, \`stickyHeader\` + \`maxHeight\`,
+empty state, and \`onRowClick\` are all props. Opt into sorting, selection,
+pagination, expandable rows, frozen columns, a column toggle, global search, and
+per-column filters. The wrapper scrolls horizontally, so it is responsive by default.
+
+A complete, copy-paste setup:
 
 \`\`\`tsx
-import { DataTable } from "@bpdm/ui";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: "active" | "invited" | "disabled";
+  tasks: number;
+};
+
+const columns: DataTableColumn<Member>[] = [
+  // text cell from a row field
+  { id: "name", header: "Name", sortable: true, filterable: true, accessor: (r) => r.name },
+  // custom node cell — give sortAccessor so sort + search/filter have a value
+  { id: "email", header: "Email",
+    accessor: (r) => <span className="font-mono text-xs">{r.email}</span>,
+    sortAccessor: (r) => r.email },
+  // "select" filter → pick from the column's distinct values
+  { id: "role", header: "Role", sortable: true, filterable: true, filterType: "select", accessor: (r) => r.role },
+  // centered badge cell
+  { id: "status", header: "Status", align: "center", filterable: true, filterType: "select",
+    cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
+  // numeric → right-aligned, tabular figures, numeric filter ops
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, filterable: true, accessor: (r) => r.tasks },
+];
 
 <DataTable
+  columns={columns}
   data={members}
-  columns={[
-    { id: "name", header: "Name", accessor: (r) => r.name },
-    { id: "tasks", header: "Tasks", numeric: true, accessor: (r) => r.tasks },
-  ]}
+  rowKey={(r) => r.id}          // stable key → selection/expansion survive sorting
+  selectable                     // checkbox column + select-all
+  searchable                     // global search box in the toolbar
+  columnToggle                   // "Columns" show/hide control
+  stickyHeader
+  pagination={{ pageSize: 10, pageSizeOptions: [10, 25, 50] }}
+  onSelectionChange={(keys, rows) => console.log(keys, rows)}
 />
 \`\`\`
+
+Each example below focuses on one feature; combine the props freely.
 `;
 
 type Member = {
@@ -64,6 +97,17 @@ const MANY: Member[] = Array.from({ length: 23 }, (_, i) => {
     ...base,
     id: `m_p${(i + 1).toString().padStart(2, "0")}`,
     tasks: (base.tasks + i * 7) % 240,
+  };
+});
+
+// 10,000 rows for the virtualization demo
+const HUGE: Member[] = Array.from({ length: 10000 }, (_, i) => {
+  const base = MEMBERS[i % MEMBERS.length];
+  return {
+    ...base,
+    id: `v_${i}`,
+    name: `${base.name.split(" ")[0]} #${i + 1}`,
+    tasks: (base.tasks + i * 3) % 300,
   };
 });
 
@@ -137,7 +181,7 @@ function MemberDetails({ member }: { member: Member }) {
 
 const columns: DataTableColumn<Member>[] = [
   { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
-  { id: "email", header: "Email", accessor: (r) => <span className="font-mono text-xs">{r.email}</span> },
+  { id: "email", header: "Email", accessor: (r) => <span className="font-mono text-xs">{r.email}</span>, sortAccessor: (r) => r.email },
   { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
   { id: "team", header: "Team", sortable: true, accessor: (r) => r.team },
   { id: "status", header: "Status", align: "center", sortable: true, cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
@@ -194,6 +238,7 @@ type Story = StoryObj<typeof DataTable<Member>>;
 export const Playground: Story = {};
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<DataTable size="sm" columns={columns} data={data} />` } },
   },
@@ -210,6 +255,7 @@ export const Sizes: Story = {
 };
 
 export const StripedAndBordered: Story = {
+  tags: ["!dev"],
   args: { striped: true, bordered: true },
   parameters: {
     docs: { source: { code: `<DataTable striped bordered columns={columns} data={data} />` } },
@@ -218,6 +264,7 @@ export const StripedAndBordered: Story = {
 
 // cap the height → header stays put while rows scroll
 export const StickyHeaderScroll: Story = {
+  tags: ["!dev"],
   args: { stickyHeader: true, maxHeight: 240 },
   parameters: {
     docs: {
@@ -233,6 +280,7 @@ export const StickyHeaderScroll: Story = {
 };
 
 export const Clickable: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<DataTable onRowClick={(row) => openMember(row.id)} columns={columns} data={data} />` } },
   },
@@ -266,6 +314,7 @@ export const Sorting: Story = {
 // Multi-column: pre-sorted by Status, then Tasks — note the numbered badges
 // (1, 2) showing the order. Shift+click another header to add it to the sort.
 export const MultiColumnSort: Story = {
+  tags: ["!dev"],
   args: {
     multiSort: true,
     bordered: true,
@@ -322,6 +371,7 @@ export const RowSelection: Story = {
 
 // single-select: radios instead of checkboxes, no select-all
 export const SingleSelection: Story = {
+  tags: ["!dev"],
   args: { selectable: true, selectionMode: "single", defaultSelectedKeys: ["m_03"] },
   parameters: {
     docs: {
@@ -334,6 +384,7 @@ export const SingleSelection: Story = {
 
 // controlled selection driving a bulk-action toolbar
 export const SelectionToolbar: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -415,6 +466,7 @@ export const ClientSidePaging: Story = {
 // server-side offset paging: the parent owns the page and passes only that
 // page's rows; total drives the page count
 export const ServerSidePaging: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -451,6 +503,7 @@ const rows = await fetchPage(page, pageSize); // your server call
 
 // cursor paging: no page numbers — only Prev / Next, driven by hasNext/hasPrev
 export const CursorPaging: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -588,13 +641,19 @@ export const FrozenColumns: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const columns = [
-  // left-pinned block (in order) — pin as many as you like
-  { id: "name", header: "Name", pin: "left", width: 180, accessor: (r) => r.name },
-  { id: "role", header: "Role", pin: "left", width: 120, accessor: (r) => r.role },
-  // …middle columns scroll…
+        code: `const columns: DataTableColumn<Member>[] = [
+  // left-pinned block (pin as many as you like; give each a numeric width)
+  { id: "name", header: "Name", pin: "left", width: 180, sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", pin: "left", width: 120, sortable: true, accessor: (r) => r.role },
+  // middle columns — these scroll horizontally
+  { id: "email", header: "Email", width: 220, accessor: (r) => <span className="font-mono text-xs">{r.email}</span> },
+  { id: "team", header: "Team", width: 150, sortable: true, accessor: (r) => r.team },
+  { id: "joined", header: "Joined", width: 130, sortable: true, accessor: (r) => r.joined },
+  { id: "status", header: "Status", width: 120, align: "center", cell: (r) => <StatusBadge status={r.status} /> },
+  { id: "tasks", header: "Tasks", width: 100, numeric: true, sortable: true, accessor: (r) => r.tasks },
   // right-pinned block (last in the array)
-  { id: "actions", pin: "right", width: 120, cell: () => <Button size="sm" variant="ghost">View</Button> },
+  { id: "actions", header: "", pin: "right", width: 120, align: "right",
+    cell: () => <Button size="sm" variant="ghost">View</Button> },
 ];
 
 <DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable />`,
@@ -635,6 +694,7 @@ export const FrozenColumns: Story = {
 // Pin left / Pin right / Unpin — so users freeze columns themselves at runtime.
 // Nothing is pinned to start; open a menu and pin a column.
 export const PinnableColumns: Story = {
+  tags: ["!dev"],
   args: { selectable: true, pinnable: true },
   parameters: {
     docs: {
@@ -662,7 +722,207 @@ export const PinnableColumns: Story = {
   },
 };
 
+// per-column filtering: click the funnel on a header. Three filter types —
+// text (Contains/Starts with/… + match all/any + add rule), number (=, >, ≥, …),
+// and select (pick from the column's distinct values). Combines with global
+// search; Clear resets everything.
+export const ColumnFilters: Story = {
+  args: { searchable: true, pagination: { pageSize: 5 } },
+  parameters: {
+    docs: {
+      source: {
+        code: `const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, filterable: true, accessor: (r) => r.name },
+  { id: "email", header: "Email", filterable: true,
+    accessor: (r) => <span className="font-mono text-xs">{r.email}</span>,
+    sortAccessor: (r) => r.email },
+  { id: "role", header: "Role", sortable: true, filterable: true, filterType: "select", accessor: (r) => r.role },
+  { id: "team", header: "Team", sortable: true, filterable: true, filterType: "select", accessor: (r) => r.team },
+  { id: "status", header: "Status", align: "center", filterable: true, filterType: "select",
+    cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, filterable: true, accessor: (r) => r.tasks },
+];
+
+<DataTable columns={columns} data={data} searchable pagination={{ pageSize: 5 }} />`,
+      },
+    },
+  },
+  render: (args) => {
+    const cols: DataTableColumn<Member>[] = [
+      { id: "name", header: "Name", sortable: true, filterable: true, accessor: (r) => r.name },
+      { id: "email", header: "Email", filterable: true, accessor: (r) => <span className="font-mono text-xs">{r.email}</span>, sortAccessor: (r) => r.email },
+      { id: "role", header: "Role", sortable: true, filterable: true, filterType: "select", accessor: (r) => r.role },
+      { id: "team", header: "Team", sortable: true, filterable: true, filterType: "select", accessor: (r) => r.team },
+      { id: "status", header: "Status", align: "center", filterable: true, filterType: "select", cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
+      { id: "tasks", header: "Tasks", numeric: true, sortable: true, filterable: true, accessor: (r) => r.tasks },
+    ];
+    return <DataTable {...args} data={MANY} columns={cols} />;
+  },
+};
+
+// global search + toolbar: type to filter rows across all columns; Clear resets.
+// Pairs with columnToggle in one toolbar. Pagination/sort reflect the filtered set.
+export const Search: Story = {
+  tags: ["!dev"],
+  args: { searchable: true, columnToggle: true, pagination: { pageSize: 5 } },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable columns={columns} data={data} searchable columnToggle pagination={{ pageSize: 5 }} />`,
+      },
+    },
+  },
+};
+
+// show/hide columns from a "Columns" control above the table (dogfoods MultiSelect).
+// Opt a column out of the toggle with { hideable: false }.
+export const ColumnToggle: Story = {
+  tags: ["!dev"],
+  args: { columnToggle: true },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable columnToggle columns={columns} data={data} />
+// keep a column always visible: { id: "name", hideable: false, … }`,
+      },
+    },
+  },
+};
+
+// a summary row pinned to the bottom. Each column's `footer` is a node or a
+// function given the filtered rows (all pages) — compute sums, counts, averages.
+export const FooterSummary: Story = {
+  tags: ["!dev"],
+  args: { pagination: { pageSize: 6 } },
+  parameters: {
+    docs: {
+      source: {
+        code: `const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", accessor: (r) => r.name, footer: "Total" },
+  { id: "team", header: "Team", accessor: (r) => r.team },
+  { id: "status", header: "Status", align: "center",
+    cell: (r) => <StatusBadge status={r.status} />,
+    footer: (rows) => \`\${rows.filter((r) => r.status === "active").length} active\` },
+  { id: "tasks", header: "Tasks", numeric: true, accessor: (r) => r.tasks,
+    footer: (rows) => rows.reduce((s, r) => s + r.tasks, 0).toLocaleString() },
+];
+
+<DataTable columns={columns} data={data} pagination={{ pageSize: 6 }} />`,
+      },
+    },
+  },
+  render: (args) => {
+    const cols: DataTableColumn<Member>[] = [
+      { id: "name", header: "Name", sortable: true, accessor: (r) => r.name, footer: <span className="text-muted-foreground">Total</span> },
+      { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+      { id: "team", header: "Team", sortable: true, accessor: (r) => r.team },
+      {
+        id: "status",
+        header: "Status",
+        align: "center",
+        cell: (r) => <StatusBadge status={r.status} />,
+        footer: (rows) => (
+          <span className="text-muted-foreground">
+            {rows.filter((r) => r.status === "active").length} active
+          </span>
+        ),
+      },
+      {
+        id: "tasks",
+        header: "Tasks",
+        numeric: true,
+        sortable: true,
+        accessor: (r) => r.tasks,
+        footer: (rows) => rows.reduce((s, r) => s + r.tasks, 0).toLocaleString(),
+      },
+    ];
+    return <DataTable {...args} columns={cols} />;
+  },
+};
+
+// below 640px each row stacks into a label/value card (no horizontal scroll).
+// Resize the window under ~640px (or pick a mobile viewport) to see it.
+export const Responsive: Story = {
+  tags: ["!dev"],
+  args: { responsive: true, selectable: true, pagination: { pageSize: 5 } },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  rowKey={(r) => r.id}
+  responsive          // < 640px → each row becomes a stacked card
+  selectable
+  pagination={{ pageSize: 5 }}
+/>`,
+      },
+    },
+  },
+};
+
+// drag a column header onto another to reorder columns (native drag-and-drop).
+// Works alongside sorting/filtering; onColumnOrderChange reports the new order.
+export const ColumnReorder: Story = {
+  args: { reorderableColumns: true },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  reorderableColumns
+  onColumnOrderChange={(order) => console.log(order)}
+/>`,
+      },
+    },
+  },
+};
+
+// drag the ☰ handle to reorder rows (needs rowKey). onRowReorder gives the new
+// data order. Best used without an active sort, which would override the order.
+export const RowReorder: Story = {
+  tags: ["!dev"],
+  args: { reorderableRows: true },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={data}
+  rowKey={(r) => r.id}
+  reorderableRows
+  onRowReorder={(rows) => setData(rows)}
+/>`,
+      },
+    },
+  },
+};
+
+// 10,000 rows, only the visible ones in the DOM (virtualized). Scrolls smoothly;
+// sorting/search/selection still work across the whole set. Pagination is ignored.
+export const Virtualized: Story = {
+  args: { virtualized: true, maxHeight: 440, selectable: true, searchable: true },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable
+  columns={columns}
+  data={tenThousandRows}
+  rowKey={(r) => r.id}
+  virtualized
+  maxHeight={440}
+  selectable
+  searchable
+/>`,
+      },
+    },
+  },
+  render: (args) => <DataTable {...args} data={HUGE} />,
+};
+
 export const Empty: Story = {
+  tags: ["!dev"],
   args: { data: [], emptyContent: "No members yet." },
   parameters: {
     docs: { source: { code: `<DataTable data={[]} emptyContent="No members yet." columns={columns} />` } },
