@@ -165,3 +165,13 @@
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.96); }
 }
+
+/* Drawer slide transitions (one pair per edge). */
+@keyframes bpdm-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes bpdm-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes bpdm-slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes bpdm-slide-out-left { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes bpdm-slide-in-top { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes bpdm-slide-out-top { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+@keyframes bpdm-slide-in-bottom { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes bpdm-slide-out-bottom { from { transform: translateY(0); } to { transform: translateY(100%); } }
