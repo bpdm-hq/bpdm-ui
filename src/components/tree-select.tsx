@@ -153,6 +153,14 @@ export function TreeSelect({
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [query, setQuery] = React.useState("");
   const q = query.trim().toLowerCase();
+
+  // portal into the nearest dialog (if any) so the dropdown stays interactive
+  // inside a modal; outside a dialog this is null → defaults to <body>
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+  const [portalContainer, setPortalContainer] = React.useState<HTMLElement | null>(null);
+  React.useEffect(() => {
+    setPortalContainer(triggerRef.current?.closest<HTMLElement>("[role='dialog']") ?? null);
+  }, []);
   const { nodes: visibleTree, forceExpand } = React.useMemo(() => {
     if (!q) return { nodes: options, forceExpand: null as Set<string> | null };
     const r = filterTree(options, q);
@@ -278,6 +286,7 @@ export function TreeSelect({
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
         <div
+          ref={triggerRef}
           id={id}
           role="combobox"
           aria-expanded={open}
@@ -333,7 +342,7 @@ export function TreeSelect({
         </div>
       </PopoverPrimitive.Trigger>
 
-      <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}
