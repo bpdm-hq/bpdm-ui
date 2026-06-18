@@ -115,6 +115,16 @@ export function Select({
   // mounts (a plain ref doesn't re-render → empty list on the first open).
   const [listEl, setListEl] = React.useState<HTMLDivElement | null>(null);
 
+  // Portal into the nearest dialog (if any) instead of <body>. Inside a modal
+  // dialog, scroll-lock makes a body-portaled popover inert (no clicks/scroll);
+  // rendering within the dialog keeps the dropdown interactive. Outside a dialog
+  // this is null → defaults to <body>.
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const [portalContainer, setPortalContainer] = React.useState<HTMLElement | null>(null);
+  React.useEffect(() => {
+    setPortalContainer(triggerRef.current?.closest<HTMLElement>("[role='dialog']") ?? null);
+  }, []);
+
   // flatten options → rows (group headers + items)
   const allRows = React.useMemo<Row[]>(() => {
     const rows: Row[] = [];
@@ -209,6 +219,7 @@ export function Select({
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
         <button
+          ref={triggerRef}
           type="button"
           id={id}
           role="combobox"
@@ -224,7 +235,7 @@ export function Select({
         </button>
       </PopoverPrimitive.Trigger>
 
-      <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}

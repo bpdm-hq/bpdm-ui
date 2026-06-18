@@ -120,6 +120,14 @@ export function MultiSelect({
   const [active, setActive] = React.useState(0);
   const [listEl, setListEl] = React.useState<HTMLDivElement | null>(null);
 
+  // portal into the nearest dialog (if any) so the dropdown stays interactive
+  // inside a modal; outside a dialog this is null → defaults to <body>
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+  const [portalContainer, setPortalContainer] = React.useState<HTMLElement | null>(null);
+  React.useEffect(() => {
+    setPortalContainer(triggerRef.current?.closest<HTMLElement>("[role='dialog']") ?? null);
+  }, []);
+
   const allRows = React.useMemo<Row[]>(() => {
     const rows: Row[] = [];
     for (const entry of options) {
@@ -230,6 +238,7 @@ export function MultiSelect({
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
         <div
+          ref={triggerRef}
           id={id}
           role="combobox"
           aria-expanded={open}
@@ -301,7 +310,7 @@ export function MultiSelect({
         </div>
       </PopoverPrimitive.Trigger>
 
-      <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}
