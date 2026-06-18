@@ -21,6 +21,7 @@ export * from "./components/stat-card";
 export * from "./components/status-timeline";
 export * from "./components/step-dialog";
 export * from "./components/switch";
+export * from "./components/tabs";
 export * from "./components/textarea";
 export * from "./components/tooltip";
 export * from "./components/tree-select";
