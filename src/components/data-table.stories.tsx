@@ -8,12 +8,13 @@ import {
   Title,
 } from "@storybook/addon-docs/blocks";
 import { DataTable, type DataTableColumn } from "./data-table";
+import { Button } from "./button";
 
 const usage = `
 Data-driven table. Describe \`columns\` once and pass an array of \`data\` — the
 table renders the rest. Columns support custom \`cell\` renderers, alignment,
-fixed widths, and a \`numeric\` flag (right-aligned, tabular figures) for money and
-counts. Density (\`sm\`/\`md\`/\`lg\`), \`striped\`, \`bordered\`, \`hoverable\`,
+fixed widths, and a \`numeric\` flag (right-aligned, tabular figures) for counts.
+Density (\`sm\`/\`md\`/\`lg\`), \`striped\`, \`bordered\`, \`hoverable\`,
 \`stickyHeader\` + \`maxHeight\`, an empty state, and \`onRowClick\` are all props.
 The wrapper scrolls horizontally on narrow screens, so it is responsive by default.
 
@@ -21,57 +22,58 @@ The wrapper scrolls horizontally on narrow screens, so it is responsive by defau
 import { DataTable } from "@bpdm/ui";
 
 <DataTable
-  data={transactions}
+  data={members}
   columns={[
-    { id: "merchant", header: "Merchant", accessor: (r) => r.merchant },
-    { id: "amount", header: "Amount", numeric: true, accessor: (r) => r.amount },
+    { id: "name", header: "Name", accessor: (r) => r.name },
+    { id: "tasks", header: "Tasks", numeric: true, accessor: (r) => r.tasks },
   ]}
 />
 \`\`\`
 `;
 
-type Txn = {
+type Member = {
   id: string;
-  date: string;
-  merchant: string;
-  method: string;
-  status: "settled" | "pending" | "failed" | "refunded";
-  amount: number;
+  name: string;
+  email: string;
+  role: "Owner" | "Admin" | "Editor" | "Viewer";
+  team: "Engineering" | "Design" | "Marketing" | "Support";
+  status: "active" | "invited" | "disabled";
+  joined: string;
+  tasks: number;
 };
 
-const TXNS: Txn[] = [
-  { id: "tx_8f2a", date: "2026-06-14", merchant: "Northwind Co.", method: "Visa •4242", status: "settled", amount: 1240.0 },
-  { id: "tx_3b9c", date: "2026-06-14", merchant: "Acme Studio", method: "SEPA", status: "pending", amount: 89.5 },
-  { id: "tx_a17d", date: "2026-06-13", merchant: "Globex LLC", method: "Mastercard •8123", status: "settled", amount: 4520.75 },
-  { id: "tx_5e21", date: "2026-06-13", merchant: "Initech", method: "Visa •1099", status: "failed", amount: 312.0 },
-  { id: "tx_c84f", date: "2026-06-12", merchant: "Soylent Corp", method: "ACH", status: "refunded", amount: -57.2 },
-  { id: "tx_2da6", date: "2026-06-12", merchant: "Umbrella Inc.", method: "Visa •7781", status: "settled", amount: 980.0 },
-  { id: "tx_9b40", date: "2026-06-12", merchant: "Stark Industries", method: "Mastercard •3320", status: "pending", amount: 2310.4 },
-  { id: "tx_61cd", date: "2026-06-11", merchant: "Wayne Enterprises", method: "SEPA", status: "settled", amount: 156.0 },
-  { id: "tx_7ae2", date: "2026-06-11", merchant: "Cyberdyne", method: "Visa •5567", status: "failed", amount: 1899.99 },
-  { id: "tx_d3f8", date: "2026-06-10", merchant: "Hooli", method: "ACH", status: "pending", amount: 640.25 },
-  { id: "tx_0c19", date: "2026-06-10", merchant: "Pied Piper", method: "Visa •2204", status: "refunded", amount: -420.0 },
-  { id: "tx_4e7b", date: "2026-06-09", merchant: "Tyrell Corp", method: "Mastercard •9981", status: "settled", amount: 3075.5 },
+const MEMBERS: Member[] = [
+  { id: "m_01", name: "Maya Patel", email: "maya@example.com", role: "Owner", team: "Engineering", status: "active", joined: "2025-02-14", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", joined: "2025-03-02", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", joined: "2025-03-19", tasks: 86 },
+  { id: "m_04", name: "Noah Bauer", email: "noah@example.com", role: "Viewer", team: "Support", status: "disabled", joined: "2025-04-08", tasks: 12 },
+  { id: "m_05", name: "Ava Nguyen", email: "ava@example.com", role: "Editor", team: "Marketing", status: "active", joined: "2025-04-21", tasks: 54 },
+  { id: "m_06", name: "Ivan Petrov", email: "ivan@example.com", role: "Admin", team: "Engineering", status: "active", joined: "2025-05-05", tasks: 203 },
+  { id: "m_07", name: "Emma Rossi", email: "emma@example.com", role: "Editor", team: "Design", status: "invited", joined: "2025-05-12", tasks: 0 },
+  { id: "m_08", name: "Omar Haddad", email: "omar@example.com", role: "Viewer", team: "Support", status: "active", joined: "2025-05-20", tasks: 31 },
+  { id: "m_09", name: "Lucy Chen", email: "lucy@example.com", role: "Editor", team: "Marketing", status: "disabled", joined: "2025-06-01", tasks: 47 },
+  { id: "m_10", name: "Finn O'Brien", email: "finn@example.com", role: "Admin", team: "Engineering", status: "active", joined: "2025-06-09", tasks: 165 },
+  { id: "m_11", name: "Nora Schmidt", email: "nora@example.com", role: "Viewer", team: "Design", status: "active", joined: "2025-06-15", tasks: 9 },
+  { id: "m_12", name: "Diego Silva", email: "diego@example.com", role: "Editor", team: "Support", status: "invited", joined: "2025-06-22", tasks: 0 },
 ];
 
 // a larger dataset for the paging demos
-const MANY: Txn[] = Array.from({ length: 23 }, (_, i) => {
-  const base = TXNS[i % TXNS.length];
-  const amt = Math.round((base.amount + i * 137.5) * 100) / 100;
-  return { ...base, id: `tx_p${(i + 1).toString().padStart(2, "0")}`, amount: amt };
+const MANY: Member[] = Array.from({ length: 23 }, (_, i) => {
+  const base = MEMBERS[i % MEMBERS.length];
+  return {
+    ...base,
+    id: `m_p${(i + 1).toString().padStart(2, "0")}`,
+    tasks: (base.tasks + i * 7) % 240,
+  };
 });
 
-const money = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
-const STATUS_STYLE: Record<Txn["status"], string> = {
-  settled: "bg-success/15 text-success",
-  pending: "bg-primary/15 text-primary",
-  failed: "bg-destructive/15 text-destructive",
-  refunded: "bg-muted text-muted-foreground",
+const STATUS_STYLE: Record<Member["status"], string> = {
+  active: "bg-success/15 text-success",
+  invited: "bg-primary/15 text-primary",
+  disabled: "bg-muted text-muted-foreground",
 };
 
-function StatusBadge({ status }: { status: Txn["status"] }) {
+function StatusBadge({ status }: { status: Member["status"] }) {
   return (
     <span
       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLE[status]}`}
@@ -81,37 +83,35 @@ function StatusBadge({ status }: { status: Txn["status"] }) {
   );
 }
 
-// a richer expanded panel: settlement breakdown + transaction metadata
-function TxnDetails({ txn }: { txn: Txn }) {
-  const gross = txn.amount;
-  const fee = Math.round((Math.abs(gross) * 0.029 + 0.3) * 100) / 100;
-  const net = Math.round((gross - fee) * 100) / 100;
-  const authCode = txn.id.replace("tx_", "").toUpperCase().padEnd(6, "0").slice(0, 6);
-  const arn = `74${txn.id.replace(/[^0-9a-f]/gi, "")}${txn.date.replace(/-/g, "")}`.slice(0, 18);
-  const meta: [string, React.ReactNode][] = [
-    ["Authorization", <span className="font-mono">{authCode}</span>],
-    ["Network", txn.method.split(" ")[0]],
-    ["Card / account", txn.method],
-    ["Reference (ARN)", <span className="font-mono text-xs">{arn}</span>],
+// a richer expanded panel: task activity + member details
+function MemberDetails({ member }: { member: Member }) {
+  const assigned = member.tasks;
+  const completed = Math.round(assigned * 0.7);
+  const open = assigned - completed;
+  const detail: [string, React.ReactNode][] = [
+    ["Email", <span className="font-mono text-xs">{member.email}</span>],
+    ["Role", member.role],
+    ["Team", member.team],
+    ["Joined", member.joined],
   ];
   return (
     <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
       <section className="rounded-lg border border-border bg-card p-4">
         <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Settlement breakdown
+          Task activity
         </p>
         <dl className="space-y-2 text-sm tabular-nums">
           <div className="flex items-center justify-between">
-            <dt className="text-muted-foreground">Gross</dt>
-            <dd>{money(gross)}</dd>
+            <dt className="text-muted-foreground">Assigned</dt>
+            <dd>{assigned}</dd>
           </div>
           <div className="flex items-center justify-between">
-            <dt className="text-muted-foreground">Processing fee · 2.9% + $0.30</dt>
-            <dd className="text-destructive">−{money(fee)}</dd>
+            <dt className="text-muted-foreground">Completed</dt>
+            <dd className="text-success">{completed}</dd>
           </div>
           <div className="mt-1 flex items-center justify-between border-t border-border pt-2 text-base font-semibold">
-            <dt>Net settlement</dt>
-            <dd>{money(net)}</dd>
+            <dt>Open</dt>
+            <dd>{open}</dd>
           </div>
         </dl>
       </section>
@@ -120,10 +120,10 @@ function TxnDetails({ txn }: { txn: Txn }) {
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Details
           </p>
-          <StatusBadge status={txn.status} />
+          <StatusBadge status={member.status} />
         </div>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-          {meta.map(([label, value]) => (
+          {detail.map(([label, value]) => (
             <div key={label} className="flex flex-col gap-0.5">
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
               <dd>{value}</dd>
@@ -135,16 +135,16 @@ function TxnDetails({ txn }: { txn: Txn }) {
   );
 }
 
-const columns: DataTableColumn<Txn>[] = [
-  { id: "id", header: "Txn ID", accessor: (r) => <span className="font-mono text-xs">{r.id}</span> },
-  { id: "date", header: "Date", sortable: true, accessor: (r) => r.date, sortAccessor: (r) => r.date },
-  { id: "merchant", header: "Merchant", sortable: true, accessor: (r) => r.merchant },
-  { id: "method", header: "Method", accessor: (r) => r.method },
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "email", header: "Email", accessor: (r) => <span className="font-mono text-xs">{r.email}</span> },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "team", header: "Team", sortable: true, accessor: (r) => r.team },
   { id: "status", header: "Status", align: "center", sortable: true, cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
-  { id: "amount", header: "Amount", numeric: true, sortable: true, cell: (r) => money(r.amount), sortAccessor: (r) => r.amount },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks, sortAccessor: (r) => r.tasks },
 ];
 
-const meta: Meta<typeof DataTable<Txn>> = {
+const meta: Meta<typeof DataTable<Member>> = {
   title: "Data Display/DataTable",
   component: DataTable,
   tags: ["autodocs"],
@@ -177,6 +177,7 @@ const meta: Meta<typeof DataTable<Txn>> = {
     selectable: { control: "boolean" },
     selectionMode: { control: "inline-radio", options: ["multiple", "single"] },
     expandMode: { control: "inline-radio", options: ["single", "multiple"] },
+    pinnable: { control: "boolean" },
     columns: { table: { disable: true } },
     data: { table: { disable: true } },
     rowKey: { table: { disable: true } },
@@ -184,11 +185,11 @@ const meta: Meta<typeof DataTable<Txn>> = {
     renderExpanded: { table: { disable: true } },
   },
   // rowKey keeps selection stable across re-sorts (keyed by id, not row position)
-  args: { columns, data: TXNS, size: "md", rowKey: (r: Txn) => r.id },
+  args: { columns, data: MEMBERS, size: "md", rowKey: (r: Member) => r.id },
 };
 export default meta;
 
-type Story = StoryObj<typeof DataTable<Txn>>;
+type Story = StoryObj<typeof DataTable<Member>>;
 
 export const Playground: Story = {};
 
@@ -226,22 +227,20 @@ export const StickyHeaderScroll: Story = {
   render: (args) => (
     <DataTable
       {...args}
-      data={[...TXNS, ...TXNS, ...TXNS].map((t, i) => ({ ...t, id: `${t.id}_${i}` }))}
+      data={[...MEMBERS, ...MEMBERS, ...MEMBERS].map((m, i) => ({ ...m, id: `${m.id}_${i}` }))}
     />
   ),
 };
 
 export const Clickable: Story = {
   parameters: {
-    docs: { source: { code: `<DataTable onRowClick={(row) => alert(row.id)} columns={columns} data={data} />` } },
+    docs: { source: { code: `<DataTable onRowClick={(row) => openMember(row.id)} columns={columns} data={data} />` } },
   },
   render: (args) => (
-    <DataTable {...args} onRowClick={(row) => window.alert(`Opened ${row.id}`)} />
+    <DataTable {...args} onRowClick={(row) => window.alert(`Opened ${row.name}`)} />
   ),
 };
 
-// click a sortable header (Date / Merchant / Status / Amount) to cycle
-// unsorted → ascending → descending → unsorted
 // Single-column: starts unsorted. Click a header to cycle asc → desc → off.
 // Clicking a different header REPLACES the sort — only one arrow is ever active.
 export const Sorting: Story = {
@@ -256,7 +255,7 @@ export const Sorting: Story = {
   render: (args) => (
     <div className="flex flex-col gap-2">
       <p className="font-mono text-xs text-muted-foreground">
-        Click any sortable header (Date / Merchant / Status / Amount). Only one
+        Click any sortable header (Name / Role / Team / Status / Tasks). Only one
         column sorts at a time.
       </p>
       <DataTable {...args} />
@@ -264,7 +263,7 @@ export const Sorting: Story = {
   ),
 };
 
-// Multi-column: pre-sorted by Status, then Amount — note the numbered badges
+// Multi-column: pre-sorted by Status, then Tasks — note the numbered badges
 // (1, 2) showing the order. Shift+click another header to add it to the sort.
 export const MultiColumnSort: Story = {
   args: {
@@ -272,7 +271,7 @@ export const MultiColumnSort: Story = {
     bordered: true,
     defaultSort: [
       { id: "status", dir: "asc" },
-      { id: "amount", dir: "desc" },
+      { id: "tasks", dir: "desc" },
     ],
   },
   parameters: {
@@ -282,7 +281,7 @@ export const MultiColumnSort: Story = {
   columns={columns}
   data={data}
   multiSort
-  defaultSort={[{ id: "status", dir: "asc" }, { id: "amount", dir: "desc" }]}
+  defaultSort={[{ id: "status", dir: "asc" }, { id: "tasks", dir: "desc" }]}
 />
 // Shift+click another header to add it to the sort`,
       },
@@ -291,7 +290,7 @@ export const MultiColumnSort: Story = {
   render: (args) => (
     <div className="flex flex-col gap-2">
       <p className="max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">
-        Sorted by Status ➊, then Amount ➋ — rows group by status, and Amount
+        Sorted by Status ➊, then Tasks ➋ — rows group by status, and Tasks
         orders the rows <em>within</em> each status block (that is what a
         secondary sort does). Shift+click a header to add a column; click without
         Shift to reset to one.
@@ -304,7 +303,7 @@ export const MultiColumnSort: Story = {
 // checkbox column + header select-all (indeterminate when only some are picked).
 // Selection is keyed by `rowKey`, so it survives sorting.
 export const RowSelection: Story = {
-  args: { selectable: true, defaultSelectedKeys: ["tx_a17d", "tx_2da6"] },
+  args: { selectable: true, defaultSelectedKeys: ["m_03", "m_06"] },
   parameters: {
     docs: {
       source: {
@@ -313,7 +312,7 @@ export const RowSelection: Story = {
   data={data}
   rowKey={(r) => r.id}
   selectable
-  defaultSelectedKeys={["tx_a17d", "tx_2da6"]}
+  defaultSelectedKeys={["m_03", "m_06"]}
   onSelectionChange={(keys, rows) => console.log(keys, rows)}
 />`,
       },
@@ -323,7 +322,7 @@ export const RowSelection: Story = {
 
 // single-select: radios instead of checkboxes, no select-all
 export const SingleSelection: Story = {
-  args: { selectable: true, selectionMode: "single", defaultSelectedKeys: ["tx_a17d"] },
+  args: { selectable: true, selectionMode: "single", defaultSelectedKeys: ["m_03"] },
   parameters: {
     docs: {
       source: {
@@ -359,9 +358,7 @@ export const SelectionToolbar: Story = {
           <div className="flex h-9 items-center gap-3">
             {selected.length > 0 ? (
               <>
-                <span className="text-sm font-medium">
-                  {selected.length} selected
-                </span>
+                <span className="text-sm font-medium">{selected.length} selected</span>
                 <button
                   type="button"
                   onClick={() => setSelected([])}
@@ -373,7 +370,7 @@ export const SelectionToolbar: Story = {
                   type="button"
                   className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground"
                 >
-                  Refund
+                  Remove
                 </button>
               </>
             ) : (
@@ -502,9 +499,9 @@ export const CursorPaging: Story = {
 // Use expandMode="single" to keep only one row open at a time.
 export const ExpandableRows: Story = {
   args: {
-    rowKey: (r: Txn) => r.id,
-    defaultExpandedKeys: ["tx_a17d"],
-    renderExpanded: (row: Txn) => <TxnDetails txn={row} />,
+    rowKey: (r: Member) => r.id,
+    defaultExpandedKeys: ["m_03"],
+    renderExpanded: (row: Member) => <MemberDetails member={row} />,
   },
   parameters: {
     docs: {
@@ -513,8 +510,8 @@ export const ExpandableRows: Story = {
   columns={columns}
   data={data}
   rowKey={(r) => r.id}
-  renderExpanded={(row) => <TxnDetails txn={row} />}
-  defaultExpandedKeys={["tx_a17d"]}
+  renderExpanded={(row) => <MemberDetails member={row} />}
+  defaultExpandedKeys={["m_03"]}
   // expandMode="single" to keep only one row open
 />`,
       },
@@ -582,9 +579,92 @@ export const Borderless: Story = {
   },
 };
 
-export const Empty: Story = {
-  args: { data: [], emptyContent: "No transactions yet." },
+// pin any number of columns to the edges while the middle scrolls horizontally.
+// Here Name + Role are pinned left and Actions is pinned right (and the selection
+// column auto-pins left). Pin more by adding pin + a numeric width to each, with
+// left-pinned columns first and right-pinned last in the array.
+export const FrozenColumns: Story = {
+  args: { selectable: true },
   parameters: {
-    docs: { source: { code: `<DataTable data={[]} emptyContent="No transactions yet." columns={columns} />` } },
+    docs: {
+      source: {
+        code: `const columns = [
+  // left-pinned block (in order) — pin as many as you like
+  { id: "name", header: "Name", pin: "left", width: 180, accessor: (r) => r.name },
+  { id: "role", header: "Role", pin: "left", width: 120, accessor: (r) => r.role },
+  // …middle columns scroll…
+  // right-pinned block (last in the array)
+  { id: "actions", pin: "right", width: 120, cell: () => <Button size="sm" variant="ghost">View</Button> },
+];
+
+<DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable />`,
+      },
+    },
+  },
+  render: (args) => {
+    const frozen: DataTableColumn<Member>[] = [
+      { id: "name", header: "Name", pin: "left", width: 180, sortable: true, accessor: (r) => r.name },
+      { id: "role", header: "Role", pin: "left", width: 120, sortable: true, accessor: (r) => r.role },
+      { id: "email", header: "Email", width: 220, accessor: (r) => <span className="font-mono text-xs">{r.email}</span> },
+      { id: "team", header: "Team", width: 150, sortable: true, accessor: (r) => r.team },
+      { id: "joined", header: "Joined", width: 130, sortable: true, accessor: (r) => r.joined },
+      { id: "status", header: "Status", width: 120, align: "center", cell: (r) => <StatusBadge status={r.status} /> },
+      { id: "tasks", header: "Tasks", width: 100, numeric: true, sortable: true, accessor: (r) => r.tasks },
+      {
+        id: "actions",
+        header: "",
+        pin: "right",
+        width: 120,
+        align: "right",
+        cell: () => (
+          <Button size="sm" variant="ghost" onClick={(e) => e.stopPropagation()}>
+            View
+          </Button>
+        ),
+      },
+    ];
+    return (
+      <div className="max-w-3xl">
+        <DataTable {...args} columns={frozen} />
+      </div>
+    );
+  },
+};
+
+// interactive freezing: with `pinnable`, every header gets a ⋮ menu —
+// Pin left / Pin right / Unpin — so users freeze columns themselves at runtime.
+// Nothing is pinned to start; open a menu and pin a column.
+export const PinnableColumns: Story = {
+  args: { selectable: true, pinnable: true },
+  parameters: {
+    docs: {
+      source: {
+        code: `<DataTable columns={columns} data={data} rowKey={(r) => r.id} pinnable selectable />
+// click the ⋮ on any header → Pin left / Pin right / Unpin`,
+      },
+    },
+  },
+  render: (args) => {
+    const cols: DataTableColumn<Member>[] = [
+      { id: "name", header: "Name", width: 180, sortable: true, accessor: (r) => r.name },
+      { id: "email", header: "Email", width: 220, accessor: (r) => <span className="font-mono text-xs">{r.email}</span> },
+      { id: "role", header: "Role", width: 120, sortable: true, accessor: (r) => r.role },
+      { id: "team", header: "Team", width: 150, sortable: true, accessor: (r) => r.team },
+      { id: "joined", header: "Joined", width: 130, sortable: true, accessor: (r) => r.joined },
+      { id: "status", header: "Status", width: 120, align: "center", cell: (r) => <StatusBadge status={r.status} /> },
+      { id: "tasks", header: "Tasks", width: 110, numeric: true, sortable: true, accessor: (r) => r.tasks },
+    ];
+    return (
+      <div className="max-w-3xl">
+        <DataTable {...args} columns={cols} />
+      </div>
+    );
+  },
+};
+
+export const Empty: Story = {
+  args: { data: [], emptyContent: "No members yet." },
+  parameters: {
+    docs: { source: { code: `<DataTable data={[]} emptyContent="No members yet." columns={columns} />` } },
   },
 };
