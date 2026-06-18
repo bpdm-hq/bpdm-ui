@@ -81,6 +81,7 @@ export const States: Story = {
 
 // pill (default) / square / sharp track + thumb
 export const Shapes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -104,6 +105,7 @@ export const Shapes: Story = {
 
 // ✓ / ✗ glyph inside the thumb
 export const WithIcon: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -122,6 +124,7 @@ export const WithIcon: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -164,6 +167,7 @@ export const WithLabel: Story = {
 
 // a settings list of toggles
 export const SettingsList: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

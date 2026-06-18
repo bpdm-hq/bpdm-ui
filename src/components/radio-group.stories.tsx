@@ -126,6 +126,7 @@ export const Horizontal: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -147,6 +148,7 @@ export const Sizes: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<RadioGroup defaultValue="pro" disabled>…</RadioGroup>` } },
   },
@@ -160,6 +162,7 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

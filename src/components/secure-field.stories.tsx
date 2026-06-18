@@ -103,6 +103,7 @@ export const ApiKey: Story = {
 
 // show the last 4 of a serial number while masked
 export const SerialTail: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: { code: `<SecureField unmaskedTail={4} copyable defaultValue="SN8842019930245011" />` },
@@ -116,6 +117,7 @@ export const SerialTail: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: { code: `<SecureField size="sm" /> <SecureField size="md" /> <SecureField size="lg" />` },
@@ -131,6 +133,7 @@ export const Sizes: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<SecureField aria-invalid format="grouped" />` } },
   },

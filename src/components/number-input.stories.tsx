@@ -91,6 +91,7 @@ export const Horizontal: Story = {
 
 // clamps to range; buttons disable at the bounds
 export const MinMaxBoundaries: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: { code: `<NumberInput min="0" max="10" defaultValue="10" />` },
@@ -101,6 +102,7 @@ export const MinMaxBoundaries: Story = {
 
 // Precision-safe: a value far beyond Number.MAX_SAFE_INTEGER stays exact.
 export const HighPrecision: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -129,6 +131,7 @@ export const HighPrecision: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -148,6 +151,7 @@ export const Sizes: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<NumberInput disabled defaultValue="20" prefix="$" />` } },
   },

@@ -83,6 +83,7 @@ export const Variants: Story = {
 
 // All key states at a glance.
 export const States: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -104,6 +105,7 @@ export const States: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -153,6 +155,7 @@ export const WithIcons: Story = {
 
 // Native types just work.
 export const Types: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -175,6 +178,7 @@ export const Types: Story = {
 
 // Real-world composition: label + input + helper / error text.
 export const FormField: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

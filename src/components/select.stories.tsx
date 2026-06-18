@@ -144,6 +144,7 @@ const CITIES: SelectItems = [
 ];
 
 export const Groups: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -165,6 +166,7 @@ export const Groups: Story = {
 };
 
 export const WithIcons: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -194,6 +196,7 @@ export const WithIcons: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -213,6 +216,7 @@ export const Sizes: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<Select aria-invalid options={…} placeholder="Required" />` } },
   },

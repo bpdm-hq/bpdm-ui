@@ -107,6 +107,7 @@ type Story = StoryObj<typeof Dialog>;
 export const Playground: Story = {};
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<Dialog size="sm" | "md" | "lg" | "xl" …>` } },
   },
@@ -250,6 +251,7 @@ export const WithDropdowns: Story = {
 
 // tall body scrolls inside the dialog; header + footer stay fixed
 export const ScrollableContent: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `// body taller than 85dvh scrolls; header/footer stay put` } },
   },

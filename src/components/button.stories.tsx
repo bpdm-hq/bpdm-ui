@@ -98,6 +98,7 @@ export const AllVariants: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -143,6 +144,7 @@ export const WithIcon: Story = {
 // Icon-only: square `size="icon"`. NOTE: always pass an `aria-label`
 // because there is no visible text for screen readers.
 export const IconOnly: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -171,6 +173,7 @@ export const IconOnly: Story = {
 
 // Circle icon buttons: `shape="round"` turns the square into a circle.
 export const RoundIcon: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -200,6 +203,7 @@ export const RoundIcon: Story = {
 // `size="none"` drops the preset height/padding so you own the sizing entirely
 // via className — handy for compact icon affordances inside other components.
 export const CustomSize: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -234,6 +238,7 @@ export const CustomSize: Story = {
 
 // Pill: `shape="round"` on a text button gives fully-rounded ends.
 export const Pill: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

@@ -85,6 +85,7 @@ export const Masked: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -104,6 +105,7 @@ export const Sizes: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   args: { length: 6, disabled: true, defaultValue: "123456" },
   parameters: {
     docs: { source: { code: `<InputOtp length={6} disabled defaultValue="123456" />` } },

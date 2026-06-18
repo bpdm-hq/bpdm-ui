@@ -89,6 +89,7 @@ export const WithCount: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<Textarea size="sm" /> <Textarea size="md" /> <Textarea size="lg" />` } },
   },
@@ -102,6 +103,7 @@ export const Sizes: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<Textarea aria-invalid placeholder="Message" />` } },
   },
@@ -114,6 +116,7 @@ export const Invalid: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<Textarea disabled defaultValue="Read only" />` } },
   },
