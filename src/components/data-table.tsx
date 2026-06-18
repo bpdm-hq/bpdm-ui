@@ -1,9 +1,12 @@
 import * as React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
+import { MultiSelect } from "./multi-select";
+import { Popover } from "./popover";
 
 /** A value the table can compare when sorting a column. */
 export type SortValue = string | number | boolean | Date | null | undefined;
@@ -88,6 +91,12 @@ export interface DataTableColumn<T> {
   accessor?: (row: T) => React.ReactNode;
   /** Full custom cell renderer — overrides `accessor`. */
   cell?: (row: T, rowIndex: number) => React.ReactNode;
+  /**
+   * Footer/summary cell — a static node, or a function given the filtered rows
+   * (all pages) to compute an aggregate (sum, average, count…). Any column with a
+   * `footer` renders a sticky summary row.
+   */
+  footer?: React.ReactNode | ((rows: T[]) => React.ReactNode);
   /** Horizontal alignment of header + cells. Default "left". */
   align?: "left" | "center" | "right";
   /** Fixed column width, e.g. 120 or "20%". */
@@ -102,6 +111,17 @@ export interface DataTableColumn<T> {
   pin?: "left" | "right";
   /** Hide the per-column pin menu for this column even when `pinnable` is on. */
   disablePinning?: boolean;
+  /** Set false to keep this column always visible (excluded from the toggle). */
+  hideable?: boolean;
+  /** Show a filter menu on this column's header. */
+  filterable?: boolean;
+  /**
+   * Filter UI: "text" operators, "number" operators, or "select" (pick from the
+   * column's distinct values). Defaults to "number" for numeric columns, else "text".
+   */
+  filterType?: "text" | "number" | "select";
+  /** Options for a "select" filter. Omit to derive distinct values from the data. */
+  filterOptions?: { value: string; label: string }[];
   /** Allow clicking the header to sort by this column. */
   sortable?: boolean;
   /**
@@ -184,6 +204,27 @@ export interface DataTableProps<T> {
   pinnable?: boolean;
   /** Fired when a column is pinned/unpinned via the header menu. */
   onColumnPinChange?: (id: string, pin: "left" | "right" | undefined) => void;
+  /** Show a "Columns" control above the table to show/hide columns. */
+  columnToggle?: boolean;
+  /** Show a global search box that filters rows across all columns. */
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  /** On narrow screens, stack each row into a label/value card instead of scrolling. */
+  responsive?: boolean;
+  /**
+   * Virtualize rows for large datasets (10k+) — only visible rows are in the DOM.
+   * Renders all rows in a scroll area (uses `maxHeight`, default 440) and ignores
+   * pagination. Best with uniform row heights.
+   */
+  virtualized?: boolean;
+  /** Let users drag column headers to reorder columns. */
+  reorderableColumns?: boolean;
+  /** Fired with the new column-id order after a drag reorder. */
+  onColumnOrderChange?: (order: string[]) => void;
+  /** Let users drag a row handle (☰) to reorder rows. Requires `rowKey`. */
+  reorderableRows?: boolean;
+  /** Fired with the reordered data after a row drag. */
+  onRowReorder?: (rows: T[]) => void;
   /** Accessible name for the table (maps to `aria-label`). */
   label?: string;
   className?: string;
@@ -273,6 +314,50 @@ function DotsIcon() {
   );
 }
 
+function SearchGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
+      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FunnelGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
+      <path
+        d="M2 3.5h12l-4.6 5.4v3.6l-2.8 1.4V8.9L2 3.5Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function GripGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" fill="none" aria-hidden>
+      <path d="M5 4h.01M5 8h.01M5 12h.01M11 4h.01M11 8h.01M11 12h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrashGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
+      <path
+        d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function PinArrow({ side }: { side: "left" | "right" }) {
   return (
     <svg viewBox="0 0 16 16" className="size-3.5 text-muted-foreground" fill="none" aria-hidden>
@@ -329,6 +414,328 @@ function ColumnPinMenu({
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
   );
+}
+
+// --- per-column filtering ---
+export type FilterOperator =
+  | "contains"
+  | "startsWith"
+  | "endsWith"
+  | "equals"
+  | "notEquals"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte";
+
+export interface ColumnFilter {
+  matchMode: "all" | "any";
+  rules: { op: FilterOperator; value: string }[];
+}
+
+const TEXT_OPS: { value: FilterOperator; label: string }[] = [
+  { value: "contains", label: "Contains" },
+  { value: "startsWith", label: "Starts with" },
+  { value: "endsWith", label: "Ends with" },
+  { value: "equals", label: "Equals" },
+  { value: "notEquals", label: "Not equals" },
+];
+const NUM_OPS: { value: FilterOperator; label: string }[] = [
+  { value: "equals", label: "=" },
+  { value: "notEquals", label: "≠" },
+  { value: "gt", label: ">" },
+  { value: "gte", label: "≥" },
+  { value: "lt", label: "<" },
+  { value: "lte", label: "≤" },
+];
+
+function evalRule(
+  cell: SortValue,
+  op: FilterOperator,
+  ruleVal: string,
+  type: "text" | "number",
+): boolean {
+  if (ruleVal === "") return true;
+  if (type === "number") {
+    const a = Number(cell);
+    const b = Number(ruleVal);
+    if (Number.isNaN(a) || Number.isNaN(b)) return false;
+    switch (op) {
+      case "equals": return a === b;
+      case "notEquals": return a !== b;
+      case "gt": return a > b;
+      case "gte": return a >= b;
+      case "lt": return a < b;
+      case "lte": return a <= b;
+      default: return true;
+    }
+  }
+  const a = String(cell ?? "").toLowerCase();
+  const b = ruleVal.toLowerCase();
+  switch (op) {
+    case "startsWith": return a.startsWith(b);
+    case "endsWith": return a.endsWith(b);
+    case "equals": return a === b;
+    case "notEquals": return a !== b;
+    case "contains":
+    default: return a.includes(b);
+  }
+}
+
+const filterField =
+  "h-9 w-full rounded-[var(--radius)] border border-input bg-background px-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring";
+
+// native select with the browser arrow hidden + our own chevron (with breathing room)
+function FilterSelect({
+  value,
+  onChange,
+  children,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(filterField, "cursor-pointer appearance-none pr-8", className)}
+      >
+        {children}
+      </select>
+      <svg
+        viewBox="0 0 16 16"
+        fill="none"
+        className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden
+      >
+        <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
+
+function ColumnFilterMenu({
+  type,
+  options,
+  filter,
+  onApply,
+  onClear,
+}: {
+  type: "text" | "number" | "select";
+  options?: { value: string; label: string }[];
+  filter?: ColumnFilter;
+  onApply: (f: ColumnFilter) => void;
+  onClear: () => void;
+}) {
+  const ops = type === "number" ? NUM_OPS : TEXT_OPS;
+  const emptyDraft = (): ColumnFilter => ({
+    matchMode: "all",
+    rules: [{ op: ops[0].value, value: "" }],
+  });
+  const [open, setOpen] = React.useState(false);
+  const [draft, setDraft] = React.useState<ColumnFilter>(filter ?? emptyDraft());
+  // "select" filters track a set of chosen values instead of operator rules
+  const [selected, setSelected] = React.useState<string[]>(
+    () => filter?.rules.map((r) => r.value) ?? [],
+  );
+  React.useEffect(() => {
+    if (!open) return;
+    setDraft(filter ?? emptyDraft());
+    setSelected(filter?.rules.map((r) => r.value) ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const active = !!filter && filter.rules.some((r) => r.value !== "");
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+      align="start"
+      trigger={
+        <button
+          type="button"
+          aria-label="Filter column"
+          onClick={(e) => e.stopPropagation()}
+          className={cn(
+            "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            active ? "text-primary" : "text-muted-foreground/70",
+          )}
+        >
+          <FunnelGlyph />
+        </button>
+      }
+    >
+      {type === "select" ? (
+        <div className="w-56 space-y-2">
+          <div className="max-h-56 space-y-0.5 overflow-y-auto">
+            {(options ?? []).map((o) => {
+              const checked = selected.includes(o.value);
+              return (
+                <label
+                  key={o.value}
+                  className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                >
+                  <Checkbox
+                    size="sm"
+                    checked={checked}
+                    onCheckedChange={() =>
+                      setSelected((s) =>
+                        checked ? s.filter((v) => v !== o.value) : [...s, o.value],
+                      )
+                    }
+                  />
+                  <span className="truncate">{o.label}</span>
+                </label>
+              );
+            })}
+            {(options ?? []).length === 0 && (
+              <p className="px-2 py-1.5 text-sm text-muted-foreground">No values</p>
+            )}
+          </div>
+          <div className="flex items-center justify-between border-t border-border pt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                onClear();
+                setOpen(false);
+              }}
+            >
+              Clear
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                onApply({
+                  matchMode: "any",
+                  rules: selected.map((v) => ({ op: "equals" as FilterOperator, value: v })),
+                });
+                setOpen(false);
+              }}
+            >
+              Apply
+            </Button>
+          </div>
+        </div>
+      ) : (
+      <div className="w-64 space-y-2.5">
+        {draft.rules.length > 1 && (
+          <FilterSelect
+            value={draft.matchMode}
+            onChange={(v) => setDraft((d) => ({ ...d, matchMode: v as "all" | "any" }))}
+            className="font-medium"
+          >
+            <option value="all">Match all</option>
+            <option value="any">Match any</option>
+          </FilterSelect>
+        )}
+        {draft.rules.map((rule, i) => (
+          <div key={i} className="space-y-2">
+            <FilterSelect
+              value={rule.op}
+              onChange={(v) =>
+                setDraft((d) => {
+                  const rules = [...d.rules];
+                  rules[i] = { ...rules[i], op: v as FilterOperator };
+                  return { ...d, rules };
+                })
+              }
+            >
+              {ops.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </FilterSelect>
+            <input
+              type={type === "number" ? "number" : "text"}
+              value={rule.value}
+              placeholder="Value"
+              onChange={(e) =>
+                setDraft((d) => {
+                  const rules = [...d.rules];
+                  rules[i] = { ...rules[i], value: e.target.value };
+                  return { ...d, rules };
+                })
+              }
+              className={filterField}
+            />
+            {draft.rules.length > 1 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setDraft((d) => ({
+                    ...d,
+                    rules: d.rules.filter((_, j) => j !== i),
+                  }))
+                }
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] py-1.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+              >
+                <TrashGlyph />
+                Remove rule
+              </button>
+            )}
+            {i < draft.rules.length - 1 && (
+              <div className="border-t border-border" />
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setDraft((d) => ({
+              ...d,
+              rules: [...d.rules, { op: ops[0].value, value: "" }],
+            }))
+          }
+          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] border border-dashed border-border py-1.5 text-sm text-primary transition-colors hover:bg-primary/5"
+        >
+          + Add rule
+        </button>
+        <div className="flex items-center justify-between pt-0.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onClear();
+              setOpen(false);
+            }}
+          >
+            Clear
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              onApply(draft);
+              setOpen(false);
+            }}
+          >
+            Apply
+          </Button>
+        </div>
+      </div>
+      )}
+    </Popover>
+  );
+}
+
+// matches a media query (SSR-safe — defaults to false until mounted)
+function useMediaQuery(query: string, enabled: boolean) {
+  const [matches, setMatches] = React.useState(false);
+  React.useEffect(() => {
+    if (!enabled || typeof window === "undefined") return;
+    const mq = window.matchMedia(query);
+    const update = () => setMatches(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [query, enabled]);
+  return matches;
 }
 
 // Lightweight radio for single-select mode (no extra dependency).
@@ -434,17 +841,27 @@ function PageSizeSelect({
   return (
     <label className="flex items-center gap-2 text-muted-foreground">
       <span>Rows</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="h-8 cursor-pointer rounded-lg border border-input bg-background px-2 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background pl-2.5 pr-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        >
+          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
     </label>
   );
 }
@@ -597,6 +1014,15 @@ export function DataTable<T>({
   onExpandedChange,
   pinnable = false,
   onColumnPinChange,
+  columnToggle = false,
+  searchable = false,
+  searchPlaceholder = "Search…",
+  responsive = false,
+  virtualized = false,
+  reorderableColumns = false,
+  onColumnOrderChange,
+  reorderableRows = false,
+  onRowReorder,
   label,
   className,
 }: DataTableProps<T>) {
@@ -607,6 +1033,12 @@ export function DataTable<T>({
     defaultSort ?? [],
   );
   const sortState = isControlled ? sort! : internalSort;
+
+  // global search query
+  const [query, setQuery] = React.useState("");
+
+  // per-column filters (id → matchMode + rules)
+  const [filters, setFilters] = React.useState<Record<string, ColumnFilter>>({});
 
   // interactive pinning: runtime pin state seeded from the columns' declared pin
   const [pinState, setPinState] = React.useState<
@@ -623,9 +1055,36 @@ export function DataTable<T>({
     onColumnPinChange?.(id, side);
   };
   // when `pinnable`, the runtime pin state overrides the declared `pin`
+  // drag-to-reorder column order (ids); empty until the user reorders
+  const [columnOrder, setColumnOrder] = React.useState<string[]>([]);
+  const [dragColId, setDragColId] = React.useState<string | null>(null);
+  const orderedBase = React.useMemo(() => {
+    if (!reorderableColumns || columnOrder.length === 0) return columns;
+    const idx = new Map(columnOrder.map((id, i) => [id, i]));
+    return [...columns].sort(
+      (a, b) => (idx.get(a.id) ?? 0) - (idx.get(b.id) ?? 0),
+    );
+  }, [columns, reorderableColumns, columnOrder]);
+  const moveColumn = (dragId: string | null, overId: string) => {
+    if (!dragId || dragId === overId) return;
+    const base = columnOrder.length ? columnOrder : columns.map((c) => c.id);
+    const from = base.indexOf(dragId);
+    const to = base.indexOf(overId);
+    if (from === -1 || to === -1) return;
+    // insert at the target's ORIGINAL index → correct for both drag directions
+    const next = [...base];
+    next.splice(from, 1);
+    next.splice(to, 0, dragId);
+    setColumnOrder(next);
+    onColumnOrderChange?.(next);
+  };
+
   const effectiveColumns = React.useMemo(
-    () => (pinnable ? columns.map((c) => ({ ...c, pin: pinState[c.id] ?? c.pin })) : columns),
-    [columns, pinnable, pinState],
+    () =>
+      pinnable
+        ? orderedBase.map((c) => ({ ...c, pin: pinState[c.id] ?? c.pin }))
+        : orderedBase,
+    [orderedBase, pinnable, pinState],
   );
 
   const colById = React.useMemo(() => {
@@ -652,18 +1111,86 @@ export function DataTable<T>({
   };
 
   // Only sort internally in the uncontrolled case — a controlled parent owns order.
+  // global search filters rows across every column's comparable value (the same
+  // value sorting uses) before sorting/paging — so totals + pages reflect it.
+  // drag-to-reorder row order (keys); requires rowKey for stable identity
+  const [rowOrder, setRowOrder] = React.useState<React.Key[]>([]);
+  const [dragRowKey, setDragRowKey] = React.useState<React.Key | null>(null);
+  // live drop target + side, so we can show an insertion line and drop exactly there
+  const [dropTarget, setDropTarget] = React.useState<{
+    key: React.Key;
+    pos: "before" | "after";
+  } | null>(null);
+  const dataOrdered = React.useMemo(() => {
+    if (!reorderableRows || rowOrder.length === 0 || !rowKey) return data;
+    const pos = new Map(rowOrder.map((k, i) => [k, i]));
+    return [...data].sort(
+      (a, b) => (pos.get(rowKey(a, 0)) ?? 0) - (pos.get(rowKey(b, 0)) ?? 0),
+    );
+  }, [data, reorderableRows, rowOrder, rowKey]);
+  const moveRow = (
+    dragKey: React.Key | null,
+    overKey: React.Key,
+    pos: "before" | "after",
+  ) => {
+    if (!rowKey || dragKey == null || dragKey === overKey) return;
+    const base = rowOrder.length ? rowOrder : data.map((r) => rowKey(r, 0));
+    if (base.indexOf(dragKey) === -1 || base.indexOf(overKey) === -1) return;
+    const next = base.filter((k) => k !== dragKey);
+    // insert relative to the target's position AFTER removing the dragged row
+    const insert = next.indexOf(overKey) + (pos === "after" ? 1 : 0);
+    next.splice(insert, 0, dragKey);
+    setRowOrder(next);
+    if (onRowReorder) {
+      const map = new Map(data.map((r) => [rowKey(r, 0), r]));
+      onRowReorder(next.map((k) => map.get(k)).filter(Boolean) as T[]);
+    }
+  };
+
+  const filteredData = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    // resolve active column filters once (skip empty-value rule sets)
+    const active = Object.entries(filters)
+      .map(([id, f]) => ({
+        col: colById.get(id),
+        type: (colById.get(id)?.filterType ??
+          (colById.get(id)?.numeric ? "number" : "text")) as "text" | "number",
+        matchMode: f.matchMode,
+        rules: f.rules.filter((r) => r.value !== ""),
+      }))
+      .filter((f) => f.col && f.rules.length > 0);
+
+    if (!q && active.length === 0) return dataOrdered;
+
+    return dataOrdered.filter((row) => {
+      if (q) {
+        const hit = effectiveColumns.some((col) => {
+          const v = getSortValue(col, row);
+          return v != null && String(v).toLowerCase().includes(q);
+        });
+        if (!hit) return false;
+      }
+      // every filtered column must pass (AND); rules within a column use matchMode
+      return active.every(({ col, type, matchMode, rules }) => {
+        const cell = getSortValue(col!, row);
+        const res = rules.map((r) => evalRule(cell, r.op, r.value, type));
+        return matchMode === "all" ? res.every(Boolean) : res.some(Boolean);
+      });
+    });
+  }, [dataOrdered, query, filters, effectiveColumns, colById]);
+
   const sortedRows = React.useMemo(() => {
-    if (isControlled || sortState.length === 0) return data;
+    if (isControlled || sortState.length === 0) return filteredData;
     // resolve the active sort columns once
     const active = sortState
       .map((s) => ({ dir: s.dir, col: colById.get(s.id) }))
       .filter((a): a is { dir: SortDirection; col: DataTableColumn<T> } => !!a.col);
-    if (active.length === 0) return data;
+    if (active.length === 0) return filteredData;
     // decorate → sort → undecorate: read each row's sort values ONCE (O(n)),
     // then compare the cached values. Avoids calling accessors inside the
     // O(n log n) comparator, which is the difference between snappy and sluggish
     // on large client-side datasets.
-    const decorated = data.map((row, i) => ({
+    const decorated = filteredData.map((row, i) => ({
       row,
       i,
       keys: active.map((a) => getSortValue(a.col, row)),
@@ -676,7 +1203,7 @@ export function DataTable<T>({
       return x.i - y.i; // stable tie-break
     });
     return decorated.map((d) => d.row);
-  }, [data, sortState, colById, isControlled]);
+  }, [filteredData, sortState, colById, isControlled]);
 
   const showSortOrder = multiSort && sortState.length > 1;
 
@@ -764,6 +1291,27 @@ export function DataTable<T>({
     );
   }
 
+  // virtualization renders ALL filtered rows in a scroll area (no paging)
+  if (virtualized) {
+    rows = sortedRows;
+    footer = null;
+  }
+
+  // scroll element (callback ref + state so the virtualizer re-measures on mount)
+  const [scrollEl, setScrollEl] = React.useState<HTMLDivElement | null>(null);
+  const rowEstimate = size === "sm" ? 38 : size === "lg" ? 54 : 45;
+  const virtualizer = useVirtualizer({
+    count: virtualized ? rows.length : 0,
+    getScrollElement: () => scrollEl,
+    estimateSize: () => rowEstimate,
+    overscan: 10,
+  });
+  const virtualItems = virtualized ? virtualizer.getVirtualItems() : [];
+  const padTop = virtualItems.length ? virtualItems[0].start : 0;
+  const padBottom = virtualItems.length
+    ? virtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
+    : 0;
+
   // --- selection (keyed by rowKey so it survives sorting) ---
   const keyOf = (row: T, index: number): React.Key =>
     rowKey ? rowKey(row, index) : index;
@@ -837,20 +1385,28 @@ export function DataTable<T>({
     );
   };
 
-  const colCount =
-    columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0);
+  // --- column visibility (toggle) ---
+  const [hiddenIds, setHiddenIds] = React.useState<Set<string>>(new Set());
 
   // Pinned columns auto-move to the edges (left-pinned first, right-pinned last),
   // keeping their relative order — so authors never have to hand-order them and
-  // the pinned blocks are always contiguous (no gaps).
+  // the pinned blocks are always contiguous (no gaps). Hidden columns drop out.
   const orderedColumns = React.useMemo(
-    () => [
-      ...effectiveColumns.filter((c) => c.pin === "left"),
-      ...effectiveColumns.filter((c) => !c.pin),
-      ...effectiveColumns.filter((c) => c.pin === "right"),
-    ],
-    [effectiveColumns],
+    () =>
+      [
+        ...effectiveColumns.filter((c) => c.pin === "left"),
+        ...effectiveColumns.filter((c) => !c.pin),
+        ...effectiveColumns.filter((c) => c.pin === "right"),
+      ].filter((c) => !(c.hideable !== false && hiddenIds.has(c.id))),
+    [effectiveColumns, hiddenIds],
   );
+
+  const colCount =
+    orderedColumns.length +
+    (selectable ? 1 : 0) +
+    (expandable ? 1 : 0) +
+    (reorderableRows ? 1 : 0);
+  const hasFooter = orderedColumns.some((c) => c.footer !== undefined);
 
   // --- frozen columns ---
   const hasLeftPin = effectiveColumns.some((c) => c.pin === "left");
@@ -927,17 +1483,210 @@ export function DataTable<T>({
     return {};
   };
 
+  const toggleable = columns.filter((c) => c.hideable !== false);
+  const visibleToggleIds = toggleable
+    .filter((c) => !hiddenIds.has(c.id))
+    .map((c) => c.id);
+
+  // distinct values for a "select" filter (derived from data unless provided)
+  const getFilterOptions = (col: DataTableColumn<T>) => {
+    const seen = new Set<string>();
+    const out: { value: string; label: string }[] = [];
+    for (const row of data) {
+      const v = getSortValue(col, row);
+      if (v == null || v === "") continue;
+      const s = String(v);
+      if (!seen.has(s)) {
+        seen.add(s);
+        out.push({ value: s, label: s });
+      }
+    }
+    return out.sort((a, b) => a.label.localeCompare(b.label));
+  };
+
+  const isMobile = useMediaQuery("(max-width: 639px)", responsive);
+  const renderCell = (col: DataTableColumn<T>, row: T, i: number) =>
+    col.cell ? col.cell(row, i) : col.accessor ? col.accessor(row) : null;
+
+  const hasFilterableCols = effectiveColumns.some((c) => c.filterable);
+  const hasActiveFilters = Object.values(filters).some((f) =>
+    f.rules.some((r) => r.value !== ""),
+  );
+  const orderChanged = reorderableColumns && columnOrder.length > 0;
+  const showToolbar =
+    searchable ||
+    hasFilterableCols ||
+    orderChanged ||
+    (columnToggle && toggleable.length > 0);
+
   return (
-    <div
-      className={cn(
-        "w-full",
-        frame && "overflow-hidden rounded-xl border border-border bg-card",
-        className,
+    <div className="w-full">
+      {showToolbar && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            {(query || hasActiveFilters) && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => {
+                  setQuery("");
+                  setFilters({});
+                }}
+              >
+                <FunnelGlyph />
+                Clear
+              </Button>
+            )}
+            {orderChanged && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setColumnOrder([]);
+                  onColumnOrderChange?.([]);
+                }}
+              >
+                Reset columns
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {columnToggle && toggleable.length > 0 && (
+              <div className="w-48">
+                <MultiSelect
+                  size="sm"
+                  maxDisplay={0}
+                  selectAll={false}
+                  searchable
+                  placeholder="Columns"
+                  options={toggleable.map((c) => ({
+                    value: c.id,
+                    label: typeof c.header === "string" ? c.header : c.id,
+                  }))}
+                  value={visibleToggleIds}
+                  onValueChange={(ids) => {
+                    const next = new Set<string>();
+                    toggleable.forEach((c) => {
+                      if (!ids.includes(c.id)) next.add(c.id);
+                    });
+                    setHiddenIds(next);
+                  }}
+                />
+              </div>
+            )}
+            {searchable && (
+              <div className="relative">
+                <SearchGlyph className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  aria-label="Search"
+                  className="h-9 w-56 rounded-[var(--radius)] border border-input bg-background pl-8 pr-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       )}
-    >
+      {responsive && isMobile ? (
+        <div className="space-y-3">
+          {rows.length === 0 ? (
+            <div className="rounded-xl border border-border bg-card px-4 py-8 text-center text-muted-foreground">
+              {emptyContent}
+            </div>
+          ) : (
+            rows.map((row, rowIndex) => {
+              const key = keyOf(row, rowIndex);
+              const selected = selectedSet.has(key);
+              const expanded = expandable && expandedSet.has(key);
+              const canExpand = expandable && (!rowExpandable || rowExpandable(row));
+              return (
+                <div
+                  key={key}
+                  data-selected={selected || undefined}
+                  onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
+                  className={cn(
+                    "rounded-xl border border-border bg-card p-4",
+                    selected && "ring-1 ring-primary",
+                    clickable && "cursor-pointer",
+                    typeof rowClassName === "function"
+                      ? rowClassName(row, rowIndex)
+                      : rowClassName,
+                  )}
+                >
+                  {(selectable || canExpand) && (
+                    <div
+                      className="mb-3 flex items-center justify-between"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {selectable ? (
+                        selectionMode === "single" ? (
+                          <RowRadio checked={selected} onSelect={() => toggleRow(key)} label="Select row" />
+                        ) : (
+                          <Checkbox size="sm" aria-label="Select row" checked={selected} onCheckedChange={() => toggleRow(key)} />
+                        )
+                      ) : (
+                        <span />
+                      )}
+                      {canExpand && (
+                        <button
+                          type="button"
+                          aria-label={expanded ? "Collapse" : "Expand"}
+                          aria-expanded={expanded}
+                          onClick={() => toggleExpand(key)}
+                          className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <svg viewBox="0 0 16 16" className={cn("size-4 transition-transform", expanded && "rotate-90")} fill="none" aria-hidden>
+                            <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <dl className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
+                    {orderedColumns.map((col) => (
+                      <React.Fragment key={col.id}>
+                        <dt className="truncate text-muted-foreground">
+                          {col.header ?? col.id}
+                        </dt>
+                        <dd className={cn("min-w-0 text-right", col.numeric && "tabular-nums")}>
+                          {renderCell(col, row, rowIndex)}
+                        </dd>
+                      </React.Fragment>
+                    ))}
+                  </dl>
+                  {expanded && (
+                    <div className="mt-3 border-t border-border pt-3">
+                      {renderExpanded!(row, rowIndex)}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+          {footer}
+        </div>
+      ) : (
       <div
+        className={cn(
+          "w-full",
+          frame && "overflow-hidden rounded-xl border border-border bg-card",
+          className,
+        )}
+      >
+      <div
+        ref={setScrollEl}
         className="overflow-auto"
-        style={maxHeight !== undefined ? { maxHeight } : undefined}
+        style={
+          virtualized
+            ? { maxHeight: maxHeight ?? 440 }
+            : maxHeight !== undefined
+              ? { maxHeight }
+              : undefined
+        }
       >
       <table
         aria-label={label}
@@ -949,6 +1698,19 @@ export function DataTable<T>({
       >
         <thead>
           <tr ref={headRef}>
+            {reorderableRows && (
+              <th
+                scope="col"
+                aria-label="Reorder"
+                className={cn(
+                  cellPad({ size }),
+                  "w-[1%]",
+                  frame ? "bg-muted" : "bg-transparent",
+                  "shadow-[inset_0_-1px_0_var(--border)]",
+                  stickyHeader && "sticky top-0 z-10",
+                )}
+              />
+            )}
             {expandable && (
               <th
                 scope="col"
@@ -1009,6 +1771,22 @@ export function DataTable<T>({
                   key={col.id}
                   scope="col"
                   data-pin-id={col.id}
+                  draggable={reorderableColumns || undefined}
+                  onDragStart={
+                    reorderableColumns ? () => setDragColId(col.id) : undefined
+                  }
+                  onDragOver={
+                    reorderableColumns ? (e) => e.preventDefault() : undefined
+                  }
+                  onDrop={
+                    reorderableColumns
+                      ? () => {
+                          moveColumn(dragColId, col.id);
+                          setDragColId(null);
+                        }
+                      : undefined
+                  }
+                  onDragEnd={reorderableColumns ? () => setDragColId(null) : undefined}
                   aria-sort={
                     !col.sortable
                       ? undefined
@@ -1027,6 +1805,8 @@ export function DataTable<T>({
                     cellPad({ size }),
                     alignClass[align],
                     "font-medium whitespace-nowrap text-muted-foreground",
+                    reorderableColumns && "cursor-grab active:cursor-grabbing",
+                    dragColId === col.id && "opacity-40",
                     // framed/pinned headers get the muted band; borderless headers
                     // stay transparent (page-coloured) for a lighter, elegant look
                     frame || col.pin ? "bg-muted" : "bg-transparent",
@@ -1065,6 +1845,25 @@ export function DataTable<T>({
                         {col.header ?? col.id}
                       </span>
                     )}
+                    {col.filterable && (
+                      <ColumnFilterMenu
+                        type={col.filterType ?? (col.numeric ? "number" : "text")}
+                        options={
+                          col.filterType === "select"
+                            ? col.filterOptions ?? getFilterOptions(col)
+                            : undefined
+                        }
+                        filter={filters[col.id]}
+                        onApply={(f) => setFilters((s) => ({ ...s, [col.id]: f }))}
+                        onClear={() =>
+                          setFilters((s) => {
+                            const next = { ...s };
+                            delete next[col.id];
+                            return next;
+                          })
+                        }
+                      />
+                    )}
                     {pinnable && !col.disablePinning && (
                       <ColumnPinMenu pin={col.pin} onPin={(p) => setPin(col.id, p)} />
                     )}
@@ -1089,7 +1888,17 @@ export function DataTable<T>({
               </td>
             </tr>
           ) : (
-            rows.map((row, rowIndex) => {
+            <>
+            {virtualized && padTop > 0 && (
+              <tr style={{ height: padTop }}>
+                <td colSpan={colCount} />
+              </tr>
+            )}
+            {(virtualized
+              ? virtualItems.map((v) => v.index)
+              : rows.map((_, i) => i)
+            ).map((rowIndex) => {
+              const row = rows[rowIndex];
               const key = keyOf(row, rowIndex);
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
@@ -1099,6 +1908,26 @@ export function DataTable<T>({
               <tr
                 data-selected={selected || undefined}
                 data-expanded={expanded || undefined}
+                onDragOver={
+                  reorderableRows
+                    ? (e) => {
+                        e.preventDefault();
+                        const r = e.currentTarget.getBoundingClientRect();
+                        const pos = e.clientY < r.top + r.height / 2 ? "before" : "after";
+                        if (dropTarget?.key !== key || dropTarget?.pos !== pos)
+                          setDropTarget({ key, pos });
+                      }
+                    : undefined
+                }
+                onDrop={
+                  reorderableRows
+                    ? () => {
+                        if (dropTarget) moveRow(dragRowKey, dropTarget.key, dropTarget.pos);
+                        setDragRowKey(null);
+                        setDropTarget(null);
+                      }
+                    : undefined
+                }
                 onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
                 tabIndex={clickable ? 0 : undefined}
                 onKeyDown={
@@ -1121,6 +1950,13 @@ export function DataTable<T>({
                   striped && "even:bg-muted/40",
                   hoverable && "hover:bg-muted/60",
                   selected && "bg-primary/10",
+                  // insertion line while reordering rows
+                  dropTarget?.key === key &&
+                    dropTarget.pos === "before" &&
+                    "shadow-[inset_0_2px_0_var(--primary)]",
+                  dropTarget?.key === key &&
+                    dropTarget.pos === "after" &&
+                    "shadow-[inset_0_-2px_0_var(--primary)]",
                   clickable &&
                     "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                   typeof rowClassName === "function"
@@ -1128,6 +1964,28 @@ export function DataTable<T>({
                     : rowClassName,
                 )}
               >
+                {reorderableRows && (
+                  <td
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div
+                      draggable
+                      onDragStart={() => setDragRowKey(key)}
+                      onDragEnd={() => {
+                        setDragRowKey(null);
+                        setDropTarget(null);
+                      }}
+                      aria-label="Drag to reorder"
+                      className={cn(
+                        "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing",
+                        dragRowKey === key && "opacity-40",
+                      )}
+                    >
+                      <GripGlyph />
+                    </div>
+                  </td>
+                )}
                 {expandable && (
                   <td
                     style={
@@ -1234,12 +2092,86 @@ export function DataTable<T>({
               )}
               </React.Fragment>
               );
-            })
+            })}
+            {virtualized && padBottom > 0 && (
+              <tr style={{ height: padBottom }}>
+                <td colSpan={colCount} />
+              </tr>
+            )}
+            </>
           )}
         </tbody>
+        {hasFooter && (
+          <tfoot>
+            <tr>
+              {reorderableRows && (
+                <td className={cn(cellPad({ size }), "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0")} />
+              )}
+              {expandable && (
+                <td
+                  style={
+                    hasLeftPin
+                      ? { position: "sticky", left: pinPx.left["__lead_expand"] }
+                      : undefined
+                  }
+                  className={cn(
+                    cellPad({ size }),
+                    "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
+                    bordered && "border-r border-border",
+                    hasLeftPin ? "sticky z-20" : "sticky",
+                    "bottom-0",
+                  )}
+                />
+              )}
+              {selectable && (
+                <td
+                  style={
+                    hasLeftPin
+                      ? { position: "sticky", left: pinPx.left["__lead_select"] }
+                      : undefined
+                  }
+                  className={cn(
+                    cellPad({ size }),
+                    "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
+                    bordered && "border-r border-border",
+                    "sticky bottom-0",
+                    hasLeftPin && "z-20",
+                  )}
+                />
+              )}
+              {orderedColumns.map((col) => {
+                const align = col.align ?? (col.numeric ? "right" : "left");
+                const content =
+                  typeof col.footer === "function" ? col.footer(sortedRows) : col.footer;
+                return (
+                  <td
+                    key={col.id}
+                    style={col.pin ? pinStyleFor(col) : undefined}
+                    className={cn(
+                      cellPad({ size }),
+                      alignClass[align],
+                      col.numeric && "tabular-nums",
+                      "sticky bottom-0 bg-muted font-medium text-foreground",
+                      "shadow-[inset_0_1px_0_var(--border)]",
+                      bordered && "border-r border-border last:border-r-0",
+                      col.pin ? "z-20" : "z-10",
+                      col.id === lastLeftId && "border-r border-border",
+                      col.id === firstRightId && "border-l border-border",
+                      col.className,
+                    )}
+                  >
+                    {content}
+                  </td>
+                );
+              })}
+            </tr>
+          </tfoot>
+        )}
       </table>
       </div>
       {footer}
+      </div>
+      )}
     </div>
   );
 }
