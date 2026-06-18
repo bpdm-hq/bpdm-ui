@@ -66,8 +66,8 @@ export interface SecureFieldProps extends VariantProps<typeof wrapVariants> {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** "card" groups digits 4-4-4-4 and restricts to digits. */
-  format?: "card" | "none";
+  /** "grouped" groups digits 4-4-4-4 and restricts input to digits. */
+  format?: "grouped" | "none";
   /** Characters kept visible while masked (e.g. 4 → •••• •••• •••• 4242). */
   unmaskedTail?: number;
   /** Show the reveal (eye) toggle. */
@@ -82,7 +82,7 @@ export interface SecureFieldProps extends VariantProps<typeof wrapVariants> {
 }
 
 /**
- * Masked input for sensitive values (card numbers, IBANs, API keys, secrets).
+ * Masked input for sensitive values (API keys, secrets, license keys, tokens).
  * Shows masked at rest with an optional visible tail, a reveal toggle, and an
  * optional copy button. Uses text + masking (not type=password) so password
  * managers don't hijack it. The real value is what you read/copy/onValueChange.
@@ -111,7 +111,7 @@ export function SecureField({
   const copyTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   React.useEffect(() => () => clearTimeout(copyTimer.current), []);
 
-  const formatted = format === "card" ? groupCard(raw) : raw;
+  const formatted = format === "grouped" ? groupCard(raw) : raw;
   const masked = maskValue(formatted, unmaskedTail);
   const show = revealed || focused;
   const display = show ? formatted : masked;
@@ -123,7 +123,7 @@ export function SecureField({
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
-    if (format === "card") v = v.replace(/\D/g, "").slice(0, 19);
+    if (format === "grouped") v = v.replace(/\D/g, "").slice(0, 19);
     setRaw(v);
   };
 
@@ -156,7 +156,7 @@ export function SecureField({
         autoComplete="off"
         data-1p-ignore
         data-lpignore="true"
-        inputMode={format === "card" ? "numeric" : "text"}
+        inputMode={format === "grouped" ? "numeric" : "text"}
         disabled={disabled}
         value={display}
         placeholder={placeholder}

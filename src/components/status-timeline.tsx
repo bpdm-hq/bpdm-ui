@@ -39,7 +39,7 @@ const dotByStatus: Record<TimelineStatus, string> = {
 };
 
 /**
- * Vertical status timeline for lifecycles (payment, order, shipment, …). Each step
+ * Vertical status timeline for lifecycles (deployment, approval, onboarding, …). Each step
  * has a status — complete (✓), current (pulsing), pending (hollow), failed (✗) —
  * with an optional timestamp and description.
  */

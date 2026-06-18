@@ -22,7 +22,7 @@ export interface NumberInputProps
   buttonLayout?: ButtonLayout;
   /** Static text shown before the value, e.g. "$". */
   prefix?: string;
-  /** Static text shown after the value, e.g. "ETH". */
+  /** Static text shown after the value, e.g. "kg". */
   suffix?: string;
   /** Called with the (string) value on every change — never loses precision. */
   onValueChange?: (value: string) => void;
@@ -103,8 +103,8 @@ const partial = /^-?\d*\.?\d*$/;
 
 /**
  * Number input with stepper buttons. **Precision-safe**: values
- * are strings and all arithmetic uses bignumber.js, so huge crypto amounts and
- * high-decimal token values never lose precision (unlike JS `number`). Controlled
+ * are strings and all arithmetic uses bignumber.js, so very large quantities and
+ * high-decimal measurements never lose precision (unlike JS `number`). Controlled
  * (`value` + `onValueChange`) or uncontrolled (`defaultValue`); clamps to min/max.
  */
 export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(

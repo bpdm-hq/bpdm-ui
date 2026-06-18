@@ -9,7 +9,7 @@ import {
 import { StatusTimeline, type TimelineItem } from "./status-timeline";
 
 const usage = `
-Vertical status timeline for lifecycles — payments, orders, shipments, approvals.
+Vertical status timeline for lifecycles — deployments, approvals, onboarding, builds.
 Each step has a status: \`complete\` (✓), \`current\` (pulsing), \`pending\` (hollow),
 \`failed\` (✗), with an optional timestamp and description.
 
@@ -18,9 +18,9 @@ import { StatusTimeline } from "@bpdm/ui";
 
 <StatusTimeline
   items={[
-    { title: "Order placed", status: "complete", timestamp: "09:41" },
-    { title: "Payment captured", status: "current", timestamp: "09:42" },
-    { title: "Settled", status: "pending" },
+    { title: "Build queued", status: "complete", timestamp: "09:41" },
+    { title: "Running tests", status: "current", timestamp: "09:42" },
+    { title: "Deploy", status: "pending" },
   ]}
 />
 \`\`\`
@@ -57,24 +57,24 @@ export default meta;
 
 type Story = StoryObj<typeof StatusTimeline>;
 
-const payment: TimelineItem[] = [
-  { title: "Order placed", status: "complete", timestamp: "09:41", description: "by customer" },
-  { title: "Payment authorized", status: "complete", timestamp: "09:41" },
-  { title: "Funds captured", status: "current", timestamp: "09:42", description: "Processing with acquirer" },
-  { title: "Settled to account", status: "pending", description: "Expected in 2 business days" },
+const pipeline: TimelineItem[] = [
+  { title: "Build queued", status: "complete", timestamp: "09:41", description: "Triggered by push to main" },
+  { title: "Dependencies installed", status: "complete", timestamp: "09:41" },
+  { title: "Running tests", status: "current", timestamp: "09:42", description: "412 of 980 passed" },
+  { title: "Deploy to production", status: "pending", description: "Waiting for tests" },
 ];
 
-export const Playground: Story = { args: { items: payment } };
+export const Playground: Story = { args: { items: pipeline } };
 
-// a flow that hit a failure (e.g. a chargeback / declined capture)
+// a flow that hit a failure
 export const WithFailure: Story = {
   parameters: {
     docs: {
       source: {
         code: `<StatusTimeline items={[
-  { title: "Payment authorized", status: "complete" },
-  { title: "Capture declined", status: "failed", description: "Insufficient funds" },
-  { title: "Retry scheduled", status: "pending" },
+  { title: "Tests passed", status: "complete" },
+  { title: "Deploy failed", status: "failed", description: "Health check timed out" },
+  { title: "Rollback scheduled", status: "pending" },
 ]} />`,
       },
     },
@@ -83,9 +83,9 @@ export const WithFailure: Story = {
     <div className="w-80">
       <StatusTimeline
         items={[
-          { title: "Payment authorized", status: "complete", timestamp: "11:02" },
-          { title: "Capture declined", status: "failed", timestamp: "11:03", description: "Insufficient funds" },
-          { title: "Retry scheduled", status: "pending", description: "Tomorrow, 09:00" },
+          { title: "Tests passed", status: "complete", timestamp: "11:02" },
+          { title: "Deploy failed", status: "failed", timestamp: "11:03", description: "Health check timed out" },
+          { title: "Rollback scheduled", status: "pending", description: "Retrying in 5 min" },
         ]}
       />
     </div>

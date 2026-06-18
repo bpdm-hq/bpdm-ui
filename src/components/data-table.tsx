@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -93,6 +94,14 @@ export interface DataTableColumn<T> {
   width?: number | string;
   /** Right-align and use tabular figures — for money / counts. */
   numeric?: boolean;
+  /**
+   * Pin this column to an edge while the table scrolls horizontally. Give pinned
+   * columns a numeric `width`, and place left-pinned columns first / right-pinned
+   * last in the array.
+   */
+  pin?: "left" | "right";
+  /** Hide the per-column pin menu for this column even when `pinnable` is on. */
+  disablePinning?: boolean;
   /** Allow clicking the header to sort by this column. */
   sortable?: boolean;
   /**
@@ -171,6 +180,10 @@ export interface DataTableProps<T> {
   defaultExpandedKeys?: React.Key[];
   /** Fired when the set of expanded rows changes. */
   onExpandedChange?: (keys: React.Key[]) => void;
+  /** Show a per-column header menu to pin/unpin columns at runtime. */
+  pinnable?: boolean;
+  /** Fired when a column is pinned/unpinned via the header menu. */
+  onColumnPinChange?: (id: string, pin: "left" | "right" | undefined) => void;
   /** Accessible name for the table (maps to `aria-label`). */
   label?: string;
   className?: string;
@@ -247,6 +260,74 @@ function SortIcon({ dir }: { dir: SortDirection | null }) {
     <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-foreground" fill="none" aria-hidden>
       <path d={dir === "asc" ? "M4 10l4-4 4 4" : "M4 6l4 4 4-4"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+function DotsIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" aria-hidden>
+      <circle cx="8" cy="3.5" r="1.3" fill="currentColor" />
+      <circle cx="8" cy="8" r="1.3" fill="currentColor" />
+      <circle cx="8" cy="12.5" r="1.3" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PinArrow({ side }: { side: "left" | "right" }) {
+  return (
+    <svg viewBox="0 0 16 16" className="size-3.5 text-muted-foreground" fill="none" aria-hidden>
+      <path
+        d={side === "left" ? "M10 4 6 8l4 4" : "M6 4l4 4-4 4"}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+const pinMenuItem =
+  "flex cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-4px)] px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-40";
+
+// per-column header menu: pin left / pin right / unpin (interactive freezing)
+function ColumnPinMenu({
+  pin,
+  onPin,
+}: {
+  pin?: "left" | "right";
+  onPin: (p: "left" | "right" | undefined) => void;
+}) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          aria-label="Column options"
+          onClick={(e) => e.stopPropagation()}
+          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <DotsIcon />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={4}
+          className="z-50 min-w-[9rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md outline-none animate-[bpdm-pop-in_120ms_ease-out]"
+        >
+          <DropdownMenu.Item className={pinMenuItem} disabled={pin === "left"} onSelect={() => onPin("left")}>
+            <PinArrow side="left" /> Pin left
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className={pinMenuItem} disabled={pin === "right"} onSelect={() => onPin("right")}>
+            <PinArrow side="right" /> Pin right
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className={pinMenuItem} disabled={!pin} onSelect={() => onPin(undefined)}>
+            <span className="size-3.5" /> Unpin
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
 
@@ -514,6 +595,8 @@ export function DataTable<T>({
   expandedKeys,
   defaultExpandedKeys,
   onExpandedChange,
+  pinnable = false,
+  onColumnPinChange,
   label,
   className,
 }: DataTableProps<T>) {
@@ -525,11 +608,31 @@ export function DataTable<T>({
   );
   const sortState = isControlled ? sort! : internalSort;
 
+  // interactive pinning: runtime pin state seeded from the columns' declared pin
+  const [pinState, setPinState] = React.useState<
+    Record<string, "left" | "right" | undefined>
+  >(() => {
+    const m: Record<string, "left" | "right" | undefined> = {};
+    columns.forEach((c) => {
+      if (c.pin) m[c.id] = c.pin;
+    });
+    return m;
+  });
+  const setPin = (id: string, side: "left" | "right" | undefined) => {
+    setPinState((s) => ({ ...s, [id]: side }));
+    onColumnPinChange?.(id, side);
+  };
+  // when `pinnable`, the runtime pin state overrides the declared `pin`
+  const effectiveColumns = React.useMemo(
+    () => (pinnable ? columns.map((c) => ({ ...c, pin: pinState[c.id] ?? c.pin })) : columns),
+    [columns, pinnable, pinState],
+  );
+
   const colById = React.useMemo(() => {
     const m = new Map<string, DataTableColumn<T>>();
-    columns.forEach((c) => m.set(c.id, c));
+    effectiveColumns.forEach((c) => m.set(c.id, c));
     return m;
-  }, [columns]);
+  }, [effectiveColumns]);
 
   const applySort = (next: DataTableSort[]) => {
     if (!isControlled) setInternalSort(next);
@@ -737,6 +840,93 @@ export function DataTable<T>({
   const colCount =
     columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0);
 
+  // Pinned columns auto-move to the edges (left-pinned first, right-pinned last),
+  // keeping their relative order — so authors never have to hand-order them and
+  // the pinned blocks are always contiguous (no gaps).
+  const orderedColumns = React.useMemo(
+    () => [
+      ...effectiveColumns.filter((c) => c.pin === "left"),
+      ...effectiveColumns.filter((c) => !c.pin),
+      ...effectiveColumns.filter((c) => c.pin === "right"),
+    ],
+    [effectiveColumns],
+  );
+
+  // --- frozen columns ---
+  const hasLeftPin = effectiveColumns.some((c) => c.pin === "left");
+  const hasRightPin = effectiveColumns.some((c) => c.pin === "right");
+  const hasPinned = hasLeftPin || hasRightPin;
+
+  const leftPinIds = orderedColumns.filter((c) => c.pin === "left").map((c) => c.id);
+  const lastLeftId = leftPinIds[leftPinIds.length - 1]; // scroll-facing edge
+  const rightPinIds = orderedColumns.filter((c) => c.pin === "right").map((c) => c.id);
+  const firstRightId = rightPinIds[0];
+
+  // Sticky offsets are measured from the ACTUAL rendered header-cell widths —
+  // declared widths drift from reality (padding, content, the narrow selection
+  // column), which would leave gaps that the scrolling cells bleed through.
+  // Re-measured on resize.
+  const headRef = React.useRef<HTMLTableRowElement>(null);
+  const [pinPx, setPinPx] = React.useState<{
+    left: Record<string, number>;
+    right: Record<string, number>;
+  }>({ left: {}, right: {} });
+
+  React.useLayoutEffect(() => {
+    const row = headRef.current;
+    if (!hasPinned || !row) return;
+    const measure = () => {
+      const ths = Array.from(row.children) as HTMLElement[];
+      const left: Record<string, number> = {};
+      let acc = 0;
+      for (const th of ths) {
+        const id = th.dataset.pinId;
+        const isLead = id === "__lead_select" || id === "__lead_expand";
+        const isLeftPin = !!id && colById.get(id)?.pin === "left";
+        if ((isLead && hasLeftPin) || isLeftPin) {
+          if (id) left[id] = acc;
+          acc += th.getBoundingClientRect().width;
+        } else break; // the left-pinned block is contiguous at the start
+      }
+      const right: Record<string, number> = {};
+      let racc = 0;
+      for (let i = ths.length - 1; i >= 0; i--) {
+        const id = ths[i].dataset.pinId;
+        if (id && colById.get(id)?.pin === "right") {
+          right[id] = racc;
+          racc += ths[i].getBoundingClientRect().width;
+        } else break;
+      }
+      setPinPx({ left, right });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    Array.from(row.children).forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPinned, hasLeftPin, colById, orderedColumns, data, selectable, expandable, size, bordered, rowSpacing]);
+
+  const expanderLeft = pinPx.left["__lead_expand"];
+  const selectionLeft = pinPx.left["__lead_select"];
+
+  // pinned body cells must be OPAQUE (a sticky cell with a translucent bg would
+  // let the scrolling cells show through). Base card + opaque color-mix tints for
+  // hover/selected, reflected from the row via `group`. Raw tokens (not --color-*)
+  // so they resolve under @theme inline.
+  const pinnedBg = cn(
+    "bg-card",
+    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))]",
+    "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
+  );
+
+  // sticky positioning for a data column (used by both th and td)
+  const pinStyleFor = (col: DataTableColumn<T>): React.CSSProperties => {
+    if (col.pin === "left") return { position: "sticky", left: pinPx.left[col.id] };
+    if (col.pin === "right") return { position: "sticky", right: pinPx.right[col.id] };
+    return {};
+  };
+
   return (
     <div
       className={cn(
@@ -758,27 +948,41 @@ export function DataTable<T>({
         style={rowSpacing ? { borderSpacing: `0 ${rowSpacing}px` } : undefined}
       >
         <thead>
-          <tr>
+          <tr ref={headRef}>
             {expandable && (
               <th
                 scope="col"
                 aria-label="Expand"
+                data-pin-id="__lead_expand"
+                style={{
+                  ...(hasLeftPin ? { position: "sticky", left: expanderLeft } : {}),
+                  ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
+                }}
                 className={cn(
                   cellPad({ size }),
-                  "w-[1%] bg-muted shadow-[inset_0_-1px_0_var(--border)]",
+                  "w-[1%]",
+                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
+                  "shadow-[inset_0_-1px_0_var(--border)]",
                   bordered && "border-r border-border",
-                  stickyHeader && "sticky top-0 z-10",
+                  hasLeftPin ? "z-20" : stickyHeader && "z-10",
                 )}
               />
             )}
             {selectable && (
               <th
                 scope="col"
+                data-pin-id="__lead_select"
+                style={{
+                  ...(hasLeftPin ? { position: "sticky", left: selectionLeft } : {}),
+                  ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
+                }}
                 className={cn(
                   cellPad({ size }),
-                  "w-[1%] bg-muted text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
+                  "w-[1%]",
+                  "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
+                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
                   bordered && "border-r border-border",
-                  stickyHeader && "sticky top-0 z-10",
+                  hasLeftPin ? "z-20" : stickyHeader && "z-10",
                 )}
               >
                 {selectionMode === "multiple" && (
@@ -793,7 +997,7 @@ export function DataTable<T>({
                 )}
               </th>
             )}
-            {columns.map((col) => {
+            {orderedColumns.map((col, ci) => {
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
               const dir = entry?.dir ?? null;
@@ -804,6 +1008,7 @@ export function DataTable<T>({
                 <th
                   key={col.id}
                   scope="col"
+                  data-pin-id={col.id}
                   aria-sort={
                     !col.sortable
                       ? undefined
@@ -813,39 +1018,57 @@ export function DataTable<T>({
                           ? "descending"
                           : "none"
                   }
-                  style={col.width !== undefined ? { width: col.width } : undefined}
+                  style={{
+                    ...(col.width !== undefined ? { width: col.width } : {}),
+                    ...pinStyleFor(col),
+                    ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
+                  }}
                   className={cn(
                     cellPad({ size }),
                     alignClass[align],
-                    "bg-muted font-medium whitespace-nowrap text-muted-foreground",
+                    "font-medium whitespace-nowrap text-muted-foreground",
+                    // framed/pinned headers get the muted band; borderless headers
+                    // stay transparent (page-coloured) for a lighter, elegant look
+                    frame || col.pin ? "bg-muted" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
+                    // borderless: thin separators between header labels
+                    !frame && !col.pin && ci > 0 && "border-l border-border/60",
                     bordered && "border-r border-border last:border-r-0",
-                    stickyHeader && "sticky top-0 z-10",
+                    col.pin ? "z-20" : stickyHeader && "z-10",
+                    col.id === lastLeftId && "border-r border-border",
+                    col.id === firstRightId && "border-l border-border",
                     col.className,
                   )}
                 >
-                  {col.sortable ? (
-                    <button
-                      type="button"
-                      onClick={(e) => handleSort(col.id, e.shiftKey)}
-                      className={cn(
-                        "flex w-full cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
-                        justifyClass[align],
-                        dir && "text-foreground",
-                      )}
-                    >
-                      <span>{col.header ?? col.id}</span>
-                      <SortIcon dir={dir} />
-                      {order > 0 && (
-                        <span className="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-                          {order}
-                        </span>
-                      )}
-                    </button>
-                  ) : (
-                    (col.header ?? col.id)
-                  )}
+                  <div className="flex items-center gap-1">
+                    {col.sortable ? (
+                      <button
+                        type="button"
+                        onClick={(e) => handleSort(col.id, e.shiftKey)}
+                        className={cn(
+                          "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
+                          justifyClass[align],
+                          dir && "text-foreground",
+                        )}
+                      >
+                        <span>{col.header ?? col.id}</span>
+                        <SortIcon dir={dir} />
+                        {order > 0 && (
+                          <span className="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
+                            {order}
+                          </span>
+                        )}
+                      </button>
+                    ) : (
+                      <span className={cn("flex-1", alignClass[align])}>
+                        {col.header ?? col.id}
+                      </span>
+                    )}
+                    {pinnable && !col.disablePinning && (
+                      <ColumnPinMenu pin={col.pin} onPin={(p) => setPin(col.id, p)} />
+                    )}
+                  </div>
                 </th>
               );
             })}
@@ -890,6 +1113,8 @@ export function DataTable<T>({
                 }
                 className={cn(
                   "transition-colors",
+                  // `group` lets pinned cells mirror the row's hover/selected state
+                  hasPinned && "group",
                   divided && !rowSpacing && "border-t border-border",
                   rowSpacing &&
                     "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
@@ -905,7 +1130,18 @@ export function DataTable<T>({
               >
                 {expandable && (
                   <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
+                    style={
+                      hasLeftPin
+                        ? { position: "sticky", left: expanderLeft }
+                        : undefined
+                    }
+                    className={cn(
+                      cellPad({ size }),
+                      "w-[1%]",
+                      bordered && "border-r border-border",
+                      hasLeftPin && `z-10 ${pinnedBg}`,
+                      cellClassName,
+                    )}
                     onClick={(e) => e.stopPropagation()}
                   >
                     {canExpand && (
@@ -930,7 +1166,18 @@ export function DataTable<T>({
                 )}
                 {selectable && (
                   <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
+                    style={
+                      hasLeftPin
+                        ? { position: "sticky", left: selectionLeft }
+                        : undefined
+                    }
+                    className={cn(
+                      cellPad({ size }),
+                      "w-[1%]",
+                      bordered && "border-r border-border",
+                      hasLeftPin && `z-10 ${pinnedBg}`,
+                      cellClassName,
+                    )}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex justify-center">
@@ -951,16 +1198,20 @@ export function DataTable<T>({
                     </div>
                   </td>
                 )}
-                {columns.map((col) => {
+                {orderedColumns.map((col) => {
                   const align = col.align ?? (col.numeric ? "right" : "left");
                   return (
                     <td
                       key={col.id}
+                      style={col.pin ? pinStyleFor(col) : undefined}
                       className={cn(
                         cellPad({ size }),
                         alignClass[align],
                         col.numeric && "tabular-nums",
                         bordered && "border-r border-border last:border-r-0",
+                        col.pin && `z-10 ${pinnedBg}`,
+                        col.id === lastLeftId && "border-r border-border",
+                        col.id === firstRightId && "border-l border-border",
                         cellClassName,
                         col.className,
                       )}

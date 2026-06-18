@@ -10,8 +10,8 @@ import { NumberInput } from "./number-input";
 
 const usage = `
 Number field with stepper buttons. **Precision-safe** — values are
-strings and arithmetic uses bignumber.js, so huge crypto amounts and high-decimal
-token values never lose precision (JS \`number\` caps at ~9×10¹⁵). Two button
+strings and arithmetic uses bignumber.js, so very large quantities and
+high-decimal measurements never lose precision (JS \`number\` caps at ~9×10¹⁵). Two button
 layouts: \`stacked\` (chevrons) and \`horizontal\` (−/+). Controlled or uncontrolled;
 clamps to \`min\`/\`max\`.
 
@@ -23,10 +23,10 @@ import { NumberInput } from "@bpdm/ui";
 <NumberInput min="0" max="10" defaultValue="5" />
 
 // precise to the last digit — no rounding
-<NumberInput defaultValue="123456789012345678" step="1" suffix="wei" />
+<NumberInput defaultValue="123456789012345678" step="1" suffix="ns" />
 
 // controlled (value + onValueChange are strings)
-<NumberInput value={amount} onValueChange={setAmount} step="0.00000001" suffix="BTC" />
+<NumberInput value={amount} onValueChange={setAmount} step="0.0001" suffix="kg" />
 \`\`\`
 `;
 
@@ -100,13 +100,13 @@ export const MinMaxBoundaries: Story = {
 };
 
 // Precision-safe: a value far beyond Number.MAX_SAFE_INTEGER stays exact.
-export const BigCryptoAmount: Story = {
+export const HighPrecision: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// 18-decimal token base units — JS number would corrupt this
-<NumberInput defaultValue="123456789012345678901234" step="1" suffix="wei" />
-<NumberInput defaultValue="0.00000001" step="0.00000001" suffix="BTC" />`,
+        code: `// 24-digit integer — a JS number would corrupt this
+<NumberInput defaultValue="123456789012345678901234" step="1" suffix="ns" />
+<NumberInput defaultValue="0.0001" step="0.0001" suffix="kg" />`,
       },
     },
   },
@@ -115,13 +115,13 @@ export const BigCryptoAmount: Story = {
       <NumberInput
         defaultValue="123456789012345678901234"
         step="1"
-        suffix="wei"
+        suffix="ns"
         className="w-[26rem]"
       />
       <NumberInput
-        defaultValue="0.00000001"
-        step="0.00000001"
-        suffix="BTC"
+        defaultValue="0.0001"
+        step="0.0001"
+        suffix="kg"
         className="w-[26rem]"
       />
     </div>

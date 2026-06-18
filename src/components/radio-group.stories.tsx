@@ -16,14 +16,14 @@ checkbox group). Controlled (\`value\` + \`onValueChange\`) or uncontrolled
 \`\`\`tsx
 import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
 
-<RadioGroup defaultValue="card">
+<RadioGroup defaultValue="pro">
   <div className="flex items-center gap-2">
-    <RadioGroupItem value="card" id="card" />
-    <label htmlFor="card">Card</label>
+    <RadioGroupItem value="free" id="free" />
+    <label htmlFor="free">Free</label>
   </div>
   <div className="flex items-center gap-2">
-    <RadioGroupItem value="upi" id="upi" />
-    <label htmlFor="upi">UPI</label>
+    <RadioGroupItem value="pro" id="pro" />
+    <label htmlFor="pro">Pro</label>
   </div>
 </RadioGroup>
 \`\`\`
@@ -53,16 +53,16 @@ const meta: Meta<typeof RadioGroup> = {
     orientation: { control: "inline-radio", options: ["vertical", "horizontal"] },
     disabled: { control: "boolean" },
   },
-  args: { defaultValue: "card", orientation: "vertical" },
+  args: { defaultValue: "pro", orientation: "vertical" },
 };
 export default meta;
 
 type Story = StoryObj<typeof RadioGroup>;
 
-const methods = [
-  { value: "card", label: "Card" },
-  { value: "paypal", label: "PayPal" },
-  { value: "wallet", label: "Wallet" },
+const plans = [
+  { value: "free", label: "Free" },
+  { value: "pro", label: "Pro" },
+  { value: "enterprise", label: "Enterprise" },
 ];
 
 function Option({
@@ -86,15 +86,15 @@ function Option({
 }
 
 // only one at a time — the single-select use case (interactive: see Controls)
-export const PaymentMethod: Story = {
+export const Plan: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<RadioGroup defaultValue="card">
-  {methods.map((m) => (
-    <div key={m.value} className="flex items-center gap-2">
-      <RadioGroupItem value={m.value} id={m.value} />
-      <label htmlFor={m.value}>{m.label}</label>
+        code: `<RadioGroup defaultValue="pro">
+  {plans.map((p) => (
+    <div key={p.value} className="flex items-center gap-2">
+      <RadioGroupItem value={p.value} id={p.value} />
+      <label htmlFor={p.value}>{p.label}</label>
     </div>
   ))}
 </RadioGroup>`,
@@ -103,8 +103,8 @@ export const PaymentMethod: Story = {
   },
   render: (args) => (
     <RadioGroup {...args}>
-      {methods.map((m) => (
-        <Option key={m.value} value={m.value} label={m.label} />
+      {plans.map((p) => (
+        <Option key={p.value} value={p.value} label={p.label} />
       ))}
     </RadioGroup>
   ),
@@ -113,13 +113,13 @@ export const PaymentMethod: Story = {
 export const Horizontal: Story = {
   parameters: {
     docs: {
-      source: { code: `<RadioGroup defaultValue="card" orientation="horizontal">…</RadioGroup>` },
+      source: { code: `<RadioGroup defaultValue="pro" orientation="horizontal">…</RadioGroup>` },
     },
   },
   render: () => (
-    <RadioGroup defaultValue="card" orientation="horizontal">
-      {methods.map((m) => (
-        <Option key={m.value} value={m.value} label={m.label} />
+    <RadioGroup defaultValue="pro" orientation="horizontal">
+      {plans.map((p) => (
+        <Option key={p.value} value={p.value} label={p.label} />
       ))}
     </RadioGroup>
   ),
@@ -137,10 +137,10 @@ export const Sizes: Story = {
   },
   render: () => (
     <div className="flex flex-col gap-5">
-      <RadioGroup defaultValue="md-card" className="flex flex-wrap gap-5">
-        <Option value="card" label="Small" size="sm" />
-        <Option value="upi" label="Medium" size="md" />
-        <Option value="wallet" label="Large" size="lg" />
+      <RadioGroup defaultValue="md-pro" className="flex flex-wrap gap-5">
+        <Option value="free" label="Small" size="sm" />
+        <Option value="pro" label="Medium" size="md" />
+        <Option value="enterprise" label="Large" size="lg" />
       </RadioGroup>
     </div>
   ),
@@ -148,12 +148,12 @@ export const Sizes: Story = {
 
 export const Disabled: Story = {
   parameters: {
-    docs: { source: { code: `<RadioGroup defaultValue="card" disabled>…</RadioGroup>` } },
+    docs: { source: { code: `<RadioGroup defaultValue="pro" disabled>…</RadioGroup>` } },
   },
   render: () => (
-    <RadioGroup defaultValue="card" disabled>
-      {methods.map((m) => (
-        <Option key={m.value} value={m.value} label={m.label} />
+    <RadioGroup defaultValue="pro" disabled>
+      {plans.map((p) => (
+        <Option key={p.value} value={p.value} label={p.label} />
       ))}
     </RadioGroup>
   ),
@@ -171,19 +171,19 @@ export const Invalid: Story = {
     <div className="flex flex-col gap-1.5">
       <RadioGroup>
         <div className="flex items-center gap-2">
-          <RadioGroupItem value="card" id="inv-card" aria-invalid />
-          <label htmlFor="inv-card" className="cursor-pointer text-sm text-foreground">
-            Card
+          <RadioGroupItem value="free" id="inv-free" aria-invalid />
+          <label htmlFor="inv-free" className="cursor-pointer text-sm text-foreground">
+            Free
           </label>
         </div>
         <div className="flex items-center gap-2">
-          <RadioGroupItem value="paypal" id="inv-paypal" aria-invalid />
-          <label htmlFor="inv-paypal" className="cursor-pointer text-sm text-foreground">
-            PayPal
+          <RadioGroupItem value="pro" id="inv-pro" aria-invalid />
+          <label htmlFor="inv-pro" className="cursor-pointer text-sm text-foreground">
+            Pro
           </label>
         </div>
       </RadioGroup>
-      <p className="text-sm text-destructive">Please choose a payment method.</p>
+      <p className="text-sm text-destructive">Please choose a plan.</p>
     </div>
   ),
 };
