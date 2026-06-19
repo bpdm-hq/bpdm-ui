@@ -1,4 +1,5 @@
 // Public entry point of @bpdm/ui — everything consumers can import.
+export * from "./components/alert";
 export * from "./components/button";
 export * from "./components/checkbox";
 export * from "./components/confirm-dialog";
@@ -23,5 +24,6 @@ export * from "./components/step-dialog";
 export * from "./components/switch";
 export * from "./components/tabs";
 export * from "./components/textarea";
+export * from "./components/toast";
 export * from "./components/tooltip";
 export * from "./components/tree-select";
