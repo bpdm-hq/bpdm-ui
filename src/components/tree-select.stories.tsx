@@ -169,8 +169,38 @@ export const ParentChild: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<TreeSelect options={tree} defaultValue={["iphone", "pixel"]} />
-// "Phones" shows indeterminate; checking it selects all phones`,
+        code: `import { TreeSelect, type TreeNode } from "@bpdm/ui";
+
+const tree: TreeNode[] = [
+  {
+    value: "electronics",
+    label: "Electronics",
+    children: [
+      {
+        value: "phones",
+        label: "Phones",
+        children: [
+          { value: "iphone", label: "iPhone 15" },
+          { value: "pixel", label: "Pixel 9" },
+          { value: "galaxy", label: "Galaxy S24" },
+        ],
+      },
+      {
+        value: "laptops",
+        label: "Laptops",
+        children: [
+          { value: "macbook", label: "MacBook Pro" },
+          { value: "xps", label: "Dell XPS" },
+        ],
+      },
+    ],
+  },
+];
+
+export function Example() {
+  // "Phones" shows indeterminate; checking it selects all phones
+  return <TreeSelect options={tree} defaultValue={["iphone", "pixel"]} placeholder="Select categories" />;
+}`,
       },
     },
   },
@@ -184,7 +214,40 @@ export const ParentChild: Story = {
 // type to filter — matches + their parents stay visible (auto-expanded)
 export const Searchable: Story = {
   parameters: {
-    docs: { source: { code: `<TreeSelect options={tree} searchable placeholder="Search categories" />` } },
+    docs: {
+      source: {
+        code: `import { TreeSelect, type TreeNode } from "@bpdm/ui";
+
+const tree: TreeNode[] = [
+  {
+    value: "electronics",
+    label: "Electronics",
+    children: [
+      {
+        value: "phones",
+        label: "Phones",
+        children: [
+          { value: "iphone", label: "iPhone 15" },
+          { value: "pixel", label: "Pixel 9" },
+        ],
+      },
+      {
+        value: "laptops",
+        label: "Laptops",
+        children: [
+          { value: "macbook", label: "MacBook Pro" },
+          { value: "xps", label: "Dell XPS" },
+        ],
+      },
+    ],
+  },
+];
+
+export function Example() {
+  return <TreeSelect options={tree} searchable placeholder="Search categories" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-80">
@@ -199,8 +262,46 @@ export const ManySelected: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<TreeSelect options={tree} searchable maxDisplay={3}
-  defaultValue={["iphone","pixel","macbook","airpods","m-shoes","decor"]} />`,
+        code: `import { TreeSelect, type TreeNode } from "@bpdm/ui";
+
+const tree: TreeNode[] = [
+  {
+    value: "electronics",
+    label: "Electronics",
+    children: [
+      {
+        value: "phones",
+        label: "Phones",
+        children: [
+          { value: "iphone", label: "iPhone 15" },
+          { value: "pixel", label: "Pixel 9" },
+        ],
+      },
+      {
+        value: "laptops",
+        label: "Laptops",
+        children: [{ value: "macbook", label: "MacBook Pro" }],
+      },
+      {
+        value: "audio",
+        label: "Audio",
+        children: [{ value: "airpods", label: "AirPods Pro" }],
+      },
+    ],
+  },
+];
+
+export function Example() {
+  return (
+    <TreeSelect
+      options={tree}
+      searchable
+      maxDisplay={3}
+      placeholder="Select categories"
+      defaultValue={["iphone", "pixel", "macbook", "airpods"]}
+    />
+  );
+}`,
       },
     },
   },
@@ -220,7 +321,41 @@ export const ManySelected: Story = {
 export const CountMode: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<TreeSelect options={tree} maxDisplay={0} />` } },
+    docs: {
+      source: {
+        code: `import { TreeSelect, type TreeNode } from "@bpdm/ui";
+
+const tree: TreeNode[] = [
+  {
+    value: "electronics",
+    label: "Electronics",
+    children: [
+      {
+        value: "phones",
+        label: "Phones",
+        children: [{ value: "iphone", label: "iPhone 15" }],
+      },
+      {
+        value: "laptops",
+        label: "Laptops",
+        children: [{ value: "macbook", label: "MacBook Pro" }],
+      },
+    ],
+  },
+];
+
+export function Example() {
+  return (
+    <TreeSelect
+      options={tree}
+      maxDisplay={0}
+      defaultValue={["iphone", "macbook"]}
+      placeholder="Select categories"
+    />
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -232,7 +367,31 @@ export const CountMode: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<TreeSelect aria-invalid options={tree} placeholder="Required" />` } },
+    docs: {
+      source: {
+        code: `import { TreeSelect, type TreeNode } from "@bpdm/ui";
+
+const tree: TreeNode[] = [
+  {
+    value: "electronics",
+    label: "Electronics",
+    children: [
+      { value: "iphone", label: "iPhone 15" },
+      { value: "macbook", label: "MacBook Pro" },
+    ],
+  },
+];
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-1.5">
+      <TreeSelect aria-invalid options={tree} placeholder="Required" />
+      <p className="text-sm text-destructive">Select at least one category.</p>
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">

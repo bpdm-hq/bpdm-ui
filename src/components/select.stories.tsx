@@ -88,12 +88,16 @@ export const Searchable: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { Select } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<Select searchable options={frameworks} placeholder="Search frameworks" />`,
+export function Example() {
+  return <Select searchable options={frameworks} placeholder="Search frameworks" />;
+}`,
       },
     },
   },
@@ -114,13 +118,17 @@ export const LargeDataset_10k: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// 10,000 rows — virtualized (only visible rows render), no lag
+        code: `import { Select } from "@bpdm/ui";
+
+// 10,000 rows — virtualized (only visible rows render), no lag
 const options = Array.from({ length: 10000 }, (_, i) => ({
   value: String(i),
   label: \`Record #\${i + 1}\`,
 }));
 
-<Select options={options} placeholder="Scroll 10,000 records" />`,
+export function Example() {
+  return <Select options={options} placeholder="Scroll 10,000 records" />;
+}`,
       },
     },
   },
@@ -157,28 +165,34 @@ export const Groups: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Select
-  placeholder="Select a City"
-  options={[
-    {
-      label: "🇩🇪 Germany",
-      options: [
-        { value: "berlin", label: "Berlin" },
-        { value: "frankfurt", label: "Frankfurt" },
-        { value: "hamburg", label: "Hamburg" },
-        { value: "munich", label: "Munich" },
-      ],
-    },
-    {
-      label: "🇺🇸 USA",
-      options: [
-        { value: "nyc", label: "New York" },
-        { value: "la", label: "Los Angeles" },
-        { value: "chicago", label: "Chicago" },
-      ],
-    },
-  ]}
-/>`,
+        code: `import { Select } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Select
+      placeholder="Select a City"
+      options={[
+        {
+          label: "🇩🇪 Germany",
+          options: [
+            { value: "berlin", label: "Berlin" },
+            { value: "frankfurt", label: "Frankfurt" },
+            { value: "hamburg", label: "Hamburg" },
+            { value: "munich", label: "Munich" },
+          ],
+        },
+        {
+          label: "🇺🇸 USA",
+          options: [
+            { value: "nyc", label: "New York" },
+            { value: "la", label: "Los Angeles" },
+            { value: "chicago", label: "Chicago" },
+          ],
+        },
+      ]}
+    />
+  );
+}`,
       },
     },
   },
@@ -194,12 +208,19 @@ export const WithIcons: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const options = [
-  { value: "todo", label: "Todo", icon: <Circle className="size-4" /> },
-  { value: "done", label: "Done", icon: <CircleCheck className="size-4" /> },
+        code: `import { Circle, CircleCheck, CircleDashed, CircleX } from "lucide-react";
+import { Select } from "@bpdm/ui";
+
+const options = [
+  { value: "todo", label: "Todo", icon: <Circle className="size-4 text-muted-foreground" /> },
+  { value: "in-progress", label: "In progress", icon: <CircleDashed className="size-4 text-primary" /> },
+  { value: "done", label: "Done", icon: <CircleCheck className="size-4 text-primary" /> },
+  { value: "canceled", label: "Canceled", icon: <CircleX className="size-4 text-destructive" /> },
 ];
 
-<Select options={options} placeholder="Set status" />`,
+export function Example() {
+  return <Select options={options} defaultValue="in-progress" placeholder="Set status" />;
+}`,
       },
     },
   },
@@ -224,16 +245,22 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { Select } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<div className="flex w-72 flex-col gap-3">
-  {(["sm", "md", "lg"] as const).map((s) => (
-    <Select key={s} size={s} options={frameworks} placeholder={\`Size \${s}\`} />
-  ))}
-</div>`,
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-3">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <Select key={s} size={s} options={frameworks} placeholder={\`Size \${s}\`} />
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -251,15 +278,21 @@ export const Invalid: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { Select } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<div className="flex w-72 flex-col gap-1.5">
-  <Select aria-invalid options={frameworks} placeholder="Required" />
-  <p className="text-sm text-destructive">Please choose a framework.</p>
-</div>`,
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-1.5">
+      <Select aria-invalid options={frameworks} placeholder="Required" />
+      <p className="text-sm text-destructive">Please choose a framework.</p>
+    </div>
+  );
+}`,
       },
     },
   },

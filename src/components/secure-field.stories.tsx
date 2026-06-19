@@ -77,7 +77,13 @@ export const Playground: Story = {};
 export const LicenseKey: Story = {
   parameters: {
     docs: {
-      source: { code: `<SecureField format="grouped" unmaskedTail={4} defaultValue="4821095512470066" />` },
+      source: {
+        code: `import { SecureField } from "@bpdm/ui";
+
+export function Example() {
+  return <SecureField format="grouped" unmaskedTail={4} defaultValue="4821095512470066" placeholder="License key" />;
+}`,
+      },
     },
   },
   render: () => (
@@ -91,7 +97,13 @@ export const LicenseKey: Story = {
 export const ApiKey: Story = {
   parameters: {
     docs: {
-      source: { code: `<SecureField copyable defaultValue="ak_live_7Hq2eZvKf3mQpe9Qa1Lx" placeholder="API key" />` },
+      source: {
+        code: `import { SecureField } from "@bpdm/ui";
+
+export function Example() {
+  return <SecureField copyable defaultValue="ak_live_7Hq2eZvKf3mQpe9Qa1Lx" placeholder="API key" />;
+}`,
+      },
     },
   },
   render: () => (
@@ -106,7 +118,13 @@ export const SerialTail: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
-      source: { code: `<SecureField unmaskedTail={4} copyable defaultValue="SN8842019930245011" />` },
+      source: {
+        code: `import { SecureField } from "@bpdm/ui";
+
+export function Example() {
+  return <SecureField unmaskedTail={4} copyable defaultValue="SN8842019930245011" placeholder="Serial number" />;
+}`,
+      },
     },
   },
   render: () => (
@@ -120,7 +138,19 @@ export const Sizes: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
-      source: { code: `<SecureField size="sm" /> <SecureField size="md" /> <SecureField size="lg" />` },
+      source: {
+        code: `import { SecureField } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-3">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <SecureField key={s} size={s} format="grouped" unmaskedTail={4} defaultValue="4821095512470066" />
+      ))}
+    </div>
+  );
+}`,
+      },
     },
   },
   render: () => (
@@ -135,7 +165,20 @@ export const Sizes: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<SecureField aria-invalid format="grouped" />` } },
+    docs: {
+      source: {
+        code: `import { SecureField } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-1.5">
+      <SecureField aria-invalid format="grouped" unmaskedTail={4} defaultValue="4821" />
+      <p className="text-sm text-destructive">Enter a valid license key.</p>
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">

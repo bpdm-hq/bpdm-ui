@@ -72,11 +72,19 @@ export const WithFailure: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<StatusTimeline items={[
-  { title: "Tests passed", status: "complete" },
-  { title: "Deploy failed", status: "failed", description: "Health check timed out" },
-  { title: "Rollback scheduled", status: "pending" },
-]} />`,
+        code: `import { StatusTimeline } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <StatusTimeline
+      items={[
+        { title: "Tests passed", status: "complete", timestamp: "11:02" },
+        { title: "Deploy failed", status: "failed", timestamp: "11:03", description: "Health check timed out" },
+        { title: "Rollback scheduled", status: "pending", description: "Retrying in 5 min" },
+      ]}
+    />
+  );
+}`,
       },
     },
   },
@@ -98,7 +106,21 @@ export const Statuses: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// status: "complete" | "current" | "pending" | "failed"`,
+        code: `import { StatusTimeline } from "@bpdm/ui";
+
+export function Example() {
+  // status: "complete" | "current" | "pending" | "failed"
+  return (
+    <StatusTimeline
+      items={[
+        { title: "Complete step", status: "complete" },
+        { title: "Current step", status: "current" },
+        { title: "Failed step", status: "failed" },
+        { title: "Pending step", status: "pending" },
+      ]}
+    />
+  );
+}`,
       },
     },
   },

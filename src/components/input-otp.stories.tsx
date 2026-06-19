@@ -66,11 +66,19 @@ export const Grouped: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// auto-balanced: 6 → 3-3, 8 → 4-4, 5 → 3-2
-<InputOtp length={6} grouped separator="−" integerOnly />
+        code: `import { InputOtp } from "@bpdm/ui";
 
-// or fixed groups of a custom size
-<InputOtp length={9} groupSize={3} separator="−" integerOnly />`,
+export function Example() {
+  return (
+    <>
+      {/* auto-balanced: 6 → 3-3, 8 → 4-4, 5 → 3-2 */}
+      <InputOtp length={6} grouped separator="−" integerOnly />
+
+      {/* or fixed groups of a custom size */}
+      <InputOtp length={9} groupSize={3} separator="−" integerOnly />
+    </>
+  );
+}`,
       },
     },
   },
@@ -80,7 +88,15 @@ export const Grouped: Story = {
 export const Masked: Story = {
   args: { length: 4, mask: true, integerOnly: true, defaultValue: "1" },
   parameters: {
-    docs: { source: { code: `<InputOtp length={4} mask integerOnly />` } },
+    docs: {
+      source: {
+        code: `import { InputOtp } from "@bpdm/ui";
+
+export function Example() {
+  return <InputOtp length={4} mask integerOnly />;
+}`,
+      },
+    },
   },
 };
 
@@ -89,9 +105,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<InputOtp length={4} size="sm" />
-<InputOtp length={4} size="md" />
-<InputOtp length={4} size="lg" />`,
+        code: `import { InputOtp } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-4">
+      <InputOtp length={4} size="sm" integerOnly />
+      <InputOtp length={4} size="md" integerOnly />
+      <InputOtp length={4} size="lg" integerOnly />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -108,6 +132,14 @@ export const Disabled: Story = {
   tags: ["!dev"],
   args: { length: 6, disabled: true, defaultValue: "123456" },
   parameters: {
-    docs: { source: { code: `<InputOtp length={6} disabled defaultValue="123456" />` } },
+    docs: {
+      source: {
+        code: `import { InputOtp } from "@bpdm/ui";
+
+export function Example() {
+  return <InputOtp length={6} disabled defaultValue="123456" />;
+}`,
+      },
+    },
   },
 };

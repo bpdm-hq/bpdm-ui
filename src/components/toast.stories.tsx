@@ -124,10 +124,26 @@ export const Playground: Story = {
   parameters: {
     docs: {
       source: {
-        code: `toast.success("Deployment complete", { description: "Build #482 is live in production." });
+        code: `import { Button, Toaster, toast } from "@bpdm/ui";
 
-// render once near the root:
-<Toaster position="bottom-right" />`,
+export function Example() {
+  return (
+    <>
+      <Button
+        onClick={() =>
+          toast.success("Deployment complete", {
+            description: "Build #482 is live in production.",
+          })
+        }
+      >
+        Deploy
+      </Button>
+
+      {/* render once near the root: */}
+      <Toaster position="bottom-right" />
+    </>
+  );
+}`,
       },
     },
   },
@@ -154,7 +170,23 @@ export const Variants: Story = {
     </div>
   ),
   parameters: {
-    docs: { source: { code: `toast.warning("Storage almost full");` } },
+    docs: {
+      source: {
+        code: `import { Button, Toaster, toast } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button variant="ghost" onClick={() => toast.success("Invite sent")}>Success</Button>
+      <Button variant="ghost" onClick={() => toast.error("Couldn’t save changes")}>Error</Button>
+      <Button variant="ghost" onClick={() => toast.warning("Storage almost full")}>Warning</Button>
+      <Button variant="ghost" onClick={() => toast.info("Sync finished")}>Info</Button>
+      <Toaster position="bottom-right" />
+    </div>
+  );
+}`,
+      },
+    },
   },
 };
 
@@ -182,10 +214,25 @@ export const WithAction: Story = {
   parameters: {
     docs: {
       source: {
-        code: `toast("Member removed", {
-  description: "Jonas Weber no longer has access.",
-  action: { label: "Undo", onClick: () => restore() },
-});`,
+        code: `import { Button, Toaster, toast } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button
+        onClick={() =>
+          toast("Member removed", {
+            description: "Jonas Weber no longer has access.",
+            action: { label: "Undo", onClick: () => restore() },
+          })
+        }
+      >
+        Remove member
+      </Button>
+      <Toaster position="bottom-right" />
+    </>
+  );
+}`,
       },
     },
   },
@@ -231,11 +278,26 @@ export const PromiseToast: Story = {
   parameters: {
     docs: {
       source: {
-        code: `toast.promise(deploy(), {
-  loading: "Deploying build #483…",
-  success: "Build #483 deployed",
-  error: "Deploy failed",
-});`,
+        code: `import { Button, Toaster, toast } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button
+        onClick={() =>
+          toast.promise(deploy(), {
+            loading: "Deploying build #483…",
+            success: "Build #483 deployed",
+            error: "Deploy failed",
+          })
+        }
+      >
+        Deploy
+      </Button>
+      <Toaster position="bottom-right" />
+    </>
+  );
+}`,
       },
     },
   },
@@ -266,6 +328,21 @@ export const Positions: Story = {
     );
   },
   parameters: {
-    docs: { source: { code: `<Toaster position="top-center" />` } },
+    docs: {
+      source: {
+        code: `import { Button, Toaster, toast } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button onClick={() => toast.info("Docked top-center", { description: "Swipe to dismiss." })}>
+        Show toast
+      </Button>
+      <Toaster position="top-center" />
+    </>
+  );
+}`,
+      },
+    },
   },
 };

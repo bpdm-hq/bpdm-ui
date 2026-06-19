@@ -63,11 +63,19 @@ export const States: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Checkbox />
-<Checkbox defaultChecked />
-<Checkbox checked="indeterminate" />
-<Checkbox disabled />
-<Checkbox disabled defaultChecked />`,
+        code: `import { Checkbox } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Checkbox />
+      <Checkbox defaultChecked />
+      <Checkbox checked="indeterminate" />
+      <Checkbox disabled />
+      <Checkbox disabled defaultChecked />
+    </>
+  );
+}`,
       },
     },
   },
@@ -87,9 +95,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Checkbox size="sm" defaultChecked />
-<Checkbox size="md" defaultChecked />
-<Checkbox size="lg" defaultChecked />`,
+        code: `import { Checkbox } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Checkbox size="sm" defaultChecked />
+      <Checkbox size="md" defaultChecked />
+      <Checkbox size="lg" defaultChecked />
+    </>
+  );
+}`,
       },
     },
   },
@@ -108,10 +124,16 @@ export const WithLabel: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<div className="flex items-center gap-2">
-  <Checkbox id="terms" defaultChecked />
-  <label htmlFor="terms">Accept terms & conditions</label>
-</div>`,
+        code: `import { Checkbox } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-2">
+      <Checkbox id="terms" defaultChecked />
+      <label htmlFor="terms">Accept terms & conditions</label>
+    </div>
+  );
+}`,
       },
     },
   },
@@ -129,12 +151,26 @@ export const Group: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{options.map((o) => (
-  <div key={o.id} className="flex items-center gap-2">
-    <Checkbox id={o.id} defaultChecked={o.checked} />
-    <label htmlFor={o.id}>{o.label}</label>
-  </div>
-))}`,
+        code: `import { Checkbox } from "@bpdm/ui";
+
+const options = [
+  { id: "g-email", label: "Email notifications", checked: true },
+  { id: "g-sms", label: "SMS notifications", checked: false },
+  { id: "g-push", label: "Push notifications", checked: true },
+];
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-3">
+      {options.map((o) => (
+        <div key={o.id} className="flex items-center gap-2">
+          <Checkbox id={o.id} defaultChecked={o.checked} />
+          <label htmlFor={o.id}>{o.label}</label>
+        </div>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -165,11 +201,21 @@ export const Invalid: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<div className="flex items-center gap-2">
-  <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
-  <label htmlFor="agree">I agree</label>
-</div>
-<p id="agree-err" className="text-sm text-destructive">You must agree to continue.</p>`,
+        code: `import { Checkbox } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-2">
+        <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
+        <label htmlFor="agree">I agree</label>
+      </div>
+      <p id="agree-err" className="text-sm text-destructive">
+        You must agree to continue.
+      </p>
+    </div>
+  );
+}`,
       },
     },
   },

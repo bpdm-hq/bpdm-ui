@@ -240,7 +240,35 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<DataTable size="sm" columns={columns} data={data} />` } },
+    docs: {
+      source: {
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-6">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <DataTable key={s} size={s} columns={columns} data={data} rowKey={(r) => r.id} />
+      ))}
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: (args) => (
     <div className="flex flex-col gap-6">
@@ -258,7 +286,29 @@ export const StripedAndBordered: Story = {
   tags: ["!dev"],
   args: { striped: true, bordered: true },
   parameters: {
-    docs: { source: { code: `<DataTable striped bordered columns={columns} data={data} />` } },
+    docs: {
+      source: {
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable striped bordered columns={columns} data={data} rowKey={(r) => r.id} />;
+}`,
+      },
+    },
   },
 };
 
@@ -268,7 +318,27 @@ export const StickyHeaderScroll: Story = {
   args: { stickyHeader: true, maxHeight: 240 },
   parameters: {
     docs: {
-      source: { code: `<DataTable stickyHeader maxHeight={240} columns={columns} data={data} />` },
+      source: {
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable stickyHeader maxHeight={240} columns={columns} data={data} rowKey={(r) => r.id} />;
+}`,
+      },
     },
   },
   render: (args) => (
@@ -282,7 +352,36 @@ export const StickyHeaderScroll: Story = {
 export const Clickable: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<DataTable onRowClick={(row) => openMember(row.id)} columns={columns} data={data} />` } },
+    docs: {
+      source: {
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      onRowClick={(row) => openMember(row.id)}
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+    />
+  );
+}`,
+      },
+    },
   },
   render: (args) => (
     <DataTable {...args} onRowClick={(row) => window.alert(`Opened ${row.name}`)} />
@@ -295,8 +394,26 @@ export const Sorting: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable columns={columns} data={data} />
-// columns marked { sortable: true } — click a header to sort`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+// columns marked { sortable: true } — click a header to sort
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable columns={columns} data={data} rowKey={(r) => r.id} />;
+}`,
       },
     },
   },
@@ -326,13 +443,34 @@ export const MultiColumnSort: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  multiSort
-  defaultSort={[{ id: "status", dir: "asc" }, { id: "tasks", dir: "desc" }]}
-/>
-// Shift+click another header to add it to the sort`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; status: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "status", header: "Status", sortable: true, accessor: (r) => r.status },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", status: "active", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", status: "invited", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", status: "active", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    // Shift+click another header to add it to the sort
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      multiSort
+      defaultSort={[{ id: "status", dir: "asc" }, { id: "tasks", dir: "desc" }]}
+    />
+  );
+}`,
       },
     },
   },
@@ -356,14 +494,34 @@ export const RowSelection: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  rowKey={(r) => r.id}
-  selectable
-  defaultSelectedKeys={["m_03", "m_06"]}
-  onSelectionChange={(keys, rows) => console.log(keys, rows)}
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+  { id: "m_06", name: "Ivan Petrov", role: "Admin", tasks: 203 },
+  { id: "m_10", name: "Finn O'Brien", role: "Admin", tasks: 165 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      selectable
+      defaultSelectedKeys={["m_03", "m_06"]}
+      onSelectionChange={(keys, rows) => console.log(keys, rows)}
+    />
+  );
+}`,
       },
     },
   },
@@ -376,7 +534,33 @@ export const SingleSelection: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable selectionMode="single" />`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      selectable
+      selectionMode="single"
+    />
+  );
+}`,
       },
     },
   },
@@ -388,16 +572,51 @@ export const SelectionToolbar: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const [selected, setSelected] = useState<React.Key[]>([]);
+        code: `import { useState } from "react";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
 
-<DataTable
-  columns={columns}
-  data={data}
-  rowKey={(r) => r.id}
-  selectable
-  selectedKeys={selected}
-  onSelectionChange={(keys) => setSelected(keys)}
-/>`,
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  const [selected, setSelected] = useState<React.Key[]>([]);
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex h-9 items-center gap-3">
+        {selected.length > 0 ? (
+          <>
+            <span className="text-sm font-medium">{selected.length} selected</span>
+            <button type="button" onClick={() => setSelected([])}>
+              Clear
+            </button>
+            <button type="button">Remove</button>
+          </>
+        ) : (
+          <span className="text-sm text-muted-foreground">Select rows to act on them.</span>
+        )}
+      </div>
+      <DataTable
+        columns={columns}
+        data={data}
+        rowKey={(r) => r.id}
+        selectable
+        selectedKeys={selected}
+        onSelectionChange={(keys) => setSelected(keys)}
+      />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -453,11 +672,32 @@ export const ClientSidePaging: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
+    />
+  );
+}`,
       },
     },
   },
@@ -470,16 +710,39 @@ export const ServerSidePaging: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const pageSize = 5;
-const [page, setPage] = useState(1);
-const rows = await fetchPage(page, pageSize); // your server call
+        code: `import { useEffect, useState } from "react";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
 
-<DataTable
-  columns={columns}
-  data={rows}
-  rowKey={(r) => r.id}
-  pagination={{ mode: "server", page, pageSize, total, onPageChange: setPage }}
-/>`,
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function Example() {
+  const pageSize = 5;
+  const [page, setPage] = useState(1);
+  const [rows, setRows] = useState<Member[]>([]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    fetchPage(page, pageSize).then((res) => {
+      setRows(res.rows);
+      setTotal(res.total);
+    });
+  }, [page]);
+
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      pagination={{ mode: "server", page, pageSize, total, onPageChange: setPage }}
+    />
+  );
+}`,
       },
     },
   },
@@ -507,19 +770,38 @@ export const CursorPaging: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={rows}
-  rowKey={(r) => r.id}
-  pagination={{
-    mode: "cursor",
-    hasPreviousPage: !!prevCursor,
-    hasNextPage: !!nextCursor,
-    onPreviousPage: () => loadBefore(prevCursor),
-    onNextPage: () => loadAfter(nextCursor),
-    rangeLabel: "Showing 1–5",
-  }}
-/>`,
+        code: `import { useState } from "react";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function Example() {
+  const [rows, setRows] = useState<Member[]>([]);
+  const [prevCursor, setPrevCursor] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      pagination={{
+        mode: "cursor",
+        hasPreviousPage: !!prevCursor,
+        hasNextPage: !!nextCursor,
+        onPreviousPage: () => loadBefore(prevCursor),
+        onNextPage: () => loadAfter(nextCursor),
+        rangeLabel: "Showing 1–5",
+      }}
+    />
+  );
+}`,
       },
     },
   },
@@ -559,14 +841,42 @@ export const ExpandableRows: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  rowKey={(r) => r.id}
-  renderExpanded={(row) => <MemberDetails member={row} />}
-  defaultExpandedKeys={["m_03"]}
-  // expandMode="single" to keep only one row open
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; email: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", email: "hugo@example.com", tasks: 128 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", email: "sara@example.com", tasks: 86 },
+];
+
+function MemberDetails({ member }: { member: Member }) {
+  return (
+    <div className="grid gap-1 text-sm">
+      <span className="font-mono text-xs">{member.email}</span>
+      <span>{member.tasks} tasks assigned</span>
+    </div>
+  );
+}
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      renderExpanded={(row) => <MemberDetails member={row} />}
+      defaultExpandedKeys={["m_03"]}
+      // expandMode="single" to keep only one row open
+    />
+  );
+}`,
       },
     },
   },
@@ -578,22 +888,49 @@ export const Borderless: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={rows}
-  rowKey={(r) => r.id}
-  frame={false}          // no outer border / rounding
-  hoverable={false}      // no row hover
-  rowSpacing={4}         // thin gap between filled row blocks
-  cellClassName="py-4"   // taller rows
-  // default fill is bg-muted/50 — override with rowClassName
-  pagination={{
-    mode: "cursor",
-    align: "center",
-    hasPreviousPage, hasNextPage, onPreviousPage, onNextPage,
-    pageSize, pageSizeOptions: [10, 25, 50], onPageSizeChange,
-  }}
-/>`,
+        code: `import { useState } from "react";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function Example() {
+  const [rows] = useState<Member[]>([
+    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+    { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+  ]);
+  const [size, setSize] = useState(10);
+
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      frame={false}          // no outer border / rounding
+      hoverable={false}      // no row hover
+      rowSpacing={4}         // thin gap between filled row blocks
+      cellClassName="py-4"   // taller rows
+      // default fill is bg-muted/50 — override with rowClassName
+      pagination={{
+        mode: "cursor",
+        align: "center",
+        hasPreviousPage: false,
+        hasNextPage: false,
+        onPreviousPage: () => {},
+        onNextPage: () => {},
+        pageSize: size,
+        pageSizeOptions: [10, 25, 50],
+        onPageSizeChange: setSize,
+      }}
+    />
+  );
+}`,
       },
     },
   },
@@ -641,7 +978,24 @@ export const FrozenColumns: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const columns: DataTableColumn<Member>[] = [
+        code: `import { Button, DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  team: string;
+  joined: string;
+  status: "active" | "invited" | "disabled";
+  tasks: number;
+};
+
+function StatusBadge({ status }: { status: Member["status"] }) {
+  return <span className="text-xs capitalize">{status}</span>;
+}
+
+const columns: DataTableColumn<Member>[] = [
   // left-pinned block (pin as many as you like; give each a numeric width)
   { id: "name", header: "Name", pin: "left", width: 180, sortable: true, accessor: (r) => r.name },
   { id: "role", header: "Role", pin: "left", width: 120, sortable: true, accessor: (r) => r.role },
@@ -656,7 +1010,15 @@ export const FrozenColumns: Story = {
     cell: () => <Button size="sm" variant="ghost">View</Button> },
 ];
 
-<DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable />`,
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", joined: "2025-02-14", status: "active", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", joined: "2025-03-02", status: "invited", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", joined: "2025-03-19", status: "active", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable columns={columns} data={data} rowKey={(r) => r.id} selectable />;
+}`,
       },
     },
   },
@@ -699,8 +1061,26 @@ export const PinnableColumns: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable columns={columns} data={data} rowKey={(r) => r.id} pinnable selectable />
-// click the ⋮ on any header → Pin left / Pin right / Unpin`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  // click the ⋮ on any header → Pin left / Pin right / Unpin
+  return <DataTable columns={columns} data={data} rowKey={(r) => r.id} pinnable selectable />;
+}`,
       },
     },
   },
@@ -731,7 +1111,23 @@ export const ColumnFilters: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const columns: DataTableColumn<Member>[] = [
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  team: string;
+  status: "active" | "invited" | "disabled";
+  tasks: number;
+};
+
+function StatusBadge({ status }: { status: Member["status"] }) {
+  return <span className="text-xs capitalize">{status}</span>;
+}
+
+const columns: DataTableColumn<Member>[] = [
   { id: "name", header: "Name", sortable: true, filterable: true, accessor: (r) => r.name },
   { id: "email", header: "Email", filterable: true,
     accessor: (r) => <span className="font-mono text-xs">{r.email}</span>,
@@ -743,7 +1139,15 @@ export const ColumnFilters: Story = {
   { id: "tasks", header: "Tasks", numeric: true, sortable: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
-<DataTable columns={columns} data={data} searchable pagination={{ pageSize: 5 }} />`,
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", status: "active", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable columns={columns} data={data} rowKey={(r) => r.id} searchable pagination={{ pageSize: 5 }} />;
+}`,
       },
     },
   },
@@ -768,7 +1172,34 @@ export const Search: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable columns={columns} data={data} searchable columnToggle pagination={{ pageSize: 5 }} />`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      searchable
+      columnToggle
+      pagination={{ pageSize: 5 }}
+    />
+  );
+}`,
       },
     },
   },
@@ -782,9 +1213,26 @@ export const ColumnToggle: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable columnToggle columns={columns} data={data} />
-// keep a column always visible:
-// { id: "name", header: "Name", hideable: false, accessor: (r) => r.name }`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  // keep a column always visible with { hideable: false }
+  { id: "name", header: "Name", hideable: false, sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable columnToggle columns={columns} data={data} rowKey={(r) => r.id} />;
+}`,
       },
     },
   },
@@ -798,7 +1246,21 @@ export const FooterSummary: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const columns: DataTableColumn<Member>[] = [
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = {
+  id: string;
+  name: string;
+  team: string;
+  status: "active" | "invited" | "disabled";
+  tasks: number;
+};
+
+function StatusBadge({ status }: { status: Member["status"] }) {
+  return <span className="text-xs capitalize">{status}</span>;
+}
+
+const columns: DataTableColumn<Member>[] = [
   { id: "name", header: "Name", accessor: (r) => r.name, footer: "Total" },
   { id: "team", header: "Team", accessor: (r) => r.team },
   { id: "status", header: "Status", align: "center",
@@ -808,7 +1270,15 @@ export const FooterSummary: Story = {
     footer: (rows) => rows.reduce((s, r) => s + r.tasks, 0).toLocaleString() },
 ];
 
-<DataTable columns={columns} data={data} pagination={{ pageSize: 6 }} />`,
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", team: "Engineering", status: "active", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", team: "Design", status: "invited", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", team: "Engineering", status: "active", tasks: 86 },
+];
+
+export function Example() {
+  return <DataTable columns={columns} data={data} rowKey={(r) => r.id} pagination={{ pageSize: 6 }} />;
+}`,
       },
     },
   },
@@ -849,14 +1319,34 @@ export const Responsive: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  rowKey={(r) => r.id}
-  responsive          // < 640px → each row becomes a stacked card
-  selectable
-  pagination={{ pageSize: 5 }}
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      responsive          // < 640px → each row becomes a stacked card
+      selectable
+      pagination={{ pageSize: 5 }}
+    />
+  );
+}`,
       },
     },
   },
@@ -869,12 +1359,33 @@ export const ColumnReorder: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  reorderableColumns
-  onColumnOrderChange={(order) => console.log(order)}
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const data: Member[] = [
+  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+  { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+];
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      reorderableColumns
+      onColumnOrderChange={(order) => console.log(order)}
+    />
+  );
+}`,
       },
     },
   },
@@ -888,13 +1399,33 @@ export const RowReorder: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={data}
-  rowKey={(r) => r.id}
-  reorderableRows
-  onRowReorder={(rows) => setData(rows)}
-/>`,
+        code: `import { useState } from "react";
+import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function Example() {
+  const [data, setData] = useState<Member[]>([
+    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
+    { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
+  ]);
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(r) => r.id}
+      reorderableRows
+      onRowReorder={(rows) => setData(rows)}
+    />
+  );
+}`,
       },
     },
   },
@@ -907,15 +1438,36 @@ export const Virtualized: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<DataTable
-  columns={columns}
-  data={tenThousandRows}
-  rowKey={(r) => r.id}
-  virtualized
-  maxHeight={440}
-  selectable
-  searchable
-/>`,
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+const tenThousandRows: Member[] = Array.from({ length: 10000 }, (_, i) => ({
+  id: \`v_\${i}\`,
+  name: \`Member #\${i + 1}\`,
+  role: "Editor",
+  tasks: i % 300,
+}));
+
+export function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={tenThousandRows}
+      rowKey={(r) => r.id}
+      virtualized
+      maxHeight={440}
+      selectable
+      searchable
+    />
+  );
+}`,
       },
     },
   },
@@ -926,6 +1478,22 @@ export const Empty: Story = {
   tags: ["!dev"],
   args: { data: [], emptyContent: "No members yet." },
   parameters: {
-    docs: { source: { code: `<DataTable data={[]} emptyContent="No members yet." columns={columns} />` } },
+    docs: {
+      source: {
+        code: `import { DataTable, type DataTableColumn } from "@bpdm/ui";
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: "name", header: "Name", sortable: true, accessor: (r) => r.name },
+  { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
+  { id: "tasks", header: "Tasks", numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function Example() {
+  return <DataTable data={[]} emptyContent="No members yet." columns={columns} rowKey={(r) => r.id} />;
+}`,
+      },
+    },
   },
 };

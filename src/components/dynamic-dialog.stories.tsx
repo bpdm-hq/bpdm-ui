@@ -109,26 +109,39 @@ export const Basic: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const dialog = useDialog();
+        code: `import { Button, DialogProvider, Input, useDialog } from "@bpdm/ui";
 
-<Button
-  onClick={() =>
-    dialog.open(
-      ({ close }) => (
-        <form className="space-y-3">
-          <Input defaultValue="Q3 Planning" />
-          <div className="flex justify-end gap-2">
-            <Button size="sm" variant="ghost" onClick={close}>Cancel</Button>
-            <Button size="sm" onClick={close}>Save</Button>
-          </div>
-        </form>
-      ),
-      { title: "Edit project", description: "Opened imperatively from code." },
-    )
-  }
->
-  Edit project
-</Button>`,
+function EditButton() {
+  const dialog = useDialog();
+  return (
+    <Button
+      onClick={() =>
+        dialog.open(
+          ({ close }) => (
+            <form className="space-y-3">
+              <Input defaultValue="Q3 Planning" />
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="ghost" onClick={close}>Cancel</Button>
+                <Button size="sm" onClick={close}>Save</Button>
+              </div>
+            </form>
+          ),
+          { title: "Edit project", description: "Opened imperatively from code." },
+        )
+      }
+    >
+      Edit project
+    </Button>
+  );
+}
+
+export function Example() {
+  return (
+    <DialogProvider>
+      <EditButton />
+    </DialogProvider>
+  );
+}`,
       },
     },
   },

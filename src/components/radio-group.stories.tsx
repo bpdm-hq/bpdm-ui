@@ -90,14 +90,26 @@ export const Plan: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<RadioGroup defaultValue="pro">
-  {plans.map((p) => (
-    <div key={p.value} className="flex items-center gap-2">
-      <RadioGroupItem value={p.value} id={p.value} />
-      <label htmlFor={p.value}>{p.label}</label>
-    </div>
-  ))}
-</RadioGroup>`,
+        code: `import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
+
+const plans = [
+  { value: "free", label: "Free" },
+  { value: "pro", label: "Pro" },
+  { value: "enterprise", label: "Enterprise" },
+];
+
+export function Example() {
+  return (
+    <RadioGroup defaultValue="pro">
+      {plans.map((p) => (
+        <div key={p.value} className="flex items-center gap-2">
+          <RadioGroupItem value={p.value} id={p.value} />
+          <label htmlFor={p.value}>{p.label}</label>
+        </div>
+      ))}
+    </RadioGroup>
+  );
+}`,
       },
     },
   },
@@ -114,20 +126,26 @@ export const Horizontal: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const plans = [
+        code: `import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
+
+const plans = [
   { value: "free", label: "Free" },
   { value: "pro", label: "Pro" },
   { value: "enterprise", label: "Enterprise" },
 ];
 
-<RadioGroup defaultValue="pro" orientation="horizontal">
-  {plans.map((p) => (
-    <div key={p.value} className="flex items-center gap-2">
-      <RadioGroupItem value={p.value} id={p.value} />
-      <label htmlFor={p.value}>{p.label}</label>
-    </div>
-  ))}
-</RadioGroup>`,
+export function Example() {
+  return (
+    <RadioGroup defaultValue="pro" orientation="horizontal">
+      {plans.map((p) => (
+        <div key={p.value} className="flex items-center gap-2">
+          <RadioGroupItem value={p.value} id={p.value} />
+          <label htmlFor={p.value}>{p.label}</label>
+        </div>
+      ))}
+    </RadioGroup>
+  );
+}`,
       },
     },
   },
@@ -145,9 +163,26 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<RadioGroupItem value="a" size="sm" />
-<RadioGroupItem value="b" size="md" />
-<RadioGroupItem value="c" size="lg" />`,
+        code: `import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <RadioGroup defaultValue="md" className="flex flex-wrap gap-5">
+      <div className="flex items-center gap-2">
+        <RadioGroupItem value="sm" id="sm" size="sm" />
+        <label htmlFor="sm">Small</label>
+      </div>
+      <div className="flex items-center gap-2">
+        <RadioGroupItem value="md" id="md" size="md" />
+        <label htmlFor="md">Medium</label>
+      </div>
+      <div className="flex items-center gap-2">
+        <RadioGroupItem value="lg" id="lg" size="lg" />
+        <label htmlFor="lg">Large</label>
+      </div>
+    </RadioGroup>
+  );
+}`,
       },
     },
   },
@@ -167,20 +202,26 @@ export const Disabled: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const plans = [
+        code: `import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
+
+const plans = [
   { value: "free", label: "Free" },
   { value: "pro", label: "Pro" },
   { value: "enterprise", label: "Enterprise" },
 ];
 
-<RadioGroup defaultValue="pro" disabled>
-  {plans.map((p) => (
-    <div key={p.value} className="flex items-center gap-2">
-      <RadioGroupItem value={p.value} id={p.value} />
-      <label htmlFor={p.value}>{p.label}</label>
-    </div>
-  ))}
-</RadioGroup>`,
+export function Example() {
+  return (
+    <RadioGroup defaultValue="pro" disabled>
+      {plans.map((p) => (
+        <div key={p.value} className="flex items-center gap-2">
+          <RadioGroupItem value={p.value} id={p.value} />
+          <label htmlFor={p.value}>{p.label}</label>
+        </div>
+      ))}
+    </RadioGroup>
+  );
+}`,
       },
     },
   },
@@ -198,7 +239,25 @@ export const Invalid: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<RadioGroupItem value="card" aria-invalid />  // mark options invalid`,
+        code: `import { RadioGroup, RadioGroupItem } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <RadioGroup>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="free" id="inv-free" aria-invalid />  {/* mark options invalid */}
+          <label htmlFor="inv-free">Free</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="pro" id="inv-pro" aria-invalid />
+          <label htmlFor="inv-pro">Pro</label>
+        </div>
+      </RadioGroup>
+      <p className="text-sm text-destructive">Please choose a plan.</p>
+    </div>
+  );
+}`,
       },
     },
   },

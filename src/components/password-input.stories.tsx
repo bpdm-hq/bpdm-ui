@@ -66,7 +66,15 @@ export const Playground: Story = {};
 // type to watch the strength meter fill (length + case + digits + symbols)
 export const StrengthMeter: Story = {
   parameters: {
-    docs: { source: { code: `<PasswordInput placeholder="Create a password" />` } },
+    docs: {
+      source: {
+        code: `import { PasswordInput } from "@bpdm/ui";
+
+export function Example() {
+  return <PasswordInput placeholder="Create a password" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -81,9 +89,17 @@ export const CustomLevels: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<PasswordInput levels={3} />                       // 3 segments
-<PasswordInput levels={5} />                       // 5 segments
-<PasswordInput levels={3} labels={["Low","Mid","High"]} />  // custom labels`,
+        code: `import { PasswordInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-6">
+      <PasswordInput levels={3} />                       {/* 3 segments */}
+      <PasswordInput levels={5} />                       {/* 5 segments */}
+      <PasswordInput levels={3} labels={["Low", "Mid", "High"]} />  {/* custom labels */}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -104,7 +120,15 @@ export const CustomLevels: Story = {
 export const NoFeedback: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<PasswordInput feedback={false} placeholder="Password" />` } },
+    docs: {
+      source: {
+        code: `import { PasswordInput } from "@bpdm/ui";
+
+export function Example() {
+  return <PasswordInput feedback={false} placeholder="Password" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -116,7 +140,21 @@ export const NoFeedback: Story = {
 export const Sizes: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<PasswordInput size="sm" /> <PasswordInput size="md" /> <PasswordInput size="lg" />` } },
+    docs: {
+      source: {
+        code: `import { PasswordInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-3">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <PasswordInput key={s} size={s} feedback={false} placeholder={\`Size \${s}\`} />
+      ))}
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-72 flex-col gap-3">
@@ -130,7 +168,20 @@ export const Sizes: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<PasswordInput aria-invalid placeholder="Password" />` } },
+    docs: {
+      source: {
+        code: `import { PasswordInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-1.5">
+      <PasswordInput aria-invalid feedback={false} placeholder="Password" />
+      <p className="text-sm text-destructive">Password is required.</p>
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">

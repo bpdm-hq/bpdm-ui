@@ -74,13 +74,21 @@ export const Sides: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{(["top", "right", "bottom", "left"] as const).map((side) => (
-  <Tooltip key={side} content={\`Side: \${side}\`} side={side}>
-    <Button variant="outline" className="capitalize">
-      {side}
-    </Button>
-  </Tooltip>
-))}`,
+        code: `import { Button, Tooltip } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex gap-4">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <Tooltip key={side} content={\`Side: \${side}\`} side={side}>
+          <Button variant="outline" className="capitalize">
+            {side}
+          </Button>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -105,9 +113,18 @@ export const OnIconButton: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tooltip content="More info">
-  <Button size="icon" variant="ghost" aria-label="Info"><InfoIcon /></Button>
-</Tooltip>`,
+        code: `import { Info } from "lucide-react";
+import { Button, Tooltip } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Tooltip content="Only your team can see this project">
+      <Button size="icon" variant="ghost" aria-label="Info">
+        <Info className="size-5" />
+      </Button>
+    </Tooltip>
+  );
+}`,
       },
     },
   },
@@ -126,17 +143,23 @@ export const RichContent: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tooltip
-  side="right"
-  content={
-    <div className="space-y-1">
-      <p className="font-medium text-foreground">Auto-sync</p>
-      <p className="text-muted-foreground">Changes sync across devices in real time.</p>
-    </div>
-  }
->
-  <Button variant="outline">Sync info</Button>
-</Tooltip>`,
+        code: `import { Button, Tooltip } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Tooltip
+      side="right"
+      content={
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Auto-sync</p>
+          <p className="text-muted-foreground">Changes sync across devices in real time.</p>
+        </div>
+      }
+    >
+      <Button variant="outline">Sync info</Button>
+    </Tooltip>
+  );
+}`,
       },
     },
   },
@@ -163,9 +186,15 @@ export const Disabled: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tooltip content="You won't see me" disabled>
-  <Button variant="outline">Hover me</Button>
-</Tooltip>`,
+        code: `import { Button, Tooltip } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Tooltip content="You won't see me" disabled>
+      <Button variant="outline">Hover me</Button>
+    </Tooltip>
+  );
+}`,
       },
     },
   },

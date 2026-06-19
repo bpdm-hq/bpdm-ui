@@ -78,20 +78,28 @@ export const Placements: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{(["top", "right", "bottom", "left"] as const).map((side) => (
-  <Popover
-    key={side}
-    side={side}
-    showArrow
-    trigger={
-      <Button variant="outline" className="capitalize">
-        {side}
-      </Button>
-    }
-  >
-    <p className="text-sm">Opens on the {side}.</p>
-  </Popover>
-))}`,
+        code: `import { Button, Popover } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center justify-center gap-4">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <Popover
+          key={side}
+          side={side}
+          showArrow
+          trigger={
+            <Button variant="outline" className="capitalize">
+              {side}
+            </Button>
+          }
+        >
+          <p className="text-sm">Opens on the {side}.</p>
+        </Popover>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -120,12 +128,18 @@ export const WithForm: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Popover trigger={<Button>Rename</Button>}>
-  <form>
-    <Input defaultValue="Q3 Planning" />
-    <PopoverClose asChild><Button size="sm">Save</Button></PopoverClose>
-  </form>
-</Popover>`,
+        code: `import { Button, Input, Popover, PopoverClose } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Popover trigger={<Button>Rename</Button>}>
+      <form>
+        <Input defaultValue="Q3 Planning" />
+        <PopoverClose asChild><Button size="sm">Save</Button></PopoverClose>
+      </form>
+    </Popover>
+  );
+}`,
       },
     },
   },
@@ -162,14 +176,20 @@ export const WithArrow: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Popover showArrow trigger={<Button variant="outline">Open popover</Button>}>
-  <div className="w-64 space-y-1">
-    <p className="font-medium">Quick info</p>
-    <p className="text-sm text-muted-foreground">
-      Popovers can hold any content — text, forms, menus.
-    </p>
-  </div>
-</Popover>`,
+        code: `import { Button, Popover } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Popover showArrow trigger={<Button variant="outline">Open popover</Button>}>
+      <div className="w-64 space-y-1">
+        <p className="font-medium">Quick info</p>
+        <p className="text-sm text-muted-foreground">
+          Popovers can hold any content — text, forms, menus.
+        </p>
+      </div>
+    </Popover>
+  );
+}`,
       },
     },
   },

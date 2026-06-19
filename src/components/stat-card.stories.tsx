@@ -82,10 +82,19 @@ export const Dashboard: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
-<StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
-<StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} icon={<TrendingDown />} />
-<StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />`,
+        code: `import { Clock, TrendingDown, UserPlus, Users } from "lucide-react";
+import { StatCard } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+      <StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
+      <StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
+      <StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} deltaLabel="vs last month" icon={<TrendingDown />} />
+      <StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -105,10 +114,19 @@ export const Colored: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<StatCard label="Page views" value="1.24M" accent="#2563eb" icon={<Eye />} />
-<StatCard label="Sessions" value="84.3K" accent="#0d9488" icon={<Activity />} />
-<StatCard label="Bounce rate" value="1.8%" accent="#e11d48" icon={<TrendingDown />} />
-<StatCard label="New signups" value="1,294" accent="#7c3aed" icon={<UserPlus />} />`,
+        code: `import { Activity, Eye, TrendingDown, UserPlus } from "lucide-react";
+import { StatCard } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard label="Page views" value="1.24M" accent="#2563eb" icon={<Eye />} />
+      <StatCard label="Sessions" value="84.3K" accent="#0d9488" icon={<Activity />} />
+      <StatCard label="Bounce rate" value="1.8%" accent="#e11d48" icon={<TrendingDown />} />
+      <StatCard label="New signups" value="1,294" accent="#7c3aed" icon={<UserPlus />} />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -125,7 +143,15 @@ export const Colored: Story = {
 export const NoDelta: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<StatCard label="Open tickets" value="37" />` } },
+    docs: {
+      source: {
+        code: `import { StatCard } from "@bpdm/ui";
+
+export function Example() {
+  return <StatCard label="Open tickets" value="37" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">

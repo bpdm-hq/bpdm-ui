@@ -95,7 +95,15 @@ export const Variants: Story = {
     </div>
   ),
   parameters: {
-    docs: { source: { code: `<Badge variant="success" appearance="soft">Active</Badge>` } },
+    docs: {
+      source: {
+        code: `import { Badge } from "@bpdm/ui";
+
+export function Example() {
+  return <Badge variant="success" appearance="soft">Active</Badge>;
+}`,
+      },
+    },
   },
 };
 
@@ -125,11 +133,19 @@ export const StatusDots: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// pill with a dot
-<Badge variant="info" dot pulse>Deploying</Badge>
+        code: `import { Badge } from "@bpdm/ui";
 
-// bare dot + label (ghost), e.g. in a table cell
-<Badge appearance="ghost" variant="success" dot>Healthy</Badge>`,
+export function Example() {
+  return (
+    <>
+      {/* pill with a dot */}
+      <Badge variant="info" dot pulse>Deploying</Badge>
+
+      {/* bare dot + label (ghost), e.g. in a table cell */}
+      <Badge appearance="ghost" variant="success" dot>Healthy</Badge>
+    </>
+  );
+}`,
       },
     },
   },
@@ -165,7 +181,36 @@ export const Removable: Story = {
     );
   },
   parameters: {
-    docs: { source: { code: `<Badge variant="neutral" onRemove={() => removeTag(t)}>{t}</Badge>` } },
+    docs: {
+      source: {
+        code: `import { useState } from "react";
+import { Badge, Button } from "@bpdm/ui";
+
+const INITIAL = ["Frontend", "Backend", "Design", "Infra", "Docs"];
+
+export function Example() {
+  const [tags, setTags] = useState(INITIAL);
+  return (
+    <div className="flex min-h-8 flex-wrap items-center gap-2">
+      {tags.map((t) => (
+        <Badge
+          key={t}
+          variant="neutral"
+          onRemove={() => setTags((cur) => cur.filter((x) => x !== t))}
+        >
+          {t}
+        </Badge>
+      ))}
+      {tags.length === 0 && (
+        <Button size="sm" variant="ghost" onClick={() => setTags(INITIAL)}>
+          Reset
+        </Button>
+      )}
+    </div>
+  );
+}`,
+      },
+    },
   },
 };
 
@@ -207,9 +252,24 @@ export const Notifications: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<NotificationBadge count={8}><BellIcon /></NotificationBadge>
-<NotificationBadge count={128} max={99}><MailIcon /></NotificationBadge>
-<NotificationBadge dot variant="success"><BellIcon /></NotificationBadge>`,
+        code: `import { Bell, Mail } from "lucide-react";
+import { Button, NotificationBadge } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button size="icon" variant="ghost" aria-label="Notifications">
+        <NotificationBadge count={8}><Bell /></NotificationBadge>
+      </Button>
+      <Button size="icon" variant="ghost" aria-label="Inbox">
+        <NotificationBadge count={128} max={99}><Mail /></NotificationBadge>
+      </Button>
+      <Button size="icon" variant="ghost" aria-label="Status">
+        <NotificationBadge dot variant="success"><Bell /></NotificationBadge>
+      </Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -224,6 +284,18 @@ export const AsLink: Story = {
     </Badge>
   ),
   parameters: {
-    docs: { source: { code: `<Badge asChild variant="primary"><a href="/changelog">What’s new →</a></Badge>` } },
+    docs: {
+      source: {
+        code: `import { Badge } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Badge asChild variant="primary" appearance="soft">
+      <a href="/changelog">What’s new →</a>
+    </Badge>
+  );
+}`,
+      },
+    },
   },
 };
