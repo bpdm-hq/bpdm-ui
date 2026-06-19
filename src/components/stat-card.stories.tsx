@@ -101,6 +101,7 @@ export const Dashboard: Story = {
 
 // custom accent colors — tinted card + matching icon badge (compact, no delta)
 export const Colored: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -122,6 +123,7 @@ export const Colored: Story = {
 };
 
 export const NoDelta: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<StatCard label="Open tickets" value="37" />` } },
   },

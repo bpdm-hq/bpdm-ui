@@ -77,6 +77,7 @@ export const StrengthMeter: Story = {
 
 // configurable number of strength segments (+ custom labels / scorer)
 export const CustomLevels: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -101,6 +102,7 @@ export const CustomLevels: Story = {
 };
 
 export const NoFeedback: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<PasswordInput feedback={false} placeholder="Password" />` } },
   },
@@ -112,6 +114,7 @@ export const NoFeedback: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<PasswordInput size="sm" /> <PasswordInput size="md" /> <PasswordInput size="lg" />` } },
   },
@@ -125,6 +128,7 @@ export const Sizes: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<PasswordInput aria-invalid placeholder="Password" />` } },
   },

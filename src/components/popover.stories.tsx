@@ -140,6 +140,7 @@ export const WithForm: Story = {
 };
 
 export const WithArrow: Story = {
+  tags: ["!dev"],
   args: { showArrow: true },
   parameters: {
     docs: { source: { code: `<Popover showArrow trigger={…}>…</Popover>` } },

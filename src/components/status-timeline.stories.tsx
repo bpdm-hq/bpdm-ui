@@ -68,6 +68,7 @@ export const Playground: Story = { args: { items: pipeline } };
 
 // a flow that hit a failure
 export const WithFailure: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

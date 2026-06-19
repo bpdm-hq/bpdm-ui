@@ -195,6 +195,7 @@ export const Searchable: Story = {
 
 // many values selected → chips capped at maxDisplay, the rest become "+N"
 export const ManySelected: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -217,6 +218,7 @@ export const ManySelected: Story = {
 };
 
 export const CountMode: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<TreeSelect options={tree} maxDisplay={0} />` } },
   },
@@ -228,6 +230,7 @@ export const CountMode: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<TreeSelect aria-invalid options={tree} placeholder="Required" />` } },
   },

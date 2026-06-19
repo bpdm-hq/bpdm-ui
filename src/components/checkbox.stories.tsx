@@ -83,6 +83,7 @@ export const States: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -103,6 +104,7 @@ export const Sizes: Story = {
 
 // label association via htmlFor (clicking the label toggles)
 export const WithLabel: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -159,6 +161,7 @@ export const Group: Story = {
 
 // error state via aria-invalid
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {

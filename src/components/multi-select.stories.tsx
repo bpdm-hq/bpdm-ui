@@ -101,6 +101,7 @@ export const ChipsWithOverflow: Story = {
 
 // maxDisplay={0} → show a count instead of chips
 export const CountMode: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<MultiSelect options={…} maxDisplay={0} defaultValue={["react","vue","svelte"]} />` } },
   },
@@ -127,6 +128,7 @@ const CITIES: SelectItems = [
 ];
 
 export const Grouped: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<MultiSelect options={groupedCities} searchable placeholder="Select cities" />` } },
   },
@@ -166,6 +168,7 @@ export const LargeDataset_10k: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<MultiSelect aria-invalid options={…} placeholder="Required" />` } },
   },

@@ -101,6 +101,7 @@ export const Currencies: Story = {
 
 // precise to the last digit — large amount keeps every digit (no float rounding)
 export const PrecisionLargeAmount: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -116,6 +117,7 @@ export const PrecisionLargeAmount: Story = {
 };
 
 export const Sizes: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -133,6 +135,7 @@ export const Sizes: Story = {
 };
 
 export const Invalid: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: { code: `<MoneyInput aria-invalid currency="USD" />` },
@@ -147,6 +150,7 @@ export const Invalid: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: { source: { code: `<MoneyInput disabled currency="USD" defaultValue="2500" />` } },
   },

@@ -91,6 +91,7 @@ export const Sides: Story = {
 
 // the common case: explain an icon-only button
 export const OnIconButton: Story = {
+  tags: ["!dev"],
   parameters: {
     docs: {
       source: {
@@ -133,6 +134,7 @@ export const RichContent: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ["!dev"],
   args: { disabled: true, content: "You won't see me" },
   parameters: {
     docs: { source: { code: `<Tooltip content="…" disabled>…</Tooltip>` } },
