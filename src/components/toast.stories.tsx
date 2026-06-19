@@ -166,10 +166,10 @@ export const WithAction: Story = {
       <Button
         onClick={() =>
           toast("Member removed", {
-            description: "Maya Patel no longer has access.",
+            description: "Jonas Weber no longer has access.",
             action: {
               label: "Undo",
-              onClick: () => toast.success("Restored Maya’s access"),
+              onClick: () => toast.success("Restored Jonas’s access"),
             },
           })
         }
@@ -183,7 +183,7 @@ export const WithAction: Story = {
     docs: {
       source: {
         code: `toast("Member removed", {
-  description: "Maya Patel no longer has access.",
+  description: "Jonas Weber no longer has access.",
   action: { label: "Undo", onClick: () => restore() },
 });`,
       },

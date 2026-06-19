@@ -99,8 +99,8 @@ export const Wizard: Story = {
           description: "Tell us about you.",
           content: (
             <div className="space-y-3">
-              <Field label="Full name" defaultValue="Maya Patel" />
-              <Field label="Email" defaultValue="maya@example.com" />
+              <Field label="Full name" defaultValue="Marco Rossi" />
+              <Field label="Email" defaultValue="marco@example.com" />
             </div>
           ),
         },
