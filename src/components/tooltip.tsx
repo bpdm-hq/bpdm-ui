@@ -73,7 +73,7 @@ export function Tooltip({
             sideOffset={sideOffset}
             className={cn(
               "z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
-              "origin-[var(--radix-tooltip-content-transform-origin)] animate-[bpdm-pop-in_120ms_ease-out]",
+              "origin-[var(--radix-tooltip-content-transform-origin)] animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_100ms_ease-in]",
               className,
             )}
           >

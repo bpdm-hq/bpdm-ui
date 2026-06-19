@@ -33,11 +33,11 @@ const drawerVariants = cva(
     variants: {
       side: {
         right:
-          "right-0 top-0 h-full border-l border-border data-[state=open]:animate-[bpdm-slide-in-right_240ms_ease-out] data-[state=closed]:animate-[bpdm-slide-out-right_180ms_ease-in]",
-        left: "left-0 top-0 h-full border-r border-border data-[state=open]:animate-[bpdm-slide-in-left_240ms_ease-out] data-[state=closed]:animate-[bpdm-slide-out-left_180ms_ease-in]",
-        top: "left-0 top-0 w-full border-b border-border data-[state=open]:animate-[bpdm-slide-in-top_240ms_ease-out] data-[state=closed]:animate-[bpdm-slide-out-top_180ms_ease-in]",
+          "right-0 top-0 h-full border-l border-border data-[state=open]:animate-[bpdm-slide-in-right_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-right_var(--bpdm-duration-base)_ease-in]",
+        left: "left-0 top-0 h-full border-r border-border data-[state=open]:animate-[bpdm-slide-in-left_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-left_var(--bpdm-duration-base)_ease-in]",
+        top: "left-0 top-0 w-full border-b border-border data-[state=open]:animate-[bpdm-slide-in-top_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-top_var(--bpdm-duration-base)_ease-in]",
         bottom:
-          "left-0 bottom-0 w-full border-t border-border data-[state=open]:animate-[bpdm-slide-in-bottom_240ms_ease-out] data-[state=closed]:animate-[bpdm-slide-out-bottom_180ms_ease-in]",
+          "left-0 bottom-0 w-full border-t border-border data-[state=open]:animate-[bpdm-slide-in-bottom_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-bottom_var(--bpdm-duration-base)_ease-in]",
       },
     },
     defaultVariants: { side: "right" },

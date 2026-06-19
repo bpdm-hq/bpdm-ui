@@ -31,7 +31,7 @@ const GROUP_H = 30;
 
 function ChevronDown() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60" aria-hidden>
+    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180" aria-hidden>
       <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -180,7 +180,14 @@ export function MultiSelect({
     overscan: 12,
   });
 
-  React.useEffect(() => setActive(firstItem === -1 ? 0 : firstItem), [rows, firstItem]);
+  // Reset the active option ONLY when the menu opens or the filter changes — not
+  // on every `rows` identity change. Inline `options` props re-create the array
+  // each render, so keying off `rows` would snap the highlight + scroll back to
+  // the top on every selection (the click appears to "jump" to the first item).
+  React.useEffect(() => {
+    setActive(firstItem === -1 ? 0 : firstItem);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, query]);
   React.useEffect(() => {
     if (open && rows.length) virtualizer.scrollToIndex(active);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -252,7 +259,7 @@ export function MultiSelect({
               setOpen((o) => !o);
             }
           }}
-          className={cn(triggerVariants({ size }), className)}
+          className={cn(triggerVariants({ size }), "group", className)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
             {selected.length === 0 ? (
@@ -319,6 +326,7 @@ export function MultiSelect({
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
+            "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
           )}
         >
@@ -402,20 +410,20 @@ export function MultiSelect({
                       onClick={() => !o.disabled && toggle(o.value)}
                       onMouseMove={() => setActive(vi.index)}
                       className={cn(
-                        "absolute left-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground disabled:pointer-events-none disabled:opacity-50",
+                        "absolute left-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         isActive && "bg-muted",
                       )}
                       {...common}
                     >
                       <span
                         className={cn(
-                          "grid size-4 shrink-0 place-items-center rounded-[4px] border",
+                          "grid size-4 shrink-0 place-items-center rounded-[4px] border transition-colors duration-[var(--bpdm-duration-fast)]",
                           isSelected
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-muted-foreground/50",
                         )}
                       >
-                        {isSelected && <Check />}
+                        {isSelected && <Check className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" />}
                       </span>
                       {o.icon}
                       <span className="truncate">{o.label}</span>

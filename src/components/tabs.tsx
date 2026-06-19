@@ -63,6 +63,7 @@ export const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "data-[state=active]:animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
       className,
     )}
     {...props}

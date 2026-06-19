@@ -134,7 +134,7 @@ export function InputOtp({
   const isGrouped = (!!groupSize && groupSize > 0) || !!grouped;
 
   const baseCell =
-    "border border-input bg-background text-center font-medium text-foreground shadow-sm transition-colors focus:z-10 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+    "border border-input bg-background text-center font-medium text-foreground shadow-sm transition-[color,border-color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] focus:z-10 focus:scale-[1.08] focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
   // isFirst/isLast = position within the cell's group (for connected rounding)
   const renderCell = (i: number, isFirst: boolean, isLast: boolean) => (

@@ -63,10 +63,16 @@ export function StatusTimeline({ items, className }: StatusTimelineProps) {
             )}
             <span
               className={cn(
-                "z-10 grid size-6 shrink-0 place-items-center rounded-full",
+                "relative z-10 grid size-6 shrink-0 place-items-center rounded-full",
                 dotByStatus[status],
               )}
             >
+              {status === "current" && (
+                <span
+                  className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite]"
+                  aria-hidden
+                />
+              )}
               {status === "complete" && <Check />}
               {status === "failed" && <Cross />}
             </span>

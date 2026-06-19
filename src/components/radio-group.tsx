@@ -19,7 +19,7 @@ export const RadioGroup = React.forwardRef<
 RadioGroup.displayName = "RadioGroup";
 
 const radioItemVariants = cva(
-  "aspect-square shrink-0 cursor-pointer rounded-full border border-muted-foreground/60 bg-background text-primary shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+  "aspect-square shrink-0 cursor-pointer rounded-full border border-muted-foreground/60 bg-background text-primary shadow-sm transition-[color,background-color,border-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
   {
     variants: {
       size: {
@@ -46,7 +46,7 @@ export const RadioGroupItem = React.forwardRef<
     {...props}
   >
     <RadioGroupPrimitive.Indicator className="flex h-full w-full items-center justify-center">
-      <span className="size-[45%] rounded-full bg-primary" />
+      <span className="size-[45%] rounded-full bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" />
     </RadioGroupPrimitive.Indicator>
   </RadioGroupPrimitive.Item>
 ));

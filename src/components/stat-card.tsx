@@ -69,7 +69,7 @@ export function StatCard({
     <div
       style={cardStyle}
       className={cn(
-        "flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm",
+        "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
         accent ? "border-transparent" : "border-border bg-card",
         className,
       )}
@@ -94,7 +94,7 @@ export function StatCard({
         <span
           style={badgeStyle}
           className={cn(
-            "grid size-12 shrink-0 place-items-center rounded-full [&_svg]:size-5",
+            "grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5",
             !accent && "bg-muted text-muted-foreground",
           )}
         >

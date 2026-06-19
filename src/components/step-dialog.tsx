@@ -42,11 +42,11 @@ function Stepper({ steps, current }: { steps: Step[]; current: number }) {
             <li className="flex shrink-0 items-center gap-2">
               <span
                 className={cn(
-                  "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium",
+                  "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
                   done
                     ? "bg-primary text-primary-foreground"
                     : active
-                      ? "border-2 border-primary text-primary"
+                      ? "scale-110 border-2 border-primary text-primary"
                       : "border border-border text-muted-foreground",
                 )}
               >
@@ -61,7 +61,14 @@ function Stepper({ steps, current }: { steps: Step[]; current: number }) {
                 {s.title}
               </span>
             </li>
-            {i < steps.length - 1 && <span className="h-px flex-1 bg-border" />}
+            {i < steps.length - 1 && (
+              <span
+                className={cn(
+                  "h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]",
+                  i < current ? "bg-primary" : "bg-border",
+                )}
+              />
+            )}
           </React.Fragment>
         );
       })}
@@ -120,7 +127,12 @@ export function StepDialog({
     >
       <div className="space-y-5">
         <Stepper steps={steps} current={step} />
-        <div>{current.content}</div>
+        <div
+          key={step}
+          className="animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
+        >
+          {current.content}
+        </div>
       </div>
     </Dialog>
   );

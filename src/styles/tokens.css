@@ -15,6 +15,14 @@
 /* ── tokens shared by every theme ── */
 :root {
   --radius: 0.625rem;
+
+  /* Motion language — one rhythm for the whole library. Reference these instead
+     of hard-coding durations/easings, e.g. `ease-[var(--bpdm-ease-overshoot)]`. */
+  --bpdm-ease-out: cubic-bezier(0.32, 0.72, 0, 1); /* confident decelerate */
+  --bpdm-ease-overshoot: cubic-bezier(0.21, 1.02, 0.73, 1); /* springy "lands with a pop" */
+  --bpdm-duration-fast: 120ms;
+  --bpdm-duration-base: 180ms;
+  --bpdm-duration-slow: 240ms;
 }
 
 /* ── LIGHT · Warm Paper (default) ─────────────────────────────── */
@@ -41,6 +49,10 @@
   --destructive-foreground: #fafafa;
   --success: #15803d; /* gains / positive deltas */
   --success-foreground: #ffffff;
+  --warning: #b45309; /* amber-brown — distinct from the brand amber */
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
 }
 
 /* ── LIGHT · Cool Mist ────────────────────────────────────────── */
@@ -66,6 +78,10 @@
   --destructive-foreground: #fafafa;
   --success: #15803d;
   --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
 }
 
 /* ── DARK · Charcoal (default dark) ───────────────────────────── */
@@ -92,6 +108,10 @@
   --destructive-foreground: #fafafa;
   --success: #4ade80; /* brighter green reads on dark */
   --success-foreground: #052e16;
+  --warning: #fbbf24;
+  --warning-foreground: #422006;
+  --info: #60a5fa;
+  --info-foreground: #0a1f44;
 }
 
 /* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
@@ -118,6 +138,10 @@
   --destructive-foreground: #0d1117;
   --success: #3fb950;
   --success-foreground: #052e16;
+  --warning: #d29922;
+  --warning-foreground: #0d1117;
+  --info: #58a6ff;
+  --info-foreground: #0d1117;
 }
 
 /* Map Tailwind utilities → raw vars (resolved at runtime). */
@@ -145,6 +169,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 }
 
 /* Overlay entry/exit animations — shared by Tooltip, Popover, Dialog, Drawer.
@@ -166,6 +194,17 @@
   to { opacity: 0; transform: scale(0.96); }
 }
 
+/* Selection indicators (checkbox tick, radio dot, dropdown check) pop in. */
+@keyframes bpdm-indicator-in {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* A single expanding ring — the "current" pulse on the status timeline. */
+@keyframes bpdm-ping {
+  0% { transform: scale(1); opacity: 0.5; }
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
 /* Drawer slide transitions (one pair per edge). */
 @keyframes bpdm-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes bpdm-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
@@ -175,3 +214,54 @@
 @keyframes bpdm-slide-out-top { from { transform: translateY(0); } to { transform: translateY(-100%); } }
 @keyframes bpdm-slide-in-bottom { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes bpdm-slide-out-bottom { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+/* Toast enter/exit — slide from the nearest edge + fade (one pair per edge). */
+@keyframes bpdm-toast-in-right { from { opacity: 0; transform: translateX(calc(100% + 1.25rem)); } to { opacity: 1; transform: translateX(0); } }
+@keyframes bpdm-toast-out-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(calc(100% + 1.25rem)); } }
+@keyframes bpdm-toast-in-left { from { opacity: 0; transform: translateX(calc(-100% - 1.25rem)); } to { opacity: 1; transform: translateX(0); } }
+@keyframes bpdm-toast-out-left { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(calc(-100% - 1.25rem)); } }
+@keyframes bpdm-toast-in-top { from { opacity: 0; transform: translateY(calc(-100% - 1.25rem)); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bpdm-toast-out-top { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(calc(-100% - 1.25rem)); } }
+@keyframes bpdm-toast-in-bottom { from { opacity: 0; transform: translateY(calc(100% + 1.25rem)); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bpdm-toast-out-bottom { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(calc(100% + 1.25rem)); } }
+
+/* Toast runtime — enter/exit driven by Radix data-state, swipe by data-swipe.
+   Direction is injected per-toast via the --bpdm-toast-in / --bpdm-toast-out vars
+   (set inline by <Toaster> based on its position), so one rule covers all edges. */
+[data-bpdm-toast] {
+  animation: var(--bpdm-toast-in, bpdm-toast-in-right) 240ms cubic-bezier(0.21, 1.02, 0.73, 1);
+}
+[data-bpdm-toast][data-state="closed"] {
+  animation: var(--bpdm-toast-out, bpdm-toast-out-right) 160ms ease-in forwards;
+}
+[data-bpdm-toast][data-swipe="move"] {
+  transform: translate3d(var(--radix-toast-swipe-move-x, 0), var(--radix-toast-swipe-move-y, 0), 0);
+}
+[data-bpdm-toast][data-swipe="cancel"] {
+  transform: translate3d(0, 0, 0);
+  transition: transform 200ms ease;
+}
+[data-bpdm-toast][data-swipe="end"] {
+  animation: var(--bpdm-toast-out, bpdm-toast-out-right) 160ms ease-in forwards;
+}
+/* Auto-dismiss countdown — the accent bar shrinks top→bottom over the toast's
+   lifetime. Paused on hover (in sync with Radix pausing its close timer). */
+@keyframes bpdm-toast-countdown {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-bpdm-toast] { animation-duration: 1ms; }
+  [data-bpdm-countdown] { display: none; }
+}
+
+/* Respect reduced-motion everywhere: keep state changes, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

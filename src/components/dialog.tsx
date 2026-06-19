@@ -33,7 +33,7 @@ export const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = "DialogOverlay";
 
 const contentVariants = cva(
-  "fixed left-1/2 top-1/2 z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none data-[state=open]:animate-[bpdm-pop-in_150ms_ease-out] data-[state=closed]:animate-[bpdm-pop-out_120ms_ease-in]",
+  "fixed left-1/2 top-1/2 z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
   {
     variants: {
       size: {

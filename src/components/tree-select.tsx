@@ -27,7 +27,7 @@ const triggerVariants = cva(
 
 function ChevronDown() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60" aria-hidden>
+    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180" aria-hidden>
       <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -239,7 +239,7 @@ export function TreeSelect({
     return (
       <React.Fragment key={node.value}>
         <div
-          className="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pr-2 hover:bg-muted"
+          className="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pr-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted"
           style={{ paddingLeft: 8 + depth * 18 }}
         >
           {hasChildren ? (
@@ -300,7 +300,7 @@ export function TreeSelect({
               setOpen((o) => !o);
             }
           }}
-          className={cn(triggerVariants({ size }), className)}
+          className={cn(triggerVariants({ size }), "group", className)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
             {selectedLeaves.length === 0 ? (
@@ -350,6 +350,7 @@ export function TreeSelect({
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
+            "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
           )}
         >
