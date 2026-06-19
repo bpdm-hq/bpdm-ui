@@ -215,6 +215,22 @@
   to { height: 0; opacity: 0; }
 }
 
+/* Spinner — bouncing dots + equalizer bars (staggered per child via delay). */
+@keyframes bpdm-dot-bounce {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+@keyframes bpdm-bar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+/* Spinner — a square flipping on X then Y (3D). */
+@keyframes bpdm-flip {
+  0% { transform: perspective(140px) rotateX(0deg) rotateY(0deg); }
+  50% { transform: perspective(140px) rotateX(-180deg) rotateY(0deg); }
+  100% { transform: perspective(140px) rotateX(-180deg) rotateY(-180deg); }
+}
+
 /* Drawer slide transitions (one pair per edge). */
 @keyframes bpdm-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes bpdm-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
