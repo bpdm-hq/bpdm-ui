@@ -93,7 +93,7 @@ const meta: Meta<typeof Drawer> = {
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Owner</label>
-          <Input defaultValue="Maya Patel" />
+          <Input defaultValue="Elena Costa" />
         </div>
       </div>
     </Drawer>
