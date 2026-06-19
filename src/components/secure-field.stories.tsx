@@ -91,7 +91,7 @@ export const LicenseKey: Story = {
 export const ApiKey: Story = {
   parameters: {
     docs: {
-      source: { code: `<SecureField copyable defaultValue="ak_live_7Hq2...e9Qa" placeholder="API key" />` },
+      source: { code: `<SecureField copyable defaultValue="ak_live_7Hq2eZvKf3mQpe9Qa1Lx" placeholder="API key" />` },
     },
   },
   render: () => (

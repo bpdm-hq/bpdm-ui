@@ -107,7 +107,30 @@ export const Playground: Story = {};
 
 export const Sides: Story = {
   parameters: {
-    docs: { source: { code: `<Drawer side="left" | "right" | "top" | "bottom" …>` } },
+    docs: {
+      source: {
+        code: `{(["left", "right", "top", "bottom"] as const).map((side) => (
+  <Drawer
+    key={side}
+    side={side}
+    title={\`\${side} drawer\`}
+    description={\`Slides in from the \${side}.\`}
+    trigger={
+      <Button variant="outline" className="capitalize">
+        {side}
+      </Button>
+    }
+    footer={
+      <DrawerClose asChild>
+        <Button>Done</Button>
+      </DrawerClose>
+    }
+  >
+    <p className="text-sm text-muted-foreground">Drawer body content.</p>
+  </Drawer>
+))}`,
+      },
+    },
   },
   render: () => (
     <div className="flex flex-wrap gap-3">
@@ -200,8 +223,21 @@ export const Controlled: Story = {
     docs: {
       source: {
         code: `const [open, setOpen] = useState(false);
-<Button onClick={() => setOpen(true)}>Open</Button>
-<Drawer open={open} onOpenChange={setOpen} title="…">…</Drawer>`,
+
+<>
+  <Button onClick={() => setOpen(true)}>Open controlled</Button>
+  <Drawer
+    open={open}
+    onOpenChange={setOpen}
+    title="Controlled drawer"
+    description="Its open state lives in the parent."
+    footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+  >
+    <p className="text-sm text-muted-foreground">
+      Open it from a menu, after an async action, etc.
+    </p>
+  </Drawer>
+</>`,
       },
     },
   },

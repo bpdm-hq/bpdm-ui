@@ -85,7 +85,21 @@ export const Playground: Story = {};
 // chips capped at maxDisplay, the rest collapse into "+N"
 export const ChipsWithOverflow: Story = {
   parameters: {
-    docs: { source: { code: `<MultiSelect options={…} maxDisplay={2} defaultValue={["react","vue","svelte","solid"]} />` } },
+    docs: {
+      source: {
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<MultiSelect
+  options={frameworks}
+  maxDisplay={2}
+  defaultValue={["react", "vue", "svelte", "solid"]}
+  placeholder="Select frameworks"
+/>`,
+      },
+    },
   },
   render: () => (
     <div className="w-80">
@@ -103,7 +117,21 @@ export const ChipsWithOverflow: Story = {
 export const CountMode: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<MultiSelect options={…} maxDisplay={0} defaultValue={["react","vue","svelte"]} />` } },
+    docs: {
+      source: {
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<MultiSelect
+  options={frameworks}
+  maxDisplay={0}
+  defaultValue={["react", "vue", "svelte"]}
+  placeholder="Select frameworks"
+/>`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -170,7 +198,19 @@ export const LargeDataset_10k: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<MultiSelect aria-invalid options={…} placeholder="Required" />` } },
+    docs: {
+      source: {
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<div className="flex w-80 flex-col gap-1.5">
+  <MultiSelect aria-invalid options={frameworks} placeholder="Required" />
+  <p className="text-sm text-destructive">Select at least one.</p>
+</div>`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">

@@ -155,7 +155,21 @@ export const Dismissible: Story = {
     );
   },
   parameters: {
-    docs: { source: { code: `<Alert variant="success" title="Invite sent" onClose={() => setOpen(false)}>…</Alert>` } },
+    docs: {
+      source: {
+        code: `const [open, setOpen] = useState(true);
+
+{open ? (
+  <Alert variant="success" title="Invite sent" onClose={() => setOpen(false)}>
+    We emailed an invitation to the new project member.
+  </Alert>
+) : (
+  <Button variant="ghost" onClick={() => setOpen(true)}>
+    Show alert again
+  </Button>
+)}`,
+      },
+    },
   },
 };
 
@@ -178,6 +192,12 @@ export const NoIcon: Story = {
     children: "Version 2.4 adds keyboard navigation across the whole console.",
   },
   parameters: {
-    docs: { source: { code: `<Alert variant="default" icon={null} title="Release notes">…</Alert>` } },
+    docs: {
+      source: {
+        code: `<Alert variant="default" icon={null} title="Release notes">
+  Version 2.4 adds keyboard navigation across the whole console.
+</Alert>`,
+      },
+    },
   },
 };

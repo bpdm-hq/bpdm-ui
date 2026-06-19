@@ -113,7 +113,22 @@ export const Plan: Story = {
 export const Horizontal: Story = {
   parameters: {
     docs: {
-      source: { code: `<RadioGroup defaultValue="pro" orientation="horizontal">…</RadioGroup>` },
+      source: {
+        code: `const plans = [
+  { value: "free", label: "Free" },
+  { value: "pro", label: "Pro" },
+  { value: "enterprise", label: "Enterprise" },
+];
+
+<RadioGroup defaultValue="pro" orientation="horizontal">
+  {plans.map((p) => (
+    <div key={p.value} className="flex items-center gap-2">
+      <RadioGroupItem value={p.value} id={p.value} />
+      <label htmlFor={p.value}>{p.label}</label>
+    </div>
+  ))}
+</RadioGroup>`,
+      },
     },
   },
   render: () => (
@@ -150,7 +165,24 @@ export const Sizes: Story = {
 export const Disabled: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<RadioGroup defaultValue="pro" disabled>…</RadioGroup>` } },
+    docs: {
+      source: {
+        code: `const plans = [
+  { value: "free", label: "Free" },
+  { value: "pro", label: "Pro" },
+  { value: "enterprise", label: "Enterprise" },
+];
+
+<RadioGroup defaultValue="pro" disabled>
+  {plans.map((p) => (
+    <div key={p.value} className="flex items-center gap-2">
+      <RadioGroupItem value={p.value} id={p.value} />
+      <label htmlFor={p.value}>{p.label}</label>
+    </div>
+  ))}
+</RadioGroup>`,
+      },
+    },
   },
   render: () => (
     <RadioGroup defaultValue="pro" disabled>

@@ -76,7 +76,24 @@ export const Playground: Story = {};
 
 export const Placements: Story = {
   parameters: {
-    docs: { source: { code: `<Popover side="top" | "right" | "bottom" | "left" …>` } },
+    docs: {
+      source: {
+        code: `{(["top", "right", "bottom", "left"] as const).map((side) => (
+  <Popover
+    key={side}
+    side={side}
+    showArrow
+    trigger={
+      <Button variant="outline" className="capitalize">
+        {side}
+      </Button>
+    }
+  >
+    <p className="text-sm">Opens on the {side}.</p>
+  </Popover>
+))}`,
+      },
+    },
   },
   render: () => (
     <div className="flex min-h-48 items-center justify-center gap-4">
@@ -143,6 +160,17 @@ export const WithArrow: Story = {
   tags: ["!dev"],
   args: { showArrow: true },
   parameters: {
-    docs: { source: { code: `<Popover showArrow trigger={…}>…</Popover>` } },
+    docs: {
+      source: {
+        code: `<Popover showArrow trigger={<Button variant="outline">Open popover</Button>}>
+  <div className="w-64 space-y-1">
+    <p className="font-medium">Quick info</p>
+    <p className="text-sm text-muted-foreground">
+      Popovers can hold any content — text, forms, menus.
+    </p>
+  </div>
+</Popover>`,
+      },
+    },
   },
 };

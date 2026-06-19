@@ -86,7 +86,21 @@ export const ContentBaseline: Story = {
   args: { baseline: "content" },
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Tabs variant="underline" baseline="content" items={[…]} />` } },
+    docs: {
+      source: {
+        code: `<Tabs
+  variant="underline"
+  baseline="content"
+  items={[
+    { value: "overview", label: "Overview", content: <Panel>Project overview and highlights.</Panel> },
+    { value: "activity", label: "Activity", content: <Panel>Recent activity and events.</Panel> },
+    { value: "members", label: "Members", content: <Panel>People with access and their roles.</Panel> },
+    { value: "integrations", label: "Integrations", content: <Panel>Connected apps and services.</Panel> },
+    { value: "settings", label: "Settings", content: <Panel>Project preferences.</Panel> },
+  ]}
+/>`,
+      },
+    },
   },
 };
 
@@ -115,8 +129,18 @@ export const Pill: Story = {
         code: `<Tabs
   variant="pill"
   items={[
-    { value: "workspace", label: "Workspace", icon: <BriefcaseIcon />, content: … },
-    { value: "profile", label: "Profile", icon: <UserIcon />, content: … },
+    {
+      value: "workspace",
+      label: "Workspace",
+      icon: <Briefcase />,
+      content: <Panel>Workspace-wide preferences.</Panel>,
+    },
+    {
+      value: "profile",
+      label: "Profile",
+      icon: <User />,
+      content: <Panel>Your personal profile.</Panel>,
+    },
   ]}
 />`,
       },
@@ -136,7 +160,18 @@ export const FullWidth: Story = {
     ],
   },
   parameters: {
-    docs: { source: { code: `<Tabs fullWidth items={[…]} />` } },
+    docs: {
+      source: {
+        code: `<Tabs
+  fullWidth
+  items={[
+    { value: "overview", label: "Overview", content: <Panel>Overview.</Panel> },
+    { value: "activity", label: "Activity", content: <Panel>Activity.</Panel> },
+    { value: "settings", label: "Settings", content: <Panel>Settings.</Panel> },
+  ]}
+/>`,
+      },
+    },
   },
 };
 
