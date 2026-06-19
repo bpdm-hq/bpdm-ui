@@ -237,6 +237,12 @@
   100% { transform: translateX(250%); }
 }
 
+/* Stepper panel — content fades + rises in as you navigate between steps. */
+@keyframes bpdm-step-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Drawer slide transitions (one pair per edge). */
 @keyframes bpdm-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes bpdm-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }

@@ -3,14 +3,14 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogClose } from "./dialog";
 import { Button } from "./button";
 
-export interface Step {
+export interface StepDialogStep {
   title: string;
   description?: React.ReactNode;
   content: React.ReactNode;
 }
 
 export interface StepDialogProps {
-  steps: Step[];
+  steps: StepDialogStep[];
   trigger?: React.ReactNode;
   /** Overall dialog title (defaults to the current step's title). */
   title?: React.ReactNode;
@@ -31,7 +31,7 @@ function CheckGlyph() {
   );
 }
 
-function Stepper({ steps, current }: { steps: Step[]; current: number }) {
+function Stepper({ steps, current }: { steps: StepDialogStep[]; current: number }) {
   return (
     <ol className="flex items-center gap-2">
       {steps.map((s, i) => {
