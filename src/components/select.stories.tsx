@@ -86,7 +86,16 @@ export const Playground: Story = {};
 // type to filter the list
 export const Searchable: Story = {
   parameters: {
-    docs: { source: { code: `<Select searchable options={…} placeholder="Search frameworks" />` } },
+    docs: {
+      source: {
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<Select searchable options={frameworks} placeholder="Search frameworks" />`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -151,8 +160,23 @@ export const Groups: Story = {
         code: `<Select
   placeholder="Select a City"
   options={[
-    { label: "🇩🇪 Germany", options: [{ value: "berlin", label: "Berlin" }, …] },
-    { label: "🇺🇸 USA", options: [{ value: "nyc", label: "New York" }, …] },
+    {
+      label: "🇩🇪 Germany",
+      options: [
+        { value: "berlin", label: "Berlin" },
+        { value: "frankfurt", label: "Frankfurt" },
+        { value: "hamburg", label: "Hamburg" },
+        { value: "munich", label: "Munich" },
+      ],
+    },
+    {
+      label: "🇺🇸 USA",
+      options: [
+        { value: "nyc", label: "New York" },
+        { value: "la", label: "Los Angeles" },
+        { value: "chicago", label: "Chicago" },
+      ],
+    },
   ]}
 />`,
       },
@@ -200,9 +224,16 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Select size="sm" options={…} />
-<Select size="md" options={…} />
-<Select size="lg" options={…} />`,
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<div className="flex w-72 flex-col gap-3">
+  {(["sm", "md", "lg"] as const).map((s) => (
+    <Select key={s} size={s} options={frameworks} placeholder={\`Size \${s}\`} />
+  ))}
+</div>`,
       },
     },
   },
@@ -218,7 +249,19 @@ export const Sizes: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Select aria-invalid options={…} placeholder="Required" />` } },
+    docs: {
+      source: {
+        code: `const frameworks = [
+  "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
+  "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
+].map((label) => ({ value: label.toLowerCase(), label }));
+
+<div className="flex w-72 flex-col gap-1.5">
+  <Select aria-invalid options={frameworks} placeholder="Required" />
+  <p className="text-sm text-destructive">Please choose a framework.</p>
+</div>`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">

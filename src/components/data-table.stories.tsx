@@ -783,7 +783,8 @@ export const ColumnToggle: Story = {
     docs: {
       source: {
         code: `<DataTable columnToggle columns={columns} data={data} />
-// keep a column always visible: { id: "name", hideable: false, … }`,
+// keep a column always visible:
+// { id: "name", header: "Name", hideable: false, accessor: (r) => r.name }`,
       },
     },
   },

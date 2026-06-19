@@ -72,7 +72,17 @@ export const Playground: Story = {};
 
 export const Sides: Story = {
   parameters: {
-    docs: { source: { code: `<Tooltip content="…" side="top" | "right" | "bottom" | "left">…</Tooltip>` } },
+    docs: {
+      source: {
+        code: `{(["top", "right", "bottom", "left"] as const).map((side) => (
+  <Tooltip key={side} content={\`Side: \${side}\`} side={side}>
+    <Button variant="outline" className="capitalize">
+      {side}
+    </Button>
+  </Tooltip>
+))}`,
+      },
+    },
   },
   render: () => (
     <div className="grid place-items-center gap-6 py-8">
@@ -114,7 +124,21 @@ export const OnIconButton: Story = {
 
 export const RichContent: Story = {
   parameters: {
-    docs: { source: { code: `<Tooltip content={<div>…multiline…</div>}>…</Tooltip>` } },
+    docs: {
+      source: {
+        code: `<Tooltip
+  side="right"
+  content={
+    <div className="space-y-1">
+      <p className="font-medium text-foreground">Auto-sync</p>
+      <p className="text-muted-foreground">Changes sync across devices in real time.</p>
+    </div>
+  }
+>
+  <Button variant="outline">Sync info</Button>
+</Tooltip>`,
+      },
+    },
   },
   render: () => (
     <div className="flex min-h-28 items-center justify-center">
@@ -137,6 +161,12 @@ export const Disabled: Story = {
   tags: ["!dev"],
   args: { disabled: true, content: "You won't see me" },
   parameters: {
-    docs: { source: { code: `<Tooltip content="…" disabled>…</Tooltip>` } },
+    docs: {
+      source: {
+        code: `<Tooltip content="You won't see me" disabled>
+  <Button variant="outline">Hover me</Button>
+</Tooltip>`,
+      },
+    },
   },
 };

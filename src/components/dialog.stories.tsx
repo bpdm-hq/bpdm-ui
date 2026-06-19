@@ -109,7 +109,30 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Dialog size="sm" | "md" | "lg" | "xl" …>` } },
+    docs: {
+      source: {
+        code: `{(["sm", "md", "lg", "xl"] as const).map((size) => (
+  <Dialog
+    key={size}
+    size={size}
+    title={\`Size: \${size}\`}
+    description="The panel width adapts to the size prop."
+    trigger={
+      <Button variant="outline" className="uppercase">
+        {size}
+      </Button>
+    }
+    footer={
+      <DialogClose asChild>
+        <Button>Got it</Button>
+      </DialogClose>
+    }
+  >
+    <p className="text-sm text-muted-foreground">Dialog body content.</p>
+  </Dialog>
+))}`,
+      },
+    },
   },
   render: () => (
     <div className="flex flex-wrap gap-3">
@@ -284,8 +307,21 @@ export const Controlled: Story = {
     docs: {
       source: {
         code: `const [open, setOpen] = useState(false);
-<Button onClick={() => setOpen(true)}>Open</Button>
-<Dialog open={open} onOpenChange={setOpen} title="…">…</Dialog>`,
+
+<>
+  <Button onClick={() => setOpen(true)}>Open controlled</Button>
+  <Dialog
+    open={open}
+    onOpenChange={setOpen}
+    title="Controlled dialog"
+    description="Its open state lives in the parent."
+    footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+  >
+    <p className="text-sm text-muted-foreground">
+      Useful when opening from a menu, after an async action, etc.
+    </p>
+  </Dialog>
+</>`,
       },
     },
   },
