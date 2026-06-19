@@ -25,7 +25,7 @@ const switchVariants = cva(
 );
 
 const thumbVariants = cva(
-  "pointer-events-none flex items-center justify-center bg-white shadow-lg ring-0 transition-transform data-[state=unchecked]:translate-x-0",
+  "pointer-events-none flex items-center justify-center bg-white shadow-lg ring-0 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] data-[state=unchecked]:translate-x-0",
   {
     variants: {
       size: {
