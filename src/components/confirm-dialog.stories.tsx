@@ -86,22 +86,35 @@ export const Destructive: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const confirm = useConfirm();
+        code: `import { Button, ConfirmProvider, useConfirm } from "@bpdm/ui";
 
-<Button
-  variant="destructive"
-  onClick={async () => {
-    const ok = await confirm({
-      title: "Delete project?",
-      description: "This permanently removes the project and its data.",
-      destructive: true,
-      confirmText: "Delete",
-    });
-    if (ok) deleteProject();
-  }}
->
-  Delete project
-</Button>`,
+function DeleteButton() {
+  const confirm = useConfirm();
+  return (
+    <Button
+      variant="destructive"
+      onClick={async () => {
+        const ok = await confirm({
+          title: "Delete project?",
+          description: "This permanently removes the project and its data.",
+          destructive: true,
+          confirmText: "Delete",
+        });
+        if (ok) deleteProject();
+      }}
+    >
+      Delete project
+    </Button>
+  );
+}
+
+export function Example() {
+  return (
+    <ConfirmProvider>
+      <DeleteButton />
+    </ConfirmProvider>
+  );
+}`,
       },
     },
   },
@@ -138,20 +151,33 @@ export const Default: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const confirm = useConfirm();
+        code: `import { Button, ConfirmProvider, useConfirm } from "@bpdm/ui";
 
-<Button
-  onClick={async () => {
-    const ok = await confirm({
-      title: "Publish changes?",
-      description: "Your edits will go live immediately.",
-      confirmText: "Publish",
-    });
-    if (ok) publish();
-  }}
->
-  Publish
-</Button>`,
+function PublishButton() {
+  const confirm = useConfirm();
+  return (
+    <Button
+      onClick={async () => {
+        const ok = await confirm({
+          title: "Publish changes?",
+          description: "Your edits will go live immediately.",
+          confirmText: "Publish",
+        });
+        if (ok) publish();
+      }}
+    >
+      Publish
+    </Button>
+  );
+}
+
+export function Example() {
+  return (
+    <ConfirmProvider>
+      <PublishButton />
+    </ConfirmProvider>
+  );
+}`,
       },
     },
   },

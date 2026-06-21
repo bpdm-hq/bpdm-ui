@@ -68,8 +68,16 @@ export const Variants: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Input variant="outline" placeholder="Outline (default)" />
-<Input variant="underline" placeholder="Underline" />`,
+        code: `import { Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-6">
+      <Input variant="outline" placeholder="Outline (default)" />
+      <Input variant="underline" placeholder="Underline" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -87,10 +95,18 @@ export const States: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Input placeholder="Default" />
-<Input defaultValue="With value" />
-<Input aria-invalid defaultValue="Invalid value" />
-<Input disabled placeholder="Disabled" />`,
+        code: `import { Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      <Input placeholder="Default" />
+      <Input defaultValue="With value" />
+      <Input aria-invalid defaultValue="Invalid value" />
+      <Input disabled placeholder="Disabled" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -109,9 +125,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Input size="sm" placeholder="Small" />
-<Input size="md" placeholder="Medium" />
-<Input size="lg" placeholder="Large" />`,
+        code: `import { Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      <Input size="sm" placeholder="Small" />
+      <Input size="md" placeholder="Medium" />
+      <Input size="lg" placeholder="Large" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -129,12 +153,19 @@ export const WithIcons: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Search, Mail, Lock, Calendar } from "lucide-react";
+        code: `import { Calendar, Lock, Mail, Search } from "lucide-react";
+import { Input } from "@bpdm/ui";
 
-<Input placeholder="Search" startIcon={<Search />} />            // leading
-<Input placeholder="Pick a date" endIcon={<Calendar />} />        // trailing
-<Input type="email" placeholder="Email" startIcon={<Mail />} />
-<Input type="password" placeholder="Password" startIcon={<Lock />} endIcon={<span>👁</span>} />  // both`,
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      <Input placeholder="Search" startIcon={<Search />} />            {/* leading */}
+      <Input placeholder="Pick a date" endIcon={<Calendar />} />        {/* trailing */}
+      <Input type="email" placeholder="Email" startIcon={<Mail />} />
+      <Input type="password" placeholder="Password" startIcon={<Lock />} endIcon={<span>👁</span>} />  {/* both */}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -159,10 +190,18 @@ export const Types: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Input type="email" placeholder="email" />
-<Input type="password" placeholder="password" />
-<Input type="number" placeholder="0" />
-<Input type="file" />`,
+        code: `import { Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      <Input type="email" placeholder="email" />
+      <Input type="password" placeholder="password" />
+      <Input type="number" placeholder="0" />
+      <Input type="file" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -182,11 +221,17 @@ export const FormField: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<div className="flex flex-col gap-1.5">
-  <label htmlFor="email" className="text-sm font-medium">Email</label>
-  <Input id="email" type="email" aria-invalid aria-describedby="email-err" placeholder="name@company.com" />
-  <p id="email-err" className="text-sm text-destructive">Enter a valid email address.</p>
-</div>`,
+        code: `import { Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor="email" className="text-sm font-medium">Email</label>
+      <Input id="email" type="email" aria-invalid aria-describedby="email-err" placeholder="name@company.com" />
+      <p id="email-err" className="text-sm text-destructive">Enter a valid email address.</p>
+    </div>
+  );
+}`,
       },
     },
   },

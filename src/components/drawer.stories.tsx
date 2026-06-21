@@ -109,26 +109,34 @@ export const Sides: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{(["left", "right", "top", "bottom"] as const).map((side) => (
-  <Drawer
-    key={side}
-    side={side}
-    title={\`\${side} drawer\`}
-    description={\`Slides in from the \${side}.\`}
-    trigger={
-      <Button variant="outline" className="capitalize">
-        {side}
-      </Button>
-    }
-    footer={
-      <DrawerClose asChild>
-        <Button>Done</Button>
-      </DrawerClose>
-    }
-  >
-    <p className="text-sm text-muted-foreground">Drawer body content.</p>
-  </Drawer>
-))}`,
+        code: `import { Button, Drawer, DrawerClose } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["left", "right", "top", "bottom"] as const).map((side) => (
+        <Drawer
+          key={side}
+          side={side}
+          title={\`\${side} drawer\`}
+          description={\`Slides in from the \${side}.\`}
+          trigger={
+            <Button variant="outline" className="capitalize">
+              {side}
+            </Button>
+          }
+          footer={
+            <DrawerClose asChild>
+              <Button>Done</Button>
+            </DrawerClose>
+          }
+        >
+          <p className="text-sm text-muted-foreground">Drawer body content.</p>
+        </Drawer>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -163,10 +171,39 @@ export const WithForm: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Drawer side="right" title="New project" trigger={<Button>New project</Button>}>
-  <Input defaultValue="Q3 Planning" />
-  <Select options={visibility} value={value} onValueChange={setValue} searchable />
-</Drawer>`,
+        code: `import { useState } from "react";
+import { Button, Drawer, DrawerClose, Input, Select } from "@bpdm/ui";
+
+const visibilityOptions = [
+  { value: "private", label: "Private" },
+  { value: "team", label: "Team" },
+  { value: "org", label: "Organization" },
+  { value: "public", label: "Public" },
+];
+
+export function Example() {
+  const [visibility, setVisibility] = useState("team");
+  return (
+    <Drawer
+      side="right"
+      title="New project"
+      trigger={<Button>New project</Button>}
+      footer={
+        <DrawerClose asChild>
+          <Button>Create</Button>
+        </DrawerClose>
+      }
+    >
+      <Input defaultValue="Q3 Planning" />
+      <Select
+        searchable
+        value={visibility}
+        onValueChange={setVisibility}
+        options={visibilityOptions}
+      />
+    </Drawer>
+  );
+}`,
       },
     },
   },
@@ -222,22 +259,28 @@ export const Controlled: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const [open, setOpen] = useState(false);
+        code: `import { useState } from "react";
+import { Button, Drawer } from "@bpdm/ui";
 
-<>
-  <Button onClick={() => setOpen(true)}>Open controlled</Button>
-  <Drawer
-    open={open}
-    onOpenChange={setOpen}
-    title="Controlled drawer"
-    description="Its open state lives in the parent."
-    footer={<Button onClick={() => setOpen(false)}>Close</Button>}
-  >
-    <p className="text-sm text-muted-foreground">
-      Open it from a menu, after an async action, etc.
-    </p>
-  </Drawer>
-</>`,
+export function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open controlled</Button>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Controlled drawer"
+        description="Its open state lives in the parent."
+        footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <p className="text-sm text-muted-foreground">
+          Open it from a menu, after an async action, etc.
+        </p>
+      </Drawer>
+    </>
+  );
+}`,
       },
     },
   },

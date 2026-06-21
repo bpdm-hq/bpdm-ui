@@ -70,9 +70,17 @@ export const Variants: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<FloatLabel label="Over" variant="over"><Input id="a" /></FloatLabel>
-<FloatLabel label="In" variant="in"><Input id="b" /></FloatLabel>
-<FloatLabel label="On the border" variant="on"><Input id="c" /></FloatLabel>`,
+        code: `import { FloatLabel, Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-7 pt-4">
+      <FloatLabel label="Over" variant="over"><Input id="a" /></FloatLabel>
+      <FloatLabel label="In" variant="in"><Input id="b" /></FloatLabel>
+      <FloatLabel label="On the border" variant="on"><Input id="c" /></FloatLabel>
+    </div>
+  );
+}`,
       },
     },
   },
@@ -97,9 +105,15 @@ export const Filled: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<FloatLabel label="Email" variant="on">
-  <Input id="email" type="email" defaultValue="ada@bpdm.dev" />
-</FloatLabel>`,
+        code: `import { FloatLabel, Input } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <FloatLabel label="Email" variant="on">
+      <Input id="email" type="email" defaultValue="ada@bpdm.dev" />
+    </FloatLabel>
+  );
+}`,
       },
     },
   },

@@ -62,10 +62,18 @@ export const States: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Switch />
-<Switch defaultChecked />
-<Switch disabled />
-<Switch disabled defaultChecked />`,
+        code: `import { Switch } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-5">
+      <Switch />
+      <Switch defaultChecked />
+      <Switch disabled />
+      <Switch disabled defaultChecked />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -85,9 +93,17 @@ export const Shapes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Switch shape="pill" defaultChecked />
-<Switch shape="square" defaultChecked />
-<Switch shape="sharp" defaultChecked />`,
+        code: `import { Switch } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-6">
+      <Switch shape="pill" defaultChecked />
+      <Switch shape="square" defaultChecked />
+      <Switch shape="sharp" defaultChecked />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -109,8 +125,16 @@ export const WithIcon: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Switch icon defaultChecked />
-<Switch icon />`,
+        code: `import { Switch } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-5">
+      <Switch icon defaultChecked />
+      <Switch icon />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -128,9 +152,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Switch size="sm" defaultChecked />
-<Switch size="md" defaultChecked />
-<Switch size="lg" defaultChecked />`,
+        code: `import { Switch } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-5">
+      <Switch size="sm" defaultChecked />
+      <Switch size="md" defaultChecked />
+      <Switch size="lg" defaultChecked />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -148,10 +180,16 @@ export const WithLabel: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<div className="flex items-center gap-2">
-  <Switch id="airplane" defaultChecked />
-  <label htmlFor="airplane">Airplane mode</label>
-</div>`,
+        code: `import { Switch } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-2">
+      <Switch id="airplane" defaultChecked />
+      <label htmlFor="airplane">Airplane mode</label>
+    </div>
+  );
+}`,
       },
     },
   },
@@ -171,12 +209,26 @@ export const SettingsList: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{settings.map((s) => (
-  <div key={s.id} className="flex items-center justify-between gap-8">
-    <label htmlFor={s.id}>{s.label}</label>
-    <Switch id={s.id} defaultChecked={s.on} />
-  </div>
-))}`,
+        code: `import { Switch } from "@bpdm/ui";
+
+const settings = [
+  { id: "s-2fa", label: "Two-factor authentication", on: true },
+  { id: "s-email", label: "Email notifications", on: false },
+  { id: "s-beta", label: "Beta features", on: true },
+];
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-4">
+      {settings.map((s) => (
+        <div key={s.id} className="flex items-center justify-between gap-8">
+          <label htmlFor={s.id}>{s.label}</label>
+          <Switch id={s.id} defaultChecked={s.on} />
+        </div>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },

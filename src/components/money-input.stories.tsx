@@ -75,10 +75,18 @@ export const Currencies: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<MoneyInput currency="USD" locale="en-US" defaultValue="100000" />   // $100,000.00
-<MoneyInput currency="EUR" locale="de-DE" defaultValue="100000" />   // 100.000,00 €
-<MoneyInput currency="INR" locale="en-IN" defaultValue="100000" />   // ₹1,00,000.00
-<MoneyInput currency="JPY" locale="ja-JP" defaultValue="100000" />   // ¥100,000`,
+        code: `import { MoneyInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-72 flex-col gap-3">
+      <MoneyInput currency="USD" locale="en-US" defaultValue="100000" />   {/* $100,000.00 */}
+      <MoneyInput currency="EUR" locale="de-DE" defaultValue="100000" />   {/* 100.000,00 € */}
+      <MoneyInput currency="INR" locale="en-IN" defaultValue="100000" />   {/* ₹1,00,000.00 */}
+      <MoneyInput currency="JPY" locale="ja-JP" defaultValue="100000" />   {/* ¥100,000 */}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -105,7 +113,11 @@ export const PrecisionLargeAmount: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<MoneyInput currency="USD" defaultValue="123456789012.34" />`,
+        code: `import { MoneyInput } from "@bpdm/ui";
+
+export function Example() {
+  return <MoneyInput currency="USD" defaultValue="123456789012.34" />;
+}`,
       },
     },
   },
@@ -121,7 +133,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<MoneyInput size="sm" /> <MoneyInput size="md" /> <MoneyInput size="lg" />`,
+        code: `import { MoneyInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-64 flex-col gap-3">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <MoneyInput key={s} size={s} currency="USD" defaultValue="2500" />
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -138,7 +160,18 @@ export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
-      source: { code: `<MoneyInput aria-invalid currency="USD" />` },
+      source: {
+        code: `import { MoneyInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-64 flex-col gap-1.5">
+      <MoneyInput aria-invalid currency="USD" defaultValue="0" />
+      <p className="text-sm text-destructive">Amount must be greater than 0.</p>
+    </div>
+  );
+}`,
+      },
     },
   },
   render: () => (
@@ -152,7 +185,15 @@ export const Invalid: Story = {
 export const Disabled: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<MoneyInput disabled currency="USD" defaultValue="2500" />` } },
+    docs: {
+      source: {
+        code: `import { MoneyInput } from "@bpdm/ui";
+
+export function Example() {
+  return <MoneyInput disabled currency="USD" defaultValue="2500" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-64">

@@ -111,26 +111,34 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `{(["sm", "md", "lg", "xl"] as const).map((size) => (
-  <Dialog
-    key={size}
-    size={size}
-    title={\`Size: \${size}\`}
-    description="The panel width adapts to the size prop."
-    trigger={
-      <Button variant="outline" className="uppercase">
-        {size}
-      </Button>
-    }
-    footer={
-      <DialogClose asChild>
-        <Button>Got it</Button>
-      </DialogClose>
-    }
-  >
-    <p className="text-sm text-muted-foreground">Dialog body content.</p>
-  </Dialog>
-))}`,
+        code: `import { Button, Dialog, DialogClose } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["sm", "md", "lg", "xl"] as const).map((size) => (
+        <Dialog
+          key={size}
+          size={size}
+          title={\`Size: \${size}\`}
+          description="The panel width adapts to the size prop."
+          trigger={
+            <Button variant="outline" className="uppercase">
+              {size}
+            </Button>
+          }
+          footer={
+            <DialogClose asChild>
+              <Button>Got it</Button>
+            </DialogClose>
+          }
+        >
+          <p className="text-sm text-muted-foreground">Dialog body content.</p>
+        </Dialog>
+      ))}
+    </div>
+  );
+}`,
       },
     },
   },
@@ -167,11 +175,82 @@ export const WithDropdowns: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Dialog size="sm" title="New project" trigger={<Button>New project</Button>}>
-  <Select options={visibility} maxHeight={150} searchable />
-  <MultiSelect options={labels} maxHeight={150} searchable />
-  <TreeSelect options={categories} maxHeight={170} searchable />
-</Dialog>`,
+        code: `import { useState } from "react";
+import { Button, Dialog, DialogClose, MultiSelect, Select, TreeSelect } from "@bpdm/ui";
+
+const visibilityOptions = [
+  { value: "private", label: "Private" },
+  { value: "team", label: "Team" },
+  { value: "org", label: "Organization" },
+  { value: "public", label: "Public" },
+];
+
+const labelOptions = [
+  { value: "frontend", label: "Frontend" },
+  { value: "backend", label: "Backend" },
+  { value: "design", label: "Design" },
+  { value: "docs", label: "Docs" },
+];
+
+const categoryOptions = [
+  {
+    value: "engineering",
+    label: "Engineering",
+    children: [
+      { value: "web", label: "Web" },
+      { value: "mobile", label: "Mobile" },
+      { value: "infra", label: "Infrastructure" },
+    ],
+  },
+  {
+    value: "product",
+    label: "Product",
+    children: [
+      { value: "design", label: "Design" },
+      { value: "research", label: "Research" },
+    ],
+  },
+];
+
+export function Example() {
+  const [visibility, setVisibility] = useState("team");
+  const [labels, setLabels] = useState<string[]>(["frontend"]);
+  const [cats, setCats] = useState<string[]>([]);
+  return (
+    <Dialog
+      size="sm"
+      title="New project"
+      trigger={<Button>New project</Button>}
+      footer={
+        <DialogClose asChild>
+          <Button>Create</Button>
+        </DialogClose>
+      }
+    >
+      <Select
+        maxHeight={150}
+        searchable
+        value={visibility}
+        onValueChange={setVisibility}
+        options={visibilityOptions}
+      />
+      <MultiSelect
+        maxHeight={150}
+        searchable
+        value={labels}
+        onValueChange={setLabels}
+        options={labelOptions}
+      />
+      <TreeSelect
+        maxHeight={170}
+        searchable
+        value={cats}
+        onValueChange={setCats}
+        options={categoryOptions}
+      />
+    </Dialog>
+  );
+}`,
       },
     },
   },
@@ -276,7 +355,36 @@ export const WithDropdowns: Story = {
 export const ScrollableContent: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `// body taller than 85dvh scrolls; header/footer stay put` } },
+    docs: {
+      source: {
+        code: `import { Button, Dialog, DialogClose } from "@bpdm/ui";
+
+export function Example() {
+  // body taller than 85dvh scrolls; header/footer stay put
+  return (
+    <Dialog
+      title="Terms of service"
+      description="Please review before continuing."
+      trigger={<Button variant="outline">Open long content</Button>}
+      footer={
+        <DialogClose asChild>
+          <Button>Accept</Button>
+        </DialogClose>
+      }
+    >
+      <div className="space-y-3 text-sm text-muted-foreground">
+        {Array.from({ length: 14 }, (_, i) => (
+          <p key={i}>
+            {i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+        ))}
+      </div>
+    </Dialog>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <Dialog
@@ -306,22 +414,28 @@ export const Controlled: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const [open, setOpen] = useState(false);
+        code: `import { useState } from "react";
+import { Button, Dialog } from "@bpdm/ui";
 
-<>
-  <Button onClick={() => setOpen(true)}>Open controlled</Button>
-  <Dialog
-    open={open}
-    onOpenChange={setOpen}
-    title="Controlled dialog"
-    description="Its open state lives in the parent."
-    footer={<Button onClick={() => setOpen(false)}>Close</Button>}
-  >
-    <p className="text-sm text-muted-foreground">
-      Useful when opening from a menu, after an async action, etc.
-    </p>
-  </Dialog>
-</>`,
+export function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open controlled</Button>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Controlled dialog"
+        description="Its open state lives in the parent."
+        footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <p className="text-sm text-muted-foreground">
+          Useful when opening from a menu, after an async action, etc.
+        </p>
+      </Dialog>
+    </>
+  );
+}`,
       },
     },
   },

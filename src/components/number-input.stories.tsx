@@ -73,7 +73,15 @@ export const Playground: Story = {};
 export const Stacked: Story = {
   args: { buttonLayout: "stacked", defaultValue: "20", prefix: "$" },
   parameters: {
-    docs: { source: { code: `<NumberInput defaultValue="20" prefix="$" />` } },
+    docs: {
+      source: {
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return <NumberInput defaultValue="20" prefix="$" />;
+}`,
+      },
+    },
   },
 };
 
@@ -83,7 +91,11 @@ export const Horizontal: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<NumberInput buttonLayout="horizontal" defaultValue="25" step="5" prefix="€" />`,
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return <NumberInput buttonLayout="horizontal" defaultValue="25" step="5" prefix="€" />;
+}`,
       },
     },
   },
@@ -94,7 +106,13 @@ export const MinMaxBoundaries: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
-      source: { code: `<NumberInput min="0" max="10" defaultValue="10" />` },
+      source: {
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return <NumberInput min="0" max="10" defaultValue="10" />;
+}`,
+      },
     },
   },
   render: () => <NumberInput min="0" max="10" defaultValue="10" />,
@@ -106,9 +124,17 @@ export const HighPrecision: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// 24-digit integer — a JS number would corrupt this
-<NumberInput defaultValue="123456789012345678901234" step="1" suffix="ns" />
-<NumberInput defaultValue="0.0001" step="0.0001" suffix="kg" />`,
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex flex-col gap-3">
+      {/* 24-digit integer — a JS number would corrupt this */}
+      <NumberInput defaultValue="123456789012345678901234" step="1" suffix="ns" />
+      <NumberInput defaultValue="0.0001" step="0.0001" suffix="kg" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -135,9 +161,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<NumberInput size="sm" defaultValue="1" />
-<NumberInput size="md" defaultValue="1" />
-<NumberInput size="lg" defaultValue="1" />`,
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex items-center gap-3">
+      <NumberInput size="sm" defaultValue="1" />
+      <NumberInput size="md" defaultValue="1" />
+      <NumberInput size="lg" defaultValue="1" />
+    </div>
+  );
+}`,
       },
     },
   },
@@ -153,7 +187,15 @@ export const Sizes: Story = {
 export const Disabled: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<NumberInput disabled defaultValue="20" prefix="$" />` } },
+    docs: {
+      source: {
+        code: `import { NumberInput } from "@bpdm/ui";
+
+export function Example() {
+  return <NumberInput disabled defaultValue="20" prefix="$" />;
+}`,
+      },
+    },
   },
   render: () => <NumberInput disabled defaultValue="20" prefix="$" />,
 };

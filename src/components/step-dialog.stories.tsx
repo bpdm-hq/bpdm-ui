@@ -72,19 +72,34 @@ export const Wizard: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<StepDialog
-  trigger={<Button>Get started</Button>}
-  title="Set up workspace"
-  steps={[
-    { title: "Account", description: "Your details",
-      content: <><Field label="Full name" /><Field label="Email" /></> },
-    { title: "Workspace", description: "Name your workspace",
-      content: <Field label="Workspace name" /> },
-    { title: "Review", description: "Confirm and finish",
-      content: <p>Everything looks good. Click Finish to create it.</p> },
-  ]}
-  onComplete={() => createWorkspace()}
-/>`,
+        code: `import { Button, Input, StepDialog } from "@bpdm/ui";
+
+function Field({ label }: { label: string }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-sm font-medium">{label}</label>
+      <Input />
+    </div>
+  );
+}
+
+export function Example() {
+  return (
+    <StepDialog
+      trigger={<Button>Get started</Button>}
+      title="Set up workspace"
+      steps={[
+        { title: "Account", description: "Your details",
+          content: <><Field label="Full name" /><Field label="Email" /></> },
+        { title: "Workspace", description: "Name your workspace",
+          content: <Field label="Workspace name" /> },
+        { title: "Review", description: "Confirm and finish",
+          content: <p>Everything looks good. Click Finish to create it.</p> },
+      ]}
+      onComplete={() => createWorkspace()}
+    />
+  );
+}`,
       },
     },
   },

@@ -67,7 +67,15 @@ export const Playground: Story = {};
 // grows with content, no scrollbar
 export const AutoResize: Story = {
   parameters: {
-    docs: { source: { code: `<Textarea autoResize placeholder="Grows as you type" />` } },
+    docs: {
+      source: {
+        code: `import { Textarea } from "@bpdm/ui";
+
+export function Example() {
+  return <Textarea autoResize placeholder="Grows as you type" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-80">
@@ -79,7 +87,15 @@ export const AutoResize: Story = {
 // character counter with a max
 export const WithCount: Story = {
   parameters: {
-    docs: { source: { code: `<Textarea showCount maxLength={200} placeholder="Bio" />` } },
+    docs: {
+      source: {
+        code: `import { Textarea } from "@bpdm/ui";
+
+export function Example() {
+  return <Textarea showCount maxLength={200} placeholder="Bio" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-80">
@@ -91,7 +107,21 @@ export const WithCount: Story = {
 export const Sizes: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Textarea size="sm" /> <Textarea size="md" /> <Textarea size="lg" />` } },
+    docs: {
+      source: {
+        code: `import { Textarea } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <Textarea key={s} size={s} placeholder={\`Size \${s}\`} />
+      ))}
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-80 flex-col gap-3">
@@ -105,7 +135,20 @@ export const Sizes: Story = {
 export const Invalid: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Textarea aria-invalid placeholder="Message" />` } },
+    docs: {
+      source: {
+        code: `import { Textarea } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-1.5">
+      <Textarea aria-invalid placeholder="Message" />
+      <p className="text-sm text-destructive">Message is required.</p>
+    </div>
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">
@@ -118,7 +161,15 @@ export const Invalid: Story = {
 export const Disabled: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<Textarea disabled defaultValue="Read only" />` } },
+    docs: {
+      source: {
+        code: `import { Textarea } from "@bpdm/ui";
+
+export function Example() {
+  return <Textarea disabled defaultValue="Read only" />;
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-80">

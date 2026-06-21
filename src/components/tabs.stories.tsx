@@ -88,17 +88,27 @@ export const ContentBaseline: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tabs
-  variant="underline"
-  baseline="content"
-  items={[
-    { value: "overview", label: "Overview", content: <Panel>Project overview and highlights.</Panel> },
-    { value: "activity", label: "Activity", content: <Panel>Recent activity and events.</Panel> },
-    { value: "members", label: "Members", content: <Panel>People with access and their roles.</Panel> },
-    { value: "integrations", label: "Integrations", content: <Panel>Connected apps and services.</Panel> },
-    { value: "settings", label: "Settings", content: <Panel>Project preferences.</Panel> },
-  ]}
-/>`,
+        code: `import { Tabs } from "@bpdm/ui";
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <p className="text-sm text-muted-foreground">{children}</p>;
+}
+
+export function Example() {
+  return (
+    <Tabs
+      variant="underline"
+      baseline="content"
+      items={[
+        { value: "overview", label: "Overview", content: <Panel>Project overview and highlights.</Panel> },
+        { value: "activity", label: "Activity", content: <Panel>Recent activity and events.</Panel> },
+        { value: "members", label: "Members", content: <Panel>People with access and their roles.</Panel> },
+        { value: "integrations", label: "Integrations", content: <Panel>Connected apps and services.</Panel> },
+        { value: "settings", label: "Settings", content: <Panel>Project preferences.</Panel> },
+      ]}
+    />
+  );
+}`,
       },
     },
   },
@@ -126,23 +136,34 @@ export const Pill: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tabs
-  variant="pill"
-  items={[
-    {
-      value: "workspace",
-      label: "Workspace",
-      icon: <Briefcase />,
-      content: <Panel>Workspace-wide preferences.</Panel>,
-    },
-    {
-      value: "profile",
-      label: "Profile",
-      icon: <User />,
-      content: <Panel>Your personal profile.</Panel>,
-    },
-  ]}
-/>`,
+        code: `import { Briefcase, User } from "lucide-react";
+import { Tabs } from "@bpdm/ui";
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <p className="text-sm text-muted-foreground">{children}</p>;
+}
+
+export function Example() {
+  return (
+    <Tabs
+      variant="pill"
+      items={[
+        {
+          value: "workspace",
+          label: "Workspace",
+          icon: <Briefcase />,
+          content: <Panel>Workspace-wide preferences.</Panel>,
+        },
+        {
+          value: "profile",
+          label: "Profile",
+          icon: <User />,
+          content: <Panel>Your personal profile.</Panel>,
+        },
+      ]}
+    />
+  );
+}`,
       },
     },
   },
@@ -162,14 +183,24 @@ export const FullWidth: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Tabs
-  fullWidth
-  items={[
-    { value: "overview", label: "Overview", content: <Panel>Overview.</Panel> },
-    { value: "activity", label: "Activity", content: <Panel>Activity.</Panel> },
-    { value: "settings", label: "Settings", content: <Panel>Settings.</Panel> },
-  ]}
-/>`,
+        code: `import { Tabs } from "@bpdm/ui";
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <p className="text-sm text-muted-foreground">{children}</p>;
+}
+
+export function Example() {
+  return (
+    <Tabs
+      fullWidth
+      items={[
+        { value: "overview", label: "Overview", content: <Panel>Overview.</Panel> },
+        { value: "activity", label: "Activity", content: <Panel>Activity.</Panel> },
+        { value: "settings", label: "Settings", content: <Panel>Settings.</Panel> },
+      ]}
+    />
+  );
+}`,
       },
     },
   },
@@ -185,6 +216,26 @@ export const DisabledTab: Story = {
     ],
   },
   parameters: {
-    docs: { source: { code: `{ value: "danger", label: "Danger zone", disabled: true }` } },
+    docs: {
+      source: {
+        code: `import { Tabs } from "@bpdm/ui";
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <p className="text-sm text-muted-foreground">{children}</p>;
+}
+
+export function Example() {
+  return (
+    <Tabs
+      items={[
+        { value: "general", label: "General", content: <Panel>General.</Panel> },
+        { value: "billing", label: "Billing", content: <Panel>Billing.</Panel> },
+        { value: "danger", label: "Danger zone", disabled: true, content: <Panel>Danger.</Panel> },
+      ]}
+    />
+  );
+}`,
+      },
+    },
   },
 };

@@ -87,17 +87,23 @@ export const ChipsWithOverflow: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { MultiSelect } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<MultiSelect
-  options={frameworks}
-  maxDisplay={2}
-  defaultValue={["react", "vue", "svelte", "solid"]}
-  placeholder="Select frameworks"
-/>`,
+export function Example() {
+  return (
+    <MultiSelect
+      options={frameworks}
+      maxDisplay={2}
+      defaultValue={["react", "vue", "svelte", "solid"]}
+      placeholder="Select frameworks"
+    />
+  );
+}`,
       },
     },
   },
@@ -119,17 +125,23 @@ export const CountMode: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { MultiSelect } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<MultiSelect
-  options={frameworks}
-  maxDisplay={0}
-  defaultValue={["react", "vue", "svelte"]}
-  placeholder="Select frameworks"
-/>`,
+export function Example() {
+  return (
+    <MultiSelect
+      options={frameworks}
+      maxDisplay={0}
+      defaultValue={["react", "vue", "svelte"]}
+      placeholder="Select frameworks"
+    />
+  );
+}`,
       },
     },
   },
@@ -158,7 +170,31 @@ const CITIES: SelectItems = [
 export const Grouped: Story = {
   tags: ["!dev"],
   parameters: {
-    docs: { source: { code: `<MultiSelect options={groupedCities} searchable placeholder="Select cities" />` } },
+    docs: {
+      source: {
+        code: `import { MultiSelect, type SelectItems } from "@bpdm/ui";
+
+const groupedCities: SelectItems = [
+  { label: "🇩🇪 Germany", options: [
+    { value: "berlin", label: "Berlin" }, { value: "munich", label: "Munich" }, { value: "hamburg", label: "Hamburg" },
+  ] },
+  { label: "🇺🇸 USA", options: [
+    { value: "nyc", label: "New York" }, { value: "la", label: "Los Angeles" }, { value: "chicago", label: "Chicago" },
+  ] },
+];
+
+export function Example() {
+  return (
+    <MultiSelect
+      options={groupedCities}
+      searchable
+      placeholder="Select cities"
+      defaultValue={["berlin"]}
+    />
+  );
+}`,
+      },
+    },
   },
   render: () => (
     <div className="w-72">
@@ -177,8 +213,25 @@ export const LargeDataset_10k: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// 10,000 options — select many, scroll/search stays smooth
-<MultiSelect searchable maxDisplay={3} options={tenThousand} placeholder="Pick records" />`,
+        code: `import { MultiSelect, type SelectItems } from "@bpdm/ui";
+
+// 10,000 options — select many, scroll/search stays smooth
+const tenThousand: SelectItems = Array.from({ length: 10000 }, (_, i) => ({
+  value: String(i),
+  label: \`Record #\${(i + 1).toLocaleString()}\`,
+}));
+
+export function Example() {
+  return (
+    <MultiSelect
+      searchable
+      maxDisplay={3}
+      options={tenThousand}
+      placeholder="Pick records"
+      searchPlaceholder="Type a number…"
+    />
+  );
+}`,
       },
     },
   },
@@ -200,15 +253,21 @@ export const Invalid: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const frameworks = [
+        code: `import { MultiSelect } from "@bpdm/ui";
+
+const frameworks = [
   "React", "Vue", "Angular", "Svelte", "Solid", "Qwik", "Preact",
   "Ember", "Lit", "Alpine", "Next.js", "Remix", "Astro", "Nuxt",
 ].map((label) => ({ value: label.toLowerCase(), label }));
 
-<div className="flex w-80 flex-col gap-1.5">
-  <MultiSelect aria-invalid options={frameworks} placeholder="Required" />
-  <p className="text-sm text-destructive">Select at least one.</p>
-</div>`,
+export function Example() {
+  return (
+    <div className="flex w-80 flex-col gap-1.5">
+      <MultiSelect aria-invalid options={frameworks} placeholder="Required" />
+      <p className="text-sm text-destructive">Select at least one.</p>
+    </div>
+  );
+}`,
       },
     },
   },

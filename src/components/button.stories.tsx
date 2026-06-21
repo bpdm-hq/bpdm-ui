@@ -78,11 +78,19 @@ export const AllVariants: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="destructive">Destructive</Button>`,
+        code: `import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button variant="primary">Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="destructive">Destructive</Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -102,9 +110,17 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
-<Button size="lg">Large</Button>`,
+        code: `import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button size="sm">Small</Button>
+      <Button size="md">Medium</Button>
+      <Button size="lg">Large</Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -122,10 +138,17 @@ export const WithIcon: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Plus, ArrowRight } from "lucide-react";
+        code: `import { ArrowRight, Plus } from "lucide-react";
+import { Button } from "@bpdm/ui";
 
-<Button><Plus className="size-4" /> New item</Button>
-<Button variant="outline">Continue <ArrowRight className="size-4" /></Button>`,
+export function Example() {
+  return (
+    <>
+      <Button><Plus className="size-4" /> New item</Button>
+      <Button variant="outline">Continue <ArrowRight className="size-4" /></Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -148,11 +171,18 @@ export const IconOnly: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Plus, Search, Heart } from "lucide-react";
+        code: `import { Heart, Plus, Search } from "lucide-react";
+import { Button } from "@bpdm/ui";
 
-<Button size="icon" aria-label="Add"><Plus className="size-4" /></Button>
-<Button size="icon" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
-<Button size="icon" variant="ghost" aria-label="Like"><Heart className="size-4" /></Button>`,
+export function Example() {
+  return (
+    <>
+      <Button size="icon" aria-label="Add"><Plus className="size-4" /></Button>
+      <Button size="icon" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
+      <Button size="icon" variant="ghost" aria-label="Like"><Heart className="size-4" /></Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -177,11 +207,18 @@ export const RoundIcon: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Plus, Search, Heart } from "lucide-react";
+        code: `import { Heart, Plus, Search } from "lucide-react";
+import { Button } from "@bpdm/ui";
 
-<Button size="iconSm" shape="round" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
-<Button size="icon" shape="round" aria-label="Add"><Plus className="size-5" /></Button>
-<Button size="iconLg" shape="round" variant="secondary" aria-label="Like"><Heart className="size-5" /></Button>`,
+export function Example() {
+  return (
+    <>
+      <Button size="iconSm" shape="round" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
+      <Button size="icon" shape="round" aria-label="Add"><Plus className="size-5" /></Button>
+      <Button size="iconLg" shape="round" variant="secondary" aria-label="Like"><Heart className="size-5" /></Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -207,14 +244,23 @@ export const CustomSize: Story = {
   parameters: {
     docs: {
       source: {
-        code: `// preset sizing
-<Button size="icon" aria-label="Search"><SearchIcon /></Button>
+        code: `import { Search } from "lucide-react";
+import { Button } from "@bpdm/ui";
 
-// bring your own dimensions
-<Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search">
-  <SearchIcon className="size-3.5" />
-</Button>
-<Button size="none" variant="outline" className="h-7 px-2 text-xs rounded-md">Tiny</Button>`,
+export function Example() {
+  return (
+    <>
+      {/* preset sizing */}
+      <Button size="icon" aria-label="Search"><Search className="size-5" /></Button>
+
+      {/* bring your own dimensions */}
+      <Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search">
+        <Search className="size-3.5" />
+      </Button>
+      <Button size="none" variant="outline" className="h-7 px-2 text-xs rounded-md">Tiny</Button>
+    </>
+  );
+}`,
       },
     },
   },
@@ -242,8 +288,17 @@ export const Pill: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Button shape="round">Rounded pill</Button>
-<Button shape="round" variant="outline">Filter <ArrowRight className="size-4" /></Button>`,
+        code: `import { ArrowRight } from "lucide-react";
+import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button shape="round">Rounded pill</Button>
+      <Button shape="round" variant="outline">Filter <ArrowRight className="size-4" /></Button>
+    </>
+  );
+}`,
       },
     },
   },

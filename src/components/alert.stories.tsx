@@ -92,7 +92,33 @@ export const Variants: Story = {
     </div>
   ),
   parameters: {
-    docs: { source: { code: `<Alert variant="success" title="Deployment complete">Build #482 is live in production.</Alert>` } },
+    docs: {
+      source: {
+        code: `import { Alert } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-full max-w-xl flex-col gap-3">
+      <Alert variant="info" title="Scheduled maintenance">
+        The deploy pipeline will be paused on Saturday, 02:00–03:00 UTC.
+      </Alert>
+      <Alert variant="success" title="Deployment complete">
+        Build #482 is live in production.
+      </Alert>
+      <Alert variant="warning" title="Approaching seat limit">
+        Your workspace is using 18 of 20 member seats.
+      </Alert>
+      <Alert variant="error" title="Build failed">
+        3 checks failed on the latest commit. Review the logs to continue.
+      </Alert>
+      <Alert variant="default" title="Heads up">
+        Two-factor authentication is recommended for every team member.
+      </Alert>
+    </div>
+  );
+}`,
+      },
+    },
   },
 };
 
@@ -119,13 +145,24 @@ export const WithActions: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Alert
-  variant="warning"
-  title="Approaching seat limit"
-  action={<><Button size="sm">Upgrade plan</Button><Button size="sm" variant="ghost">Manage members</Button></>}
->
-  Your workspace is using 18 of 20 member seats. Upgrade to add more.
-</Alert>`,
+        code: `import { Alert, Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Alert
+      variant="warning"
+      title="Approaching seat limit"
+      action={
+        <>
+          <Button size="sm">Upgrade plan</Button>
+          <Button size="sm" variant="ghost">Manage members</Button>
+        </>
+      }
+    >
+      Your workspace is using 18 of 20 member seats. Upgrade to add more.
+    </Alert>
+  );
+}`,
       },
     },
   },
@@ -157,17 +194,21 @@ export const Dismissible: Story = {
   parameters: {
     docs: {
       source: {
-        code: `const [open, setOpen] = useState(true);
+        code: `import { useState } from "react";
+import { Alert, Button } from "@bpdm/ui";
 
-{open ? (
-  <Alert variant="success" title="Invite sent" onClose={() => setOpen(false)}>
-    We emailed an invitation to the new project member.
-  </Alert>
-) : (
-  <Button variant="ghost" onClick={() => setOpen(true)}>
-    Show alert again
-  </Button>
-)}`,
+export function Example() {
+  const [open, setOpen] = useState(true);
+  return open ? (
+    <Alert variant="success" title="Invite sent" onClose={() => setOpen(false)}>
+      We emailed an invitation to the new project member.
+    </Alert>
+  ) : (
+    <Button variant="ghost" onClick={() => setOpen(true)}>
+      Show alert again
+    </Button>
+  );
+}`,
       },
     },
   },
@@ -178,7 +219,15 @@ export const TitleOnly: Story = {
   tags: ["!dev"],
   args: { variant: "info", title: "Your changes have been saved.", children: undefined },
   parameters: {
-    docs: { source: { code: `<Alert variant="info" title="Your changes have been saved." />` } },
+    docs: {
+      source: {
+        code: `import { Alert } from "@bpdm/ui";
+
+export function Example() {
+  return <Alert variant="info" title="Your changes have been saved." />;
+}`,
+      },
+    },
   },
 };
 
@@ -194,9 +243,15 @@ export const NoIcon: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<Alert variant="default" icon={null} title="Release notes">
-  Version 2.4 adds keyboard navigation across the whole console.
-</Alert>`,
+        code: `import { Alert } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Alert variant="default" icon={null} title="Release notes">
+      Version 2.4 adds keyboard navigation across the whole console.
+    </Alert>
+  );
+}`,
       },
     },
   },
