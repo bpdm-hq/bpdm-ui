@@ -18,6 +18,7 @@ export * from "./components/multi-select";
 export * from "./components/number-input";
 export * from "./components/password-input";
 export * from "./components/popover";
+export * from "./components/progress";
 export * from "./components/radio-group";
 export * from "./components/secure-field";
 export * from "./components/select";

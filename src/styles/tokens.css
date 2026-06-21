@@ -231,6 +231,12 @@
   100% { transform: perspective(140px) rotateX(-180deg) rotateY(-180deg); }
 }
 
+/* ProgressBar indeterminate — a partial bar sweeping across the track. */
+@keyframes bpdm-progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
 /* Drawer slide transitions (one pair per edge). */
 @keyframes bpdm-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes bpdm-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
