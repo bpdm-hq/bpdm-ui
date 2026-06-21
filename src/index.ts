@@ -27,6 +27,7 @@ export * from "./components/spinner";
 export * from "./components/stat-card";
 export * from "./components/status-timeline";
 export * from "./components/step-dialog";
+export * from "./components/stepper";
 export * from "./components/switch";
 export * from "./components/tabs";
 export * from "./components/textarea";
