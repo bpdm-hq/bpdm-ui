@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # full history so Turborepo can diff against the base and run only
+          # the packages affected by this change
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -25,17 +29,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Bundle size
-        run: pnpm size
+      # One Turborepo run, scoped to affected packages only — unchanged packages
+      # are not executed and never appear in the output. A change to a root file
+      # (lockfile, turbo.json, …) invalidates the global hash and runs
+      # everything, as it should.
+      - name: Verify affected packages
+        run: pnpm exec turbo run lint typecheck test build size --affected
+        env:
+          TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          TURBO_SCM_HEAD: ${{ github.sha }}
