@@ -68,6 +68,15 @@ export function Example() {
 }
 ```
 
+Import from the package root, or deep-import a single component by its file name —
+both are tree-shakeable; the per-component subpath guarantees only that module is pulled in:
+
+```tsx
+import { Button } from "@bpdm/ui";            // barrel (tree-shaken)
+import { Button } from "@bpdm/ui/button";     // single component
+import { DatePicker } from "@bpdm/ui/calendar";
+```
+
 ## Components
 
 **Actions** — `Button`
