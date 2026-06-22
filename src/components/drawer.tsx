@@ -9,20 +9,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "./dialog";
+import { OverlayClose as XIcon } from "./internal/overlay-icons";
 
 // re-export the shared pieces so a Drawer can be composed too
 export const DrawerRoot = DialogPrimitive.Root;
 export const DrawerTrigger = DialogPrimitive.Trigger;
 export const DrawerClose = DialogPrimitive.Close;
 export { DialogHeader as DrawerHeader, DialogFooter as DrawerFooter, DialogTitle as DrawerTitle, DialogDescription as DrawerDescription };
-
-function XIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-4" fill="none" aria-hidden>
-      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 type Side = "left" | "right" | "top" | "bottom";
 type Size = "sm" | "md" | "lg" | "xl" | "full";
