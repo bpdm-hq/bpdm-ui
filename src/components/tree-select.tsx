@@ -2,6 +2,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { FieldChevron, FieldCheck, FieldClearX, FieldDash, FieldSearch } from "./internal/field-icons";
 
 export type TreeNode = {
   value: string;
@@ -25,47 +26,10 @@ const triggerVariants = cva(
   },
 );
 
-function ChevronDown() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180" aria-hidden>
-      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 function Caret({ open }: { open: boolean }) {
   return (
     <svg viewBox="0 0 16 16" fill="none" className={cn("size-3.5 transition-transform", open && "rotate-90")} aria-hidden>
       <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function Check() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
-      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function Dash() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
-      <path d="M4 8h8" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-function X() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-3" aria-hidden>
-      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-muted-foreground" aria-hidden>
-      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
@@ -271,7 +235,7 @@ export function TreeSelect({
                   : "border-muted-foreground/50",
               )}
             >
-              {checked ? <Check /> : indeterminate ? <Dash /> : null}
+              {checked ? <FieldCheck /> : indeterminate ? <FieldDash /> : null}
             </span>
             {node.icon}
             <span className="truncate">{node.label}</span>
@@ -334,10 +298,10 @@ export function TreeSelect({
                 }}
                 className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
               >
-                <X />
+                <FieldClearX />
               </button>
             )}
-            <ChevronDown />
+            <FieldChevron />
           </div>
         </div>
       </PopoverPrimitive.Trigger>
@@ -375,7 +339,7 @@ export function TreeSelect({
                         : "border-muted-foreground/50",
                     )}
                   >
-                    {allSel ? <Check /> : someSel ? <Dash /> : null}
+                    {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
                   </span>
                   {!searchable && "Select all"}
                 </button>
@@ -385,7 +349,7 @@ export function TreeSelect({
               )}
               {searchable && (
                 <>
-                  <SearchIcon />
+                  <FieldSearch />
                   <input
                     autoFocus
                     value={query}
