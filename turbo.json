@@ -10,8 +10,12 @@
       "outputs": ["storybook-static/**"]
     },
     "lint": {},
-    "typecheck": {},
-    "test": {},
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
     "size": {
       "dependsOn": ["build"]
     }

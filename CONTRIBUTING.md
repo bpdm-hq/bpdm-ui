@@ -41,6 +41,7 @@ Scope any command to one package with `pnpm --filter @bpdm/ui <script>`.
 ```
 packages/
   tokens/                  # @bpdm/tokens — shared design tokens (CSS), source of truth
+  variants/                # @bpdm/variants — shared cn + cva variant maps (pure TS)
   react/                   # @bpdm/ui — the React library (published to npm)
     src/
       components/          # one file per component (+ a .stories.tsx beside it)
