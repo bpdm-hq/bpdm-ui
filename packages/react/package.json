@@ -431,7 +431,7 @@
     "test:watch": "vitest",
     "size": "size-limit",
     "prepublishOnly": "pnpm build",
-    "storybook": "storybook dev -p 6012",
+    "storybook": "storybook dev -p 8100",
     "build-storybook": "storybook build"
   },
   "packageManager": "pnpm@10.12.1",
