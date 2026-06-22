@@ -123,6 +123,11 @@ pnpm build       # bundle the library (tsup → ESM + CJS + d.ts)
 pnpm typecheck   # tsc --noEmit
 ```
 
+## Contributing
+
+Conventions, project structure, and how to add a component are in
+[CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## License
 
 [MIT](./LICENSE) © [Bhavin P. Devamorari](https://bpdm.dev)
