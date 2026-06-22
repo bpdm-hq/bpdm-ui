@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bpdm/ui — Component Library</title>
+    <meta
+      name="description"
+      content="bpdm/ui — an accessible, themeable component library. Choose your framework: React or Angular."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #0e0e11;
+        --card: #16161a;
+        --border: #27272a;
+        --fg: #f7f6f3;
+        --muted: #a5a3ad;
+        --primary: #f5a623;
+        --react: #61dafb;
+        --angular: #dd0031;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        /* warm amber glow behind the content */
+        background-image: radial-gradient(
+          60rem 40rem at 50% -10%,
+          color-mix(in srgb, var(--primary) 12%, transparent),
+          transparent 70%
+        );
+      }
+      main { width: 100%; max-width: 56rem; text-align: center; }
+      .brand {
+        font-size: 0.8rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      h1 .amber { color: var(--primary); }
+      .tagline {
+        margin: 1rem auto 0;
+        max-width: 34rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+      .cards {
+        margin-top: 3rem;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 640px) {
+        .cards { grid-template-columns: 1fr 1fr; }
+      }
+      .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding: 1.75rem;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--card);
+        text-align: left;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border-color 0.28s var(--ease);
+      }
+      .card--active { cursor: pointer; }
+      .card--active:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+      }
+      .card--soon { opacity: 0.62; cursor: not-allowed; }
+      .logo {
+        width: 3rem;
+        height: 3rem;
+        display: grid;
+        place-items: center;
+      }
+      .logo svg { width: 100%; height: 100%; }
+      .card h2 { font-size: 1.4rem; font-weight: 650; }
+      .card p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+      .row { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
+      .cta {
+        margin-top: 0.35rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--accent);
+      }
+      .card--active:hover .cta .arrow { transform: translateX(4px); }
+      .arrow { transition: transform 0.28s var(--ease); }
+      .badge {
+        margin-left: auto;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--muted) 22%, transparent);
+        color: var(--muted);
+      }
+      footer {
+        margin-top: 3rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+      @media (prefers-reduced-motion: reduce) {
+        .card, .arrow { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="brand">bpdm · design system</p>
+      <h1>One design system,<br /><span class="amber">every framework.</span></h1>
+      <p class="tagline">
+        Accessible, themeable UI components with a warm amber design system and a
+        shared set of tokens. Pick your framework to explore the live docs.
+      </p>
+
+      <div class="cards">
+        <!-- React -->
+        <a class="card card--active" href="/react/" style="--accent: var(--react)">
+          <div class="row">
+            <span class="logo" aria-hidden="true">
+              <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
+                <circle r="2.05" fill="#61dafb" />
+                <g stroke="#61dafb" stroke-width="1">
+                  <ellipse rx="11" ry="4.2" />
+                  <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                  <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                </g>
+              </svg>
+            </span>
+            <span class="badge" style="background: color-mix(in srgb, var(--react) 18%, transparent); color: var(--react)">Live</span>
+          </div>
+          <h2>React</h2>
+          <p>38 components built on Radix primitives, Tailwind 4, and four themes.</p>
+          <span class="cta">Explore React docs <span class="arrow">→</span></span>
+        </a>
+
+        <!-- Angular -->
+        <div class="card card--soon" style="--accent: var(--angular)" aria-disabled="true">
+          <div class="row">
+            <span class="logo" aria-hidden="true">
+              <svg viewBox="0 0 256 272" fill="none">
+                <path fill="#dd0031" d="M128 0 0 45.8l19.5 169.3L128 272l108.5-56.9L256 45.8z" />
+                <path fill="#c3002f" d="M128 0v272l108.5-56.9L256 45.8z" />
+                <path fill="#fff" d="M128 32 47.8 211.7h29.9l16.1-40.2h67.8l16.1 40.2h29.9L128 32zm23.4 114.6h-46.8L128 90.2z" />
+              </svg>
+            </span>
+            <span class="badge">Coming soon</span>
+          </div>
+          <h2>Angular</h2>
+          <p>The same design tokens, re-implemented with Angular &amp; the CDK.</p>
+          <span class="cta">In progress</span>
+        </div>
+      </div>
+
+      <footer>
+        MIT · <a href="https://github.com/BDev-9/bpdm-ui">GitHub</a> ·
+        <a href="https://bpdm.dev">bpdm.dev</a>
+      </footer>
+    </main>
+  </body>
+</html>

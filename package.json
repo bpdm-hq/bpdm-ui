@@ -17,6 +17,7 @@
     "test": "turbo run test",
     "size": "turbo run size",
     "build-storybook": "turbo run build-storybook",
+    "build:site": "turbo run build-storybook && node scripts/assemble-site.mjs",
     "storybook": "pnpm --filter @bpdm/ui storybook"
   },
   "devDependencies": {
