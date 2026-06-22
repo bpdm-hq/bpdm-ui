@@ -3,6 +3,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { FieldChevron, FieldCheck, FieldClearX, FieldDash, FieldSearch } from "./internal/field-icons";
 import type { SelectItems, SelectOption, SelectOptionGroup } from "./select";
 
 const isGroup = (x: SelectOption | SelectOptionGroup): x is SelectOptionGroup =>
@@ -29,42 +30,6 @@ type Row =
 const ITEM_H = 36;
 const GROUP_H = 30;
 
-function ChevronDown() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180" aria-hidden>
-      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function Check({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className={cn("size-3.5", className)} aria-hidden>
-      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function X({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className={cn("size-3", className)} aria-hidden>
-      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-function Dash() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
-      <path d="M4 8h8" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-muted-foreground" aria-hidden>
-      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export interface MultiSelectProps extends VariantProps<typeof triggerVariants> {
   options: SelectItems;
@@ -285,7 +250,7 @@ export function MultiSelect({
                       }}
                       className="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
                     >
-                      <X />
+                      <FieldClearX />
                     </button>
                   </span>
                 ))}
@@ -309,10 +274,10 @@ export function MultiSelect({
                 }}
                 className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
               >
-                <X />
+                <FieldClearX />
               </button>
             )}
-            <ChevronDown />
+            <FieldChevron />
           </div>
         </div>
       </PopoverPrimitive.Trigger>
@@ -351,7 +316,7 @@ export function MultiSelect({
                         : "border-muted-foreground/50",
                     )}
                   >
-                    {allSel ? <Check /> : someSel ? <Dash /> : null}
+                    {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
                   </span>
                   {!searchable && "Select all"}
                 </button>
@@ -361,7 +326,7 @@ export function MultiSelect({
               )}
               {searchable && (
                 <>
-                  <SearchIcon />
+                  <FieldSearch />
                   <input
                     autoFocus
                     value={query}
@@ -423,7 +388,7 @@ export function MultiSelect({
                             : "border-muted-foreground/50",
                         )}
                       >
-                        {isSelected && <Check className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" />}
+                        {isSelected && <FieldCheck className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" />}
                       </span>
                       {o.icon}
                       <span className="truncate">{o.label}</span>

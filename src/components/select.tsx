@@ -3,6 +3,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { FieldChevron, FieldCheck, FieldSearch } from "./internal/field-icons";
 
 export type SelectOption = {
   value: string;
@@ -41,28 +42,6 @@ type Row =
 const ITEM_H = 36;
 const GROUP_H = 30;
 
-function ChevronDown() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180" aria-hidden>
-      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function Check() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4" aria-hidden>
-      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-muted-foreground" aria-hidden>
-      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export interface SelectProps extends VariantProps<typeof triggerVariants> {
   options: SelectItems;
@@ -238,7 +217,7 @@ export function Select({
           <span className={cn("truncate", !selectedLabel && "text-muted-foreground")}>
             {selectedLabel ?? placeholder}
           </span>
-          <ChevronDown />
+          <FieldChevron />
         </button>
       </PopoverPrimitive.Trigger>
 
@@ -260,7 +239,7 @@ export function Select({
         >
           {searchable && (
             <div className="flex shrink-0 items-center gap-2 border-b border-border px-3">
-              <SearchIcon />
+              <FieldSearch />
               <input
                 autoFocus
                 value={query}
@@ -325,7 +304,7 @@ export function Select({
                       <span className="flex size-4 shrink-0 items-center justify-center text-primary">
                         {isSelected && (
                           <span className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]">
-                            <Check />
+                            <FieldCheck />
                           </span>
                         )}
                       </span>
