@@ -1,24 +1,27 @@
 # @bpdm/ui
 
-A modern, themeable, accessible **React component library** — built on Radix
-primitives and Tailwind CSS 4, with a warm amber design system and four built-in
-themes (light & dark).
+A modern, themeable, accessible **React component library** — **38 components** built
+on Radix primitives and Tailwind CSS 4, with a warm amber design system, four
+built-in themes (light & dark), and one consistent motion language.
 
 [![npm version](https://img.shields.io/npm/v/@bpdm/ui.svg)](https://www.npmjs.com/package/@bpdm/ui)
 [![license](https://img.shields.io/npm/l/@bpdm/ui.svg)](./LICENSE)
 [![types](https://img.shields.io/npm/types/@bpdm/ui.svg)](#)
 
+**[Live demo & docs → ui.bpdm.dev](https://ui.bpdm.dev)** — interactive Storybook with every component, variant, and theme.
+
 ---
 
 ## Features
 
-- **Accessible by default** — keyboard, focus, and ARIA handled via Radix primitives.
-- **Themeable** — every component reads semantic CSS variables; switch the whole UI
-  with one `data-theme` attribute, or override variables to match your brand.
+- **38 components** across forms, selection, data display, overlays, feedback, and navigation.
+- **Accessible by default** — keyboard, focus, and ARIA handled via Radix primitives (`role`, `aria-*`, roving focus).
+- **Themeable** — every component reads semantic CSS variables; switch the whole UI with one `data-theme` attribute, or override variables to match your brand.
 - **Four built-in themes** — `paper` & `mist` (light), `charcoal` & `slate` (dark).
+- **One motion language** — shared easing/duration tokens drive every transition; honors `prefers-reduced-motion`.
 - **Typed** — full TypeScript types and prop-level autocomplete.
-- **Tree-shakeable** — ESM + CJS, `sideEffects: false`, only what you import ships.
-- **Tiny surface** — Tailwind class strings, no runtime CSS-in-JS.
+- **Tree-shakeable** — ESM + CJS, `sideEffects: false`; only what you import ships.
+- **Light footprint** — Tailwind class strings, no runtime CSS-in-JS.
 
 ## Install
 
@@ -41,10 +44,10 @@ In your global CSS:
 Pick a theme on any ancestor (default is `paper`):
 
 ```html
-<html data-theme="paper">   <!-- light · warm (default) -->
-<html data-theme="mist">    <!-- light · cool -->
-<html data-theme="charcoal"><!-- dark · warm -->
-<html data-theme="slate">   <!-- dark · cool, enterprise -->
+<html data-theme="paper">    <!-- light · warm (default) -->
+<html data-theme="mist">     <!-- light · cool -->
+<html data-theme="charcoal"> <!-- dark · warm -->
+<html data-theme="slate">    <!-- dark · cool, enterprise -->
 ```
 
 ## Usage
@@ -67,16 +70,33 @@ export function Example() {
 
 ## Components
 
+**Actions** — `Button`
+
+**Inputs** — `Input` · `Textarea` · `NumberInput` · `MoneyInput` · `PasswordInput` · `SecureField` · `InputOtp` · `FloatLabel` · `DatePicker`
+
+**Selection** — `Checkbox` · `RadioGroup` · `Switch` · `Select` · `MultiSelect` · `TreeSelect`
+
+**Data Display** — `Card` · `Avatar` · `Badge` · `StatCard` · `StatusTimeline` · `DataTable` · `OrderList` · `PickList`
+
+**Overlay** — `Dialog` · `Drawer` · `Popover` · `Tooltip` · `ConfirmDialog` · `DynamicDialog` · `StepDialog`
+
+**Feedback** — `Toast` · `Alert` · `Spinner` · `ProgressBar`
+
+**Navigation** — `Tabs` · `Accordion` · `Stepper`
+
+A few highlights:
+
 | Component | Highlights |
 | --- | --- |
-| `Button` | variants (primary/secondary/outline/ghost/destructive), sizes, icon-only, round/pill, `asChild` |
-| `Input` | sizes, outline/underline, start/end icons, invalid state |
-| `NumberInput` | precision-safe stepper (string + bignumber.js), stacked/horizontal, min/max, prefix/suffix |
-| `FloatLabel` | floating label wrapper — over / in / on variants |
-| `InputOtp` | one-time-code — auto-advance, paste, mask, grouping |
-| `Checkbox` | checked / indeterminate, sizes, invalid |
-| `RadioGroup` | single-select, sizes, horizontal/vertical, invalid |
-| `Switch` | pill/square/sharp shapes, optional icon thumb, sizes |
+| `DataTable` | sorting, multi-select, paging (client / server / cursor), column pinning + reorder, filters, frozen columns, virtualization, responsive card mode |
+| `DatePicker` | single & range, multi-month, month/year dropdowns, configurable presets, min/max + disabled days — zero date-lib dependency |
+| `Select` / `MultiSelect` / `TreeSelect` | virtualized (10k+ rows), searchable, grouped, chips with overflow |
+| `NumberInput` / `MoneyInput` | precision-safe (string + bignumber.js), no float drift |
+| `Toast` | imperative `toast()` API, `toast.promise()`, swipe-to-dismiss, six positions |
+| `Stepper` | horizontal / vertical, linear + validation gating, lock indicator |
+| `OrderList` / `PickList` | select & reorder / transfer between lists, drag-and-drop |
+
+> Every component has live examples and copy-pasteable code on **[ui.bpdm.dev](https://ui.bpdm.dev)**.
 
 ## Theming
 
@@ -85,22 +105,22 @@ Components never hardcode colors — they read CSS variables (`--primary`,
 
 ```css
 :root {
-  --primary: #7c3aed;          /* your brand color    */
+  --primary: #7c3aed;          /* your brand color     */
   --ring: #7c3aed;             /* matching focus ring  */
   --primary-foreground: #fff;  /* text on primary      */
 }
 ```
 
-A starter `bpdm-theme.css` (with the full required/optional variable reference) is
-downloadable from the **Theming → Custom Theme Template** page in Storybook.
+A starter theme template (with the full required/optional variable reference) is on
+the **Theming → Custom Theme Template** page in the docs.
 
-## Documentation
-
-Run the interactive component explorer locally:
+## Local development
 
 ```bash
 pnpm install
-pnpm storybook   # http://localhost:6003
+pnpm storybook   # http://localhost:6012
+pnpm build       # bundle the library (tsup → ESM + CJS + d.ts)
+pnpm typecheck   # tsc --noEmit
 ```
 
 ## License
