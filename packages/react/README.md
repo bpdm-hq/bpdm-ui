@@ -30,8 +30,19 @@ built-in themes (light & dark), and one consistent motion language.
 
 ```bash
 pnpm add @bpdm/ui
-# peers: react >= 18, react-dom >= 18 — and Tailwind CSS 4 in your app
+# peers: react ^18 || ^19, react-dom ^18 || ^19, and tailwindcss ^4
 ```
+
+## Compatibility
+
+| Dependency | Supported | Notes |
+| --- | --- | --- |
+| **React** / react-dom | **18.x · 19.x** | declared as a peer (`^18 \|\| ^19`) |
+| **Tailwind CSS** | **4.x** _(required)_ | the tokens use Tailwind 4 syntax (`@theme inline`, custom variants); declared as a peer |
+| **TypeScript** | 5.x or newer | optional — full types ship with the package |
+| **Node** | ≥ 20 | for local development only; the package itself is browser code |
+
+**Support policy:** we support the **current and previous major** of React (today: 18 & 19). Older majors are best-effort and may be dropped in a minor release, always noted in the changelog. Tailwind CSS **4 is required** — the design tokens won't compile on Tailwind 3.
 
 ## Setup
 

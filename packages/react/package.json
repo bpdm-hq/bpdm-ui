@@ -436,8 +436,9 @@
   },
   "packageManager": "pnpm@10.12.1",
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
+    "tailwindcss": "^4"
   },
   "dependencies": {
     "@bpdm/variants": "workspace:*",
