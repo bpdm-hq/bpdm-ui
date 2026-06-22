@@ -39,7 +39,27 @@ export default meta;
 type Story = StoryObj<BpdmButton>;
 
 /** Play with every option from the controls panel. */
-export const Playground: Story = {};
+export const Playground: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-button-demo',
+  imports: [BpdmButton],
+  template: \`
+    <button bpdmButton variant="primary" size="md" shape="default">
+      Save changes
+    </button>
+  \`,
+})
+export class ButtonDemoComponent {}`,
+      },
+    },
+  },
+};
 
 /** The five visual styles. */
 export const Variants: Story = {
