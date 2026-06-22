@@ -19,6 +19,7 @@ export * from "./components/money-input";
 export * from "./components/multi-select";
 export * from "./components/number-input";
 export * from "./components/order-list";
+export * from "./components/pick-list";
 export * from "./components/password-input";
 export * from "./components/popover";
 export * from "./components/progress";
