@@ -1460,7 +1460,6 @@ export function DataTable<T>({
     ro.observe(row);
     Array.from(row.children).forEach((c) => ro.observe(c));
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasPinned, hasLeftPin, colById, orderedColumns, data, selectable, expandable, size, bordered, rowSpacing]);
 
   const expanderLeft = pinPx.left["__lead_expand"];

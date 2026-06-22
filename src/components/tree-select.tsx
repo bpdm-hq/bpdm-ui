@@ -99,7 +99,10 @@ export function TreeSelect({
   const [open, setOpen] = React.useState(false);
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState<string[]>(defaultValue ?? []);
-  const selected = isControlled ? (value ?? []) : internal;
+  const selected = React.useMemo(
+    () => (isControlled ? (value ?? []) : internal),
+    [isControlled, value, internal],
+  );
   const selectedSet = React.useMemo(() => new Set(selected), [selected]);
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [query, setQuery] = React.useState("");

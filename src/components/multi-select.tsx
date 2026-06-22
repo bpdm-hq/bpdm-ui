@@ -66,7 +66,10 @@ export function MultiSelect({
   const [open, setOpen] = React.useState(false);
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState<string[]>(defaultValue ?? []);
-  const selected = isControlled ? (value ?? []) : internal;
+  const selected = React.useMemo(
+    () => (isControlled ? (value ?? []) : internal),
+    [isControlled, value, internal],
+  );
   const selectedSet = React.useMemo(() => new Set(selected), [selected]);
   const [query, setQuery] = React.useState("");
   const [active, setActive] = React.useState(0);
