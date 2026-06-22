@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm build-storybook",
-  "outputDirectory": "storybook-static",
+  "outputDirectory": "packages/react/storybook-static",
   "framework": null
 }
