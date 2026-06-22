@@ -83,6 +83,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
         )}
         <div
           role="progressbar"
+          aria-label={typeof label === "string" ? label : "Progress"}
           aria-valuemin={0}
           aria-valuemax={indeterminate ? undefined : max}
           aria-valuenow={indeterminate ? undefined : Math.round(value)}

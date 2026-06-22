@@ -424,11 +424,12 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup && cp src/styles/tokens.css dist/styles.css",
+    "build": "tsup && node scripts/add-use-client.mjs && cp src/styles/tokens.css dist/styles.css",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "size": "size-limit",
     "prepublishOnly": "pnpm build",
     "storybook": "storybook dev -p 6012",
     "build-storybook": "storybook build"
@@ -459,6 +460,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "@storybook/addon-a11y": "^10.4.6",
     "@storybook/addon-docs": "^10.4.4",
     "@storybook/react-vite": "^10.4.4",
     "@tailwindcss/vite": "^4.3.0",
@@ -476,13 +479,15 @@
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "size-limit": "^12.1.0",
     "storybook": "^10.4.4",
     "tailwindcss": "^4.3.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "vitest-axe": "^0.1.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

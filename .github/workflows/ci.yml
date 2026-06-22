@@ -8,7 +8,7 @@ on:
 
 jobs:
   verify:
-    name: Lint · Typecheck · Test · Build
+    name: Lint · Typecheck · Test · Build · Size
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,3 +36,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Bundle size
+        run: pnpm size

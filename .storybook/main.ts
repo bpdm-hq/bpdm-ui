@@ -4,8 +4,9 @@ import tailwindcss from "@tailwindcss/vite";
 const config: StorybookConfig = {
   // the Introduction landing page (.mdx) first, then component stories
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(ts|tsx)"],
-  // addon-docs: enables the "Docs" pages (autodocs) + per-story "Show code"
-  addons: ["@storybook/addon-docs"],
+  // addon-docs: the "Docs" pages (autodocs) + per-story "Show code";
+  // addon-a11y: a live accessibility audit panel for every story
+  addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
   framework: { name: "@storybook/react-vite", options: {} },
   // serve /public (favicon) at the root
   staticDirs: ["../public"],

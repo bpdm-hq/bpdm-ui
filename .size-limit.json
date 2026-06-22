@@ -1,0 +1,29 @@
+[
+  {
+    "name": "import { Button } (tree-shaken)",
+    "path": "dist/index.js",
+    "import": "{ Button }",
+    "ignore": ["react", "react-dom"],
+    "limit": "11 kB"
+  },
+  {
+    "name": "import { DatePicker }",
+    "path": "dist/index.js",
+    "import": "{ DatePicker }",
+    "ignore": ["react", "react-dom"],
+    "limit": "37 kB"
+  },
+  {
+    "name": "import { DataTable }",
+    "path": "dist/index.js",
+    "import": "{ DataTable }",
+    "ignore": ["react", "react-dom"],
+    "limit": "60 kB"
+  },
+  {
+    "name": "whole library (barrel)",
+    "path": "dist/index.js",
+    "ignore": ["react", "react-dom"],
+    "limit": "105 kB"
+  }
+]

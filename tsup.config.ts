@@ -19,6 +19,8 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   minify: false,
+  // "use client" is added post-build (scripts/add-use-client.mjs) — tsup's banner
+  // is unreliable with code-splitting on.
   // peers — never bundle React; everything else in `dependencies` is also
   // externalized by tsup so consumers dedupe via their own install.
   external: ["react", "react-dom"],
