@@ -2,8 +2,8 @@ import type { StorybookConfig } from "@storybook/react-vite";
 import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
-  // where Storybook finds component stories
-  stories: ["../src/**/*.stories.@(ts|tsx)"],
+  // the Introduction landing page (.mdx) first, then component stories
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(ts|tsx)"],
   // addon-docs: enables the "Docs" pages (autodocs) + per-story "Show code"
   addons: ["@storybook/addon-docs"],
   framework: { name: "@storybook/react-vite", options: {} },
