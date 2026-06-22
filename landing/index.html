@@ -91,7 +91,15 @@
         box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
         border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
       }
+      .card--active:focus-visible {
+        outline: none;
+        transform: translateY(-6px);
+        box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+      }
       .card--soon { opacity: 0.62; cursor: not-allowed; }
+      /* "coming soon" cards are not a live state — keep the cue calm, not alarming */
+      .card--soon .cta { color: var(--muted); }
       .logo {
         width: 3rem;
         height: 3rem;
@@ -129,7 +137,17 @@
         color: var(--muted);
         font-size: 0.85rem;
       }
-      footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+      footer a {
+        color: var(--muted);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        border-radius: 4px;
+      }
+      footer a:hover { color: var(--fg); }
+      footer a:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary);
+      }
       @media (prefers-reduced-motion: reduce) {
         .card, .arrow { transition: none; }
       }
@@ -184,8 +202,9 @@
       </div>
 
       <footer>
-        MIT · <a href="https://github.com/BDev-9/bpdm-ui">GitHub</a> ·
-        <a href="https://bpdm.dev">bpdm.dev</a>
+        MIT ·
+        <a href="https://github.com/BDev-9/bpdm-ui" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+        <a href="https://bpdm.dev" target="_blank" rel="noopener noreferrer">bpdm.dev</a>
       </footer>
     </main>
   </body>
