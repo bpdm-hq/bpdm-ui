@@ -1,6 +1,7 @@
 import * as React from "react";
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useControllable } from "@/lib/use-controllable";
 import { Popover } from "./popover";
 
 // ── date helpers (local, compared by y/m/d so DST never bites) ───────────────
@@ -68,20 +69,6 @@ export interface CalendarProps {
   fromYear?: number;
   toYear?: number;
   className?: string;
-}
-
-function useControllable<T>(controlled: T | undefined, fallback: T, onChange?: (v: T) => void) {
-  const [internal, setInternal] = React.useState(fallback);
-  const isControlled = controlled !== undefined;
-  const value = isControlled ? (controlled as T) : internal;
-  const set = React.useCallback(
-    (v: T) => {
-      if (!isControlled) setInternal(v);
-      onChange?.(v);
-    },
-    [isControlled, onChange],
-  );
-  return [value, set] as const;
 }
 
 /**
