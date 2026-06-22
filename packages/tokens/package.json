@@ -1,0 +1,30 @@
+{
+  "name": "@bpdm/tokens",
+  "version": "0.1.0",
+  "description": "Framework-agnostic design tokens for the bpdm design system — CSS variables, four themes, and one motion language.",
+  "license": "MIT",
+  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "homepage": "https://bpdm.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "directory": "packages/tokens"
+  },
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "css-variables",
+    "theme",
+    "tailwindcss"
+  ],
+  "files": [
+    "tokens.css"
+  ],
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./styles.css": "./tokens.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

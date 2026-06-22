@@ -40,12 +40,13 @@ Scope any command to one package with `pnpm --filter @bpdm/ui <script>`.
 
 ```
 packages/
+  tokens/                  # @bpdm/tokens — shared design tokens (CSS), source of truth
   react/                   # @bpdm/ui — the React library (published to npm)
     src/
       components/          # one file per component (+ a .stories.tsx beside it)
         internal/          # shared, non-exported helpers (icons, trigger variants)
       lib/                 # shared utilities (cn, useControllable)
-      styles/tokens.css    # design tokens, themes, keyframes, motion language
+      styles/globals.css   # Storybook/dev entry: Tailwind + @bpdm/tokens
       index.ts             # public entry point — every export is the public API
       Introduction.mdx     # Storybook landing page
 landing/                   # framework-picker portal (static index.html)
@@ -68,7 +69,7 @@ These keep the library consistent and production-grade. Please follow them.
 - Variant styling via `class-variance-authority` (`cva`); merge classes with `cn()`.
 
 **Motion language**
-- Reuse the shared tokens from `tokens.css` — `--bpdm-ease-out`,
+- Reuse the shared tokens from `@bpdm/tokens` — `--bpdm-ease-out`,
   `--bpdm-ease-overshoot`, `--bpdm-duration-fast | base | slow` — instead of
   hardcoding durations/easings. Keep motion subtle; it must respect
   `prefers-reduced-motion`.

@@ -1,4 +1,5 @@
 /* Storybook / dev entry: pull in Tailwind, then our shippable design tokens.
-   Consumers don't use this file — they import "@bpdm/ui/styles.css" (= tokens.css). */
+   Tokens are the shared @bpdm/tokens package (re-shipped as "@bpdm/ui/styles.css").
+   Consumers don't use this file — they import "@bpdm/ui/styles.css". */
 @import "tailwindcss";
-@import "./tokens.css";
+@import "@bpdm/tokens/tokens.css";
