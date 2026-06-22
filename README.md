@@ -17,9 +17,9 @@ developers install only what they use, and every framework looks identical.
 
 | Package | Path | What | Status |
 | --- | --- | --- | --- |
+| [`@bpdm/tokens`](./packages/tokens) | `packages/tokens` | Framework-agnostic design tokens (CSS variables, themes, motion) — the shared source of truth | ✅ Live |
 | [`@bpdm/ui`](./packages/react) | `packages/react` | **React** components (Radix + Tailwind 4) — 38 components | ✅ Live |
 | `@bpdm/ng` | `packages/angular` | **Angular** components (Angular CDK + Tailwind) | 🚧 Coming soon |
-| `@bpdm/tokens` | `packages/tokens` | Framework-agnostic design tokens (CSS variables, themes, motion) | 🚧 Planned |
 
 Install only the framework you need — both pull in the same shared tokens:
 
@@ -52,6 +52,7 @@ Scope a command to one package with `pnpm --filter @bpdm/ui <script>`.
 
 ```
 packages/
+  tokens/                  # @bpdm/tokens — shared design tokens (CSS), source of truth
   react/                   # @bpdm/ui — the React library (see its own README)
 landing/                   # framework-picker portal (static index.html)
 scripts/assemble-site.mjs  # assembles site/ (landing + each Storybook) for deploy

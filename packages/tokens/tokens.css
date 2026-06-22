@@ -1,4 +1,7 @@
-/* @bpdm/ui design tokens — shipped as @bpdm/ui/styles.css.
+/* @bpdm/tokens — the bpdm design system's framework-agnostic design tokens.
+   Shared by every framework package (@bpdm/ui for React, @bpdm/ng for Angular, …);
+   re-exported by each as its own `…/styles.css`.
+
    Import this AFTER `@import "tailwindcss"` in your app's CSS. No Tailwind import
    here (your app already has it), so it won't duplicate utilities.
 

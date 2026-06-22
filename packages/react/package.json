@@ -424,7 +424,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup && node scripts/add-use-client.mjs && cp src/styles/tokens.css dist/styles.css",
+    "build": "tsup && node scripts/add-use-client.mjs && cp node_modules/@bpdm/tokens/tokens.css dist/styles.css",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -459,6 +459,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@bpdm/tokens": "workspace:*",
     "@eslint/js": "^10.0.1",
     "@size-limit/preset-small-lib": "^12.1.0",
     "@storybook/addon-a11y": "^10.4.6",
