@@ -1,39 +1,56 @@
-# Contributing to @bpdm/ui
+# Contributing to bpdm/ui
 
 Thanks for your interest! This guide covers how to set the project up, the
 conventions the library follows, and how to add or change a component.
 
+`bpdm/ui` is a **monorepo** (pnpm workspaces + Turborepo). The React component
+library (`@bpdm/ui`) lives in `packages/react`; an Angular package is planned.
+A small landing portal in `landing/` lets visitors pick a framework on the
+[live site](https://ui.bpdm.dev).
+
 ## Prerequisites
 
-- **Node** ≥ 18
+- **Node** ≥ 20
 - **pnpm** (the repo uses the pnpm lockfile)
 
 ## Setup
 
+Run everything from the repo root — Turborepo fans tasks out to the packages:
+
 ```bash
 pnpm install
-pnpm storybook    # interactive docs at http://localhost:6012
+pnpm storybook    # interactive docs at http://localhost:8100
 ```
 
-Useful scripts:
+Useful scripts (root):
 
 | Command | What it does |
 | --- | --- |
-| `pnpm storybook` | run the docs/playground locally |
-| `pnpm build` | bundle the library with tsup → ESM + CJS + `.d.ts` |
+| `pnpm storybook` | run the React docs/playground locally (port 8100) |
+| `pnpm build` | build every package (tsup → ESM + CJS + `.d.ts`) |
 | `pnpm typecheck` | `tsc --noEmit` (strict: `noUnusedLocals` / `noUnusedParameters`) |
-| `pnpm build-storybook` | static docs build (what the live site deploys) |
+| `pnpm lint` | ESLint across packages |
+| `pnpm test` | unit + a11y tests (Vitest) |
+| `pnpm build-storybook` | static docs build per package |
+| `pnpm build:site` | build the Storybooks and assemble the deployed `site/` (landing + `/react`) |
+
+Scope any command to one package with `pnpm --filter @bpdm/ui <script>`.
 
 ## Project structure
 
 ```
-src/
-  components/            # one file per component (+ a .stories.tsx beside it)
-    internal/            # shared, non-exported helpers (icons, trigger variants)
-  lib/                   # shared utilities (cn, useControllable)
-  styles/tokens.css      # design tokens, themes, keyframes, motion language
-  index.ts               # public entry point — every export is the public API
-  Introduction.mdx       # Storybook landing page
+packages/
+  react/                   # @bpdm/ui — the React library (published to npm)
+    src/
+      components/          # one file per component (+ a .stories.tsx beside it)
+        internal/          # shared, non-exported helpers (icons, trigger variants)
+      lib/                 # shared utilities (cn, useControllable)
+      styles/tokens.css    # design tokens, themes, keyframes, motion language
+      index.ts             # public entry point — every export is the public API
+      Introduction.mdx     # Storybook landing page
+landing/                   # framework-picker portal (static index.html)
+scripts/assemble-site.mjs  # assembles site/ (landing + each Storybook) for deploy
+turbo.json                 # task pipeline       pnpm-workspace.yaml  # workspaces
 ```
 
 ## Conventions
@@ -67,8 +84,11 @@ These keep the library consistent and production-grade. Please follow them.
 
 ## Adding a component
 
-1. Create `src/components/<name>.tsx` and export it from `src/index.ts`.
-2. Add `src/components/<name>.stories.tsx`:
+Components live in `packages/react/src`.
+
+1. Create `packages/react/src/components/<name>.tsx` and export it from
+   `packages/react/src/index.ts`.
+2. Add `packages/react/src/components/<name>.stories.tsx`:
    - a `title` under the right group (`Actions`, `Inputs`, `Selection`,
      `Data Display`, `Overlay`, `Feedback`, `Navigation`);
    - `tags: ["autodocs"]`, plus `tags: ["!dev"]` on secondary stories so the
@@ -83,10 +103,11 @@ These keep the library consistent and production-grade. Please follow them.
 
 - One concise, lower-case summary line per commit (e.g.
   `feat: Badge + NotificationBadge`, `refactor: share useControllable hook`).
-- Keep PRs focused (one component or one concern); make sure `pnpm typecheck` and
-  `pnpm build` pass.
+- Keep PRs focused (one component or one concern); make sure `pnpm typecheck`,
+  `pnpm lint`, `pnpm test`, and `pnpm build` pass.
 
 ## License
 
 By contributing, you agree your contributions are licensed under the project's
 [MIT License](./LICENSE).
+</content>
