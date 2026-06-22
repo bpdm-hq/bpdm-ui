@@ -47,7 +47,7 @@
     "build": "tsup && cp src/styles/tokens.css dist/styles.css",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build",
-    "storybook": "storybook dev -p 6003",
+    "storybook": "storybook dev -p 6012",
     "build-storybook": "storybook build"
   },
   "packageManager": "pnpm@10.12.1",
