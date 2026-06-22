@@ -35,9 +35,14 @@ export default tseslint.config(
       "react-hooks/exhaustive-deps": "off",
     },
   },
-  // tests + config run in node/vitest
+  // tests, config, and build scripts run in node/vitest
   {
-    files: ["**/*.test.{ts,tsx}", "vitest.setup.ts", "vitest.config.ts"],
+    files: [
+      "**/*.test.{ts,tsx}",
+      "vitest.setup.ts",
+      "vitest.config.ts",
+      "scripts/**/*.{js,mjs}",
+    ],
     languageOptions: { globals: { ...globals.node } },
   },
 );
