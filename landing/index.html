@@ -6,206 +6,335 @@
     <title>bpdm/ui — Component Library</title>
     <meta
       name="description"
-      content="bpdm/ui — an accessible, themeable component library. Choose your framework: React or Angular."
+      content="bpdm — an accessible, themeable design system with one set of tokens for every framework. Pick React or Angular and explore the live docs."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
       :root {
         --bg: #0e0e11;
+        --bg-soft: #131318;
         --card: #16161a;
+        --card-hover: #1b1b21;
         --border: #27272a;
         --fg: #f7f6f3;
         --muted: #a5a3ad;
         --primary: #f5a623;
         --react: #61dafb;
-        --angular: #dd0031;
+        --angular: #ff5a6a;
         --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        --maxw: 66rem;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
       body {
         font-family: "Inter", system-ui, -apple-system, sans-serif;
         background: var(--bg);
         color: var(--fg);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        /* warm amber glow behind the content */
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
         background-image: radial-gradient(
-          60rem 40rem at 50% -10%,
-          color-mix(in srgb, var(--primary) 12%, transparent),
+          55rem 32rem at 50% -8%,
+          color-mix(in srgb, var(--primary) 11%, transparent),
           transparent 70%
         );
       }
-      main { width: 100%; max-width: 56rem; text-align: center; }
-      .brand {
-        font-size: 0.8rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--primary);
-        font-weight: 600;
-        margin-bottom: 1rem;
+      a { color: inherit; }
+      .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
+
+      /* ── nav ─────────────────────────────────────────────── */
+      .nav {
+        position: sticky; top: 0; z-index: 10;
+        backdrop-filter: blur(12px);
+        background: color-mix(in srgb, var(--bg) 78%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
       }
-      h1 {
-        font-size: clamp(2rem, 5vw, 3.25rem);
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        line-height: 1.05;
+      .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 3.75rem; }
+      .brand-mark { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none; }
+      .brand-mark .b { color: var(--primary); }
+      .nav-links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
+      .nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s var(--ease); }
+      .nav-links a:hover { color: var(--fg); }
+      .nav-links a.gh { display: inline-flex; align-items: center; gap: 0.4rem; }
+      @media (max-width: 540px) { .nav-links .hide-sm { display: none; } }
+
+      /* ── hero ────────────────────────────────────────────── */
+      .hero { text-align: center; padding: 5rem 0 3.5rem; }
+      .eyebrow {
+        display: inline-block; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+        color: var(--primary); font-weight: 600; margin-bottom: 1.25rem;
+        padding: 0.3rem 0.85rem; border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
+        border-radius: 999px; background: color-mix(in srgb, var(--primary) 8%, transparent);
       }
+      h1 { font-size: clamp(2.25rem, 6vw, 3.75rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.04; }
       h1 .amber { color: var(--primary); }
-      .tagline {
-        margin: 1rem auto 0;
-        max-width: 34rem;
-        color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.6;
+      .tagline { margin: 1.25rem auto 0; max-width: 36rem; color: var(--muted); font-size: 1.1rem; }
+      .cta-row { margin-top: 2rem; display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.95rem;
+        padding: 0.7rem 1.3rem; border-radius: 0.7rem; text-decoration: none; cursor: pointer;
+        border: 1px solid transparent; transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
       }
-      .cards {
-        margin-top: 3rem;
-        display: grid;
-        gap: 1.25rem;
-        grid-template-columns: 1fr;
-      }
-      @media (min-width: 640px) {
-        .cards { grid-template-columns: 1fr 1fr; }
-      }
+      .btn-primary { background: var(--primary); color: #1a1205; }
+      .btn-primary:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--primary) 90%, white); }
+      .btn-ghost { color: var(--fg); border-color: var(--border); background: var(--card); }
+      .btn-ghost:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--fg) 30%, var(--border)); }
+      .btn .arrow { transition: transform 0.25s var(--ease); }
+      .btn:hover .arrow { transform: translateX(3px); }
+      .hero-meta { margin-top: 1.75rem; font-size: 0.85rem; color: var(--muted); display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+      .hero-meta span { white-space: nowrap; }
+      .hero-meta .dot { color: color-mix(in srgb, var(--muted) 50%, transparent); }
+
+      /* ── section scaffolding ─────────────────────────────── */
+      section { padding: 3.25rem 0; }
+      .section-head { text-align: center; margin-bottom: 2.25rem; }
+      .section-head h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; letter-spacing: -0.02em; }
+      .section-head p { margin-top: 0.6rem; color: var(--muted); }
+      .soft { background: var(--bg-soft); border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); }
+
+      /* ── framework cards ─────────────────────────────────── */
+      .cards { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+      @media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
       .card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.85rem;
-        padding: 1.75rem;
-        border: 1px solid var(--border);
-        border-radius: 1rem;
-        background: var(--card);
-        text-align: left;
-        text-decoration: none;
-        color: inherit;
-        transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border-color 0.28s var(--ease);
+        position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.85rem;
+        padding: 1.75rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card);
+        text-align: left; text-decoration: none; color: inherit;
+        transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border-color 0.28s var(--ease), background 0.28s var(--ease);
       }
       .card--active { cursor: pointer; }
-      .card--active:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
-        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-      }
-      .card--active:focus-visible {
-        outline: none;
-        transform: translateY(-6px);
-        box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
-        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-      }
-      .card--soon { opacity: 0.62; cursor: not-allowed; }
-      /* "coming soon" cards are not a live state — keep the cue calm, not alarming */
-      .card--soon .cta { color: var(--muted); }
-      .logo {
-        width: 3rem;
-        height: 3rem;
-        display: grid;
-        place-items: center;
-      }
+      .card--active:hover { transform: translateY(-6px); background: var(--card-hover); box-shadow: 0 18px 40px -12px rgba(0,0,0,0.6); border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+      .card--active:focus-visible { outline: none; transform: translateY(-6px); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+      .logo { width: 3rem; height: 3rem; display: grid; place-items: center; }
       .logo svg { width: 100%; height: 100%; }
-      .card h2 { font-size: 1.4rem; font-weight: 650; }
-      .card p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+      .card h3 { font-size: 1.4rem; font-weight: 650; }
+      .card p { color: var(--muted); font-size: 0.95rem; }
       .row { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
-      .cta {
-        margin-top: 0.35rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: var(--accent);
-      }
+      .cta { margin-top: 0.35rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.95rem; color: var(--accent); }
       .card--active:hover .cta .arrow { transform: translateX(4px); }
       .arrow { transition: transform 0.28s var(--ease); }
       .badge {
-        margin-left: auto;
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        padding: 0.25rem 0.6rem;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--muted) 22%, transparent);
-        color: var(--muted);
+        margin-left: auto; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+        padding: 0.25rem 0.6rem; border-radius: 999px;
+        background: color-mix(in srgb, var(--muted) 22%, transparent); color: var(--muted);
       }
-      footer {
-        margin-top: 3rem;
-        color: var(--muted);
-        font-size: 0.85rem;
+
+      /* ── features grid ───────────────────────────────────── */
+      .features { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+      @media (min-width: 560px) { .features { grid-template-columns: 1fr 1fr; } }
+      @media (min-width: 880px) { .features { grid-template-columns: 1fr 1fr 1fr; } }
+      .feature {
+        padding: 1.5rem; border: 1px solid var(--border); border-radius: 0.9rem; background: var(--card);
+        transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
       }
-      footer a {
-        color: var(--muted);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        border-radius: 4px;
-      }
+      .feature:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+      .feature .ic { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 0.6rem; margin-bottom: 0.9rem; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+      .feature .ic svg { width: 1.3rem; height: 1.3rem; }
+      .feature h3 { font-size: 1.05rem; font-weight: 650; margin-bottom: 0.35rem; }
+      .feature p { color: var(--muted); font-size: 0.9rem; }
+
+      /* ── theme showcase ──────────────────────────────────── */
+      .themes { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
+      @media (min-width: 760px) { .themes { grid-template-columns: repeat(4, 1fr); } }
+      .theme { border: 1px solid; border-radius: 0.9rem; padding: 1.1rem; transition: transform 0.25s var(--ease); }
+      .theme:hover { transform: translateY(-4px); }
+      .theme-preview { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+      .theme-pill { font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.7rem; border-radius: 0.5rem; }
+      .theme-bars { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; }
+      .theme-bars i { height: 0.4rem; border-radius: 999px; display: block; }
+      .theme-name { font-size: 0.92rem; font-weight: 650; }
+      .theme-name small { display: block; font-weight: 400; font-size: 0.78rem; opacity: 0.7; }
+
+      /* ── footer ──────────────────────────────────────────── */
+      footer { border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent); padding: 2.5rem 0; }
+      .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: 0.85rem; }
+      footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; border-radius: 4px; }
       footer a:hover { color: var(--fg); }
-      footer a:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary);
-      }
+      footer a:focus-visible, .nav-links a:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary); }
+
       @media (prefers-reduced-motion: reduce) {
-        .card, .arrow { transition: none; }
+        html { scroll-behavior: auto; }
+        * { transition: none !important; }
       }
     </style>
   </head>
   <body>
-    <main>
-      <p class="brand">bpdm · design system</p>
-      <h1>One design system,<br /><span class="amber">every framework.</span></h1>
-      <p class="tagline">
-        Accessible, themeable UI components with a warm amber design system and a
-        shared set of tokens. Pick your framework to explore the live docs.
-      </p>
-
-      <div class="cards">
-        <!-- React -->
-        <a class="card card--active" href="/react/?path=/docs/introduction--docs" style="--accent: var(--react)">
-          <div class="row">
-            <span class="logo" aria-hidden="true">
-              <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
-                <circle r="2.05" fill="#61dafb" />
-                <g stroke="#61dafb" stroke-width="1">
-                  <ellipse rx="11" ry="4.2" />
-                  <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-                  <ellipse rx="11" ry="4.2" transform="rotate(120)" />
-                </g>
-              </svg>
-            </span>
-            <span class="badge" style="background: color-mix(in srgb, var(--react) 18%, transparent); color: var(--react)">Live</span>
-          </div>
-          <h2>React</h2>
-          <p>38 components built on Radix primitives, Tailwind 4, and four themes.</p>
-          <span class="cta">Explore React docs <span class="arrow">→</span></span>
-        </a>
-
-        <!-- Angular -->
-        <a class="card card--active" href="/angular/?path=/docs/introduction--docs" style="--accent: var(--angular)">
-          <div class="row">
-            <span class="logo" aria-hidden="true">
-              <svg viewBox="0 0 256 272" fill="none">
-                <path fill="#dd0031" d="M128 0 0 45.8l19.5 169.3L128 272l108.5-56.9L256 45.8z" />
-                <path fill="#c3002f" d="M128 0v272l108.5-56.9L256 45.8z" />
-                <path fill="#fff" d="M128 32 47.8 211.7h29.9l16.1-40.2h67.8l16.1 40.2h29.9L128 32zm23.4 114.6h-46.8L128 90.2z" />
-              </svg>
-            </span>
-            <span class="badge">In progress</span>
-          </div>
-          <h2>Angular</h2>
-          <p>The same tokens &amp; variants, built with Angular standalone components and the CDK.</p>
-          <span class="cta">Preview the Angular docs <span class="arrow">→</span></span>
-        </a>
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand-mark" href="/"><span class="b">&lt;</span>Bpdm<span class="b"> /&gt;</span></a>
+        <nav class="nav-links">
+          <a class="hide-sm" href="#frameworks">Components</a>
+          <a class="hide-sm" href="#themes">Themes</a>
+          <a class="gh" href="https://github.com/BDev-9/bpdm-ui" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+          </a>
+        </nav>
       </div>
+    </header>
 
-      <footer>
-        MIT ·
-        <a href="https://github.com/BDev-9/bpdm-ui" target="_blank" rel="noopener noreferrer">GitHub</a> ·
-        <a href="https://bpdm.dev" target="_blank" rel="noopener noreferrer">bpdm.dev</a>
-      </footer>
+    <main>
+      <!-- hero -->
+      <section class="hero">
+        <div class="wrap">
+          <span class="eyebrow">bpdm · design system</span>
+          <h1>One design system,<br /><span class="amber">every framework.</span></h1>
+          <p class="tagline">
+            Accessible, themeable UI components built on one shared set of design
+            tokens — implemented natively for each framework, so they look and move
+            exactly the same everywhere.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="/react/?path=/docs/introduction--docs">Explore the components <span class="arrow">→</span></a>
+            <a class="btn btn-ghost" href="https://github.com/BDev-9/bpdm-ui" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+          </div>
+          <div class="hero-meta">
+            <span>Accessible</span><span class="dot">·</span>
+            <span>Themeable</span><span class="dot">·</span>
+            <span>Tree-shakeable</span><span class="dot">·</span>
+            <span>React &amp; Angular</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- framework picker -->
+      <section id="frameworks" class="soft">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Pick your framework</h2>
+            <p>Same design, same tokens — choose the implementation you build with.</p>
+          </div>
+          <div class="cards">
+            <!-- React -->
+            <a class="card card--active" href="/react/?path=/docs/introduction--docs" style="--accent: var(--react)">
+              <div class="row">
+                <span class="logo" aria-hidden="true">
+                  <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
+                    <circle r="2.05" fill="#61dafb" />
+                    <g stroke="#61dafb" stroke-width="1">
+                      <ellipse rx="11" ry="4.2" />
+                      <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                      <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                    </g>
+                  </svg>
+                </span>
+                <span class="badge" style="background: color-mix(in srgb, var(--react) 18%, transparent); color: var(--react)">Live</span>
+              </div>
+              <h3>React</h3>
+              <p>38 components built on Radix primitives, Tailwind 4, and four themes.</p>
+              <span class="cta">Explore React docs <span class="arrow">→</span></span>
+            </a>
+
+            <!-- Angular -->
+            <a class="card card--active" href="/angular/?path=/docs/introduction--docs" style="--accent: var(--angular)">
+              <div class="row">
+                <span class="logo" aria-hidden="true">
+                  <svg viewBox="0 0 256 272" fill="none">
+                    <path fill="#dd0031" d="M128 0 0 45.8l19.5 169.3L128 272l108.5-56.9L256 45.8z" />
+                    <path fill="#c3002f" d="M128 0v272l108.5-56.9L256 45.8z" />
+                    <path fill="#fff" d="M128 32 47.8 211.7h29.9l16.1-40.2h67.8l16.1 40.2h29.9L128 32zm23.4 114.6h-46.8L128 90.2z" />
+                  </svg>
+                </span>
+                <span class="badge">In progress</span>
+              </div>
+              <h3>Angular</h3>
+              <p>The same tokens &amp; variants, built with Angular standalone components and the CDK.</p>
+              <span class="cta">Preview the Angular docs <span class="arrow">→</span></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- features -->
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Built for production</h2>
+            <p>The things you'd expect from a serious component library — by default.</p>
+          </div>
+          <div class="features">
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <h3>Accessible by default</h3>
+              <p>Keyboard, focus and ARIA handled via Radix (React) and the Angular CDK — not bolted on later.</p>
+            </div>
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></span>
+              <h3>Four built-in themes</h3>
+              <p>Light (paper, mist) and dark (charcoal, slate). Switch the whole UI with one <code>data-theme</code>.</p>
+            </div>
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg></span>
+              <h3>Tree-shakeable</h3>
+              <p>Standalone components, ESM and <code>sideEffects: false</code> — only what you import ships.</p>
+            </div>
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></span>
+              <h3>Fully typed</h3>
+              <p>First-class TypeScript with prop-level autocomplete across every component and variant.</p>
+            </div>
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+              <h3>One motion language</h3>
+              <p>Shared easing and duration tokens drive every transition — and honor <code>prefers-reduced-motion</code>.</p>
+            </div>
+            <div class="feature">
+              <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span>
+              <h3>Shared design tokens</h3>
+              <p>One source of truth (<code>@bpdm/tokens</code>) powers every framework — re-brand by overriding variables.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- theme showcase -->
+      <section id="themes" class="soft">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Four themes, one token set</h2>
+            <p>Every component reads semantic variables — these are the built-in palettes.</p>
+          </div>
+          <div class="themes">
+            <div class="theme" style="background:#faf9f6; color:#1c1a17; border-color:#e7e3dc">
+              <div class="theme-preview">
+                <span class="theme-pill" style="background:#f5a623; color:#1a1205">Aa</span>
+                <span class="theme-bars"><i style="background:#1c1a17; width:80%"></i><i style="background:#e7e3dc; width:60%"></i></span>
+              </div>
+              <div class="theme-name">Paper <small>light · warm</small></div>
+            </div>
+            <div class="theme" style="background:#f7f8fa; color:#1a1d24; border-color:#e2e6ec">
+              <div class="theme-preview">
+                <span class="theme-pill" style="background:#f5a623; color:#1a1205">Aa</span>
+                <span class="theme-bars"><i style="background:#1a1d24; width:80%"></i><i style="background:#e2e6ec; width:60%"></i></span>
+              </div>
+              <div class="theme-name">Mist <small>light · cool</small></div>
+            </div>
+            <div class="theme" style="background:#1b1b21; color:#f7f6f3; border-color:#2e2e35">
+              <div class="theme-preview">
+                <span class="theme-pill" style="background:#f5a623; color:#1a1205">Aa</span>
+                <span class="theme-bars"><i style="background:#f7f6f3; width:80%"></i><i style="background:#2e2e35; width:60%"></i></span>
+              </div>
+              <div class="theme-name">Charcoal <small>dark · warm</small></div>
+            </div>
+            <div class="theme" style="background:#161b22; color:#e6e8eb; border-color:#2a313c">
+              <div class="theme-preview">
+                <span class="theme-pill" style="background:#f5a623; color:#1a1205">Aa</span>
+                <span class="theme-bars"><i style="background:#e6e8eb; width:80%"></i><i style="background:#2a313c; width:60%"></i></span>
+              </div>
+              <div class="theme-name">Slate <small>dark · cool</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer>
+      <div class="wrap foot-inner">
+        <span><span style="color:var(--primary)">&lt;</span>Bpdm /&gt; · an open-source design system</span>
+        <span>
+          MIT ·
+          <a href="https://github.com/BDev-9/bpdm-ui" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+          <a href="https://bpdm.dev" target="_blank" rel="noopener noreferrer">bpdm.dev</a>
+        </span>
+      </div>
+    </footer>
   </body>
 </html>
