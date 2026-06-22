@@ -5,7 +5,9 @@ the single source of truth shared by every framework package (`@bpdm/ui` for Rea
 `@bpdm/ng` for Angular, …). One warm amber identity, four built-in themes, and one
 motion language, expressed as plain CSS variables.
 
-This is a **CSS-only** package — no JavaScript, no build step.
+This is a **CSS-only** package — no JavaScript, no build step. It **requires
+Tailwind CSS 4** in the consuming app (the tokens use Tailwind 4 syntax such as
+`@theme inline` and custom variants; they won't compile on Tailwind 3).
 
 ## What's inside
 

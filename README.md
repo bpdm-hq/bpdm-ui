@@ -33,6 +33,19 @@ npm install @bpdm/ng     # Angular (coming soon)
 > peer dependencies you don't use. Separate scoped packages sharing `@bpdm/tokens`
 > is the standard, lighter approach.
 
+## Compatibility
+
+Every package **requires Tailwind CSS 4** (the design tokens use Tailwind 4 syntax).
+Framework support follows a **current + previous major** policy — older majors are
+best-effort and only dropped in a minor release, noted in the changelog.
+
+| Package | Framework support |
+| --- | --- |
+| `@bpdm/ui` (React) | React **18.x · 19.x** |
+| `@bpdm/ng` (Angular) | latest two Angular majors _(set when it ships)_ |
+
+Each package's README has its full compatibility table.
+
 ## Local development
 
 Run everything from the repo root — Turborepo fans tasks out to the packages:
