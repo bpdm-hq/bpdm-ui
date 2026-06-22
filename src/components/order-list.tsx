@@ -8,6 +8,7 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useControllable } from "@/lib/use-controllable";
 
 // ── shared list helpers (also used by PickList later) ────────────────────────
 export type ItemKey = string | number;
@@ -53,20 +54,6 @@ export function moveSelectedTop<T>(arr: T[], keyOf: (i: T) => ItemKey, sel: Set<
 export function moveSelectedBottom<T>(arr: T[], keyOf: (i: T) => ItemKey, sel: Set<ItemKey>): T[] {
   const { picked, rest } = partition(arr, keyOf, sel);
   return [...rest, ...picked];
-}
-
-function useControllable<T>(controlled: T | undefined, fallback: T, onChange?: (v: T) => void) {
-  const [internal, setInternal] = React.useState(fallback);
-  const isControlled = controlled !== undefined;
-  const value = isControlled ? (controlled as T) : internal;
-  const set = React.useCallback(
-    (v: T) => {
-      if (!isControlled) setInternal(v);
-      onChange?.(v);
-    },
-    [isControlled, onChange],
-  );
-  return [value, set] as const;
 }
 
 // ── SelectableList — scrollable, selectable, filterable, optionally drag-sortable

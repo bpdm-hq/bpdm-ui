@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Check, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useControllable } from "@/lib/use-controllable";
 
 export type StepperOrientation = "horizontal" | "vertical";
 
@@ -55,24 +56,6 @@ export function useStepper() {
   const ctx = useStepperContext("useStepper");
   const { value, activeIndex, steps, isFirst, isLast, next, back, activate, complete, finished } = ctx;
   return { value, activeIndex, steps, count: steps.length, isFirst, isLast, next, back, activate, complete, finished };
-}
-
-function useControllable(
-  controlled: string | undefined,
-  fallback: string,
-  onChange?: (value: string) => void,
-) {
-  const [internal, setInternal] = React.useState(fallback);
-  const isControlled = controlled !== undefined;
-  const value = isControlled ? controlled : internal;
-  const setValue = React.useCallback(
-    (next: string) => {
-      if (!isControlled) setInternal(next);
-      onChange?.(next);
-    },
-    [isControlled, onChange],
-  );
-  return [value, setValue] as const;
 }
 
 // recursively collect step values in declaration order (deterministic — no

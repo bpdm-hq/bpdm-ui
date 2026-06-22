@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useControllable } from "@/lib/use-controllable";
 import {
   ControlButton,
   ReorderControls,
@@ -29,20 +30,6 @@ export interface PickListProps<T> {
   reorder?: boolean;
   scrollHeight?: string;
   className?: string;
-}
-
-function useControllable<T>(controlled: T | undefined, fallback: T, onChange?: (v: T) => void) {
-  const [internal, setInternal] = React.useState(fallback);
-  const isControlled = controlled !== undefined;
-  const value = isControlled ? (controlled as T) : internal;
-  const set = React.useCallback(
-    (v: T) => {
-      if (!isControlled) setInternal(v);
-      onChange?.(v);
-    },
-    [isControlled, onChange],
-  );
-  return [value, set] as const;
 }
 
 /**
