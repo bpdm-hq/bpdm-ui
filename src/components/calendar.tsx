@@ -154,7 +154,7 @@ export function Calendar({
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    let next: Date | null = null;
+    let next: Date;
     if (e.key === "ArrowLeft") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() - 1);
     else if (e.key === "ArrowRight") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() + 1);
     else if (e.key === "ArrowUp") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() - 7);
