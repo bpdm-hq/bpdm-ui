@@ -20,7 +20,7 @@ developers install only what they use, and every framework looks identical.
 | [`@bpdm/tokens`](./packages/tokens) | `packages/tokens` | Framework-agnostic design tokens (CSS variables, themes, motion) — the shared source of truth | ✅ Live |
 | [`@bpdm/variants`](./packages/variants) | `packages/variants` | Framework-agnostic styling primitives (`cn` + cva variant maps) — shared class strings | ✅ Live |
 | [`@bpdm/ui`](./packages/react) | `packages/react` | **React** components (Radix + Tailwind 4) — 38 components | ✅ Live |
-| `@bpdm/ng` | `packages/angular` | **Angular** components (Angular CDK + Tailwind) | 🚧 Coming soon |
+| [`@bpdm/ng`](./packages/angular) | `packages/angular` | **Angular** components (standalone + Angular CDK + Tailwind) | 🚧 In progress |
 
 Install only the framework you need — both pull in the same shared tokens:
 
@@ -42,7 +42,7 @@ best-effort and only dropped in a minor release, noted in the changelog.
 | Package | Framework support |
 | --- | --- |
 | `@bpdm/ui` (React) | React **18.x · 19.x** |
-| `@bpdm/ng` (Angular) | latest two Angular majors _(set when it ships)_ |
+| `@bpdm/ng` (Angular) | Angular **21.x** |
 
 Each package's README has its full compatibility table.
 

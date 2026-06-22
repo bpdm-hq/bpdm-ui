@@ -1,0 +1,9 @@
+/* Storybook entry styles: Tailwind + the shared design tokens.
+   Angular component templates carry NO Tailwind class strings — they are
+   computed from @bpdm/variants at runtime — so Tailwind would never see them.
+   Point it at the variant source (and the stories) with @source so every
+   utility a component can emit is generated. */
+@import "tailwindcss";
+@import "@bpdm/tokens/tokens.css";
+@source "../../variants/src";
+@source "../src";

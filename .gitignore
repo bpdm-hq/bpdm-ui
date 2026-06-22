@@ -3,6 +3,8 @@ dist
 storybook-static
 site
 .turbo
+.angular
+out-tsc
 *.log
 .DS_Store
 .env*

@@ -1,0 +1,96 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+<div style={{ maxWidth: "52rem" }}>
+
+# @bpdm/ng
+
+A modern, themeable, accessible **Angular component library** built on Angular CDK
+and Tailwind CSS&nbsp;4, with a warm amber design system, four built-in themes, and
+one consistent motion language.
+
+The Angular implementation of the **bpdm design system** — it shares the exact same
+design tokens and variant definitions as the React package (`@bpdm/ui`), so a
+component looks and moves identically across frameworks. _(Pick a framework on the
+[live site](https://ui.bpdm.dev).)_
+
+[Live site](https://ui.bpdm.dev) · [npm](https://www.npmjs.com/package/@bpdm/ng) · [GitHub](https://github.com/BDev-9/bpdm-ui)
+
+---
+
+## Why @bpdm/ng
+
+- **Standalone & modern** — standalone directives/components, signal inputs, and
+  `OnPush`; no NgModules, zoneless-ready.
+- **Accessible by default** — built on Angular CDK (focus, keyboard, ARIA, overlays).
+- **Themeable** — components read semantic CSS variables; switch the whole UI with one
+  `data-theme`, or override variables to match your brand. _Try the **Theme** switcher
+  in the toolbar above ↑._
+- **Four themes** — `paper` & `mist` (light), `charcoal` & `slate` (dark).
+- **One motion language** — shared easing/duration tokens; honors `prefers-reduced-motion`.
+- **Tree-shakeable** — standalone + FESM + `sideEffects: false`; only the components you
+  import ship to production.
+
+## Install
+
+```bash
+npm install @bpdm/ng
+# peers: @angular/core ^21, @angular/common ^21, @angular/cdk ^21,
+#        rxjs ^7.8, and tailwindcss ^4 in your app
+```
+
+In your global `styles.css`, after Tailwind, pull in the design tokens and let
+Tailwind scan the library so it generates the classes the components emit:
+
+```css
+@import "tailwindcss";
+@import "@bpdm/tokens/tokens.css";          /* design tokens + themes */
+@source "../node_modules/@bpdm/ng";          /* generate the components' classes */
+```
+
+Pick a theme on any ancestor (default `paper`):
+
+```html
+<html data-theme="slate"> <!-- paper · mist · charcoal · slate -->
+```
+
+## Quick start
+
+Import the standalone directive where you use it:
+
+```ts
+import { Component } from "@angular/core";
+import { BpdmButton } from "@bpdm/ng";
+
+@Component({
+  selector: "app-root",
+  imports: [BpdmButton],
+  template: `
+    <button bpdmButton variant="primary" (click)="save()">Save changes</button>
+    <a bpdmButton variant="ghost" href="/docs">Read the docs</a>
+  `,
+})
+export class AppComponent {
+  save() {}
+}
+```
+
+## Theming
+
+Components never hardcode colors — they read CSS variables. Re-brand by overriding
+them, globally or scoped:
+
+```css
+:root {
+  --primary: #7c3aed;          /* your brand color    */
+  --ring: #7c3aed;             /* matching focus ring */
+  --primary-foreground: #fff;  /* text on primary     */
+}
+```
+
+---
+
+MIT © [Bhavin P. Devamorari](https://bpdm.dev)
+
+</div>
