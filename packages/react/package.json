@@ -489,10 +489,5 @@
     "vite": "^8.0.16",
     "vitest": "^4.1.9",
     "vitest-axe": "^0.1.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

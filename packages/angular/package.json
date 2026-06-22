@@ -1,0 +1,75 @@
+{
+  "name": "@bpdm/ng",
+  "version": "0.1.0",
+  "description": "A modern, themeable, accessible Angular component library — Angular CDK, Tailwind 4, and the bpdm design system.",
+  "license": "MIT",
+  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "homepage": "https://bpdm.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "directory": "packages/angular"
+  },
+  "keywords": [
+    "angular",
+    "component-library",
+    "design-system",
+    "ui",
+    "tailwindcss",
+    "angular-cdk",
+    "accessible"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "typecheck": "tsc -p tsconfig.lib.json --noEmit",
+    "lint": "eslint .",
+    "test": "ng test --no-watch",
+    "test:watch": "ng test",
+    "storybook": "ng run bpdm-ng:storybook",
+    "build-storybook": "ng run bpdm-ng:build-storybook",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "@angular/cdk": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "rxjs": "^7.8.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "dependencies": {
+    "@bpdm/tokens": "workspace:*",
+    "@bpdm/variants": "workspace:*",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^21.2.0",
+    "@angular/build": "^21.2.0",
+    "@eslint/js": "^10.0.1",
+    "@angular/cdk": "^21.2.0",
+    "@angular/cli": "^21.2.0",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/compiler-cli": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/platform-browser-dynamic": "^21.2.0",
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-docs": "^10.4.6",
+    "@storybook/angular": "^10.4.6",
+    "@tailwindcss/postcss": "^4.3.0",
+    "eslint": "^10.5.0",
+    "jsdom": "^29.1.1",
+    "ng-packagr": "^21.2.5",
+    "rxjs": "^7.8.2",
+    "storybook": "^10.4.6",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9",
+    "zone.js": "^0.15.1"
+  }
+}
