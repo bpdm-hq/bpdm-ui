@@ -81,7 +81,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
             type="button"
             onClick={() => setClosing(true)}
             aria-label="Dismiss"
-            className="absolute right-2.5 top-2.5 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="size-3.5" />
           </button>
