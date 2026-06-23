@@ -31,6 +31,7 @@
           "builder": "@storybook/angular:start-storybook",
           "options": {
             "configDir": ".storybook",
+            "browserTarget": "bpdm-ng:build",
             "tsConfig": ".storybook/tsconfig.json",
             "compodoc": false,
             "styles": [".storybook/styles.css"],
