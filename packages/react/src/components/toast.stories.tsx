@@ -6,9 +6,32 @@ import {
   Stories,
   Title,
 } from "@storybook/addon-docs/blocks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster, toast, type ToastPosition } from "./toast";
 import { Button } from "./button";
+
+// On the Docs page every story is mounted at once. Since `toast()` writes to a
+// global store, each story's own <Toaster> would render the same toast — so it
+// appeared in every block. DemoToaster renders exactly ONE Toaster (the first to
+// mount wins); the Positions story drives that single Toaster's position.
+let toasterRefCount = 0;
+let setOwnerPosition: ((p: ToastPosition) => void) | null = null;
+
+function DemoToaster({ position = "bottom-right" }: { position?: ToastPosition }) {
+  const [isOwner, setIsOwner] = useState(false);
+  const [pos, setPos] = useState<ToastPosition>(position);
+  useEffect(() => {
+    toasterRefCount += 1;
+    const owner = toasterRefCount === 1;
+    setIsOwner(owner);
+    if (owner) setOwnerPosition = setPos;
+    return () => {
+      toasterRefCount -= 1;
+      if (owner) setOwnerPosition = null;
+    };
+  }, []);
+  return isOwner ? <Toaster position={pos} /> : null;
+}
 
 const usage = `
 Transient notifications. Call \`toast(...)\` from anywhere — no provider or hook
@@ -118,7 +141,7 @@ export const Playground: Story = {
       <Button variant="ghost" onClick={() => toast.dismiss()}>
         Dismiss all
       </Button>
-      <Toaster {...args} />
+      <DemoToaster position={args.position} />
     </div>
   ),
   parameters: {
@@ -166,7 +189,7 @@ export const Variants: Story = {
       <Button variant="ghost" onClick={() => toast.info("Sync finished")}>
         Info
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -208,7 +231,7 @@ export const WithAction: Story = {
       >
         Remove member
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -272,7 +295,7 @@ export const PromiseToast: Story = {
       >
         Deploy (rejects)
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -317,13 +340,14 @@ export const Positions: Story = {
             variant={p === position ? "primary" : "ghost"}
             onClick={() => {
               setPosition(p);
+              setOwnerPosition?.(p);
               toast.info(`Docked ${p}`, { description: "Swipe to dismiss." });
             }}
           >
             {p}
           </Button>
         ))}
-        <Toaster position={position} />
+        <DemoToaster position={position} />
       </div>
     );
   },
