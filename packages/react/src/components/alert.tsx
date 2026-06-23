@@ -6,39 +6,19 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
+import { alertTones, type AlertVariant } from "@bpdm/variants";
 import { cn } from "@/lib/utils";
 
-export type AlertVariant = "default" | "info" | "success" | "warning" | "error";
+export type { AlertVariant };
 
-const VARIANTS: Record<
-  AlertVariant,
-  { Icon: React.ComponentType<{ className?: string }> | null; fg: string; accent: string; tint: string }
-> = {
-  default: { Icon: Info, fg: "text-muted-foreground", accent: "before:bg-border", tint: "bg-muted" },
-  info: {
-    Icon: Info,
-    fg: "text-info",
-    accent: "before:bg-info",
-    tint: "bg-[color-mix(in_srgb,var(--info)_16%,transparent)]",
-  },
-  success: {
-    Icon: CircleCheck,
-    fg: "text-success",
-    accent: "before:bg-success",
-    tint: "bg-[color-mix(in_srgb,var(--success)_16%,transparent)]",
-  },
-  warning: {
-    Icon: TriangleAlert,
-    fg: "text-warning",
-    accent: "before:bg-warning",
-    tint: "bg-[color-mix(in_srgb,var(--warning)_16%,transparent)]",
-  },
-  error: {
-    Icon: CircleX,
-    fg: "text-destructive",
-    accent: "before:bg-destructive",
-    tint: "bg-[color-mix(in_srgb,var(--destructive)_16%,transparent)]",
-  },
+// per-variant leading icon — the colors (fg / accent / tint) come from the
+// shared `alertTones` so the React and Angular alerts match.
+const ICONS: Record<AlertVariant, React.ComponentType<{ className?: string }> | null> = {
+  default: Info,
+  info: Info,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  error: CircleX,
 };
 
 export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
@@ -60,8 +40,9 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
  */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ variant = "default", title, icon, onClose, action, className, children, ...props }, ref) => {
-    const v = VARIANTS[variant];
-    const showIcon = icon !== null && (icon !== undefined || v.Icon);
+    const tone = alertTones[variant];
+    const Icon = ICONS[variant];
+    const showIcon = icon !== null && (icon !== undefined || Icon);
     const [closing, setClosing] = React.useState(false);
 
     const box = (
@@ -71,7 +52,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         className={cn(
           "relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm",
           "before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
-          v.accent,
+          tone.accent,
           className,
         )}
         {...props}
@@ -80,10 +61,10 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           <span
             className={cn(
               "flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]",
-              v.tint,
+              tone.tint,
             )}
           >
-            {icon ?? (v.Icon ? <v.Icon className={cn("size-4", v.fg)} /> : null)}
+            {icon ?? (Icon ? <Icon className={cn("size-4", tone.fg)} /> : null)}
           </span>
         )}
         <div className={cn("min-w-0 flex-1", onClose && "pr-6")}>
