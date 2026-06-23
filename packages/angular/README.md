@@ -49,8 +49,9 @@ In your global `styles.css`:
 
 ```css
 @import "tailwindcss";
-@import "@bpdm/tokens/tokens.css";          /* design tokens + themes */
-@source "../node_modules/@bpdm/ng";          /* let Tailwind scan the components */
+@import "@bpdm/tokens/tokens.css";              /* design tokens + themes */
+@source "../node_modules/@bpdm/ng";             /* the components */
+@source "../node_modules/@bpdm/variants/dist";  /* the shared variant classes */
 ```
 
 Pick a theme on any ancestor (default is `paper`):
