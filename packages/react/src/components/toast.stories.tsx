@@ -6,9 +6,39 @@ import {
   Stories,
   Title,
 } from "@storybook/addon-docs/blocks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Toaster, toast, type ToastPosition } from "./toast";
 import { Button } from "./button";
+
+// On the Docs page every story is mounted at once, and `toast()` writes to a
+// global store — so each story's own <Toaster> would show the same toast and it
+// appeared in every block. DemoToaster fixes that for the docs in two ways:
+//   1. it renders exactly ONE Toaster (the first to mount wins; the rest no-op),
+//   2. it portals that Toaster to <body>, because Storybook's story container has
+//      a CSS transform that would otherwise trap the viewport's `position: fixed`
+//      inside one block. Portaling lets toasts dock at the real viewport corner,
+//      just like a single <Toaster /> at the app root does in production.
+// The Positions story drives that single Toaster's dock position.
+let toasterRefCount = 0;
+let setOwnerPosition: ((p: ToastPosition) => void) | null = null;
+
+function DemoToaster({ position = "bottom-right" }: { position?: ToastPosition }) {
+  const [isOwner, setIsOwner] = useState(false);
+  const [pos, setPos] = useState<ToastPosition>(position);
+  useEffect(() => {
+    toasterRefCount += 1;
+    const owner = toasterRefCount === 1;
+    setIsOwner(owner);
+    if (owner) setOwnerPosition = setPos;
+    return () => {
+      toasterRefCount -= 1;
+      if (owner) setOwnerPosition = null;
+    };
+  }, []);
+  if (!isOwner || typeof document === "undefined") return null;
+  return createPortal(<Toaster position={pos} />, document.body);
+}
 
 const usage = `
 Transient notifications. Call \`toast(...)\` from anywhere — no provider or hook
@@ -118,7 +148,7 @@ export const Playground: Story = {
       <Button variant="ghost" onClick={() => toast.dismiss()}>
         Dismiss all
       </Button>
-      <Toaster {...args} />
+      <DemoToaster position={args.position} />
     </div>
   ),
   parameters: {
@@ -166,7 +196,7 @@ export const Variants: Story = {
       <Button variant="ghost" onClick={() => toast.info("Sync finished")}>
         Info
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -208,7 +238,7 @@ export const WithAction: Story = {
       >
         Remove member
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -272,7 +302,7 @@ export const PromiseToast: Story = {
       >
         Deploy (rejects)
       </Button>
-      <Toaster position="bottom-right" />
+      <DemoToaster />
     </div>
   ),
   parameters: {
@@ -317,13 +347,14 @@ export const Positions: Story = {
             variant={p === position ? "primary" : "ghost"}
             onClick={() => {
               setPosition(p);
+              setOwnerPosition?.(p);
               toast.info(`Docked ${p}`, { description: "Swipe to dismiss." });
             }}
           >
             {p}
           </Button>
         ))}
-        <Toaster position={position} />
+        <DemoToaster position={position} />
       </div>
     );
   },
