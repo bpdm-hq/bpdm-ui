@@ -50,6 +50,55 @@ export class BpdmCard {
   );
 }
 
+const ASPECTS: Record<string, string> = {
+  video: "aspect-video",
+  square: "aspect-square",
+  wide: "aspect-[21/9]",
+  auto: "",
+};
+
+/**
+ * Edge-to-edge media band at the top (or side) of a card. Pass `src` for an
+ * image (it zooms on card hover) or project your own content. `overlay` adds a
+ * bottom scrim for text placed over the media.
+ */
+@Component({
+  selector: "bpdm-card-media",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { "[class]": "hostClass()" },
+  template: `
+    @if (src()) {
+      <img
+        [src]="src()"
+        [alt]="alt()"
+        class="size-full object-cover transition-transform duration-[500ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.06]"
+      />
+    } @else {
+      <ng-content />
+    }
+    @if (overlay()) {
+      <div
+        class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-transparent"
+      ></div>
+    }
+  `,
+})
+export class BpdmCardMedia {
+  /** Image URL; omit to project custom content instead. */
+  readonly src = input<string>();
+  readonly alt = input("");
+  /** Aspect ratio of the band. Default `video` (16:9). */
+  readonly aspect = input<keyof typeof ASPECTS>("video");
+  /** Dark gradient scrim at the bottom (for text/badges over the media). */
+  readonly overlay = input(false);
+  /** Extra classes, merged with tailwind-merge. */
+  readonly classInput = input<string>("", { alias: "class" });
+
+  protected readonly hostClass = computed(() =>
+    cn("relative block overflow-hidden bg-muted", ASPECTS[this.aspect()], this.classInput()),
+  );
+}
+
 /** Header row — projects the title/description; mark a trailing element `bpdmCardAction`. */
 @Component({
   selector: "bpdm-card-header",

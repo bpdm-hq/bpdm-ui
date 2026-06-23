@@ -78,7 +78,7 @@ import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
           @if (title()) {
             <p class="text-sm font-semibold">{{ title() }}</p>
           }
-          <div class="text-sm text-muted-foreground" [class.mt-1]="!!title()">
+          <div class="text-sm text-muted-foreground empty:hidden" [class.mt-1]="!!title()">
             <ng-content />
           </div>
           <div class="mt-3 flex flex-wrap gap-2 empty:hidden">

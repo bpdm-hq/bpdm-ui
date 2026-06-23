@@ -4,8 +4,10 @@ import { BpdmAlert } from "./alert";
 import { BpdmButton } from "../button/button";
 
 /**
- * `<bpdm-alert>` — an inline, persistent alert with a colored accent, status
- * icon, title and body. Same tones as the React alert.
+ * Inline, persistent alert — a colored left accent, a tinted icon, a title and
+ * body, with optional actions and a dismiss button. Five variants
+ * (`default`, `info`, `success`, `warning`, `error`), theme-aware across all
+ * themes. For transient pop-up notifications use a toast instead.
  */
 const meta: Meta<BpdmAlert> = {
   title: "Feedback/Alert",
@@ -13,27 +15,32 @@ const meta: Meta<BpdmAlert> = {
   tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: "select",
+      control: "inline-radio",
       options: ["default", "info", "success", "warning", "error"],
-      description: "Color + default icon",
     },
-    title: { control: "text", description: "Bold heading line" },
-    dismissible: { control: "boolean", description: "Show a dismiss button" },
-    showIcon: { control: "boolean", description: "Show the leading status icon" },
+    title: { control: "text" },
+    dismissible: { control: "boolean" },
+    showIcon: { control: "boolean" },
   },
-  args: { variant: "info", title: "Heads up", dismissible: false, showIcon: true },
+  args: {
+    variant: "info",
+    title: "Scheduled maintenance",
+    dismissible: false,
+    showIcon: true,
+  },
   render: (args) => ({
     props: args,
-    template: `<bpdm-alert [variant]="variant" [title]="title" [dismissible]="dismissible" [showIcon]="showIcon">
-  This is the alert body — a short, helpful message.
-</bpdm-alert>`,
+    template: `<div class="w-full max-w-xl">
+  <bpdm-alert [variant]="variant" [title]="title" [dismissible]="dismissible" [showIcon]="showIcon">
+    The deploy pipeline will be paused on Saturday, 02:00–03:00 UTC.
+  </bpdm-alert>
+</div>`,
   }),
 };
 export default meta;
 
 type Story = StoryObj<BpdmAlert>;
 
-/** Play with every option from the controls panel. */
 export const Playground: Story = {
   parameters: {
     docs: {
@@ -45,8 +52,8 @@ import { BpdmAlert } from '@bpdm/ng';
   selector: 'app-alert-demo',
   imports: [BpdmAlert],
   template: \`
-    <bpdm-alert variant="info" title="Heads up">
-      This is the alert body — a short, helpful message.
+    <bpdm-alert variant="info" title="Scheduled maintenance">
+      The deploy pipeline will be paused on Saturday, 02:00–03:00 UTC.
     </bpdm-alert>
   \`,
 })
@@ -56,16 +63,15 @@ export class AlertDemoComponent {}`,
   },
 };
 
-/** Every status color. */
+/** All five variants stacked. */
 export const Variants: Story = {
-  tags: ["!dev"],
   render: () => ({
-    template: `<div class="flex flex-col gap-3">
-  <bpdm-alert variant="default" title="Note">A neutral, informational message.</bpdm-alert>
-  <bpdm-alert variant="info" title="Did you know?">Tokens are shared across frameworks.</bpdm-alert>
-  <bpdm-alert variant="success" title="Saved">Your changes have been published.</bpdm-alert>
-  <bpdm-alert variant="warning" title="Heads up">Your trial ends in three days.</bpdm-alert>
-  <bpdm-alert variant="error" title="Something went wrong">We couldn't reach the server.</bpdm-alert>
+    template: `<div class="flex w-full max-w-xl flex-col gap-3">
+  <bpdm-alert variant="info" title="Scheduled maintenance">The deploy pipeline will be paused on Saturday, 02:00–03:00 UTC.</bpdm-alert>
+  <bpdm-alert variant="success" title="Deployment complete">Build #482 is live in production.</bpdm-alert>
+  <bpdm-alert variant="warning" title="Approaching seat limit">Your workspace is using 18 of 20 member seats.</bpdm-alert>
+  <bpdm-alert variant="error" title="Build failed">3 checks failed on the latest commit. Review the logs to continue.</bpdm-alert>
+  <bpdm-alert variant="default" title="Heads up">Two-factor authentication is recommended for every team member.</bpdm-alert>
 </div>`,
   }),
   parameters: {
@@ -78,12 +84,12 @@ import { BpdmAlert } from '@bpdm/ng';
   selector: 'app-alert-variants',
   imports: [BpdmAlert],
   template: \`
-    <div class="flex flex-col gap-3">
-      <bpdm-alert variant="default" title="Note">A neutral, informational message.</bpdm-alert>
-      <bpdm-alert variant="info" title="Did you know?">Tokens are shared across frameworks.</bpdm-alert>
-      <bpdm-alert variant="success" title="Saved">Your changes have been published.</bpdm-alert>
-      <bpdm-alert variant="warning" title="Heads up">Your trial ends in three days.</bpdm-alert>
-      <bpdm-alert variant="error" title="Something went wrong">We couldn't reach the server.</bpdm-alert>
+    <div class="flex w-full max-w-xl flex-col gap-3">
+      <bpdm-alert variant="info" title="Scheduled maintenance">The deploy pipeline will be paused on Saturday, 02:00–03:00 UTC.</bpdm-alert>
+      <bpdm-alert variant="success" title="Deployment complete">Build #482 is live in production.</bpdm-alert>
+      <bpdm-alert variant="warning" title="Approaching seat limit">Your workspace is using 18 of 20 member seats.</bpdm-alert>
+      <bpdm-alert variant="error" title="Build failed">3 checks failed on the latest commit. Review the logs to continue.</bpdm-alert>
+      <bpdm-alert variant="default" title="Heads up">Two-factor authentication is recommended for every team member.</bpdm-alert>
     </div>
   \`,
 })
@@ -93,41 +99,128 @@ export class AlertVariantsComponent {}`,
   },
 };
 
-/** Dismissible, with an actions slot. */
+/** Title + body + action buttons. */
+export const WithActions: Story = {
+  render: () => ({
+    template: `<div class="w-full max-w-xl">
+  <bpdm-alert variant="warning" title="Approaching seat limit">
+    Your workspace is using 18 of 20 member seats. Upgrade to add more.
+    <div bpdmAlertActions>
+      <button bpdmButton size="sm">Upgrade plan</button>
+      <button bpdmButton size="sm" variant="ghost">Manage members</button>
+    </div>
+  </bpdm-alert>
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmAlert, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-alert-actions',
+  imports: [BpdmAlert, BpdmButton],
+  template: \`
+    <bpdm-alert variant="warning" title="Approaching seat limit">
+      Your workspace is using 18 of 20 member seats. Upgrade to add more.
+      <div bpdmAlertActions>
+        <button bpdmButton size="sm">Upgrade plan</button>
+        <button bpdmButton size="sm" variant="ghost">Manage members</button>
+      </div>
+    </bpdm-alert>
+  \`,
+})
+export class AlertActionsComponent {}`,
+      },
+    },
+  },
+};
+
+/** Dismissable — the alert collapses and emits `closed`. */
 export const Dismissible: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<bpdm-alert variant="warning" title="Unsaved changes" dismissible>
-  You have edits that haven't been saved yet.
-  <div bpdmAlertActions>
-    <button bpdmButton size="sm" variant="outline">Discard</button>
-    <button bpdmButton size="sm">Save now</button>
-  </div>
-</bpdm-alert>`,
+    template: `<div class="w-full max-w-xl">
+  <bpdm-alert variant="success" title="Invite sent" dismissible>
+    We emailed an invitation to the new project member.
+  </bpdm-alert>
+</div>`,
   }),
   parameters: {
     docs: {
       source: {
         code: `import { Component } from '@angular/core';
 import { BpdmAlert } from '@bpdm/ng';
-import { BpdmButton } from '@bpdm/ng';
 
 @Component({
   selector: 'app-alert-dismissible',
-  imports: [BpdmAlert, BpdmButton],
+  imports: [BpdmAlert],
   template: \`
-    <bpdm-alert variant="warning" title="Unsaved changes" dismissible (closed)="onClose()">
-      You have edits that haven't been saved yet.
-      <div bpdmAlertActions>
-        <button bpdmButton size="sm" variant="outline">Discard</button>
-        <button bpdmButton size="sm">Save now</button>
-      </div>
+    <bpdm-alert variant="success" title="Invite sent" dismissible (closed)="onClose()">
+      We emailed an invitation to the new project member.
     </bpdm-alert>
   \`,
 })
 export class AlertDismissibleComponent {
   onClose() {}
 }`,
+      },
+    },
+  },
+};
+
+/** Title only, no body. */
+export const TitleOnly: Story = {
+  tags: ["!dev"],
+  render: () => ({
+    template: `<div class="w-full max-w-xl">
+  <bpdm-alert variant="info" title="Your changes have been saved." />
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-alert-title-only',
+  imports: [BpdmAlert],
+  template: \`<bpdm-alert variant="info" title="Your changes have been saved." />\`,
+})
+export class AlertTitleOnlyComponent {}`,
+      },
+    },
+  },
+};
+
+/** Hide the leading icon. */
+export const NoIcon: Story = {
+  tags: ["!dev"],
+  render: () => ({
+    template: `<div class="w-full max-w-xl">
+  <bpdm-alert variant="default" [showIcon]="false" title="Release notes">
+    Version 2.4 adds keyboard navigation across the whole console.
+  </bpdm-alert>
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-alert-no-icon',
+  imports: [BpdmAlert],
+  template: \`
+    <bpdm-alert variant="default" [showIcon]="false" title="Release notes">
+      Version 2.4 adds keyboard navigation across the whole console.
+    </bpdm-alert>
+  \`,
+})
+export class AlertNoIconComponent {}`,
       },
     },
   },
