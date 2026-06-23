@@ -12,10 +12,10 @@ export const bpdmTheme = create({
   colorPrimary: "#f5a623",
   colorSecondary: "#f5a623",
 
-  appBg: "#0e0e11",
-  appContentBg: "#0e0e11",
-  appPreviewBg: "#0e0e11",
-  appBorderColor: "#27272a",
+  appBg: "#131318",
+  appContentBg: "#1a1a1f",
+  appPreviewBg: "#131318",
+  appBorderColor: "#2e2e35",
   appBorderRadius: 10,
 
   textColor: "#f7f6f3",
