@@ -1,76 +1,20 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import {
+  badgeDot,
+  badgeTone,
+  badgeVariants,
+  type BadgeAppearance,
+  type BadgeVariant,
+  type VariantProps,
+} from "@bpdm/variants";
 import { cn } from "@/lib/utils";
 
-export type BadgeVariant =
-  | "neutral"
-  | "primary"
-  | "success"
-  | "warning"
-  | "info"
-  | "destructive";
+export type { BadgeVariant, BadgeAppearance };
 
-export type BadgeAppearance = "soft" | "solid" | "outline" | "ghost";
-
-// the dot's true color, independent of the label color (so a `ghost` badge can
-// keep a foreground label next to a colored status dot)
-const DOT: Record<BadgeVariant, string> = {
-  neutral: "bg-muted-foreground",
-  primary: "bg-primary",
-  success: "bg-success",
-  warning: "bg-warning",
-  info: "bg-info",
-  destructive: "bg-destructive",
-};
-
-// color × appearance — `soft` (tinted, the default), `solid` (filled), `outline`.
-// `ghost` is handled separately (no chrome: just a dot + label).
-const TONE: Record<BadgeVariant, Record<"soft" | "solid" | "outline", string>> = {
-  neutral: {
-    soft: "border-transparent bg-muted text-foreground",
-    solid: "border-transparent bg-foreground text-background",
-    outline: "border-border text-foreground",
-  },
-  primary: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary",
-    solid: "border-transparent bg-primary text-primary-foreground",
-    outline: "border-primary/40 text-primary",
-  },
-  success: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success",
-    solid: "border-transparent bg-success text-success-foreground",
-    outline: "border-success/40 text-success",
-  },
-  warning: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--warning)_18%,transparent)] text-warning",
-    solid: "border-transparent bg-warning text-warning-foreground",
-    outline: "border-warning/40 text-warning",
-  },
-  info: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--info)_18%,transparent)] text-info",
-    solid: "border-transparent bg-info text-info-foreground",
-    outline: "border-info/40 text-info",
-  },
-  destructive: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--destructive)_18%,transparent)] text-destructive",
-    solid: "border-transparent bg-destructive text-destructive-foreground",
-    outline: "border-destructive/40 text-destructive",
-  },
-};
-
-const badgeVariants = cva(
-  "inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-full border font-medium transition-[color,background-color,border-color,transform] duration-[var(--bpdm-duration-fast)] [&>svg]:size-3 [&>svg]:shrink-0",
-  {
-    variants: {
-      size: {
-        sm: "h-5 px-2 text-[0.6875rem]",
-        md: "h-6 px-2.5 text-xs",
-      },
-    },
-    defaultVariants: { size: "md" },
-  },
-);
+// local aliases so the component body below reads the same as before
+const DOT = badgeDot;
+const TONE = badgeTone;
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>,

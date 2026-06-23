@@ -1,31 +1,14 @@
 import * as React from "react";
+import {
+  progressFill,
+  progressFillFg,
+  progressTrack,
+  type ProgressSize,
+  type ProgressVariant,
+} from "@bpdm/variants";
 import { cn } from "@/lib/utils";
 
-export type ProgressVariant = "primary" | "success" | "warning" | "destructive" | "info";
-export type ProgressSize = "sm" | "md" | "lg";
-
-const TRACK: Record<ProgressSize, string> = {
-  sm: "h-1.5",
-  md: "h-2.5",
-  lg: "h-4",
-};
-
-const FILL: Record<ProgressVariant, string> = {
-  primary: "bg-primary",
-  success: "bg-success",
-  warning: "bg-warning",
-  destructive: "bg-destructive",
-  info: "bg-info",
-};
-
-// readable text color on top of each fill color (for the inside-bar label)
-const FILL_FG: Record<ProgressVariant, string> = {
-  primary: "text-primary-foreground",
-  success: "text-success-foreground",
-  warning: "text-warning-foreground",
-  destructive: "text-destructive-foreground",
-  info: "text-info-foreground",
-};
+export type { ProgressVariant, ProgressSize };
 
 export interface ProgressBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   /** Current value (ignored when `indeterminate`). */
@@ -90,7 +73,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
           aria-valuetext={indeterminate ? "Loading" : (typeof valueText === "string" ? valueText : `${Math.round(pct)}%`)}
           className={cn(
             "relative w-full overflow-hidden rounded-full bg-muted",
-            inside ? "h-5" : TRACK[size],
+            inside ? "h-5" : progressTrack[size],
           )}
         >
           {/* inside label, base layer — reads on the unfilled track */}
@@ -104,7 +87,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
             <span
               className={cn(
                 "absolute inset-y-0 left-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]",
-                FILL[variant],
+                progressFill[variant],
               )}
             >
               <span aria-hidden className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
@@ -113,7 +96,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
             <span
               className={cn(
                 "relative z-[2] block h-full overflow-hidden rounded-full transition-[width] duration-500 ease-[cubic-bezier(0.45,0,0.2,1)]",
-                FILL[variant],
+                progressFill[variant],
               )}
               style={{ width: `${pct}%` }}
             >
@@ -125,7 +108,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
                 <span
                   className={cn(
                     "pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-[0.7rem] font-semibold tabular-nums",
-                    FILL_FG[variant],
+                    progressFillFg[variant],
                   )}
                   style={{ width: `${(100 / pct) * 100}%` }}
                 >
