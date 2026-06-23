@@ -3,3 +3,7 @@
    Consumers don't use this file — they import "@bpdm/ui/styles.css". */
 @import "tailwindcss";
 @import "@bpdm/tokens/tokens.css";
+/* Some component classes now live only in the shared @bpdm/variants package
+   (e.g. the checkbox's data-[state=checked]:bg-primary). Tailwind ignores
+   node_modules by default, so point it at the variant source for Storybook. */
+@source "../../../variants/src";
