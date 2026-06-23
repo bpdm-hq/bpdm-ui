@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/angular";
 import { componentWrapperDecorator } from "@storybook/angular";
+import { bpdmTheme } from "./theme";
 // global styles (Tailwind + tokens) are wired via angular.json `styles`
 
 const THEMES = ["paper", "mist", "charcoal", "slate"] as const;
@@ -7,6 +8,8 @@ const THEMES = ["paper", "mist", "charcoal", "slate"] as const;
 const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    // theme the docs pages too (not just the manager), so the chrome is dark amber
+    docs: { theme: bpdmTheme },
     options: {
       storySort: { order: ["Introduction", "Actions", "*"] },
     },

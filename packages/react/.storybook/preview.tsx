@@ -1,10 +1,13 @@
 import type { Preview } from "@storybook/react-vite";
 import { useEffect } from "react";
+import { bpdmTheme } from "./theme";
 import "../src/styles/globals.css";
 
 const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    // theme the docs pages too (not just the manager), so the chrome is dark amber
+    docs: { theme: bpdmTheme },
     options: {
       storySort: {
         order: ["Introduction", "Actions", "Inputs", "Selection", "Data Display", "Overlay", "Feedback", "Navigation"],
