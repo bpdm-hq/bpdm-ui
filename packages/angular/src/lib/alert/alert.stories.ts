@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
-import { BpdmAlert } from "./alert";
+import { BpdmAlert, BpdmAlertActions } from "./alert";
 import { BpdmButton } from "../button/button";
 
 /**
@@ -11,7 +11,7 @@ import { BpdmButton } from "../button/button";
  */
 const meta: Meta<BpdmAlert> = {
   title: "Feedback/Alert",
-  decorators: [moduleMetadata({ imports: [BpdmAlert, BpdmButton] })],
+  decorators: [moduleMetadata({ imports: [BpdmAlert, BpdmAlertActions, BpdmButton] })],
   tags: ["autodocs"],
   argTypes: {
     variant: {
@@ -116,11 +116,11 @@ export const WithActions: Story = {
     docs: {
       source: {
         code: `import { Component } from '@angular/core';
-import { BpdmAlert, BpdmButton } from '@bpdm/ng';
+import { BpdmAlert, BpdmAlertActions, BpdmButton } from '@bpdm/ng';
 
 @Component({
   selector: 'app-alert-actions',
-  imports: [BpdmAlert, BpdmButton],
+  imports: [BpdmAlert, BpdmAlertActions, BpdmButton],
   template: \`
     <bpdm-alert variant="warning" title="Approaching seat limit">
       Your workspace is using 18 of 20 member seats. Upgrade to add more.

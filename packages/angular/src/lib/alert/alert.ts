@@ -2,12 +2,20 @@ import {
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  Directive,
   computed,
   input,
   output,
   signal,
 } from "@angular/core";
 import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
+
+/** Actions row inside an alert — lays its buttons out with the right spacing. */
+@Directive({
+  selector: "[bpdmAlertActions]",
+  host: { class: "mt-3 flex flex-wrap gap-2" },
+})
+export class BpdmAlertActions {}
 
 /**
  * `<bpdm-alert>` — an inline, persistent alert: a colored left accent, a tinted
@@ -82,9 +90,7 @@ import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
           <div class="text-sm text-muted-foreground empty:hidden" [class.mt-1]="!!title()">
             <ng-content />
           </div>
-          <div class="mt-3 flex flex-wrap gap-2 empty:hidden">
-            <ng-content select="[bpdmAlertActions]" />
-          </div>
+          <ng-content select="[bpdmAlertActions]" />
         </div>
 
         @if (dismissible()) {
