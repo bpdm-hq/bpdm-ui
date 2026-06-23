@@ -1,4 +1,5 @@
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -108,9 +109,9 @@ export class BpdmAlert {
   /** Bold heading line. */
   readonly title = input<string>();
   /** Show a dismiss button; emits `closed` after the collapse animation. */
-  readonly dismissible = input(false);
+  readonly dismissible = input(false, { transform: booleanAttribute });
   /** Show the leading status icon. */
-  readonly showIcon = input(true);
+  readonly showIcon = input(true, { transform: booleanAttribute });
   /** Fired once the alert has finished collapsing after dismiss. */
   readonly closed = output<void>();
 

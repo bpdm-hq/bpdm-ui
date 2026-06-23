@@ -1,4 +1,5 @@
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   Directive,
@@ -32,9 +33,9 @@ export class BpdmCard {
   /** Surface style. */
   readonly variant = input<NonNullable<CardVariants["variant"]>>("elevated");
   /** Lift + deepen the shadow on hover. */
-  readonly hoverable = input(false);
+  readonly hoverable = input(false, { transform: booleanAttribute });
   /** Focusable + pressable (use for fully-clickable cards). */
-  readonly interactive = input(false);
+  readonly interactive = input(false, { transform: booleanAttribute });
   /** Extra classes, merged with tailwind-merge. */
   readonly classInput = input<string>("", { alias: "class" });
 
@@ -90,7 +91,7 @@ export class BpdmCardMedia {
   /** Aspect ratio of the band. Default `video` (16:9). */
   readonly aspect = input<keyof typeof ASPECTS>("video");
   /** Dark gradient scrim at the bottom (for text/badges over the media). */
-  readonly overlay = input(false);
+  readonly overlay = input(false, { transform: booleanAttribute });
   /** Extra classes, merged with tailwind-merge. */
   readonly classInput = input<string>("", { alias: "class" });
 
@@ -144,5 +145,5 @@ export class BpdmCardContent {}
 })
 export class BpdmCardFooter {
   /** Add a hairline divider above the footer. */
-  readonly divider = input(false);
+  readonly divider = input(false, { transform: booleanAttribute });
 }
