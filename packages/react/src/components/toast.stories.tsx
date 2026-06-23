@@ -7,13 +7,19 @@ import {
   Title,
 } from "@storybook/addon-docs/blocks";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Toaster, toast, type ToastPosition } from "./toast";
 import { Button } from "./button";
 
-// On the Docs page every story is mounted at once. Since `toast()` writes to a
-// global store, each story's own <Toaster> would render the same toast — so it
-// appeared in every block. DemoToaster renders exactly ONE Toaster (the first to
-// mount wins); the Positions story drives that single Toaster's position.
+// On the Docs page every story is mounted at once, and `toast()` writes to a
+// global store — so each story's own <Toaster> would show the same toast and it
+// appeared in every block. DemoToaster fixes that for the docs in two ways:
+//   1. it renders exactly ONE Toaster (the first to mount wins; the rest no-op),
+//   2. it portals that Toaster to <body>, because Storybook's story container has
+//      a CSS transform that would otherwise trap the viewport's `position: fixed`
+//      inside one block. Portaling lets toasts dock at the real viewport corner,
+//      just like a single <Toaster /> at the app root does in production.
+// The Positions story drives that single Toaster's dock position.
 let toasterRefCount = 0;
 let setOwnerPosition: ((p: ToastPosition) => void) | null = null;
 
@@ -30,7 +36,8 @@ function DemoToaster({ position = "bottom-right" }: { position?: ToastPosition }
       if (owner) setOwnerPosition = null;
     };
   }, []);
-  return isOwner ? <Toaster position={pos} /> : null;
+  if (!isOwner || typeof document === "undefined") return null;
+  return createPortal(<Toaster position={pos} />, document.body);
 }
 
 const usage = `
