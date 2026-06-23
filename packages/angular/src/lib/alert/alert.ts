@@ -92,7 +92,7 @@ import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
             type="button"
             (click)="dismiss()"
             aria-label="Dismiss"
-            class="absolute right-2.5 top-2.5 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
               <path d="M18 6 6 18" /><path d="m6 6 12 12" />
