@@ -1,7 +1,10 @@
 import * as React from "react";
+import {
+  floatFloated,
+  floatResting,
+  type FloatLabelVariant as Variant,
+} from "@bpdm/variants";
 import { cn } from "@/lib/utils";
-
-type Variant = "over" | "in" | "on";
 
 export interface FloatLabelProps {
   label: string;
@@ -18,24 +21,9 @@ export interface FloatLabelProps {
   }>;
 }
 
-// Resting (placeholder) state — same for every variant.
-const resting =
-  "pointer-events-none absolute left-3 z-10 origin-left text-muted-foreground transition-all duration-150 top-1/2 -translate-y-1/2 text-sm peer-focus:text-ring";
-
-// Floated state — triggered on focus OR when the field is filled
-// (:not(:placeholder-shown)). Classes are written out in full so Tailwind
-// can detect them (no dynamic concatenation).
-const floated: Record<Variant, string> = {
-  over:
-    "peer-focus:top-0 peer-focus:-translate-y-[135%] peer-focus:text-xs " +
-    "peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:-translate-y-[135%] peer-[:not(:placeholder-shown)]:text-xs",
-  on:
-    "peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:bg-background peer-focus:px-1 peer-focus:text-xs " +
-    "peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:bg-background peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:text-xs",
-  in:
-    "peer-focus:top-1.5 peer-focus:translate-y-0 peer-focus:text-xs " +
-    "peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs",
-};
+// local aliases so the component body reads the same as before
+const resting = floatResting;
+const floated = floatFloated;
 
 /**
  * Floating label wrapper. Wrap a single input; the label sits as

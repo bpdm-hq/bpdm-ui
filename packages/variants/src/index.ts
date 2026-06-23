@@ -36,6 +36,16 @@ export {
   type AvatarShape,
   type AvatarStatus,
 } from "./avatar";
+export { inputVariants, type InputVariants } from "./input";
+export { textareaVariants, type TextareaVariants } from "./textarea";
+export { checkboxVariants, type CheckboxVariants } from "./checkbox";
+export { switchVariants, thumbVariants, type SwitchVariants } from "./switch";
+export { radioItemVariants, type RadioVariants } from "./radio";
+export {
+  floatResting,
+  floatFloated,
+  type FloatLabelVariant,
+} from "./float-label";
 
 // Re-export cva's type helper so framework packages can derive prop types
 // without taking a direct dependency on class-variance-authority.
