@@ -35,6 +35,7 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
       [class]="boxClass()"
       [attr.data-state]="state()"
       [attr.aria-checked]="indeterminate() ? 'mixed' : checked()"
+      [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
       [disabled]="disabled()"
       (click)="toggle()"
       (blur)="onTouched()"
@@ -58,6 +59,8 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
 export class BpdmCheckbox implements ControlValueAccessor {
   readonly size = input<NonNullable<CheckboxVariants["size"]>>("md");
   readonly indeterminate = input(false, { transform: booleanAttribute });
+  /** Invalid state — set `aria-invalid="true"`; styled red. */
+  readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
   /** Standalone two-way binding; also driven by ngModel / formControl. */
   readonly checked = model(false);
