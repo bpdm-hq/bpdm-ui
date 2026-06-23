@@ -16,6 +16,12 @@ class HostComponent {
 })
 class IndeterminateHost {}
 
+@Component({
+  imports: [BpdmCheckbox],
+  template: `<bpdm-checkbox aria-invalid="true" />`,
+})
+class InvalidHost {}
+
 describe("BpdmCheckbox", () => {
   it("toggles checked state on click", () => {
     const fixture = TestBed.createComponent(HostComponent);
@@ -35,5 +41,12 @@ describe("BpdmCheckbox", () => {
     const btn = fixture.nativeElement.querySelector('[role="checkbox"]') as HTMLButtonElement;
     expect(btn.getAttribute("aria-checked")).toBe("mixed");
     expect(btn.getAttribute("data-state")).toBe("indeterminate");
+  });
+
+  it("forwards aria-invalid to the inner control (red error styling)", () => {
+    const fixture = TestBed.createComponent(InvalidHost);
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector('[role="checkbox"]') as HTMLButtonElement;
+    expect(btn.getAttribute("aria-invalid")).toBe("true");
   });
 });

@@ -1,6 +1,57 @@
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { BpdmRadio, BpdmRadioGroup } from "./radio-group";
+
+// Interactive demos use a writable signal + [(value)] so clicking switches the
+// selection (a one-way [value]="…" binding would fight the group and flicker).
+@Component({
+  selector: "demo-radio-plan",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [BpdmRadioGroup, BpdmRadio],
+  template: `
+    <bpdm-radio-group [(value)]="plan">
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="team" /> Team</label>
+    </bpdm-radio-group>
+  `,
+})
+class RadioPlanDemo {
+  readonly plan = signal("pro");
+}
+
+@Component({
+  selector: "demo-radio-horizontal",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [BpdmRadioGroup, BpdmRadio],
+  template: `
+    <bpdm-radio-group orientation="horizontal" [(value)]="val">
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="sm" /> Small</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="md" /> Medium</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="lg" /> Large</label>
+    </bpdm-radio-group>
+  `,
+})
+class RadioHorizontalDemo {
+  readonly val = signal("sm");
+}
+
+@Component({
+  selector: "demo-radio-sizes",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [BpdmRadioGroup, BpdmRadio],
+  template: `
+    <bpdm-radio-group orientation="horizontal" [(value)]="val">
+      <bpdm-radio value="a" size="sm" />
+      <bpdm-radio value="b" size="md" />
+      <bpdm-radio value="c" size="lg" />
+    </bpdm-radio-group>
+  `,
+})
+class RadioSizesDemo {
+  readonly val = signal("a");
+}
 
 /**
  * Single-select radio group with three item sizes and vertical/horizontal layout.
@@ -8,16 +59,13 @@ import { BpdmRadio, BpdmRadioGroup } from "./radio-group";
  */
 const meta: Meta<BpdmRadioGroup> = {
   title: "Selection/RadioGroup",
-  decorators: [moduleMetadata({ imports: [BpdmRadioGroup, BpdmRadio] })],
+  decorators: [
+    moduleMetadata({
+      imports: [BpdmRadioGroup, BpdmRadio, RadioPlanDemo, RadioHorizontalDemo, RadioSizesDemo],
+    }),
+  ],
   tags: ["autodocs"],
-  render: (args) => ({
-    props: args,
-    template: `<bpdm-radio-group [value]="'pro'">
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="team" /> Team</label>
-</bpdm-radio-group>`,
-  }),
+  render: () => ({ template: `<demo-radio-plan />` }),
 };
 export default meta;
 
@@ -54,13 +102,7 @@ export class RadioPlanComponent {
 /** Laid out in a row. */
 export const Horizontal: Story = {
   tags: ["!dev"],
-  render: () => ({
-    template: `<bpdm-radio-group orientation="horizontal" [value]="'sm'">
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="sm" /> Small</label>
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="md" /> Medium</label>
-  <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="lg" /> Large</label>
-</bpdm-radio-group>`,
-  }),
+  render: () => ({ template: `<demo-radio-horizontal />` }),
   parameters: {
     docs: {
       source: {
@@ -87,13 +129,7 @@ export class RadioHorizontalComponent {}`,
 /** Three item sizes. */
 export const Sizes: Story = {
   tags: ["!dev"],
-  render: () => ({
-    template: `<bpdm-radio-group orientation="horizontal" [value]="'a'">
-  <bpdm-radio value="a" size="sm" />
-  <bpdm-radio value="b" size="md" />
-  <bpdm-radio value="c" size="lg" />
-</bpdm-radio-group>`,
-  }),
+  render: () => ({ template: `<demo-radio-sizes />` }),
   parameters: {
     docs: {
       source: {

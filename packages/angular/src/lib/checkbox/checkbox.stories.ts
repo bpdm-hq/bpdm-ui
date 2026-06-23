@@ -13,12 +13,13 @@ const meta: Meta<BpdmCheckbox> = {
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     indeterminate: { control: "boolean" },
-    checked: { control: "boolean" },
   },
-  args: { size: "md", indeterminate: false, checked: false },
+  args: { size: "md", indeterminate: false },
   render: (args) => ({
     props: args,
-    template: `<bpdm-checkbox [size]="size" [indeterminate]="indeterminate" [checked]="checked"></bpdm-checkbox>`,
+    // no [checked] binding — the checkbox self-manages clicks (a one-way arg
+    // binding would fight the toggle and flicker)
+    template: `<bpdm-checkbox [size]="size" [indeterminate]="indeterminate"></bpdm-checkbox>`,
   }),
 };
 export default meta;

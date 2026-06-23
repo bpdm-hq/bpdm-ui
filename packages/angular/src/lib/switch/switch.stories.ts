@@ -14,12 +14,12 @@ const meta: Meta<BpdmSwitch> = {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     shape: { control: "inline-radio", options: ["pill", "square", "sharp"] },
     icon: { control: "boolean" },
-    checked: { control: "boolean" },
   },
-  args: { size: "md", shape: "pill", icon: false, checked: true },
+  args: { size: "md", shape: "pill", icon: false },
   render: (args) => ({
     props: args,
-    template: `<bpdm-switch [size]="size" [shape]="shape" [icon]="icon" [checked]="checked"></bpdm-switch>`,
+    // no [checked] binding — self-manages clicks (avoids the arg-vs-toggle flicker)
+    template: `<bpdm-switch [size]="size" [shape]="shape" [icon]="icon"></bpdm-switch>`,
   }),
 };
 export default meta;

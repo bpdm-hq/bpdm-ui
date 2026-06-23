@@ -84,6 +84,7 @@ export class BpdmRadioGroup implements ControlValueAccessor {
       [class]="itemClass()"
       [attr.data-state]="checked() ? 'checked' : 'unchecked'"
       [attr.aria-checked]="checked()"
+      [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
       [disabled]="group.disabled()"
       (click)="group.select(value())"
     >
@@ -98,6 +99,8 @@ export class BpdmRadioGroup implements ControlValueAccessor {
 export class BpdmRadio {
   readonly value = input.required<string>();
   readonly size = input<NonNullable<RadioVariants["size"]>>("md");
+  /** Invalid state — set `aria-invalid="true"`; styled red. */
+  readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly group = inject(BpdmRadioGroup);
