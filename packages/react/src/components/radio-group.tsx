@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { cva, type VariantProps } from "class-variance-authority";
+import { radioItemVariants, type VariantProps } from "@bpdm/variants";
 import { cn } from "@/lib/utils";
 
 export const RadioGroup = React.forwardRef<
@@ -17,20 +17,6 @@ export const RadioGroup = React.forwardRef<
   />
 ));
 RadioGroup.displayName = "RadioGroup";
-
-const radioItemVariants = cva(
-  "aspect-square shrink-0 cursor-pointer rounded-full border border-muted-foreground/60 bg-background text-primary shadow-sm transition-[color,background-color,border-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
-  {
-    variants: {
-      size: {
-        sm: "size-4",
-        md: "size-5",
-        lg: "size-6",
-      },
-    },
-    defaultVariants: { size: "md" },
-  },
-);
 
 export interface RadioGroupItemProps
   extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
