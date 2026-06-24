@@ -92,7 +92,7 @@ ship as element components (`<bpdm-card>`).
 
 **Actions** — `bpdmButton`
 
-**Overlay** — `bpdmTooltip`
+**Overlay** — `bpdmTooltip` · `bpdmPopover`
 
 _More components are landing incrementally; track progress on **[ui.bpdm.dev](https://ui.bpdm.dev)**._
 
