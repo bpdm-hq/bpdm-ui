@@ -197,6 +197,14 @@
   to { opacity: 0; transform: scale(0.96); }
 }
 
+/* Modal scrim (Angular CDK dialog/drawer overlays). The React build applies this
+   with Tailwind classes on the overlay; here it styles the CDK backdrop element. */
+.bpdm-dialog-backdrop {
+  background-color: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(1px);
+  transition: opacity 120ms ease;
+}
+
 /* Selection indicators (checkbox tick, radio dot, dropdown check) pop in. */
 @keyframes bpdm-indicator-in {
   from { opacity: 0; transform: scale(0.3); }
