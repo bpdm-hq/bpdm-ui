@@ -21,7 +21,12 @@ export interface TooltipProps {
   sideOffset?: number;
   /** Hide the little arrow. */
   hideArrow?: boolean;
-  /** Render the child only, with no tooltip. */
+  /**
+   * Turn the tooltip OFF: the trigger renders untouched and stays fully
+   * interactive — nothing appears on hover/focus. This disables the *tooltip*,
+   * not the trigger element. (To explain a disabled control, keep the tooltip
+   * enabled and disable the child, e.g. `<Button disabled>`.)
+   */
   disabled?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
@@ -60,11 +65,29 @@ export function Tooltip({
   // nothing to show → render the trigger untouched
   if (disabled || content == null || content === "") return <>{children}</>;
 
+  // A disabled control doesn't emit pointer/focus events, so the tooltip would
+  // never open on it. When the trigger is disabled, wrap it in a focusable span
+  // that receives those events (the child keeps pointer-events off) — so the
+  // common "explain why this is disabled" tooltip works and stays keyboard-reachable.
+  const childEl = React.isValidElement(children)
+    ? (children as React.ReactElement<{ disabled?: boolean; className?: string; tabIndex?: number }>)
+    : null;
+  const trigger = childEl?.props.disabled ? (
+    <span tabIndex={0} className="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      {React.cloneElement(childEl, {
+        tabIndex: -1,
+        className: cn(childEl.props.className, "pointer-events-none"),
+      })}
+    </span>
+  ) : (
+    children
+  );
+
   return (
     <TooltipPrimitive.Provider delayDuration={delayDuration}>
       <TooltipPrimitive.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
         <TooltipPrimitive.Trigger asChild ref={triggerRef}>
-          {children}
+          {trigger}
         </TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal container={portalContainer ?? undefined}>
           <TooltipPrimitive.Content
