@@ -20,3 +20,6 @@ export * from "./lib/drawer/drawer";
 export * from "./lib/confirm-dialog/confirm-dialog";
 export * from "./lib/dynamic-dialog/dynamic-dialog";
 export * from "./lib/step-dialog/step-dialog";
+export * from "./lib/tabs/tabs";
+export * from "./lib/accordion/accordion";
+export * from "./lib/stepper/stepper";
