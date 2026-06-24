@@ -17,3 +17,4 @@ export * from "./lib/tooltip/tooltip";
 export * from "./lib/popover/popover";
 export * from "./lib/dialog/dialog";
 export * from "./lib/drawer/drawer";
+export * from "./lib/confirm-dialog/confirm-dialog";
