@@ -5,5 +5,7 @@
    utility a component can emit is generated. */
 @import "tailwindcss";
 @import "@bpdm/tokens/tokens.css";
+/* CDK overlay structural CSS — positions the overlay container for tooltips/popovers */
+@import "@angular/cdk/overlay-prebuilt.css";
 @source "../../variants/src";
 @source "../src";
