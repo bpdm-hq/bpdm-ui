@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { BpdmButton } from "../button/button";
 import { BpdmInput } from "../input/input";
+import { BpdmSelect } from "../select/select";
 import {
   BpdmDrawer,
   BpdmDrawerBody,
@@ -18,6 +19,7 @@ const DRAWER_IMPORTS = [
   BpdmDrawerFooter,
   BpdmButton,
   BpdmInput,
+  BpdmSelect,
 ];
 
 /**
@@ -185,4 +187,37 @@ export class DrawerControlledComponent {
       },
     },
   },
+};
+
+/** A form inside the drawer — the Select dropdown portals out and stays clickable. */
+export const WithForm: Story = {
+  render: () => ({
+    props: {
+      visibility: [
+        { value: "private", label: "Private" },
+        { value: "team", label: "Team" },
+        { value: "org", label: "Organization" },
+        { value: "public", label: "Public" },
+      ],
+    },
+    template: `<bpdm-drawer side="right" title="New project" description="Dropdowns portal out — fully clickable.">
+  <button bpdmButton bpdmDrawerTrigger>New project</button>
+  <ng-template bpdmDrawerBody>
+    <div class="space-y-3">
+      <div class="space-y-1.5">
+        <label class="text-sm font-medium">Name</label>
+        <input bpdmInput value="Q3 Planning" />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-sm font-medium">Visibility</label>
+        <bpdm-select searchable [options]="visibility" defaultValue="team" />
+      </div>
+    </div>
+  </ng-template>
+  <ng-template bpdmDrawerFooter>
+    <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+    <button bpdmButton bpdmDrawerClose>Create</button>
+  </ng-template>
+</bpdm-drawer>`,
+  }),
 };

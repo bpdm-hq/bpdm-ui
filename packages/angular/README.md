@@ -94,6 +94,8 @@ ship as element components (`<bpdm-card>`).
 
 **Overlay** — `bpdmTooltip` · `bpdmPopover` · `bpdm-dialog` · `bpdm-drawer` · `BpdmConfirm` · `BpdmDialogService` · `bpdm-step-dialog`
 
+**Selection** — `bpdm-select` · `bpdm-multi-select` · `bpdm-tree-select`
+
 **Navigation** — `bpdm-tabs` · `bpdm-accordion` · `bpdm-stepper`
 
 _More components are landing incrementally; track progress on **[ui.bpdm.dev](https://ui.bpdm.dev)**._
