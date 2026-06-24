@@ -1,29 +1,23 @@
-import { NgTemplateOutlet } from "@angular/common";
 import {
-  afterNextRender,
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   ComponentRef,
-  computed,
   contentChild,
   Directive,
   effect,
-  ElementRef,
   inject,
   input,
   model,
   OnDestroy,
-  output,
   TemplateRef,
   untracked,
   ViewContainerRef,
-  viewChild,
 } from "@angular/core";
-import { CdkTrapFocus } from "@angular/cdk/a11y";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
+import { BpdmOverlayPanel } from "../overlay/overlay-panel";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl";
 
@@ -36,6 +30,10 @@ const SIZE: Record<DialogSize, string> = {
   xl: "max-w-4xl",
 };
 
+const ENTER = "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]";
+// `forwards` holds the faded-out frame until teardown (no snap-back flicker)
+const EXIT = "animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in_forwards]";
+
 /** Marker for the dialog body: `<ng-template bpdmDialogBody>…</ng-template>`. */
 @Directive({ selector: "ng-template[bpdmDialogBody]" })
 export class BpdmDialogBody {}
@@ -43,100 +41,6 @@ export class BpdmDialogBody {}
 /** Marker for the dialog footer: `<ng-template bpdmDialogFooter>…</ng-template>`. */
 @Directive({ selector: "ng-template[bpdmDialogFooter]" })
 export class BpdmDialogFooter {}
-
-/** Internal panel rendered into the CDK overlay. Not part of the public API. */
-@Component({
-  selector: "bpdm-dialog-panel",
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgTemplateOutlet, CdkTrapFocus],
-  host: { class: "contents" },
-  template: `
-    <div
-      #root
-      role="dialog"
-      aria-modal="true"
-      tabindex="-1"
-      [attr.aria-labelledby]="labelId()"
-      [attr.aria-describedby]="description() ? descId() : null"
-      [class]="boxClass()"
-      [cdkTrapFocus]="true"
-      (keydown.escape)="dismiss.emit()"
-    >
-      <div class="flex flex-col gap-1.5 p-6 pb-2">
-        <h2
-          [attr.id]="labelId()"
-          [class]="title() ? 'text-lg font-semibold tracking-tight' : 'sr-only'"
-        >
-          {{ title() || "Dialog" }}
-        </h2>
-        @if (description()) {
-          <p [attr.id]="descId()" class="text-sm text-muted-foreground">{{ description() }}</p>
-        }
-      </div>
-      @if (body()) {
-        <div class="min-h-0 flex-1 overflow-y-auto px-6 py-2">
-          <ng-container [ngTemplateOutlet]="body()!" />
-        </div>
-      }
-      @if (footer()) {
-        <div class="flex flex-col-reverse gap-2 p-6 pt-2 sm:flex-row sm:justify-end">
-          <ng-container [ngTemplateOutlet]="footer()!" />
-        </div>
-      }
-      @if (showClose()) {
-        <button
-          type="button"
-          aria-label="Close"
-          (click)="dismiss.emit()"
-          class="absolute right-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="size-4"
-          >
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-      }
-    </div>
-  `,
-})
-class BpdmDialogPanel {
-  readonly title = input("");
-  readonly description = input("");
-  readonly size = input<DialogSize>("md");
-  readonly showClose = input(true);
-  readonly body = input<TemplateRef<unknown> | null>(null);
-  readonly footer = input<TemplateRef<unknown> | null>(null);
-  readonly labelId = input("");
-  readonly descId = input("");
-  readonly closing = input(false);
-  readonly dismiss = output<void>();
-
-  private readonly root = viewChild<ElementRef<HTMLElement>>("root");
-
-  constructor() {
-    // focus the panel itself (not the first field) — like Radix — so a prefilled
-    // input isn't auto-focused with the caret jammed at the start
-    afterNextRender(() => this.root()?.nativeElement.focus());
-  }
-
-  protected readonly boxClass = computed(() =>
-    cn(
-      "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none",
-      SIZE[this.size()],
-      this.closing()
-        ? // `forwards` holds the faded-out frame until teardown (no snap-back flicker)
-          "animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in_forwards]"
-        : "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
-    ),
-  );
-}
 
 /**
  * `<bpdm-dialog>` — a modal dialog on the Angular CDK overlay: focus trap, scroll
@@ -181,7 +85,7 @@ export class BpdmDialog implements OnDestroy {
   protected readonly descId = `bpdm-dialog-desc-${did}`;
 
   private overlayRef?: OverlayRef;
-  private panelRef?: ComponentRef<BpdmDialogPanel>;
+  private panelRef?: ComponentRef<BpdmOverlayPanel>;
   private closeTimer?: ReturnType<typeof setTimeout>;
   private previouslyFocused: HTMLElement | null = null;
 
@@ -219,16 +123,25 @@ export class BpdmDialog implements OnDestroy {
       backdropClass: ["cdk-overlay-backdrop", "bpdm-dialog-backdrop"],
     });
 
-    const ref = this.overlayRef.attach(new ComponentPortal(BpdmDialogPanel, this.vcr));
+    const ref = this.overlayRef.attach(new ComponentPortal(BpdmOverlayPanel, this.vcr));
     this.panelRef = ref;
     ref.setInput("title", this.title());
     ref.setInput("description", this.description());
-    ref.setInput("size", this.size());
     ref.setInput("showClose", this.showClose());
     ref.setInput("body", this.body() ?? null);
     ref.setInput("footer", this.footer() ?? null);
     ref.setInput("labelId", this.labelId);
     ref.setInput("descId", this.descId);
+    ref.setInput("fallbackTitle", "Dialog");
+    ref.setInput(
+      "panelClass",
+      cn(
+        "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none",
+        SIZE[this.size()],
+      ),
+    );
+    ref.setInput("enterAnim", ENTER);
+    ref.setInput("exitAnim", EXIT);
 
     ref.instance.dismiss.subscribe(() => this.close());
     this.overlayRef.backdropClick().subscribe(() => this.close());
