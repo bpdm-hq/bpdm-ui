@@ -16,3 +16,4 @@ export * from "./lib/float-label/float-label";
 export * from "./lib/tooltip/tooltip";
 export * from "./lib/popover/popover";
 export * from "./lib/dialog/dialog";
+export * from "./lib/drawer/drawer";
