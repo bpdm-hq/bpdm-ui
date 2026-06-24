@@ -142,24 +142,21 @@ import { BpdmAccordion, AccordionItemData } from '@bpdm/ng';
   imports: [BpdmAccordion],
   template: \`
     <bpdm-accordion [items]="items()" variant="borderless" defaultValue="rollback" />
-    <ng-template #deploys>Every merge to the main branch kicks off a build and a production deploy. You can also trigger a manual deploy from the dashboard.</ng-template>
-    <ng-template #rollback>Yes — open any past deploy and choose “Promote to production” to instantly roll back to that version.</ng-template>
-    <ng-template #logs>Build and runtime logs are retained for 30 days and are searchable per deploy and per service.</ng-template>
-    <ng-template #members>Open Settings → Members, enter their email and pick a role. They’ll receive an invite link by email.</ng-template>
+    <ng-template #deploys>Every merge to main deploys to production.</ng-template>
+    <ng-template #rollback>Promote any past deploy to roll back.</ng-template>
+    <ng-template #logs>Retained for 30 days, fully searchable.</ng-template>
   \`,
 })
 export class FaqComponent {
   private deploys = viewChild<TemplateRef<unknown>>('deploys');
   private rollback = viewChild<TemplateRef<unknown>>('rollback');
   private logs = viewChild<TemplateRef<unknown>>('logs');
-  private members = viewChild<TemplateRef<unknown>>('members');
   items = computed<AccordionItemData[]>(() => {
-    const d = this.deploys(), r = this.rollback(), l = this.logs(), m = this.members();
-    return d && r && l && m ? [
+    const d = this.deploys(), r = this.rollback(), l = this.logs();
+    return d && r && l ? [
       { value: 'deploys', title: 'How are deploys triggered?', content: d },
       { value: 'rollback', title: 'Can I roll back a release?', content: r },
       { value: 'logs', title: 'Where are build logs stored?', content: l },
-      { value: 'members', title: 'How do I invite a teammate?', content: m },
     ] : [];
   });
 }`,
@@ -182,24 +179,21 @@ import { BpdmAccordion, AccordionItemData } from '@bpdm/ng';
   imports: [BpdmAccordion],
   template: \`
     <bpdm-accordion [items]="items()" variant="separated" defaultValue="deploys" />
-    <ng-template #deploys>Every merge to the main branch kicks off a build and a production deploy. You can also trigger a manual deploy from the dashboard.</ng-template>
-    <ng-template #rollback>Yes — open any past deploy and choose “Promote to production” to instantly roll back to that version.</ng-template>
-    <ng-template #logs>Build and runtime logs are retained for 30 days and are searchable per deploy and per service.</ng-template>
-    <ng-template #members>Open Settings → Members, enter their email and pick a role. They’ll receive an invite link by email.</ng-template>
+    <ng-template #deploys>Every merge to main deploys to production.</ng-template>
+    <ng-template #rollback>Promote any past deploy to roll back.</ng-template>
+    <ng-template #logs>Retained for 30 days, fully searchable.</ng-template>
   \`,
 })
 export class FaqComponent {
   private deploys = viewChild<TemplateRef<unknown>>('deploys');
   private rollback = viewChild<TemplateRef<unknown>>('rollback');
   private logs = viewChild<TemplateRef<unknown>>('logs');
-  private members = viewChild<TemplateRef<unknown>>('members');
   items = computed<AccordionItemData[]>(() => {
-    const d = this.deploys(), r = this.rollback(), l = this.logs(), m = this.members();
-    return d && r && l && m ? [
+    const d = this.deploys(), r = this.rollback(), l = this.logs();
+    return d && r && l ? [
       { value: 'deploys', title: 'How are deploys triggered?', content: d },
       { value: 'rollback', title: 'Can I roll back a release?', content: r },
       { value: 'logs', title: 'Where are build logs stored?', content: l },
-      { value: 'members', title: 'How do I invite a teammate?', content: m },
     ] : [];
   });
 }`,
@@ -222,10 +216,10 @@ import { BpdmAccordion, AccordionItemData } from '@bpdm/ng';
   imports: [BpdmAccordion],
   template: \`
     <bpdm-accordion [items]="items()" variant="separated" defaultValue="deploys" />
-    <ng-template #deploys>Every merge to the main branch kicks off a build and a production deploy. You can also trigger a manual deploy from the dashboard.</ng-template>
-    <ng-template #rollback>Yes — open any past deploy and choose “Promote to production” to instantly roll back to that version.</ng-template>
-    <ng-template #logs>Build and runtime logs are retained for 30 days and are searchable per deploy and per service.</ng-template>
-    <ng-template #members>Open Settings → Members, enter their email and pick a role. They’ll receive an invite link by email.</ng-template>
+    <ng-template #deploys>Every merge to main deploys to production.</ng-template>
+    <ng-template #rollback>Promote any past deploy to roll back.</ng-template>
+    <ng-template #logs>Retained for 30 days, fully searchable.</ng-template>
+    <ng-template #members>Settings → Members → enter an email.</ng-template>
 
     <ng-template #rocket><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /></svg></ng-template>
     <ng-template #rotate><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg></ng-template>
@@ -273,22 +267,19 @@ import { BpdmAccordion, AccordionItemData } from '@bpdm/ng';
   imports: [BpdmAccordion],
   template: \`
     <bpdm-accordion [items]="items()" type="multiple" [defaultValue]="['deploys', 'logs']" />
-    <ng-template #deploys>Every merge to the main branch kicks off a build and a production deploy. You can also trigger a manual deploy from the dashboard.</ng-template>
-    <ng-template #rollback>Yes — open any past deploy and choose “Promote to production” to instantly roll back to that version.</ng-template>
-    <ng-template #logs>Build and runtime logs are retained for 30 days and are searchable per deploy and per service.</ng-template>
-    <ng-template #members>Open Settings → Members, enter their email and pick a role. They’ll receive an invite link by email.</ng-template>
+    <ng-template #deploys>Every merge to main deploys to production.</ng-template>
+    <ng-template #logs>Retained for 30 days, fully searchable.</ng-template>
+    <ng-template #members>Settings → Members → enter an email.</ng-template>
   \`,
 })
 export class FaqComponent {
   private deploys = viewChild<TemplateRef<unknown>>('deploys');
-  private rollback = viewChild<TemplateRef<unknown>>('rollback');
   private logs = viewChild<TemplateRef<unknown>>('logs');
   private members = viewChild<TemplateRef<unknown>>('members');
   items = computed<AccordionItemData[]>(() => {
-    const d = this.deploys(), r = this.rollback(), l = this.logs(), m = this.members();
-    return d && r && l && m ? [
+    const d = this.deploys(), l = this.logs(), m = this.members();
+    return d && l && m ? [
       { value: 'deploys', title: 'How are deploys triggered?', content: d },
-      { value: 'rollback', title: 'Can I roll back a release?', content: r },
       { value: 'logs', title: 'Where are build logs stored?', content: l },
       { value: 'members', title: 'How do I invite a teammate?', content: m },
     ] : [];
@@ -317,24 +308,21 @@ import { BpdmAccordion, AccordionItemData } from '@bpdm/ng';
   imports: [BpdmAccordion],
   template: \`
     <bpdm-accordion [items]="items()" defaultValue="deploys" />
-    <ng-template #deploys>Every merge to the main branch kicks off a build and a production deploy. You can also trigger a manual deploy from the dashboard.</ng-template>
-    <ng-template #rollback>Yes — open any past deploy and choose “Promote to production” to instantly roll back to that version.</ng-template>
-    <ng-template #logs>Build and runtime logs are retained for 30 days and are searchable per deploy and per service.</ng-template>
-    <ng-template #members>Open Settings → Members, enter their email and pick a role. They’ll receive an invite link by email.</ng-template>
+    <ng-template #deploys>Every merge to main deploys to production.</ng-template>
+    <ng-template #rollback>Promote any past deploy to roll back.</ng-template>
+    <ng-template #logs>Retained for 30 days, fully searchable.</ng-template>
   \`,
 })
 export class FaqComponent {
   private deploys = viewChild<TemplateRef<unknown>>('deploys');
   private rollback = viewChild<TemplateRef<unknown>>('rollback');
   private logs = viewChild<TemplateRef<unknown>>('logs');
-  private members = viewChild<TemplateRef<unknown>>('members');
   items = computed<AccordionItemData[]>(() => {
-    const d = this.deploys(), r = this.rollback(), l = this.logs(), m = this.members();
-    return d && r && l && m ? [
+    const d = this.deploys(), r = this.rollback(), l = this.logs();
+    return d && r && l ? [
       { value: 'deploys', title: 'How are deploys triggered?', content: d },
       { value: 'rollback', title: 'Can I roll back a release?', content: r, disabled: true },
       { value: 'logs', title: 'Where are build logs stored?', content: l },
-      { value: 'members', title: 'How do I invite a teammate?', content: m },
     ] : [];
   });
 }`,

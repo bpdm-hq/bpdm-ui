@@ -43,7 +43,7 @@ const meta: Meta<BpdmTextarea> = {
   args: { size: "md", resize: "vertical", autoResize: false },
   render: (args) => ({
     props: args,
-    template: `<div class="w-80"><textarea bpdmTextarea [size]="size" [resize]="resize" [autoResize]="autoResize" placeholder="Type here…"></textarea></div>`,
+    template: `<div class="w-80"><textarea bpdmTextarea [size]="size" [resize]="resize" [autoResize]="autoResize" placeholder="Write something…"></textarea></div>`,
   }),
 };
 export default meta;
@@ -60,7 +60,7 @@ import { BpdmTextarea } from '@bpdm/ng';
 @Component({
   selector: 'app-textarea-demo',
   imports: [BpdmTextarea],
-  template: \`<textarea bpdmTextarea placeholder="Type here…"></textarea>\`,
+  template: \`<textarea bpdmTextarea placeholder="Write something…"></textarea>\`,
 })
 export class TextareaDemoComponent {}`,
       },
@@ -153,7 +153,10 @@ export class TextareaSizesComponent {}`,
 export const Invalid: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<div class="w-80"><textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea></div>`,
+    template: `<div class="flex w-80 flex-col gap-1.5">
+  <textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea>
+  <p class="text-sm text-destructive">Message is required.</p>
+</div>`,
   }),
   parameters: {
     docs: {
@@ -164,7 +167,12 @@ import { BpdmTextarea } from '@bpdm/ng';
 @Component({
   selector: 'app-textarea-invalid',
   imports: [BpdmTextarea],
-  template: \`<textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea>\`,
+  template: \`
+    <div class="flex w-80 flex-col gap-1.5">
+      <textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea>
+      <p class="text-sm text-destructive">Message is required.</p>
+    </div>
+  \`,
 })
 export class TextareaInvalidComponent {}`,
       },

@@ -13,7 +13,7 @@ import { BpdmRadio, BpdmRadioGroup } from "./radio-group";
     <bpdm-radio-group [(value)]="plan">
       <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
       <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
-      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="team" /> Team</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="enterprise" /> Enterprise</label>
     </bpdm-radio-group>
   `,
 })
@@ -27,14 +27,14 @@ class RadioPlanDemo {
   imports: [BpdmRadioGroup, BpdmRadio],
   template: `
     <bpdm-radio-group orientation="horizontal" [(value)]="val">
-      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="sm" /> Small</label>
-      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="md" /> Medium</label>
-      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="lg" /> Large</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="enterprise" /> Enterprise</label>
     </bpdm-radio-group>
   `,
 })
 class RadioHorizontalDemo {
-  readonly val = signal("sm");
+  readonly val = signal("pro");
 }
 
 @Component({
@@ -43,14 +43,14 @@ class RadioHorizontalDemo {
   imports: [BpdmRadioGroup, BpdmRadio],
   template: `
     <bpdm-radio-group orientation="horizontal" [(value)]="val">
-      <bpdm-radio value="a" size="sm" />
-      <bpdm-radio value="b" size="md" />
-      <bpdm-radio value="c" size="lg" />
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="sm" size="sm" /> Small</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="md" size="md" /> Medium</label>
+      <label class="flex cursor-pointer items-center gap-2 text-sm"><bpdm-radio value="lg" size="lg" /> Large</label>
     </bpdm-radio-group>
   `,
 })
 class RadioSizesDemo {
-  readonly val = signal("a");
+  readonly val = signal("md");
 }
 
 /**
@@ -88,7 +88,7 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
     <bpdm-radio-group [(ngModel)]="plan">
       <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
       <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="team" /> Team</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="enterprise" /> Enterprise</label>
     </bpdm-radio-group>
   \`,
 })
@@ -114,10 +114,10 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
   selector: 'app-radio-horizontal',
   imports: [BpdmRadioGroup, BpdmRadio],
   template: \`
-    <bpdm-radio-group orientation="horizontal" [value]="'sm'">
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="sm" /> Small</label>
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="md" /> Medium</label>
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="lg" /> Large</label>
+    <bpdm-radio-group orientation="horizontal" [value]="'pro'">
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="enterprise" /> Enterprise</label>
     </bpdm-radio-group>
   \`,
 })
@@ -141,10 +141,10 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
   selector: 'app-radio-sizes',
   imports: [BpdmRadioGroup, BpdmRadio],
   template: \`
-    <bpdm-radio-group orientation="horizontal" [value]="'a'">
-      <bpdm-radio value="a" size="sm" />
-      <bpdm-radio value="b" size="md" />
-      <bpdm-radio value="c" size="lg" />
+    <bpdm-radio-group orientation="horizontal" [value]="'md'">
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="sm" size="sm" /> Small</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="md" size="md" /> Medium</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="lg" size="lg" /> Large</label>
     </bpdm-radio-group>
   \`,
 })
@@ -162,6 +162,7 @@ export const Disabled: Story = {
     template: `<bpdm-radio-group [value]="'pro'" [disabled]="dis">
   <label class="flex items-center gap-2 text-sm opacity-70"><bpdm-radio value="free" /> Free</label>
   <label class="flex items-center gap-2 text-sm opacity-70"><bpdm-radio value="pro" /> Pro</label>
+  <label class="flex items-center gap-2 text-sm opacity-70"><bpdm-radio value="enterprise" /> Enterprise</label>
 </bpdm-radio-group>`,
   }),
   parameters: {
@@ -178,6 +179,7 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
     <bpdm-radio-group [formControl]="plan">
       <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" /> Free</label>
       <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" /> Pro</label>
+      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="enterprise" /> Enterprise</label>
     </bpdm-radio-group>
   \`,
 })
@@ -193,10 +195,13 @@ export class RadioDisabledComponent {
 export const Invalid: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<bpdm-radio-group>
-  <label class="flex items-center gap-2 text-sm"><bpdm-radio value="yes" aria-invalid="true" /> Yes</label>
-  <label class="flex items-center gap-2 text-sm"><bpdm-radio value="no" aria-invalid="true" /> No</label>
-</bpdm-radio-group>`,
+    template: `<div class="flex flex-col gap-1.5">
+  <bpdm-radio-group>
+    <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" aria-invalid="true" /> Free</label>
+    <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" aria-invalid="true" /> Pro</label>
+  </bpdm-radio-group>
+  <p class="text-sm text-destructive">Please choose a plan.</p>
+</div>`,
   }),
   parameters: {
     docs: {
@@ -208,10 +213,13 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
   selector: 'app-radio-invalid',
   imports: [BpdmRadioGroup, BpdmRadio],
   template: \`
-    <bpdm-radio-group>
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="yes" aria-invalid="true" /> Yes</label>
-      <label class="flex items-center gap-2 text-sm"><bpdm-radio value="no" aria-invalid="true" /> No</label>
-    </bpdm-radio-group>
+    <div class="flex flex-col gap-1.5">
+      <bpdm-radio-group>
+        <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" aria-invalid="true" /> Free</label>
+        <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" aria-invalid="true" /> Pro</label>
+      </bpdm-radio-group>
+      <p class="text-sm text-destructive">Please choose a plan.</p>
+    </div>
   \`,
 })
 export class RadioInvalidComponent {}`,

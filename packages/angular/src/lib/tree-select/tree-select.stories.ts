@@ -201,6 +201,11 @@ export class TreeComponent {
       { value: 'phones', label: 'Phones', children: [
         { value: 'iphone', label: 'iPhone 15' },
         { value: 'pixel', label: 'Pixel 9' },
+        { value: 'galaxy', label: 'Galaxy S24' },
+      ] },
+      { value: 'laptops', label: 'Laptops', children: [
+        { value: 'macbook', label: 'MacBook Pro' },
+        { value: 'xps', label: 'Dell XPS' },
       ] },
     ] },
   ];
@@ -234,6 +239,7 @@ export class TreeSearchComponent {
       ] },
       { value: 'laptops', label: 'Laptops', children: [
         { value: 'macbook', label: 'MacBook Pro' },
+        { value: 'xps', label: 'Dell XPS' },
       ] },
     ] },
   ];
@@ -249,9 +255,9 @@ export const ManySelected: Story = {
   render: () => ({
     props: {
       options: TREE,
-      dv: ["iphone", "pixel", "galaxy", "macbook", "airpods", "sony"],
+      dv: ["iphone", "pixel", "macbook", "airpods", "m-shoes", "decor"],
     },
-    template: `<div class="w-80"><bpdm-tree-select [options]="options" [defaultValue]="dv" placeholder="Select categories" /></div>`,
+    template: `<div class="w-80"><bpdm-tree-select searchable [maxDisplay]="3" [options]="options" [defaultValue]="dv" placeholder="Select categories" /></div>`,
   }),
   parameters: {
     docs: {
@@ -262,7 +268,7 @@ import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
 @Component({
   selector: 'app-tree-many',
   imports: [BpdmTreeSelect],
-  template: \`<bpdm-tree-select [options]="categories" [defaultValue]="['iphone','pixel','galaxy','macbook','airpods','sony']" placeholder="Select categories" />\`,
+  template: \`<bpdm-tree-select searchable [maxDisplay]="3" [options]="categories" [defaultValue]="['iphone','pixel','macbook','airpods']" placeholder="Select categories" />\`,
 })
 export class TreeManyComponent {
   categories: TreeNode[] = [
@@ -270,14 +276,12 @@ export class TreeManyComponent {
       { value: 'phones', label: 'Phones', children: [
         { value: 'iphone', label: 'iPhone 15' },
         { value: 'pixel', label: 'Pixel 9' },
-        { value: 'galaxy', label: 'Galaxy S24' },
       ] },
       { value: 'laptops', label: 'Laptops', children: [
         { value: 'macbook', label: 'MacBook Pro' },
       ] },
       { value: 'audio', label: 'Audio', children: [
         { value: 'airpods', label: 'AirPods Pro' },
-        { value: 'sony', label: 'Sony WH-1000XM5' },
       ] },
     ] },
   ];
@@ -291,8 +295,8 @@ export class TreeManyComponent {
 export const CountMode: Story = {
   tags: ["!dev"],
   render: () => ({
-    props: { options: TREE, dv: ["iphone", "pixel", "macbook", "airpods"] },
-    template: `<div class="w-80"><bpdm-tree-select [options]="options" [maxDisplay]="0" [defaultValue]="dv" placeholder="Select categories" /></div>`,
+    props: { options: TREE, dv: ["iphone", "macbook", "shoes"] },
+    template: `<div class="w-72"><bpdm-tree-select [options]="options" [maxDisplay]="0" [defaultValue]="dv" placeholder="Select categories" /></div>`,
   }),
   parameters: {
     docs: {
@@ -303,20 +307,16 @@ import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
 @Component({
   selector: 'app-tree-count',
   imports: [BpdmTreeSelect],
-  template: \`<bpdm-tree-select [options]="categories" [maxDisplay]="0" [defaultValue]="['iphone','pixel','macbook','airpods']" placeholder="Select categories" />\`,
+  template: \`<bpdm-tree-select [options]="categories" [maxDisplay]="0" [defaultValue]="['iphone','macbook']" placeholder="Select categories" />\`,
 })
 export class TreeCountComponent {
   categories: TreeNode[] = [
     { value: 'electronics', label: 'Electronics', children: [
       { value: 'phones', label: 'Phones', children: [
         { value: 'iphone', label: 'iPhone 15' },
-        { value: 'pixel', label: 'Pixel 9' },
       ] },
       { value: 'laptops', label: 'Laptops', children: [
         { value: 'macbook', label: 'MacBook Pro' },
-      ] },
-      { value: 'audio', label: 'Audio', children: [
-        { value: 'airpods', label: 'AirPods Pro' },
       ] },
     ] },
   ];
@@ -331,7 +331,10 @@ export const Invalid: Story = {
   tags: ["!dev"],
   render: () => ({
     props: { options: TREE },
-    template: `<div class="w-80"><bpdm-tree-select aria-invalid [options]="options" placeholder="Required" /></div>`,
+    template: `<div class="flex w-80 flex-col gap-1.5">
+  <bpdm-tree-select aria-invalid [options]="options" placeholder="Required" />
+  <p class="text-sm text-destructive">Select at least one category.</p>
+</div>`,
   }),
   parameters: {
     docs: {
@@ -342,13 +345,18 @@ import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
 @Component({
   selector: 'app-tree-invalid',
   imports: [BpdmTreeSelect],
-  template: \`<bpdm-tree-select aria-invalid [options]="categories" placeholder="Required" />\`,
+  template: \`
+    <div class="flex w-80 flex-col gap-1.5">
+      <bpdm-tree-select aria-invalid [options]="categories" placeholder="Required" />
+      <p class="text-sm text-destructive">Select at least one category.</p>
+    </div>
+  \`,
 })
 export class TreeInvalidComponent {
   categories: TreeNode[] = [
     { value: 'electronics', label: 'Electronics', children: [
       { value: 'iphone', label: 'iPhone 15' },
-      { value: 'pixel', label: 'Pixel 9' },
+      { value: 'macbook', label: 'MacBook Pro' },
     ] },
   ];
 }`,

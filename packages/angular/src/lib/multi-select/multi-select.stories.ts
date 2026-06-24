@@ -18,8 +18,8 @@ const CITIES: SelectItems = [
     label: "🇩🇪 Germany",
     options: [
       { value: "berlin", label: "Berlin" },
-      { value: "frankfurt", label: "Frankfurt" },
       { value: "munich", label: "Munich" },
+      { value: "hamburg", label: "Hamburg" },
     ],
   },
   {
@@ -119,8 +119,10 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
   template: \`<bpdm-multi-select [options]="frameworks" [maxDisplay]="2" [defaultValue]="['react','vue','svelte','solid']" placeholder="Select frameworks" />\`,
 })
 export class MultiOverflowComponent {
-  frameworks: SelectItems = ['React', 'Vue', 'Svelte', 'Solid']
-    .map((label) => ({ value: label.toLowerCase(), label }));
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
     },
@@ -131,7 +133,7 @@ export class MultiOverflowComponent {
 export const CountMode: Story = {
   tags: ["!dev"],
   render: () => ({
-    props: { options: FRAMEWORKS, dv: ["react", "vue", "angular", "svelte", "solid"] },
+    props: { options: FRAMEWORKS, dv: ["react", "vue", "svelte"] },
     template: `<div class="w-80"><bpdm-multi-select [options]="options" [maxDisplay]="0" [defaultValue]="dv" placeholder="Select frameworks" /></div>`,
   }),
   parameters: {
@@ -143,11 +145,12 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-multi-count',
   imports: [BpdmMultiSelect],
-  template: \`<bpdm-multi-select [options]="frameworks" [maxDisplay]="0" [defaultValue]="['react','vue','angular','svelte','solid']" placeholder="Select frameworks" />\`,
+  template: \`<bpdm-multi-select [options]="frameworks" [maxDisplay]="0" [defaultValue]="['react','vue','svelte']" placeholder="Select frameworks" />\`,
 })
 export class MultiCountComponent {
   frameworks: SelectItems = [
-    'React', 'Vue', 'Angular', 'Svelte', 'Solid',
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
   ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
@@ -159,7 +162,7 @@ export class MultiCountComponent {
 export const Grouped: Story = {
   tags: ["!dev"],
   render: () => ({
-    props: { options: CITIES, dv: ["berlin", "munich"] },
+    props: { options: CITIES, dv: ["berlin"] },
     template: `<div class="w-80"><bpdm-multi-select searchable [options]="options" [defaultValue]="dv" placeholder="Select cities" /></div>`,
   }),
   parameters: {
@@ -171,7 +174,7 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-multi-grouped',
   imports: [BpdmMultiSelect],
-  template: \`<bpdm-multi-select searchable [options]="cities" [defaultValue]="['berlin','munich']" placeholder="Select cities" />\`,
+  template: \`<bpdm-multi-select searchable [options]="cities" [defaultValue]="['berlin']" placeholder="Select cities" />\`,
 })
 export class MultiGroupedComponent {
   cities: SelectItems = [
@@ -179,8 +182,8 @@ export class MultiGroupedComponent {
       label: '🇩🇪 Germany',
       options: [
         { value: 'berlin', label: 'Berlin' },
-        { value: 'frankfurt', label: 'Frankfurt' },
         { value: 'munich', label: 'Munich' },
+        { value: 'hamburg', label: 'Hamburg' },
       ],
     },
     {
@@ -201,8 +204,8 @@ export class MultiGroupedComponent {
 /** 10,000 options — virtualized, multi-select stays smooth. */
 export const LargeDataset_10k: Story = {
   render: () => ({
-    props: { options: BIG, dv: ["3", "7"] },
-    template: `<div class="w-80"><bpdm-multi-select [options]="options" [defaultValue]="dv" placeholder="Pick from 10,000" /></div>`,
+    props: { options: BIG },
+    template: `<div class="w-80"><bpdm-multi-select searchable [maxDisplay]="3" [options]="options" placeholder="Pick records" searchPlaceholder="Type a number…" /></div>`,
   }),
   parameters: {
     docs: {
@@ -213,12 +216,12 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-multi-big',
   imports: [BpdmMultiSelect],
-  template: \`<bpdm-multi-select [options]="options" placeholder="Pick from 10,000" />\`,
+  template: \`<bpdm-multi-select searchable [maxDisplay]="3" [options]="options" placeholder="Pick records" searchPlaceholder="Type a number…" />\`,
 })
 export class MultiBigComponent {
   options: SelectItems = Array.from({ length: 10000 }, (_, i) => ({
     value: String(i),
-    label: \`Record #\${i + 1}\`,
+    label: \`Record #\${(i + 1).toLocaleString()}\`,
   }));
 }`,
       },
@@ -231,7 +234,10 @@ export const Invalid: Story = {
   tags: ["!dev"],
   render: () => ({
     props: { options: FRAMEWORKS },
-    template: `<div class="w-80"><bpdm-multi-select aria-invalid [options]="options" placeholder="Required" /></div>`,
+    template: `<div class="flex w-80 flex-col gap-1.5">
+  <bpdm-multi-select aria-invalid [options]="options" placeholder="Required" />
+  <p class="text-sm text-destructive">Select at least one.</p>
+</div>`,
   }),
   parameters: {
     docs: {
@@ -242,13 +248,18 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-multi-invalid',
   imports: [BpdmMultiSelect],
-  template: \`<bpdm-multi-select aria-invalid [options]="options" placeholder="Required" />\`,
+  template: \`
+    <div class="flex w-80 flex-col gap-1.5">
+      <bpdm-multi-select aria-invalid [options]="frameworks" placeholder="Required" />
+      <p class="text-sm text-destructive">Select at least one.</p>
+    </div>
+  \`,
 })
 export class MultiInvalidComponent {
-  options: SelectItems = [
-    { value: 'react', label: 'React' },
-    { value: 'vue', label: 'Vue' },
-  ];
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
     },
