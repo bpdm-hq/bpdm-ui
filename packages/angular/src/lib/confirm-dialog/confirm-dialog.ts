@@ -50,7 +50,7 @@ const EXIT = "animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in_forwards]"
       (dismiss)="cancel.emit()"
     />
     <ng-template #footerTpl>
-      <button bpdmButton variant="ghost" (click)="cancel.emit()">{{ cancelText() }}</button>
+      <button bpdmButton variant="secondary" appearance="ghost" (click)="cancel.emit()">{{ cancelText() }}</button>
       <button
         bpdmButton
         [variant]="destructive() ? 'destructive' : 'primary'"

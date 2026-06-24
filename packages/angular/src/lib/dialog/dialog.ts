@@ -54,7 +54,7 @@ export class BpdmDialogFooter {}
  *   <button bpdmButton bpdmDialogTrigger>Edit project</button>
  *   <ng-template bpdmDialogBody>…</ng-template>
  *   <ng-template bpdmDialogFooter>
- *     <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+ *     <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
  *     <button bpdmButton bpdmDialogClose>Save</button>
  *   </ng-template>
  * </bpdm-dialog>

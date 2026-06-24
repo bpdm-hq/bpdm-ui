@@ -58,7 +58,7 @@ function Row() {
     <div className="flex flex-wrap items-center gap-3">
       <Button>Primary</Button>
       <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
+      <Button variant="secondary" appearance="outline">Outline</Button>
       <Button variant="destructive">Destructive</Button>
     </div>
   );
@@ -125,7 +125,7 @@ function Sample() {
       <div className="flex flex-wrap items-center gap-2">
         <Button>Primary</Button>
         <Button variant="secondary">Secondary</Button>
-        <Button variant="outline">Outline</Button>
+        <Button variant="secondary" appearance="outline">Outline</Button>
       </div>
       <Input placeholder="you@company.com" className="max-w-xs" />
       {/* a white card lifting off the page */}

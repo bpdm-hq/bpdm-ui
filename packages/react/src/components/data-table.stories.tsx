@@ -1007,7 +1007,7 @@ const columns: DataTableColumn<Member>[] = [
   { id: "tasks", header: "Tasks", width: 100, numeric: true, sortable: true, accessor: (r) => r.tasks },
   // right-pinned block (last in the array)
   { id: "actions", header: "", pin: "right", width: 120, align: "right",
-    cell: () => <Button size="sm" variant="ghost">View</Button> },
+    cell: () => <Button size="sm" variant="secondary" appearance="ghost">View</Button> },
 ];
 
 const data: Member[] = [
@@ -1038,7 +1038,7 @@ export function Example() {
         width: 120,
         align: "right",
         cell: () => (
-          <Button size="sm" variant="ghost" onClick={(e) => e.stopPropagation()}>
+          <Button size="sm" variant="secondary" appearance="ghost" onClick={(e) => e.stopPropagation()}>
             View
           </Button>
         ),

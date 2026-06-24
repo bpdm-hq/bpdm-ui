@@ -16,7 +16,7 @@ import { cardVariants, cn, type CardVariants } from "@bpdm/variants";
  *   <bpdm-card-header>
  *     <h3 bpdmCardTitle>Deployment</h3>
  *     <p bpdmCardDescription>Triggered 2 minutes ago</p>
- *     <button bpdmButton size="iconSm" variant="ghost" bpdmCardAction aria-label="Menu">⋯</button>
+ *     <button bpdmButton size="iconSm" variant="secondary" appearance="ghost" bpdmCardAction aria-label="Menu">⋯</button>
  *   </bpdm-card-header>
  *   <div bpdmCardContent>Build #482 is rolling out to production.</div>
  *   <div bpdmCardFooter divider><button bpdmButton size="sm">View logs</button></div>

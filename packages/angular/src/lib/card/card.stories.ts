@@ -140,7 +140,7 @@ export const Advanced: Story = {
   </bpdm-card-header>
   <div bpdmCardContent>${BODY}</div>
   <div bpdmCardFooter>
-    <button bpdmButton variant="outline" class="flex-1">Cancel</button>
+    <button bpdmButton variant="secondary" appearance="outline" class="flex-1">Cancel</button>
     <button bpdmButton class="flex-1">Save</button>
   </div>
 </bpdm-card>`,
@@ -173,7 +173,7 @@ import {
         without overwhelming the reader.
       </div>
       <div bpdmCardFooter>
-        <button bpdmButton variant="outline" class="flex-1">Cancel</button>
+        <button bpdmButton variant="secondary" appearance="outline" class="flex-1">Cancel</button>
         <button bpdmButton class="flex-1">Save</button>
       </div>
     </bpdm-card>

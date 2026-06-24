@@ -29,7 +29,7 @@ import { Dialog, DialogClose } from "@bpdm/ui";
   title="Edit project"
   description="Update the project details."
   footer={<>
-    <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+    <DialogClose asChild><Button variant="secondary" appearance="ghost">Cancel</Button></DialogClose>
     <Button>Save</Button>
   </>}
 >
@@ -79,7 +79,7 @@ const meta: Meta<typeof Dialog> = {
       footer={
         <>
           <DialogClose asChild>
-            <Button variant="ghost">Cancel</Button>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button>Save changes</Button>
@@ -123,7 +123,7 @@ export function Example() {
           title={\`Size: \${size}\`}
           description="The panel width adapts to the size prop."
           trigger={
-            <Button variant="outline" className="uppercase">
+            <Button variant="secondary" appearance="outline" className="uppercase">
               {size}
             </Button>
           }
@@ -151,7 +151,7 @@ export function Example() {
           title={`Size: ${size}`}
           description="The panel width adapts to the size prop."
           trigger={
-            <Button variant="outline" className="uppercase">
+            <Button variant="secondary" appearance="outline" className="uppercase">
               {size}
             </Button>
           }
@@ -268,7 +268,7 @@ export function Example() {
           footer={
             <>
               <DialogClose asChild>
-                <Button variant="ghost">Cancel</Button>
+                <Button variant="secondary" appearance="ghost">Cancel</Button>
               </DialogClose>
               <DialogClose asChild>
                 <Button>Create</Button>
@@ -365,7 +365,7 @@ export function Example() {
     <Dialog
       title="Terms of service"
       description="Please review before continuing."
-      trigger={<Button variant="outline">Open long content</Button>}
+      trigger={<Button variant="secondary" appearance="outline">Open long content</Button>}
       footer={
         <DialogClose asChild>
           <Button>Accept</Button>
@@ -390,7 +390,7 @@ export function Example() {
     <Dialog
       title="Terms of service"
       description="Please review before continuing."
-      trigger={<Button variant="outline">Open long content</Button>}
+      trigger={<Button variant="secondary" appearance="outline">Open long content</Button>}
       footer={
         <DialogClose asChild>
           <Button>Accept</Button>

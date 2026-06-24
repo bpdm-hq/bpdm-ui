@@ -62,7 +62,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
         description={o.description}
         footer={
           <>
-            <Button variant="ghost" onClick={() => settle(false)}>
+            <Button variant="secondary" appearance="ghost" onClick={() => settle(false)}>
               {o.cancelText ?? "Cancel"}
             </Button>
             <Button

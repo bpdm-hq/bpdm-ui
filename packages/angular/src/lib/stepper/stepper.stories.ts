@@ -18,7 +18,7 @@ import {
   imports: [BpdmButton],
   template: `
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">
         Back
       </button>
       @if (s.isLast()) {
@@ -339,7 +339,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -396,7 +396,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -455,7 +455,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -515,7 +515,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -619,7 +619,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -693,7 +693,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -750,7 +750,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {
@@ -817,7 +817,7 @@ import {
   imports: [BpdmButton],
   template: \`
     <div class="mt-4 flex items-center justify-between">
-      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
       @if (s.isLast()) {
         <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
       } @else {

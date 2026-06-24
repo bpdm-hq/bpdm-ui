@@ -17,7 +17,7 @@ const INITIAL_TAGS = ["Frontend", "Backend", "Design", "Infra", "Docs"];
         <bpdm-badge variant="neutral" removable (removed)="drop(t)">{{ t }}</bpdm-badge>
       }
       @if (tags().length === 0) {
-        <button bpdmButton size="sm" variant="ghost" (click)="reset()">Reset</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="reset()">Reset</button>
       }
     </div>
   `,
@@ -39,24 +39,24 @@ class BadgeRemovableDemo {
   imports: [BpdmBadge, BpdmNotificationBadge, BpdmButton],
   template: `
     <div class="flex items-center gap-6">
-      <button bpdmButton size="icon" variant="ghost" aria-label="Notifications">
+      <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
         <bpdm-notification-badge [count]="count()">
           <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         </bpdm-notification-badge>
       </button>
-      <button bpdmButton size="icon" variant="ghost" aria-label="Inbox">
+      <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
         <bpdm-notification-badge [count]="128" [max]="99">
           <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         </bpdm-notification-badge>
       </button>
-      <button bpdmButton size="icon" variant="ghost" aria-label="Status">
+      <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Status">
         <bpdm-notification-badge dot variant="success">
           <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         </bpdm-notification-badge>
       </button>
       <div class="flex items-center gap-2">
-        <button bpdmButton size="sm" variant="outline" (click)="count.set(count() + 1)">Add</button>
-        <button bpdmButton size="sm" variant="ghost" (click)="count.set(0)">Clear</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="count.set(count() + 1)">Add</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="count.set(0)">Clear</button>
       </div>
     </div>
   `,
@@ -215,7 +215,7 @@ const INITIAL = ['Frontend', 'Backend', 'Design', 'Infra', 'Docs'];
         <bpdm-badge variant="neutral" removable (removed)="drop(t)">{{ t }}</bpdm-badge>
       }
       @if (tags().length === 0) {
-        <button bpdmButton size="sm" variant="ghost" (click)="reset()">Reset</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="reset()">Reset</button>
       }
     </div>
   \`,
@@ -243,13 +243,13 @@ import { BpdmNotificationBadge, BpdmButton } from '@bpdm/ng';
   selector: 'app-badge-notifications',
   imports: [BpdmNotificationBadge, BpdmButton],
   template: \`
-    <button bpdmButton size="icon" variant="ghost" aria-label="Notifications">
+    <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
       <bpdm-notification-badge [count]="count()"><svg><!-- bell --></svg></bpdm-notification-badge>
     </button>
-    <button bpdmButton size="icon" variant="ghost" aria-label="Inbox">
+    <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
       <bpdm-notification-badge [count]="128" [max]="99"><svg><!-- mail --></svg></bpdm-notification-badge>
     </button>
-    <button bpdmButton size="icon" variant="ghost" aria-label="Status">
+    <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Status">
       <bpdm-notification-badge dot variant="success"><svg><!-- bell --></svg></bpdm-notification-badge>
     </button>
   \`,

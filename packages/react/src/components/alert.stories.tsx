@@ -132,7 +132,7 @@ export const WithActions: Story = {
         action={
           <>
             <Button size="sm">Upgrade plan</Button>
-            <Button size="sm" variant="ghost">
+            <Button size="sm" variant="secondary" appearance="ghost">
               Manage members
             </Button>
           </>
@@ -155,7 +155,7 @@ export function Example() {
       action={
         <>
           <Button size="sm">Upgrade plan</Button>
-          <Button size="sm" variant="ghost">Manage members</Button>
+          <Button size="sm" variant="secondary" appearance="ghost">Manage members</Button>
         </>
       }
     >
@@ -184,7 +184,7 @@ export const Dismissible: Story = {
             We emailed an invitation to the new project member.
           </Alert>
         ) : (
-          <Button variant="ghost" onClick={() => setOpen(true)}>
+          <Button variant="secondary" appearance="ghost" onClick={() => setOpen(true)}>
             Show alert again
           </Button>
         )}
@@ -204,7 +204,7 @@ export function Example() {
       We emailed an invitation to the new project member.
     </Alert>
   ) : (
-    <Button variant="ghost" onClick={() => setOpen(true)}>
+    <Button variant="secondary" appearance="ghost" onClick={() => setOpen(true)}>
       Show alert again
     </Button>
   );

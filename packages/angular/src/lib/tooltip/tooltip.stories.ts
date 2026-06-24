@@ -41,7 +41,7 @@ const meta: Meta<BpdmTooltip> = {
     template: `<div class="flex min-h-24 items-center justify-center">
   <button
     bpdmButton
-    variant="outline"
+    variant="secondary" appearance="outline"
     [bpdmTooltip]="content"
     [bpdmTooltipSide]="side"
     [bpdmTooltipAlign]="align"
@@ -67,7 +67,7 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
 @Component({
   selector: 'app-tooltip-demo',
   imports: [BpdmButton, BpdmTooltip],
-  template: \`<button bpdmButton variant="outline" bpdmTooltip="Copy address">Hover me</button>\`,
+  template: \`<button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Copy address">Hover me</button>\`,
 })
 export class TooltipDemoComponent {}`,
       },
@@ -81,7 +81,7 @@ export const Sides: Story = {
     template: `<div class="grid place-items-center gap-6 py-8">
   <div class="flex gap-4">
     @for (side of ['top', 'right', 'bottom', 'left']; track side) {
-      <button bpdmButton variant="outline" class="capitalize" [bpdmTooltip]="'Side: ' + side" [bpdmTooltipSide]="side">
+      <button bpdmButton variant="secondary" appearance="outline" class="capitalize" [bpdmTooltip]="'Side: ' + side" [bpdmTooltipSide]="side">
         {{ side }}
       </button>
     }
@@ -100,7 +100,7 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
   template: \`
     <div class="flex gap-4">
       @for (side of sides; track side) {
-        <button bpdmButton variant="outline" class="capitalize" [bpdmTooltip]="'Side: ' + side" [bpdmTooltipSide]="side">
+        <button bpdmButton variant="secondary" appearance="outline" class="capitalize" [bpdmTooltip]="'Side: ' + side" [bpdmTooltipSide]="side">
           {{ side }}
         </button>
       }
@@ -120,7 +120,7 @@ export const OnIconButton: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="flex min-h-24 items-center justify-center">
-  <button bpdmButton size="icon" variant="ghost" aria-label="Info" bpdmTooltip="Only your team can see this project">
+  <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Info" bpdmTooltip="Only your team can see this project">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
       <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
     </svg>
@@ -137,7 +137,7 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
   selector: 'app-tooltip-icon',
   imports: [BpdmButton, BpdmTooltip],
   template: \`
-    <button bpdmButton size="icon" variant="ghost" aria-label="Info"
+    <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Info"
       bpdmTooltip="Only your team can see this project">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round" class="size-5">
@@ -156,7 +156,7 @@ export class TooltipIconComponent {}`,
 export const RichContent: Story = {
   render: () => ({
     template: `<div class="flex min-h-28 items-center justify-center">
-  <button bpdmButton variant="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
+  <button bpdmButton variant="secondary" appearance="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
   <ng-template #rich>
     <div class="space-y-1">
       <p class="font-medium text-foreground">Auto-sync</p>
@@ -175,7 +175,7 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
   selector: 'app-tooltip-rich',
   imports: [BpdmButton, BpdmTooltip],
   template: \`
-    <button bpdmButton variant="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
+    <button bpdmButton variant="secondary" appearance="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
     <ng-template #rich>
       <div class="space-y-1">
         <p class="font-medium text-foreground">Auto-sync</p>
@@ -198,11 +198,11 @@ export const Disabled: Story = {
   render: () => ({
     template: `<div class="flex min-h-24 items-center justify-center gap-12">
   <div class="flex flex-col items-center gap-2">
-    <button bpdmButton variant="outline" bpdmTooltip="Saves your changes">Tooltip on</button>
+    <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes">Tooltip on</button>
     <span class="text-xs text-muted-foreground">hover → tooltip shows</span>
   </div>
   <div class="flex flex-col items-center gap-2">
-    <button bpdmButton variant="outline" bpdmTooltip="Saves your changes" [bpdmTooltipDisabled]="true">Tooltip off</button>
+    <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes" [bpdmTooltipDisabled]="true">Tooltip off</button>
     <span class="text-xs text-muted-foreground">disabled → nothing on hover</span>
   </div>
 </div>`,
@@ -219,10 +219,10 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
   template: \`
     <div class="flex gap-10">
       <!-- tooltip on → shows on hover -->
-      <button bpdmButton variant="outline" bpdmTooltip="Saves your changes">Tooltip on</button>
+      <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes">Tooltip on</button>
 
       <!-- disabled → tooltip suppressed; the button still works -->
-      <button bpdmButton variant="outline" bpdmTooltip="Saves your changes" bpdmTooltipDisabled>Tooltip off</button>
+      <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes" bpdmTooltipDisabled>Tooltip off</button>
     </div>
   \`,
 })

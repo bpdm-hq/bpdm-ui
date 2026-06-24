@@ -33,7 +33,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="flex justify-between">
-      <Button variant="ghost" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button onClick={complete}>Finish</Button>  // marks every step done
         : <Button onClick={next}>Next</Button>}
@@ -69,7 +69,7 @@ function Nav({ onFinish }: { onFinish?: () => void }) {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex items-center justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>
         Back
       </Button>
       {isLast ? (
@@ -96,7 +96,7 @@ function GateNav({ canNext, onFinish }: { canNext: boolean; onFinish?: () => voi
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex items-center justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>
         Back
       </Button>
       {isLast ? (
@@ -189,7 +189,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>  // every step shows a check
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -264,7 +264,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -324,7 +324,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -424,7 +424,7 @@ function GateNav({ canNext, onFinish }) {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={() => { complete(); onFinish?.(); }}>Finish</Button>
         : <Button size="sm" onClick={next} disabled={!canNext}>Next</Button>}
@@ -556,7 +556,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -631,7 +631,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -717,7 +717,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}
@@ -797,7 +797,7 @@ function Nav() {
   const { isFirst, isLast, next, back, complete } = useStepper();
   return (
     <div className="mt-4 flex justify-between">
-      <Button variant="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
       {isLast
         ? <Button size="sm" onClick={complete}>Finish</Button>
         : <Button size="sm" onClick={next}>Next</Button>}

@@ -122,7 +122,7 @@ export const OverlayInCard: Story = {
           <p className="mt-1 text-xs text-success">+8.2% this week</p>
           <LoadingOverlay show={loading} label="Fetching…" size="md" />
         </div>
-        <Button size="sm" variant="outline" onClick={refetch}>
+        <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
           Refetch
         </Button>
       </div>
@@ -148,7 +148,7 @@ export function Example() {
         <p className="mt-1 text-xs text-success">+8.2% this week</p>
         <LoadingOverlay show={loading} label="Fetching…" size="md" />
       </div>
-      <Button size="sm" variant="outline" onClick={refetch}>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
         Refetch
       </Button>
     </div>
@@ -182,7 +182,7 @@ export const InlineValue: Story = {
           </div>
           <p className="mt-1 text-xs text-success">+8.2% this week</p>
         </div>
-        <Button size="sm" variant="outline" onClick={refetch}>
+        <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
           Refetch amount
         </Button>
       </div>
@@ -214,7 +214,7 @@ export function Example() {
         </div>
         <p className="mt-1 text-xs text-success">+8.2% this week</p>
       </div>
-      <Button size="sm" variant="outline" onClick={refetch}>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
         Refetch amount
       </Button>
     </div>
@@ -342,7 +342,7 @@ export const InButton: Story = {
       <Button disabled>
         <Spinner size="sm" className="text-current" /> Saving…
       </Button>
-      <Button variant="outline" disabled>
+      <Button variant="secondary" appearance="outline" disabled>
         <Spinner size="sm" variant="dots" className="text-current" /> Loading
       </Button>
     </div>
@@ -358,7 +358,7 @@ export function Example() {
       <Button disabled>
         <Spinner size="sm" className="text-current" /> Saving…
       </Button>
-      <Button variant="outline" disabled>
+      <Button variant="secondary" appearance="outline" disabled>
         <Spinner size="sm" variant="dots" className="text-current" /> Loading
       </Button>
     </div>

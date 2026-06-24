@@ -19,7 +19,7 @@ pass \`content\` and wrap any focusable element.
 import { Tooltip } from "@bpdm/ui";
 
 <Tooltip content="Copy address">
-  <Button size="icon" variant="ghost" aria-label="Copy"><CopyIcon /></Button>
+  <Button size="icon" variant="secondary" appearance="ghost" aria-label="Copy"><CopyIcon /></Button>
 </Tooltip>
 \`\`\`
 
@@ -59,7 +59,7 @@ const meta: Meta<typeof Tooltip> = {
   render: (args) => (
     <div className="flex min-h-24 items-center justify-center">
       <Tooltip {...args}>
-        <Button variant="outline">Hover me</Button>
+        <Button variant="secondary" appearance="outline">Hover me</Button>
       </Tooltip>
     </div>
   ),
@@ -81,7 +81,7 @@ export function Example() {
     <div className="flex gap-4">
       {(["top", "right", "bottom", "left"] as const).map((side) => (
         <Tooltip key={side} content={\`Side: \${side}\`} side={side}>
-          <Button variant="outline" className="capitalize">
+          <Button variant="secondary" appearance="outline" className="capitalize">
             {side}
           </Button>
         </Tooltip>
@@ -97,7 +97,7 @@ export function Example() {
       <div className="flex gap-4">
         {(["top", "right", "bottom", "left"] as const).map((side) => (
           <Tooltip key={side} content={`Side: ${side}`} side={side}>
-            <Button variant="outline" className="capitalize">
+            <Button variant="secondary" appearance="outline" className="capitalize">
               {side}
             </Button>
           </Tooltip>
@@ -119,7 +119,7 @@ import { Button, Tooltip } from "@bpdm/ui";
 export function Example() {
   return (
     <Tooltip content="Only your team can see this project">
-      <Button size="icon" variant="ghost" aria-label="Info">
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Info">
         <Info className="size-5" />
       </Button>
     </Tooltip>
@@ -131,7 +131,7 @@ export function Example() {
   render: () => (
     <div className="flex min-h-24 items-center justify-center">
       <Tooltip content="Only your team can see this project">
-        <Button size="icon" variant="ghost" aria-label="Info">
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Info">
           <Info className="size-5" />
         </Button>
       </Tooltip>
@@ -156,7 +156,7 @@ export function Example() {
         </div>
       }
     >
-      <Button variant="outline">Sync info</Button>
+      <Button variant="secondary" appearance="outline">Sync info</Button>
     </Tooltip>
   );
 }`,
@@ -174,7 +174,7 @@ export function Example() {
           </div>
         }
       >
-        <Button variant="outline">Sync info</Button>
+        <Button variant="secondary" appearance="outline">Sync info</Button>
       </Tooltip>
     </div>
   ),
@@ -195,12 +195,12 @@ export function Example() {
     <div className="flex gap-10">
       {/* tooltip on → shows on hover */}
       <Tooltip content="Saves your changes">
-        <Button variant="outline">Tooltip on</Button>
+        <Button variant="secondary" appearance="outline">Tooltip on</Button>
       </Tooltip>
 
       {/* disabled → tooltip suppressed; the button still works */}
       <Tooltip content="Saves your changes" disabled>
-        <Button variant="outline">Tooltip off</Button>
+        <Button variant="secondary" appearance="outline">Tooltip off</Button>
       </Tooltip>
     </div>
   );
@@ -212,13 +212,13 @@ export function Example() {
     <div className="flex min-h-24 items-center justify-center gap-12">
       <div className="flex flex-col items-center gap-2">
         <Tooltip content="Saves your changes">
-          <Button variant="outline">Tooltip on</Button>
+          <Button variant="secondary" appearance="outline">Tooltip on</Button>
         </Tooltip>
         <span className="text-xs text-muted-foreground">hover → tooltip shows</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <Tooltip content="Saves your changes" disabled>
-          <Button variant="outline">Tooltip off</Button>
+          <Button variant="secondary" appearance="outline">Tooltip off</Button>
         </Tooltip>
         <span className="text-xs text-muted-foreground">disabled → nothing on hover</span>
       </div>

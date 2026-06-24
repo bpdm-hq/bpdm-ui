@@ -9,7 +9,7 @@ import { buttonVariants, cn, type ButtonVariants } from "@bpdm/variants";
  *
  * ```html
  * <button bpdmButton variant="primary" (click)="save()">Save changes</button>
- * <a bpdmButton variant="ghost" href="/docs">Read the docs</a>
+ * <a bpdmButton variant="secondary" appearance="ghost" href="/docs">Read the docs</a>
  * ```
  *
  * The variant classes come from the shared `@bpdm/variants` package — the same
@@ -25,8 +25,10 @@ import { buttonVariants, cn, type ButtonVariants } from "@bpdm/variants";
   },
 })
 export class BpdmButton {
-  /** Visual style. */
+  /** Colour / severity. */
   readonly variant = input<NonNullable<ButtonVariants["variant"]>>("primary");
+  /** Visual style — `solid` (filled), `outline` (border), or `ghost` (no border/fill). */
+  readonly appearance = input<NonNullable<ButtonVariants["appearance"]>>("solid");
   /** Text sizes (`sm`/`md`/`lg`), square icon sizes (`iconSm`/`icon`/`iconLg`), or `none` to opt out. */
   readonly size = input<NonNullable<ButtonVariants["size"]>>("md");
   /** Corner shape — `default` (token radius) or `round` (pill / circle). */
@@ -38,6 +40,7 @@ export class BpdmButton {
     cn(
       buttonVariants({
         variant: this.variant(),
+        appearance: this.appearance(),
         size: this.size(),
         shape: this.shape(),
       }),

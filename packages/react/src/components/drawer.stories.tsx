@@ -26,7 +26,7 @@ import { Drawer, DrawerClose } from "@bpdm/ui";
   trigger={<Button>Open</Button>}
   title="Edit project"
   footer={<>
-    <DrawerClose asChild><Button variant="ghost">Cancel</Button></DrawerClose>
+    <DrawerClose asChild><Button variant="secondary" appearance="ghost">Cancel</Button></DrawerClose>
     <Button>Save</Button>
   </>}
 >
@@ -78,7 +78,7 @@ const meta: Meta<typeof Drawer> = {
       footer={
         <>
           <DrawerClose asChild>
-            <Button variant="ghost">Cancel</Button>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
           </DrawerClose>
           <DrawerClose asChild>
             <Button>Save changes</Button>
@@ -121,7 +121,7 @@ export function Example() {
           title={\`\${side} drawer\`}
           description={\`Slides in from the \${side}.\`}
           trigger={
-            <Button variant="outline" className="capitalize">
+            <Button variant="secondary" appearance="outline" className="capitalize">
               {side}
             </Button>
           }
@@ -149,7 +149,7 @@ export function Example() {
           title={`${side} drawer`}
           description={`Slides in from the ${side}.`}
           trigger={
-            <Button variant="outline" className="capitalize">
+            <Button variant="secondary" appearance="outline" className="capitalize">
               {side}
             </Button>
           }
@@ -219,7 +219,7 @@ export function Example() {
           footer={
             <>
               <DrawerClose asChild>
-                <Button variant="ghost">Cancel</Button>
+                <Button variant="secondary" appearance="ghost">Cancel</Button>
               </DrawerClose>
               <DrawerClose asChild>
                 <Button>Create</Button>
