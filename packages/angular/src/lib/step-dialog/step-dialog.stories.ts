@@ -80,6 +80,7 @@ closed, and \`(complete)\` fires on Finish.
 
 const meta: Meta = {
   title: "Overlay/StepDialog",
+  component: BpdmStepDialog,
   decorators: [moduleMetadata({ imports: [StepDemo] })],
   tags: ["autodocs"],
   parameters: { docs: { description: { component: usage } } },

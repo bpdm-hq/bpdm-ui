@@ -15,6 +15,7 @@ import { BpdmTooltip } from "./tooltip";
  */
 const meta: Meta<BpdmTooltip> = {
   title: "Overlay/Tooltip",
+  component: BpdmTooltip,
   decorators: [moduleMetadata({ imports: [BpdmTooltip, BpdmButton] })],
   tags: ["autodocs"],
   argTypes: {

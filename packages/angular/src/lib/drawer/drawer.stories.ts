@@ -31,6 +31,7 @@ const DRAWER_IMPORTS = [
  */
 const meta: Meta<BpdmDrawer> = {
   title: "Overlay/Drawer",
+  component: BpdmDrawer,
   decorators: [moduleMetadata({ imports: DRAWER_IMPORTS })],
   tags: ["autodocs"],
   argTypes: {
@@ -220,4 +221,52 @@ export const WithForm: Story = {
   </ng-template>
 </bpdm-drawer>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import {
+  BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerClose, BpdmDrawerFooter, BpdmDrawerTrigger,
+  BpdmInput, BpdmSelect, SelectItems,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-new-project-drawer',
+  imports: [
+    BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerClose, BpdmDrawerFooter, BpdmDrawerTrigger,
+    BpdmInput, BpdmSelect,
+  ],
+  template: \`
+    <bpdm-drawer side="right" title="New project" description="Dropdowns portal out — fully clickable.">
+      <button bpdmButton bpdmDrawerTrigger>New project</button>
+      <ng-template bpdmDrawerBody>
+        <div class="space-y-3">
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium">Name</label>
+            <input bpdmInput value="Q3 Planning" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium">Visibility</label>
+            <bpdm-select searchable [options]="visibility" defaultValue="team" />
+          </div>
+        </div>
+      </ng-template>
+      <ng-template bpdmDrawerFooter>
+        <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+        <button bpdmButton bpdmDrawerClose>Create</button>
+      </ng-template>
+    </bpdm-drawer>
+  \`,
+})
+export class NewProjectDrawerComponent {
+  visibility: SelectItems = [
+    { value: 'private', label: 'Private' },
+    { value: 'team', label: 'Team' },
+    { value: 'org', label: 'Organization' },
+    { value: 'public', label: 'Public' },
+  ];
+}`,
+      },
+    },
+  },
 };

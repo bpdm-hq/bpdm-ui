@@ -59,6 +59,7 @@ class RadioSizesDemo {
  */
 const meta: Meta<BpdmRadioGroup> = {
   title: "Selection/RadioGroup",
+  component: BpdmRadioGroup,
   decorators: [
     moduleMetadata({
       imports: [BpdmRadioGroup, BpdmRadio, RadioPlanDemo, RadioHorizontalDemo, RadioSizesDemo],

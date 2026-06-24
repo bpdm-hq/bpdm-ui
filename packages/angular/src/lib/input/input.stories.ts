@@ -16,6 +16,7 @@ const MAIL = ic(`<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7
  */
 const meta: Meta<BpdmInput> = {
   title: "Inputs/Input",
+  component: BpdmInput,
   decorators: [moduleMetadata({ imports: [BpdmInput] })],
   tags: ["autodocs"],
   argTypes: {

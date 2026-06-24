@@ -85,6 +85,7 @@ class SpinnerFullPageDemo {
  */
 const meta: Meta<BpdmSpinner> = {
   title: "Feedback/Spinner",
+  component: BpdmSpinner,
   decorators: [
     moduleMetadata({
       imports: [

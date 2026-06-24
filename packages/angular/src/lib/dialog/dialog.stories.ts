@@ -35,6 +35,7 @@ const DIALOG_IMPORTS = [
  */
 const meta: Meta<BpdmDialog> = {
   title: "Overlay/Dialog",
+  component: BpdmDialog,
   decorators: [moduleMetadata({ imports: DIALOG_IMPORTS })],
   tags: ["autodocs"],
   argTypes: {
@@ -305,4 +306,71 @@ export const WithDropdowns: Story = {
   </ng-template>
 </bpdm-dialog>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import {
+  BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFooter, BpdmDialogTrigger,
+  BpdmSelect, BpdmMultiSelect, BpdmTreeSelect, SelectItems, TreeNode,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-new-project',
+  imports: [
+    BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFooter, BpdmDialogTrigger,
+    BpdmSelect, BpdmMultiSelect, BpdmTreeSelect,
+  ],
+  template: \`
+    <bpdm-dialog size="sm" title="New project" description="Every dropdown portals out — clickable, scrollable, no height change.">
+      <button bpdmButton bpdmDialogTrigger>New project</button>
+      <ng-template bpdmDialogBody>
+        <div class="space-y-3">
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium">Visibility</label>
+            <bpdm-select searchable [maxHeight]="150" [options]="visibility" defaultValue="team" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium">Labels</label>
+            <bpdm-multi-select searchable [maxHeight]="150" [options]="labels" [defaultValue]="['frontend']" placeholder="Add labels" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium">Category</label>
+            <bpdm-tree-select searchable [maxHeight]="170" [options]="categories" placeholder="Pick categories" />
+          </div>
+        </div>
+      </ng-template>
+      <ng-template bpdmDialogFooter>
+        <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+        <button bpdmButton bpdmDialogClose>Create</button>
+      </ng-template>
+    </bpdm-dialog>
+  \`,
+})
+export class NewProjectComponent {
+  visibility: SelectItems = [
+    { value: 'private', label: 'Private' },
+    { value: 'team', label: 'Team' },
+    { value: 'org', label: 'Organization' },
+    { value: 'public', label: 'Public' },
+  ];
+  labels: SelectItems = [
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'design', label: 'Design' },
+  ];
+  categories: TreeNode[] = [
+    { value: 'engineering', label: 'Engineering', children: [
+      { value: 'web', label: 'Web' },
+      { value: 'mobile', label: 'Mobile' },
+    ] },
+    { value: 'product', label: 'Product', children: [
+      { value: 'design', label: 'Design' },
+      { value: 'research', label: 'Research' },
+    ] },
+  ];
+}`,
+      },
+    },
+  },
 };

@@ -42,6 +42,7 @@ const BODY =
  */
 const meta: Meta<BpdmCard> = {
   title: "Data Display/Card",
+  component: BpdmCard,
   decorators: [moduleMetadata({ imports: CARD_PARTS })],
   tags: ["autodocs"],
   argTypes: {

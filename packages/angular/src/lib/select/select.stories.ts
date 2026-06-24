@@ -77,7 +77,28 @@ export default meta;
 
 type Story = StoryObj<BpdmSelect>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmSelect, SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select',
+  imports: [BpdmSelect],
+  template: \`<bpdm-select [options]="frameworks" placeholder="Select a framework" />\`,
+})
+export class SelectComponent {
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
+}`,
+      },
+    },
+  },
+};
 
 /** Type to filter the list. */
 export const Searchable: Story = {
@@ -131,6 +152,41 @@ export class SelectBigComponent {
 export const Groups: Story = {
   tags: ["!dev"],
   args: { options: CITIES, placeholder: "Select a city" },
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmSelect, SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select-groups',
+  imports: [BpdmSelect],
+  template: \`<bpdm-select placeholder="Select a city" [options]="cities" />\`,
+})
+export class SelectGroupsComponent {
+  cities: SelectItems = [
+    {
+      label: '🇩🇪 Germany',
+      options: [
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'frankfurt', label: 'Frankfurt' },
+        { value: 'hamburg', label: 'Hamburg' },
+        { value: 'munich', label: 'Munich' },
+      ],
+    },
+    {
+      label: '🇺🇸 USA',
+      options: [
+        { value: 'nyc', label: 'New York' },
+        { value: 'la', label: 'Los Angeles' },
+        { value: 'chicago', label: 'Chicago' },
+      ],
+    },
+  ];
+}`,
+      },
+    },
+  },
 };
 
 /** Three sizes. */
@@ -144,6 +200,31 @@ export const Sizes: Story = {
   <bpdm-select size="lg" [options]="options" placeholder="Large" />
 </div>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmSelect, SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select-sizes',
+  imports: [BpdmSelect],
+  template: \`
+    <bpdm-select size="sm" [options]="options" placeholder="Small" />
+    <bpdm-select size="md" [options]="options" placeholder="Medium" />
+    <bpdm-select size="lg" [options]="options" placeholder="Large" />
+  \`,
+})
+export class SelectSizesComponent {
+  options: SelectItems = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}`,
+      },
+    },
+  },
 };
 
 /** Invalid state (red border). */
@@ -153,4 +234,24 @@ export const Invalid: Story = {
     props: { options: FRAMEWORKS },
     template: `<div class="w-72"><bpdm-select aria-invalid [options]="options" placeholder="Required" /></div>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmSelect, SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select-invalid',
+  imports: [BpdmSelect],
+  template: \`<bpdm-select aria-invalid [options]="options" placeholder="Required" />\`,
+})
+export class SelectInvalidComponent {
+  options: SelectItems = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+  ];
+}`,
+      },
+    },
+  },
 };

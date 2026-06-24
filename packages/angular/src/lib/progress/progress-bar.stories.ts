@@ -82,6 +82,7 @@ class ProgressInCardDemo {
  */
 const meta: Meta<BpdmProgressBar> = {
   title: "Feedback/ProgressBar",
+  component: BpdmProgressBar,
   decorators: [
     moduleMetadata({
       imports: [BpdmProgressBar, ProgressDynamicDemo, ProgressInCardDemo],

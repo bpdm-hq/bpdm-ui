@@ -9,6 +9,7 @@ import { BpdmButton } from "./button";
  */
 const meta: Meta<BpdmButton> = {
   title: "Actions/Button",
+  component: BpdmButton,
   decorators: [moduleMetadata({ imports: [BpdmButton] })],
   tags: ["autodocs"],
   argTypes: {

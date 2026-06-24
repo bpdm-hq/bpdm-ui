@@ -310,6 +310,7 @@ const ALL = [
 
 const meta: Meta = {
   title: "Navigation/Stepper",
+  component: BpdmStepper,
   decorators: [moduleMetadata({ imports: ALL })],
   tags: ["autodocs"],
   parameters: { docs: { description: { component: usage } } },
@@ -318,31 +319,543 @@ export default meta;
 
 type Story = StoryObj;
 
-export const Horizontal: Story = { render: () => ({ template: `<demo-stepper-horizontal />` }) };
+export const Horizontal: Story = {
+  render: () => ({ template: `<demo-stepper-horizontal />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
+  template: \`
+    <bpdm-stepper defaultValue="1">
+      <bpdm-step-list>
+        <bpdm-step value="1">Account</bpdm-step>
+        <bpdm-step value="2">Workspace</bpdm-step>
+        <bpdm-step value="3">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="1">Tell us who you are — name and email.</bpdm-step-panel>
+        <bpdm-step-panel value="2">Name your workspace and pick a URL.</bpdm-step-panel>
+        <bpdm-step-panel value="3">Everything looks good — review and finish.</bpdm-step-panel>
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+  \`,
+})
+export class StepperExample {}`,
+      },
+    },
+  },
+};
 /** Content sits inline under each step header. */
-export const Vertical: Story = { render: () => ({ template: `<demo-stepper-vertical />` }) };
+export const Vertical: Story = {
+  render: () => ({ template: `<demo-stepper-vertical />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepItem,
+  BpdmStep,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper-vertical',
+  imports: [BpdmStepper, BpdmStepItem, BpdmStep, BpdmStepPanel, StepNav],
+  template: \`
+    <bpdm-stepper orientation="vertical" defaultValue="1">
+      <bpdm-step-item value="1">
+        <bpdm-step>Account</bpdm-step>
+        <bpdm-step-panel>Tell us who you are — name and email.<app-step-nav /></bpdm-step-panel>
+      </bpdm-step-item>
+      <bpdm-step-item value="2">
+        <bpdm-step>Workspace</bpdm-step>
+        <bpdm-step-panel>Name your workspace and pick a URL.<app-step-nav /></bpdm-step-panel>
+      </bpdm-step-item>
+      <bpdm-step-item value="3">
+        <bpdm-step>Review</bpdm-step>
+        <bpdm-step-panel>Everything looks good — review and finish.<app-step-nav /></bpdm-step-panel>
+      </bpdm-step-item>
+    </bpdm-stepper>
+  \`,
+})
+export class StepperVerticalExample {}`,
+      },
+    },
+  },
+};
 /** Linear — future steps aren't clickable until reached; advance with Next. */
 export const Linear: Story = {
   render: () => ({ template: `<demo-stepper-horizontal [linear]="true" />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper-linear',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
+  template: \`
+    <bpdm-stepper defaultValue="1" linear>
+      <bpdm-step-list>
+        <bpdm-step value="1">Account</bpdm-step>
+        <bpdm-step value="2">Workspace</bpdm-step>
+        <bpdm-step value="3">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="1">Tell us who you are — name and email.</bpdm-step-panel>
+        <bpdm-step-panel value="2">Name your workspace and pick a URL.</bpdm-step-panel>
+        <bpdm-step-panel value="3">Everything looks good — review and finish.</bpdm-step-panel>
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+  \`,
+})
+export class StepperLinearExample {}`,
+      },
+    },
+  },
 };
 /** Gated progression — Next stays disabled until the step's content is valid. */
-export const Validated: Story = { render: () => ({ template: `<demo-stepper-validated />` }) };
+export const Validated: Story = {
+  render: () => ({ template: `<demo-stepper-validated />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject, input, signal } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+  BpdmInput,
+} from '@bpdm/ng';
+
+// Next is disabled until the step is valid; \`linear\` keeps future steps locked.
+@Component({
+  selector: 'app-gate-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()" [disabled]="!canNext()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class GateNav {
+  protected readonly s = inject(BpdmStepper);
+  readonly canNext = input(true);
+}
+
+@Component({
+  selector: 'app-stepper-validated',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, GateNav, BpdmInput],
+  template: \`
+    <bpdm-stepper defaultValue="account" linear lockIndicator>
+      <bpdm-step-list>
+        <bpdm-step value="account">Account</bpdm-step>
+        <bpdm-step value="workspace">Workspace</bpdm-step>
+        <bpdm-step value="review">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="account">
+          <div class="space-y-3 py-2">
+            <input bpdmInput placeholder="Full name" [value]="name()" (input)="name.set($any($event.target).value)" />
+            <input bpdmInput placeholder="Email" type="email" [value]="email()" (input)="email.set($any($event.target).value)" />
+          </div>
+          <app-gate-nav [canNext]="valid()" />
+        </bpdm-step-panel>
+        <bpdm-step-panel value="workspace">
+          Name your workspace and pick a URL.
+          <app-gate-nav [canNext]="true" />
+        </bpdm-step-panel>
+        <bpdm-step-panel value="review">
+          Everything looks good — review and finish.
+          <app-gate-nav [canNext]="true" />
+        </bpdm-step-panel>
+      </bpdm-step-panels>
+    </bpdm-stepper>
+  \`,
+})
+export class StepperValidatedExample {
+  protected readonly name = signal('');
+  protected readonly email = signal('');
+  protected valid(): boolean {
+    return this.name().trim().length > 0 && /.+@.+\\..+/.test(this.email());
+  }
+}`,
+      },
+    },
+  },
+};
 /** Just the progress indicator (no panels) — clickable steps. */
-export const StepsOnly: Story = { render: () => ({ template: `<demo-stepper-steps-only />` }) };
+export const StepsOnly: Story = {
+  render: () => ({ template: `<demo-stepper-steps-only />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmStepper, BpdmStepList, BpdmStep } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-stepper-steps-only',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep],
+  template: \`
+    <bpdm-stepper defaultValue="design">
+      <bpdm-step-list>
+        <bpdm-step value="design">Design</bpdm-step>
+        <bpdm-step value="development">Development</bpdm-step>
+        <bpdm-step value="qa">QA</bpdm-step>
+      </bpdm-step-list>
+    </bpdm-stepper>
+  \`,
+})
+export class StepperStepsOnlyExample {}`,
+      },
+    },
+  },
+};
 /** Custom marker icons + form content. */
-export const Template: Story = { render: () => ({ template: `<demo-stepper-template />` }) };
+export const Template: Story = {
+  render: () => ({ template: `<demo-stepper-template />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+  BpdmInput,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+// Pass any TemplateRef as the step marker via [icon].
+@Component({
+  selector: 'app-stepper-template',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav, BpdmInput],
+  template: \`
+    <bpdm-stepper defaultValue="account">
+      <bpdm-step-list>
+        <bpdm-step value="account" [icon]="user">Account</bpdm-step>
+        <bpdm-step value="preferences" [icon]="sliders">Preferences</bpdm-step>
+        <bpdm-step value="review" [icon]="list">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="account">
+          <div class="space-y-3 py-2">
+            <input bpdmInput placeholder="Full name" />
+            <input bpdmInput placeholder="Email" type="email" />
+          </div>
+        </bpdm-step-panel>
+        <bpdm-step-panel value="preferences">
+          <div class="space-y-3 py-2">
+            <input bpdmInput placeholder="Workspace name" />
+            <input bpdmInput placeholder="URL slug" />
+          </div>
+        </bpdm-step-panel>
+        <bpdm-step-panel value="review">Confirm your details and finish.</bpdm-step-panel>
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+
+    <ng-template #user><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 0 0-16 0" /></svg></ng-template>
+    <ng-template #sliders><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4" /><line x1="10" x2="3" y1="4" y2="4" /><line x1="21" x2="12" y1="12" y2="12" /><line x1="8" x2="3" y1="12" y2="12" /><line x1="21" x2="16" y1="20" y2="20" /><line x1="12" x2="3" y1="20" y2="20" /></svg></ng-template>
+    <ng-template #list><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /><path d="M13 6h8" /><path d="M13 12h8" /><path d="M13 18h8" /></svg></ng-template>
+  \`,
+})
+export class StepperTemplateExample {}`,
+      },
+    },
+  },
+};
 /** As few as two steps. */
 export const TwoSteps: Story = {
   tags: ["!dev"],
   render: () => ({ template: `<demo-stepper-two />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper-two',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
+  template: \`
+    <bpdm-stepper defaultValue="details">
+      <bpdm-step-list>
+        <bpdm-step value="details">Details</bpdm-step>
+        <bpdm-step value="confirm">Confirm</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="details">Enter the details for your new project.</bpdm-step-panel>
+        <bpdm-step-panel value="confirm">Review and confirm to create it.</bpdm-step-panel>
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+  \`,
+})
+export class StepperTwoExample {}`,
+      },
+    },
+  },
 };
 /** Step count is fully configurable — here are five. */
 export const FiveSteps: Story = {
   tags: ["!dev"],
   render: () => ({ template: `<demo-stepper-five />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper-five',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
+  template: \`
+    <bpdm-stepper defaultValue="account">
+      <bpdm-step-list>
+        @for (s of steps; track s.value) {
+          <bpdm-step [value]="s.value">{{ s.label }}</bpdm-step>
+        }
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        @for (s of steps; track s.value) {
+          <bpdm-step-panel [value]="s.value">{{ s.body }}</bpdm-step-panel>
+        }
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+  \`,
+})
+export class StepperFiveExample {
+  protected readonly steps = [
+    { value: 'account', label: 'Account', body: 'Tell us who you are — name and email.' },
+    { value: 'team', label: 'Team', body: 'Invite teammates and assign roles.' },
+    { value: 'project', label: 'Project', body: 'Create your first project.' },
+    { value: 'integrations', label: 'Integrations', body: 'Connect the tools you already use.' },
+    { value: 'review', label: 'Review', body: 'Everything looks good — review and finish.' },
+  ];
+}`,
+      },
+    },
+  },
 };
 /** Controlled from outside — single source of truth in your own state. */
 export const Controlled: Story = {
   tags: ["!dev"],
   render: () => ({ template: `<demo-stepper-controlled />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject, signal } from '@angular/core';
+import {
+  BpdmStepper,
+  BpdmStepList,
+  BpdmStep,
+  BpdmStepPanels,
+  BpdmStepPanel,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'app-step-nav',
+  imports: [BpdmButton],
+  template: \`
+    <div class="mt-4 flex items-center justify-between">
+      <button bpdmButton variant="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+      @if (s.isLast()) {
+        <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+      } @else {
+        <button bpdmButton size="sm" (click)="s.next()">Next</button>
+      }
+    </div>
+  \`,
+})
+export class StepNav {
+  protected readonly s = inject(BpdmStepper);
+}
+
+@Component({
+  selector: 'app-stepper-controlled',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
+  template: \`
+    <p class="text-sm text-muted-foreground">
+      Active step: <span class="font-medium text-foreground">{{ value() }}</span>
+    </p>
+    <bpdm-stepper [value]="value()" (valueChange)="value.set($event)">
+      <bpdm-step-list>
+        <bpdm-step value="1">Account</bpdm-step>
+        <bpdm-step value="2">Workspace</bpdm-step>
+        <bpdm-step value="3">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="1">Step one content.</bpdm-step-panel>
+        <bpdm-step-panel value="2">Step two content.</bpdm-step-panel>
+        <bpdm-step-panel value="3">Step three content.</bpdm-step-panel>
+      </bpdm-step-panels>
+      <app-step-nav />
+    </bpdm-stepper>
+  \`,
+})
+export class StepperControlledExample {
+  protected readonly value = signal('1');
+}`,
+      },
+    },
+  },
 };
