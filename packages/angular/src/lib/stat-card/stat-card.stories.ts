@@ -20,6 +20,7 @@ const ICONS = {
  */
 const meta: Meta<BpdmStatCard> = {
   title: "Data Display/StatCard",
+  component: BpdmStatCard,
   decorators: [moduleMetadata({ imports: [BpdmStatCard] })],
   tags: ["autodocs"],
   argTypes: {

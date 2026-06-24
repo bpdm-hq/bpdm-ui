@@ -11,6 +11,7 @@ import { BpdmButton } from "../button/button";
  */
 const meta: Meta<BpdmAlert> = {
   title: "Feedback/Alert",
+  component: BpdmAlert,
   decorators: [moduleMetadata({ imports: [BpdmAlert, BpdmAlertActions, BpdmButton] })],
   tags: ["autodocs"],
   argTypes: {

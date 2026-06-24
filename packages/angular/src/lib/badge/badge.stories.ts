@@ -73,6 +73,7 @@ class BadgeNotificationsDemo {
  */
 const meta: Meta<BpdmBadge> = {
   title: "Data Display/Badge",
+  component: BpdmBadge,
   decorators: [
     moduleMetadata({
       imports: [

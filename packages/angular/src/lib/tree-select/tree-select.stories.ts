@@ -139,7 +139,44 @@ export default meta;
 
 type Story = StoryObj<BpdmTreeSelect>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-tree',
+  imports: [BpdmTreeSelect],
+  template: \`<bpdm-tree-select [options]="categories" placeholder="Select categories" />\`,
+})
+export class TreeComponent {
+  categories: TreeNode[] = [
+    {
+      value: 'electronics',
+      label: 'Electronics',
+      children: [
+        { value: 'phones', label: 'Phones', children: [
+          { value: 'iphone', label: 'iPhone 15' },
+          { value: 'pixel', label: 'Pixel 9' },
+          { value: 'galaxy', label: 'Galaxy S24' },
+        ] },
+        { value: 'laptops', label: 'Laptops', children: [
+          { value: 'macbook', label: 'MacBook Pro' },
+        ] },
+        { value: 'audio', label: 'Audio', children: [
+          { value: 'airpods', label: 'AirPods Pro' },
+          { value: 'sony', label: 'Sony WH-1000XM5' },
+        ] },
+      ],
+    },
+  ];
+}`,
+      },
+    },
+  },
+};
 
 /** Checking a parent selects all its leaves; partial selection shows indeterminate. */
 export const ParentChild: Story = {
@@ -177,6 +214,33 @@ export class TreeComponent {
 export const Searchable: Story = {
   tags: ["!dev"],
   args: { searchable: true, placeholder: "Search categories" },
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-tree-search',
+  imports: [BpdmTreeSelect],
+  template: \`<bpdm-tree-select searchable [options]="categories" placeholder="Search categories" />\`,
+})
+export class TreeSearchComponent {
+  categories: TreeNode[] = [
+    { value: 'electronics', label: 'Electronics', children: [
+      { value: 'phones', label: 'Phones', children: [
+        { value: 'iphone', label: 'iPhone 15' },
+        { value: 'pixel', label: 'Pixel 9' },
+      ] },
+      { value: 'laptops', label: 'Laptops', children: [
+        { value: 'macbook', label: 'MacBook Pro' },
+      ] },
+    ] },
+  ];
+}`,
+      },
+    },
+  },
 };
 
 /** Many leaves selected — chips overflow into "+N". */
@@ -189,15 +253,77 @@ export const ManySelected: Story = {
     },
     template: `<div class="w-80"><bpdm-tree-select [options]="options" [defaultValue]="dv" placeholder="Select categories" /></div>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-tree-many',
+  imports: [BpdmTreeSelect],
+  template: \`<bpdm-tree-select [options]="categories" [defaultValue]="['iphone','pixel','galaxy','macbook','airpods','sony']" placeholder="Select categories" />\`,
+})
+export class TreeManyComponent {
+  categories: TreeNode[] = [
+    { value: 'electronics', label: 'Electronics', children: [
+      { value: 'phones', label: 'Phones', children: [
+        { value: 'iphone', label: 'iPhone 15' },
+        { value: 'pixel', label: 'Pixel 9' },
+        { value: 'galaxy', label: 'Galaxy S24' },
+      ] },
+      { value: 'laptops', label: 'Laptops', children: [
+        { value: 'macbook', label: 'MacBook Pro' },
+      ] },
+      { value: 'audio', label: 'Audio', children: [
+        { value: 'airpods', label: 'AirPods Pro' },
+        { value: 'sony', label: 'Sony WH-1000XM5' },
+      ] },
+    ] },
+  ];
+}`,
+      },
+    },
+  },
 };
 
-/** `maxDisplay=0` → show a count instead of chips. */
+/** \`maxDisplay=0\` → show a count instead of chips. */
 export const CountMode: Story = {
   tags: ["!dev"],
   render: () => ({
     props: { options: TREE, dv: ["iphone", "pixel", "macbook", "airpods"] },
     template: `<div class="w-80"><bpdm-tree-select [options]="options" [maxDisplay]="0" [defaultValue]="dv" placeholder="Select categories" /></div>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-tree-count',
+  imports: [BpdmTreeSelect],
+  template: \`<bpdm-tree-select [options]="categories" [maxDisplay]="0" [defaultValue]="['iphone','pixel','macbook','airpods']" placeholder="Select categories" />\`,
+})
+export class TreeCountComponent {
+  categories: TreeNode[] = [
+    { value: 'electronics', label: 'Electronics', children: [
+      { value: 'phones', label: 'Phones', children: [
+        { value: 'iphone', label: 'iPhone 15' },
+        { value: 'pixel', label: 'Pixel 9' },
+      ] },
+      { value: 'laptops', label: 'Laptops', children: [
+        { value: 'macbook', label: 'MacBook Pro' },
+      ] },
+      { value: 'audio', label: 'Audio', children: [
+        { value: 'airpods', label: 'AirPods Pro' },
+      ] },
+    ] },
+  ];
+}`,
+      },
+    },
+  },
 };
 
 /** Invalid state (red border). */
@@ -207,4 +333,26 @@ export const Invalid: Story = {
     props: { options: TREE },
     template: `<div class="w-80"><bpdm-tree-select aria-invalid [options]="options" placeholder="Required" /></div>`,
   }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-tree-invalid',
+  imports: [BpdmTreeSelect],
+  template: \`<bpdm-tree-select aria-invalid [options]="categories" placeholder="Required" />\`,
+})
+export class TreeInvalidComponent {
+  categories: TreeNode[] = [
+    { value: 'electronics', label: 'Electronics', children: [
+      { value: 'iphone', label: 'iPhone 15' },
+      { value: 'pixel', label: 'Pixel 9' },
+    ] },
+  ];
+}`,
+      },
+    },
+  },
 };

@@ -17,6 +17,7 @@ import { BpdmPopover, BpdmPopoverClose } from "./popover";
  */
 const meta: Meta<BpdmPopover> = {
   title: "Overlay/Popover",
+  component: BpdmPopover,
   decorators: [moduleMetadata({ imports: [BpdmPopover, BpdmPopoverClose, BpdmButton, BpdmInput] })],
   tags: ["autodocs"],
   argTypes: {

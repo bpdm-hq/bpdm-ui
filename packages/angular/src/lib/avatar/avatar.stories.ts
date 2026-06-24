@@ -25,6 +25,7 @@ const PEOPLE = ["Aria Lindqvist", "Theo Brandt", "Lena Cho", "Mateo Silva", "Ine
  */
 const meta: Meta<BpdmAvatar> = {
   title: "Data Display/Avatar",
+  component: BpdmAvatar,
   decorators: [moduleMetadata({ imports: [BpdmAvatar, BpdmAvatarGroup, BpdmNotificationBadge] })],
   tags: ["autodocs"],
   argTypes: {

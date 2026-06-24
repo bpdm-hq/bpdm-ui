@@ -10,6 +10,7 @@ import { BpdmInput } from "../input/input";
  */
 const meta: Meta<BpdmFloatLabel> = {
   title: "Inputs/FloatLabel",
+  component: BpdmFloatLabel,
   decorators: [moduleMetadata({ imports: [BpdmFloatLabel, BpdmInput] })],
   tags: ["autodocs"],
   argTypes: {

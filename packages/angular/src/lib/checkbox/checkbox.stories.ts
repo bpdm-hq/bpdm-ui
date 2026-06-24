@@ -8,6 +8,7 @@ import { BpdmCheckbox } from "./checkbox";
  */
 const meta: Meta<BpdmCheckbox> = {
   title: "Selection/Checkbox",
+  component: BpdmCheckbox,
   decorators: [moduleMetadata({ imports: [BpdmCheckbox] })],
   tags: ["autodocs"],
   argTypes: {

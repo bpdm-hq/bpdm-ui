@@ -8,6 +8,7 @@ import { BpdmSwitch } from "./switch";
  */
 const meta: Meta<BpdmSwitch> = {
   title: "Selection/Switch",
+  component: BpdmSwitch,
   decorators: [moduleMetadata({ imports: [BpdmSwitch] })],
   tags: ["autodocs"],
   argTypes: {

@@ -32,6 +32,7 @@ class TextareaCountDemo {
  */
 const meta: Meta<BpdmTextarea> = {
   title: "Inputs/Textarea",
+  component: BpdmTextarea,
   decorators: [moduleMetadata({ imports: [BpdmTextarea, TextareaCountDemo] })],
   tags: ["autodocs"],
   argTypes: {
