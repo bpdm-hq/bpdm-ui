@@ -13,35 +13,22 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from "@angular/core";
-import {
-  ConnectedPosition,
-  ConnectionPositionPair,
-  Overlay,
-  OverlayRef,
-} from "@angular/cdk/overlay";
+import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
+import {
+  connectedPositions,
+  OVERLAY_ARROW,
+  OVERLAY_ORIGIN,
+  type OverlayAlign,
+  type OverlaySide,
+  sideFromPair,
+} from "../overlay/overlay";
 
-export type TooltipSide = "top" | "right" | "bottom" | "left";
-export type TooltipAlign = "start" | "center" | "end";
+export type TooltipSide = OverlaySide;
+export type TooltipAlign = OverlayAlign;
 
 let uid = 0;
-
-// the side the bubble grows from — so the pop-in scales out of the trigger edge
-const ORIGIN: Record<TooltipSide, string> = {
-  top: "origin-bottom",
-  bottom: "origin-top",
-  left: "origin-right",
-  right: "origin-left",
-};
-
-// where the little arrow sits + how it's rotated to point back at the trigger
-const ARROW: Record<TooltipSide, string> = {
-  top: "absolute left-1/2 top-full -translate-x-1/2",
-  bottom: "absolute left-1/2 bottom-full -translate-x-1/2 rotate-180",
-  left: "absolute top-1/2 left-full -translate-y-1/2 -rotate-90",
-  right: "absolute top-1/2 right-full -translate-y-1/2 rotate-90",
-};
 
 /**
  * Internal bubble rendered into the CDK overlay. Not part of the public API —
@@ -81,61 +68,19 @@ class BpdmTooltipContent {
   readonly id = input("");
   readonly boxClassInput = input("");
 
-  protected readonly arrowClass = computed(() => ARROW[this.side()]);
+  protected readonly arrowClass = computed(() => OVERLAY_ARROW[this.side()]);
 
   protected readonly boxClass = computed(() =>
     cn(
       "relative z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
-      ORIGIN[this.side()],
+      OVERLAY_ORIGIN[this.side()],
       this.closing()
-        ? "animate-[bpdm-pop-out_100ms_ease-in]"
+        ? // `forwards` holds the faded-out frame until teardown (no snap-back flicker)
+          "animate-[bpdm-pop-out_100ms_ease-in_forwards]"
         : "animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)]",
       this.boxClassInput(),
     ),
   );
-}
-
-function onePosition(
-  side: TooltipSide,
-  align: TooltipAlign,
-  offset: number,
-): ConnectedPosition {
-  if (side === "top" || side === "bottom") {
-    const x = align === "center" ? "center" : align === "start" ? "start" : "end";
-    const base = { originX: x, overlayX: x } as const;
-    return side === "top"
-      ? { ...base, originY: "top", overlayY: "bottom", offsetY: -offset }
-      : { ...base, originY: "bottom", overlayY: "top", offsetY: offset };
-  }
-  const y = align === "center" ? "center" : align === "start" ? "top" : "bottom";
-  const base = { originY: y, overlayY: y } as const;
-  return side === "left"
-    ? { ...base, originX: "start", overlayX: "end", offsetX: -offset }
-    : { ...base, originX: "end", overlayX: "start", offsetX: offset };
-}
-
-const OPPOSITE: Record<TooltipSide, TooltipSide> = {
-  top: "bottom",
-  bottom: "top",
-  left: "right",
-  right: "left",
-};
-
-// primary placement, plus the opposite side as a flip fallback when space is tight
-function buildPositions(
-  side: TooltipSide,
-  align: TooltipAlign,
-  offset: number,
-): ConnectedPosition[] {
-  return [onePosition(side, align, offset), onePosition(OPPOSITE[side], align, offset)];
-}
-
-// recover which side CDK actually settled on (it may have flipped) so the arrow follows
-function sideFromPair(p: ConnectionPositionPair): TooltipSide {
-  const vertical =
-    p.originY !== p.overlayY && p.originY !== "center" && p.overlayY !== "center";
-  if (vertical) return p.overlayY === "bottom" ? "top" : "bottom";
-  return p.overlayX === "end" ? "left" : "right";
 }
 
 /**
@@ -229,7 +174,7 @@ export class BpdmTooltip implements OnDestroy {
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this.host)
-      .withPositions(buildPositions(this.side(), this.align(), this.offset()));
+      .withPositions(connectedPositions(this.side(), this.align(), this.offset()));
 
     this.overlayRef = this.overlay.create({
       positionStrategy,
