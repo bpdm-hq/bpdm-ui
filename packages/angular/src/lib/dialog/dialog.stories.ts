@@ -243,7 +243,7 @@ export class DialogControlledComponent {
 };
 
 /** Select / MultiSelect / TreeSelect all work inside the dialog — each dropdown
- * portals out and stays clickable + scrollable without changing the dialog's height. */
+ * portals into the dialog and stays clickable + scrollable without changing the dialog's height. */
 export const WithDropdowns: Story = {
   render: () => ({
     props: {
@@ -282,7 +282,7 @@ export const WithDropdowns: Story = {
         },
       ],
     },
-    template: `<bpdm-dialog size="sm" title="New project" description="Every dropdown portals out — clickable, scrollable, no height change.">
+    template: `<bpdm-dialog size="sm" title="New project" description="Every dropdown portals into the dialog — clickable, scrollable, no height change.">
   <button bpdmButton bpdmDialogTrigger>New project</button>
   <ng-template bpdmDialogBody>
     <div class="space-y-3">
@@ -322,7 +322,7 @@ import {
     BpdmSelect, BpdmMultiSelect, BpdmTreeSelect,
   ],
   template: \`
-    <bpdm-dialog size="sm" title="New project" description="Every dropdown portals out — clickable, scrollable, no height change.">
+    <bpdm-dialog size="sm" title="New project" description="Every dropdown portals into the dialog — clickable, scrollable, no height change.">
       <button bpdmButton bpdmDialogTrigger>New project</button>
       <ng-template bpdmDialogBody>
         <div class="space-y-3">

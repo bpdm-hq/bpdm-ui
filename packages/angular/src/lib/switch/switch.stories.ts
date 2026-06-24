@@ -185,7 +185,7 @@ export const WithLabel: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<label class="flex cursor-pointer items-center gap-3 text-sm">
-  <bpdm-switch [checked]="true" /> Enable notifications
+  <bpdm-switch [checked]="true" /> Airplane mode
 </label>`,
   }),
   parameters: {
@@ -200,12 +200,12 @@ import { BpdmSwitch } from '@bpdm/ng';
   imports: [BpdmSwitch, FormsModule],
   template: \`
     <label class="flex cursor-pointer items-center gap-3 text-sm">
-      <bpdm-switch [(ngModel)]="notify" /> Enable notifications
+      <bpdm-switch [(ngModel)]="airplane" /> Airplane mode
     </label>
   \`,
 })
 export class SwitchLabelComponent {
-  notify = true;
+  airplane = true;
 }`,
       },
     },
@@ -216,18 +216,18 @@ export class SwitchLabelComponent {
 export const SettingsList: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<div class="w-80 divide-y divide-border rounded-xl border border-border">
-  <div class="flex items-center justify-between p-4">
-    <div><p class="text-sm font-medium">Email notifications</p><p class="text-xs text-muted-foreground">Weekly product digest</p></div>
+    template: `<div class="flex w-72 flex-col gap-4 text-sm">
+  <div class="flex items-center justify-between gap-8">
+    <label class="cursor-pointer">Two-factor authentication</label>
     <bpdm-switch [checked]="true" />
   </div>
-  <div class="flex items-center justify-between p-4">
-    <div><p class="text-sm font-medium">Two-factor auth</p><p class="text-xs text-muted-foreground">Extra account security</p></div>
-    <bpdm-switch [checked]="true" />
-  </div>
-  <div class="flex items-center justify-between p-4">
-    <div><p class="text-sm font-medium">Public profile</p><p class="text-xs text-muted-foreground">Visible to anyone</p></div>
+  <div class="flex items-center justify-between gap-8">
+    <label class="cursor-pointer">Email notifications</label>
     <bpdm-switch />
+  </div>
+  <div class="flex items-center justify-between gap-8">
+    <label class="cursor-pointer">Beta features</label>
+    <bpdm-switch [checked]="true" />
   </div>
 </div>`,
   }),
@@ -241,15 +241,19 @@ import { BpdmSwitch } from '@bpdm/ng';
   selector: 'app-switch-settings',
   imports: [BpdmSwitch],
   template: \`
-    <div class="w-80 divide-y divide-border rounded-xl border border-border">
-      <div class="flex items-center justify-between p-4">
-        <div>
-          <p class="text-sm font-medium">Email notifications</p>
-          <p class="text-xs text-muted-foreground">Weekly product digest</p>
-        </div>
+    <div class="flex w-72 flex-col gap-4 text-sm">
+      <div class="flex items-center justify-between gap-8">
+        <label class="cursor-pointer">Two-factor authentication</label>
         <bpdm-switch [checked]="true" />
       </div>
-      <!-- …more rows… -->
+      <div class="flex items-center justify-between gap-8">
+        <label class="cursor-pointer">Email notifications</label>
+        <bpdm-switch />
+      </div>
+      <div class="flex items-center justify-between gap-8">
+        <label class="cursor-pointer">Beta features</label>
+        <bpdm-switch [checked]="true" />
+      </div>
     </div>
   \`,
 })

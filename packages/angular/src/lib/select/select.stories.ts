@@ -115,8 +115,10 @@ import { BpdmSelect, SelectItems } from '@bpdm/ng';
   template: \`<bpdm-select searchable [options]="frameworks" placeholder="Search frameworks" />\`,
 })
 export class SelectSearchComponent {
-  frameworks: SelectItems = ['React', 'Vue', 'Angular', 'Svelte']
-    .map((label) => ({ value: label.toLowerCase(), label }));
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
     },
@@ -151,7 +153,7 @@ export class SelectBigComponent {
 /** Grouped options with bold headers. */
 export const Groups: Story = {
   tags: ["!dev"],
-  args: { options: CITIES, placeholder: "Select a city" },
+  args: { options: CITIES, placeholder: "Select a City" },
   parameters: {
     docs: {
       source: {
@@ -161,7 +163,7 @@ import { BpdmSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-select-groups',
   imports: [BpdmSelect],
-  template: \`<bpdm-select placeholder="Select a city" [options]="cities" />\`,
+  template: \`<bpdm-select placeholder="Select a City" [options]="cities" />\`,
 })
 export class SelectGroupsComponent {
   cities: SelectItems = [
@@ -195,9 +197,9 @@ export const Sizes: Story = {
   render: () => ({
     props: { options: FRAMEWORKS },
     template: `<div class="w-72 space-y-3">
-  <bpdm-select size="sm" [options]="options" placeholder="Small" />
-  <bpdm-select size="md" [options]="options" placeholder="Medium" />
-  <bpdm-select size="lg" [options]="options" placeholder="Large" />
+  <bpdm-select size="sm" [options]="options" placeholder="Size sm" />
+  <bpdm-select size="md" [options]="options" placeholder="Size md" />
+  <bpdm-select size="lg" [options]="options" placeholder="Size lg" />
 </div>`,
   }),
   parameters: {
@@ -210,17 +212,16 @@ import { BpdmSelect, SelectItems } from '@bpdm/ng';
   selector: 'app-select-sizes',
   imports: [BpdmSelect],
   template: \`
-    <bpdm-select size="sm" [options]="options" placeholder="Small" />
-    <bpdm-select size="md" [options]="options" placeholder="Medium" />
-    <bpdm-select size="lg" [options]="options" placeholder="Large" />
+    <bpdm-select size="sm" [options]="frameworks" placeholder="Size sm" />
+    <bpdm-select size="md" [options]="frameworks" placeholder="Size md" />
+    <bpdm-select size="lg" [options]="frameworks" placeholder="Size lg" />
   \`,
 })
 export class SelectSizesComponent {
-  options: SelectItems = [
-    { value: 'react', label: 'React' },
-    { value: 'vue', label: 'Vue' },
-    { value: 'angular', label: 'Angular' },
-  ];
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
     },
@@ -243,13 +244,13 @@ import { BpdmSelect, SelectItems } from '@bpdm/ng';
 @Component({
   selector: 'app-select-invalid',
   imports: [BpdmSelect],
-  template: \`<bpdm-select aria-invalid [options]="options" placeholder="Required" />\`,
+  template: \`<bpdm-select aria-invalid [options]="frameworks" placeholder="Required" />\`,
 })
 export class SelectInvalidComponent {
-  options: SelectItems = [
-    { value: 'react', label: 'React' },
-    { value: 'vue', label: 'Vue' },
-  ];
+  frameworks: SelectItems = [
+    'React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Qwik', 'Preact',
+    'Ember', 'Lit', 'Alpine', 'Next.js', 'Remix', 'Astro', 'Nuxt',
+  ].map((label) => ({ value: label.toLowerCase(), label }));
 }`,
       },
     },

@@ -60,7 +60,7 @@ export class FloatLabelDemoComponent {
 export const Variants: Story = {
   render: () => ({
     template: `<div class="flex w-80 flex-col gap-6 pt-2">
-  <bpdm-float-label label="Over (default)" variant="over" htmlFor="fl-over"><input bpdmInput id="fl-over" /></bpdm-float-label>
+  <bpdm-float-label label="Over" variant="over" htmlFor="fl-over"><input bpdmInput id="fl-over" /></bpdm-float-label>
   <bpdm-float-label label="In" variant="in" htmlFor="fl-in"><input bpdmInput id="fl-in" /></bpdm-float-label>
   <bpdm-float-label label="On the border" variant="on" htmlFor="fl-on"><input bpdmInput id="fl-on" /></bpdm-float-label>
 </div>`,
@@ -76,7 +76,7 @@ import { BpdmFloatLabel, BpdmInput } from '@bpdm/ng';
   imports: [BpdmFloatLabel, BpdmInput],
   template: \`
     <div class="flex w-80 flex-col gap-6">
-      <bpdm-float-label label="Over (default)" variant="over" htmlFor="a"><input bpdmInput id="a" /></bpdm-float-label>
+      <bpdm-float-label label="Over" variant="over" htmlFor="a"><input bpdmInput id="a" /></bpdm-float-label>
       <bpdm-float-label label="In" variant="in" htmlFor="b"><input bpdmInput id="b" /></bpdm-float-label>
       <bpdm-float-label label="On the border" variant="on" htmlFor="c"><input bpdmInput id="c" /></bpdm-float-label>
     </div>
@@ -93,8 +93,8 @@ export const Filled: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="w-80 pt-2">
-  <bpdm-float-label label="Full name" htmlFor="fl-filled">
-    <input bpdmInput id="fl-filled" value="Ada Lovelace" />
+  <bpdm-float-label label="Email" variant="on" htmlFor="fl-filled">
+    <input bpdmInput id="fl-filled" type="email" value="ada@bpdm.dev" />
   </bpdm-float-label>
 </div>`,
   }),
@@ -108,8 +108,8 @@ import { BpdmFloatLabel, BpdmInput } from '@bpdm/ng';
   selector: 'app-floatlabel-filled',
   imports: [BpdmFloatLabel, BpdmInput],
   template: \`
-    <bpdm-float-label label="Full name" htmlFor="name">
-      <input bpdmInput id="name" value="Ada Lovelace" />
+    <bpdm-float-label label="Email" variant="on" htmlFor="email">
+      <input bpdmInput id="email" type="email" value="ada@bpdm.dev" />
     </bpdm-float-label>
   \`,
 })

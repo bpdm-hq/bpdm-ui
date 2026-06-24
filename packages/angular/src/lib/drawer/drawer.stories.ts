@@ -190,7 +190,7 @@ export class DrawerControlledComponent {
   },
 };
 
-/** A form inside the drawer — the Select dropdown portals out and stays clickable. */
+/** A form inside the drawer — the Select dropdown portals into the drawer and stays clickable. */
 export const WithForm: Story = {
   render: () => ({
     props: {
@@ -201,7 +201,7 @@ export const WithForm: Story = {
         { value: "public", label: "Public" },
       ],
     },
-    template: `<bpdm-drawer side="right" title="New project" description="Dropdowns portal out — fully clickable.">
+    template: `<bpdm-drawer side="right" title="New project" description="Dropdowns portal into the drawer — fully clickable.">
   <button bpdmButton bpdmDrawerTrigger>New project</button>
   <ng-template bpdmDrawerBody>
     <div class="space-y-3">
@@ -237,7 +237,7 @@ import {
     BpdmInput, BpdmSelect,
   ],
   template: \`
-    <bpdm-drawer side="right" title="New project" description="Dropdowns portal out — fully clickable.">
+    <bpdm-drawer side="right" title="New project" description="Dropdowns portal into the drawer — fully clickable.">
       <button bpdmButton bpdmDrawerTrigger>New project</button>
       <ng-template bpdmDrawerBody>
         <div class="space-y-3">

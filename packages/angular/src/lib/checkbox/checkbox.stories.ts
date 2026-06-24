@@ -119,7 +119,7 @@ export class CheckboxSizesComponent {}`,
 export const WithLabel: Story = {
   render: () => ({
     template: `<label class="flex cursor-pointer items-center gap-2 text-sm">
-  <bpdm-checkbox [checked]="true" /> Email me about product updates
+  <bpdm-checkbox [checked]="true" /> Accept terms &amp; conditions
 </label>`,
   }),
   parameters: {
@@ -134,12 +134,12 @@ import { BpdmCheckbox } from '@bpdm/ng';
   imports: [BpdmCheckbox, FormsModule],
   template: \`
     <label class="flex cursor-pointer items-center gap-2 text-sm">
-      <bpdm-checkbox [(ngModel)]="subscribed" /> Email me about product updates
+      <bpdm-checkbox [(ngModel)]="accepted" /> Accept terms &amp; conditions
     </label>
   \`,
 })
 export class CheckboxLabelComponent {
-  subscribed = true;
+  accepted = true;
 }`,
       },
     },
@@ -151,10 +151,9 @@ export const Group: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="flex flex-col gap-3 text-sm">
-  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Analytics</label>
-  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Deployments</label>
-  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> Billing</label>
-  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> Team activity</label>
+  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Email notifications</label>
+  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> SMS notifications</label>
+  <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Push notifications</label>
 </div>`,
   }),
   parameters: {
@@ -168,10 +167,9 @@ import { BpdmCheckbox } from '@bpdm/ng';
   imports: [BpdmCheckbox],
   template: \`
     <div class="flex flex-col gap-3 text-sm">
-      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Analytics</label>
-      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Deployments</label>
-      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> Billing</label>
-      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> Team activity</label>
+      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Email notifications</label>
+      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox /> SMS notifications</label>
+      <label class="flex cursor-pointer items-center gap-2"><bpdm-checkbox [checked]="true" /> Push notifications</label>
     </div>
   \`,
 })
@@ -185,9 +183,12 @@ export class CheckboxGroupComponent {}`,
 export const Invalid: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<label class="flex cursor-pointer items-center gap-2 text-sm">
-  <bpdm-checkbox aria-invalid="true" /> I accept the terms (required)
-</label>`,
+    template: `<div class="flex flex-col gap-1.5">
+  <label class="flex cursor-pointer items-center gap-2 text-sm">
+    <bpdm-checkbox aria-invalid="true" /> I agree to the processing of my data
+  </label>
+  <p class="text-sm text-destructive">You must agree to continue.</p>
+</div>`,
   }),
   parameters: {
     docs: {
@@ -199,9 +200,12 @@ import { BpdmCheckbox } from '@bpdm/ng';
   selector: 'app-checkbox-invalid',
   imports: [BpdmCheckbox],
   template: \`
-    <label class="flex cursor-pointer items-center gap-2 text-sm">
-      <bpdm-checkbox aria-invalid="true" /> I accept the terms (required)
-    </label>
+    <div class="flex flex-col gap-1.5">
+      <label class="flex cursor-pointer items-center gap-2 text-sm">
+        <bpdm-checkbox aria-invalid="true" /> I agree to the processing of my data
+      </label>
+      <p class="text-sm text-destructive">You must agree to continue.</p>
+    </div>
   \`,
 })
 export class CheckboxInvalidComponent {}`,
