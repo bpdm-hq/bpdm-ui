@@ -50,6 +50,7 @@ In your global `styles.css`:
 ```css
 @import "tailwindcss";
 @import "@bpdm/tokens/tokens.css";              /* design tokens + themes */
+@import "@angular/cdk/overlay-prebuilt.css";    /* required for overlays (tooltip, …) */
 @source "../node_modules/@bpdm/ng";             /* the components */
 @source "../node_modules/@bpdm/variants/dist";  /* the shared variant classes */
 ```
@@ -90,6 +91,8 @@ ship as element components (`<bpdm-card>`).
 ## Components
 
 **Actions** — `bpdmButton`
+
+**Overlay** — `bpdmTooltip`
 
 _More components are landing incrementally; track progress on **[ui.bpdm.dev](https://ui.bpdm.dev)**._
 
