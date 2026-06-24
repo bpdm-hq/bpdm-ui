@@ -599,7 +599,7 @@ function ColumnFilterMenu({
           </div>
           <div className="flex items-center justify-between border-t border-border pt-2">
             <Button
-              variant="ghost"
+              variant="secondary" appearance="ghost"
               size="sm"
               onClick={() => {
                 onClear();
@@ -699,7 +699,7 @@ function ColumnFilterMenu({
         </button>
         <div className="flex items-center justify-between pt-0.5">
           <Button
-            variant="ghost"
+            variant="secondary" appearance="ghost"
             size="sm"
             onClick={() => {
               onClear();
@@ -816,7 +816,7 @@ function ChevronButton({
   );
   return (
     <Button
-      variant="ghost"
+      variant="secondary" appearance="ghost"
       size={text ? "sm" : "iconSm"}
       aria-label={label}
       disabled={disabled}
@@ -910,7 +910,8 @@ function NumberedFooter({
             ) : (
               <Button
                 key={p}
-                variant={p === page ? "primary" : "ghost"}
+                variant={p === page ? "primary" : "secondary"}
+                appearance={p === page ? "solid" : "ghost"}
                 size="sm"
                 aria-current={p === page ? "page" : undefined}
                 onClick={() => onPage(p)}
@@ -1525,7 +1526,7 @@ export function DataTable<T>({
           <div className="flex items-center gap-2">
             {(query || hasActiveFilters) && (
               <Button
-                variant="outline"
+                variant="secondary" appearance="outline"
                 size="sm"
                 className="gap-1.5"
                 onClick={() => {
@@ -1539,7 +1540,7 @@ export function DataTable<T>({
             )}
             {orderChanged && (
               <Button
-                variant="ghost"
+                variant="secondary" appearance="ghost"
                 size="sm"
                 onClick={() => {
                   setColumnOrder([]);

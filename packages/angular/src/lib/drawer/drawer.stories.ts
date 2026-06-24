@@ -65,7 +65,7 @@ const meta: Meta<BpdmDrawer> = {
     </div>
   </ng-template>
   <ng-template bpdmDrawerFooter>
-    <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDrawerClose>Cancel</button>
     <button bpdmButton bpdmDrawerClose>Save changes</button>
   </ng-template>
 </bpdm-drawer>`,
@@ -95,7 +95,7 @@ import { BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerClose, BpdmDrawerFoot
         </div>
       </ng-template>
       <ng-template bpdmDrawerFooter>
-        <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+        <button bpdmButton variant="secondary" appearance="ghost" bpdmDrawerClose>Cancel</button>
         <button bpdmButton bpdmDrawerClose>Save changes</button>
       </ng-template>
     </bpdm-drawer>
@@ -114,7 +114,7 @@ export const Sides: Story = {
     template: `<div class="flex flex-wrap gap-3">
   @for (side of sides; track side) {
     <bpdm-drawer [side]="side" [title]="side + ' drawer'" [description]="'Slides in from the ' + side + '.'">
-      <button bpdmButton variant="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
+      <button bpdmButton variant="secondary" appearance="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
       <ng-template bpdmDrawerBody><p class="text-sm text-muted-foreground">Drawer body content.</p></ng-template>
       <ng-template bpdmDrawerFooter><button bpdmButton bpdmDrawerClose>Done</button></ng-template>
     </bpdm-drawer>
@@ -134,7 +134,7 @@ import { BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerClose, BpdmDrawerFoot
     <div class="flex flex-wrap gap-3">
       @for (side of sides; track side) {
         <bpdm-drawer [side]="side" [title]="side + ' drawer'" [description]="'Slides in from the ' + side + '.'">
-          <button bpdmButton variant="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
+          <button bpdmButton variant="secondary" appearance="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
           <ng-template bpdmDrawerBody><p class="text-sm text-muted-foreground">Drawer body content.</p></ng-template>
           <ng-template bpdmDrawerFooter><button bpdmButton bpdmDrawerClose>Done</button></ng-template>
         </bpdm-drawer>
@@ -216,7 +216,7 @@ export const WithForm: Story = {
     </div>
   </ng-template>
   <ng-template bpdmDrawerFooter>
-    <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDrawerClose>Cancel</button>
     <button bpdmButton bpdmDrawerClose>Create</button>
   </ng-template>
 </bpdm-drawer>`,
@@ -252,7 +252,7 @@ import {
         </div>
       </ng-template>
       <ng-template bpdmDrawerFooter>
-        <button bpdmButton variant="ghost" bpdmDrawerClose>Cancel</button>
+        <button bpdmButton variant="secondary" appearance="ghost" bpdmDrawerClose>Cancel</button>
         <button bpdmButton bpdmDrawerClose>Create</button>
       </ng-template>
     </bpdm-drawer>

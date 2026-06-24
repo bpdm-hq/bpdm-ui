@@ -173,7 +173,7 @@ export const Removable: Story = {
           </Badge>
         ))}
         {tags.length === 0 && (
-          <Button size="sm" variant="ghost" onClick={() => setTags(["Frontend", "Backend", "Design", "Infra", "Docs"])}>
+          <Button size="sm" variant="secondary" appearance="ghost" onClick={() => setTags(["Frontend", "Backend", "Design", "Infra", "Docs"])}>
             Reset
           </Button>
         )}
@@ -202,7 +202,7 @@ export function Example() {
         </Badge>
       ))}
       {tags.length === 0 && (
-        <Button size="sm" variant="ghost" onClick={() => setTags(INITIAL)}>
+        <Button size="sm" variant="secondary" appearance="ghost" onClick={() => setTags(INITIAL)}>
           Reset
         </Button>
       )}
@@ -220,29 +220,29 @@ export const Notifications: Story = {
     const [count, setCount] = useState(3);
     return (
       <div className="flex items-center gap-6">
-        <Button size="icon" variant="ghost" aria-label="Notifications">
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
           <NotificationBadge count={count}>
             <Bell />
           </NotificationBadge>
         </Button>
 
-        <Button size="icon" variant="ghost" aria-label="Inbox">
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
           <NotificationBadge count={128} max={99}>
             <Mail />
           </NotificationBadge>
         </Button>
 
-        <Button size="icon" variant="ghost" aria-label="Status">
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Status">
           <NotificationBadge dot variant="success">
             <Bell />
           </NotificationBadge>
         </Button>
 
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => setCount((c) => c + 1)}>
+          <Button size="sm" variant="secondary" appearance="outline" onClick={() => setCount((c) => c + 1)}>
             Add
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => setCount(0)}>
+          <Button size="sm" variant="secondary" appearance="ghost" onClick={() => setCount(0)}>
             Clear
           </Button>
         </div>
@@ -258,13 +258,13 @@ import { Button, NotificationBadge } from "@bpdm/ui";
 export function Example() {
   return (
     <>
-      <Button size="icon" variant="ghost" aria-label="Notifications">
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
         <NotificationBadge count={8}><Bell /></NotificationBadge>
       </Button>
-      <Button size="icon" variant="ghost" aria-label="Inbox">
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
         <NotificationBadge count={128} max={99}><Mail /></NotificationBadge>
       </Button>
-      <Button size="icon" variant="ghost" aria-label="Status">
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Status">
         <NotificationBadge dot variant="success"><Bell /></NotificationBadge>
       </Button>
     </>

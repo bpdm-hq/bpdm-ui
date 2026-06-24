@@ -6,18 +6,33 @@ import {
   Stories,
   Title,
 } from "@storybook/addon-docs/blocks";
-import { ArrowRight, Heart, Plus, Search } from "lucide-react";
+import { ArrowRight, Bell, Check, Download, Heart, Mail, Plus, Search, Star, Trash2 } from "lucide-react";
 import { Button } from "./button";
 
+// one distinct icon per severity — used by the icon-only matrix
+const SEVERITY_ICONS = [
+  { variant: "primary", label: "Add", icon: <Plus className="size-4" /> },
+  { variant: "secondary", label: "Favorite", icon: <Star className="size-4" /> },
+  { variant: "success", label: "Confirm", icon: <Check className="size-4" /> },
+  { variant: "info", label: "Notifications", icon: <Bell className="size-4" /> },
+  { variant: "warning", label: "Download", icon: <Download className="size-4" /> },
+  { variant: "help", label: "Messages", icon: <Mail className="size-4" /> },
+  { variant: "destructive", label: "Delete", icon: <Trash2 className="size-4" /> },
+  { variant: "contrast", label: "Like", icon: <Heart className="size-4" /> },
+] as const;
+
 const usage = `
-Accessible button built with class-variance-authority. Supports \`variant\`,
-\`size\`, \`shape\`, and \`asChild\` (render as a link, etc).
+Accessible button built with class-variance-authority. Two independent axes —
+\`variant\` (colour / severity) and \`appearance\` (\`solid\` / \`outline\` / \`ghost\`) —
+plus \`size\`, \`shape\`, and \`asChild\`.
 
 \`\`\`tsx
 import { Button } from "@bpdm/ui";
 
 <Button>Save</Button>
-<Button variant="outline" size="lg">Cancel</Button>
+<Button variant="success">Publish</Button>
+<Button variant="destructive" appearance="outline">Delete</Button>
+<Button variant="secondary" appearance="ghost">Cancel</Button>
 
 // icon-only — always give an aria-label
 <Button size="icon" aria-label="Search"><SearchIcon /></Button>
@@ -30,6 +45,11 @@ import { Button } from "@bpdm/ui";
 \`\`\`
 `;
 
+const COLORS = [
+  "primary", "secondary", "success", "info",
+  "warning", "help", "destructive", "contrast",
+] as const;
+
 const meta: Meta<typeof Button> = {
   title: "Actions/Button",
   component: Button,
@@ -37,8 +57,6 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: { component: usage },
-      // custom Docs layout: interactive "Playground" on top, then the
-      // example stories below (Playground excluded from that list).
       page: () => (
         <>
           <Title />
@@ -53,10 +71,8 @@ const meta: Meta<typeof Button> = {
     },
   },
   argTypes: {
-    variant: {
-      control: "select",
-      options: ["primary", "secondary", "outline", "ghost", "destructive"],
-    },
+    variant: { control: "select", options: COLORS },
+    appearance: { control: "inline-radio", options: ["solid", "outline", "ghost"] },
     size: {
       control: "select",
       options: ["sm", "md", "lg", "iconSm", "icon", "iconLg", "none"],
@@ -69,11 +85,11 @@ export default meta;
 
 type Story = StoryObj<typeof Button>;
 
-// Interactive — tweak variant / size / shape live from the Controls panel.
 export const Playground: Story = {
-  args: { children: "Button", variant: "primary", size: "md", shape: "default" },
+  args: { children: "Button", variant: "primary", appearance: "solid", size: "md", shape: "default" },
 };
 
+// every colour / severity, filled
 export const AllVariants: Story = {
   parameters: {
     docs: {
@@ -85,9 +101,12 @@ export function Example() {
     <>
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
+      <Button variant="success">Success</Button>
+      <Button variant="info">Info</Button>
+      <Button variant="warning">Warning</Button>
+      <Button variant="help">Help</Button>
       <Button variant="destructive">Destructive</Button>
+      <Button variant="contrast">Contrast</Button>
     </>
   );
 }`,
@@ -96,11 +115,74 @@ export function Example() {
   },
   render: () => (
     <div className="flex flex-wrap gap-3">
-      <Button variant="primary">Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="destructive">Destructive</Button>
+      {COLORS.map((v) => (
+        <Button key={v} variant={v} className="capitalize">
+          {v}
+        </Button>
+      ))}
+    </div>
+  ),
+};
+
+// same severities, bordered (transparent fill)
+export const Outlined: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button variant="primary" appearance="outline">Primary</Button>
+      <Button variant="success" appearance="outline">Success</Button>
+      <Button variant="destructive" appearance="outline">Destructive</Button>
+      <Button variant="contrast" appearance="outline">Contrast</Button>
+    </>
+  );
+}`,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-wrap gap-3">
+      {COLORS.map((v) => (
+        <Button key={v} variant={v} appearance="outline" className="capitalize">
+          {v}
+        </Button>
+      ))}
+    </div>
+  ),
+};
+
+// same severities, no border or fill
+export const Ghost: Story = {
+  tags: ["!dev"],
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button variant="primary" appearance="ghost">Primary</Button>
+      <Button variant="success" appearance="ghost">Success</Button>
+      <Button variant="destructive" appearance="ghost">Destructive</Button>
+      <Button variant="secondary" appearance="ghost">Secondary</Button>
+    </>
+  );
+}`,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-wrap gap-3">
+      {COLORS.map((v) => (
+        <Button key={v} variant={v} appearance="ghost" className="capitalize">
+          {v}
+        </Button>
+      ))}
     </div>
   ),
 };
@@ -145,7 +227,7 @@ export function Example() {
   return (
     <>
       <Button><Plus className="size-4" /> New item</Button>
-      <Button variant="outline">Continue <ArrowRight className="size-4" /></Button>
+      <Button variant="secondary" appearance="outline">Continue <ArrowRight className="size-4" /></Button>
     </>
   );
 }`,
@@ -157,46 +239,70 @@ export function Example() {
       <Button>
         <Plus className="size-4" /> New item
       </Button>
-      <Button variant="outline">
+      <Button variant="secondary" appearance="outline">
         Continue <ArrowRight className="size-4" />
       </Button>
     </div>
   ),
 };
 
-// Icon-only: square `size="icon"`. NOTE: always pass an `aria-label`
-// because there is no visible text for screen readers.
+// Icon-only matrix: every severity × every appearance (square `size="icon"`).
+// Always pass an `aria-label` — there's no visible text.
 export const IconOnly: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
       source: {
-        code: `import { Heart, Plus, Search } from "lucide-react";
+        code: `import { Bell, Check, Download, Heart, Mail, Plus, Star, Trash2 } from "lucide-react";
 import { Button } from "@bpdm/ui";
+
+const icons = [
+  { variant: "primary", label: "Add", icon: <Plus className="size-4" /> },
+  { variant: "secondary", label: "Favorite", icon: <Star className="size-4" /> },
+  { variant: "success", label: "Confirm", icon: <Check className="size-4" /> },
+  { variant: "info", label: "Notifications", icon: <Bell className="size-4" /> },
+  { variant: "warning", label: "Download", icon: <Download className="size-4" /> },
+  { variant: "help", label: "Messages", icon: <Mail className="size-4" /> },
+  { variant: "destructive", label: "Delete", icon: <Trash2 className="size-4" /> },
+  { variant: "contrast", label: "Like", icon: <Heart className="size-4" /> },
+] as const;
 
 export function Example() {
   return (
-    <>
-      <Button size="icon" aria-label="Add"><Plus className="size-4" /></Button>
-      <Button size="icon" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
-      <Button size="icon" variant="ghost" aria-label="Like"><Heart className="size-4" /></Button>
-    </>
+    <div className="space-y-3">
+      {(["solid", "outline", "ghost"] as const).map((appearance) => (
+        <div key={appearance} className="flex gap-3">
+          {icons.map((i) => (
+            <Button key={i.variant} size="icon" shape="round" variant={i.variant} appearance={appearance} aria-label={i.label}>
+              {i.icon}
+            </Button>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }`,
       },
     },
   },
   render: () => (
-    <div className="flex items-center gap-3">
-      <Button size="icon" aria-label="Add">
-        <Plus className="size-4" />
-      </Button>
-      <Button size="icon" variant="outline" aria-label="Search">
-        <Search className="size-4" />
-      </Button>
-      <Button size="icon" variant="ghost" aria-label="Like">
-        <Heart className="size-4" />
-      </Button>
+    <div className="space-y-3">
+      {(["solid", "outline", "ghost"] as const).map((appearance) => (
+        <div key={appearance} className="flex flex-wrap gap-3">
+          {SEVERITY_ICONS.map((i) => (
+            <Button
+              key={i.variant}
+              size="icon"
+              shape="round"
+              variant={i.variant}
+              appearance={appearance}
+              aria-label={i.label}
+            >
+              {i.icon}
+            </Button>
+          ))}
+        </div>
+      ))}
     </div>
   ),
 };
@@ -213,7 +319,7 @@ import { Button } from "@bpdm/ui";
 export function Example() {
   return (
     <>
-      <Button size="iconSm" shape="round" variant="outline" aria-label="Search"><Search className="size-4" /></Button>
+      <Button size="iconSm" shape="round" variant="secondary" appearance="outline" aria-label="Search"><Search className="size-4" /></Button>
       <Button size="icon" shape="round" aria-label="Add"><Plus className="size-5" /></Button>
       <Button size="iconLg" shape="round" variant="secondary" aria-label="Like"><Heart className="size-5" /></Button>
     </>
@@ -224,7 +330,7 @@ export function Example() {
   },
   render: () => (
     <div className="flex items-center gap-3">
-      <Button size="iconSm" shape="round" variant="outline" aria-label="Search">
+      <Button size="iconSm" shape="round" variant="secondary" appearance="outline" aria-label="Search">
         <Search className="size-4" />
       </Button>
       <Button size="icon" shape="round" aria-label="Add">
@@ -237,8 +343,7 @@ export function Example() {
   ),
 };
 
-// `size="none"` drops the preset height/padding so you own the sizing entirely
-// via className — handy for compact icon affordances inside other components.
+// `size="none"` drops the preset height/padding so you own the sizing entirely.
 export const CustomSize: Story = {
   tags: ["!dev"],
   parameters: {
@@ -250,14 +355,12 @@ import { Button } from "@bpdm/ui";
 export function Example() {
   return (
     <>
-      {/* preset sizing */}
-      <Button size="icon" aria-label="Search"><Search className="size-5" /></Button>
-
-      {/* bring your own dimensions */}
-      <Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search">
+      <Button size="icon" variant="secondary" appearance="outline" aria-label="Search"><Search className="size-5" /></Button>
+      <Button size="none" variant="secondary" appearance="ghost" className="size-6 rounded-md" aria-label="Search">
         <Search className="size-3.5" />
       </Button>
-      <Button size="none" variant="outline" className="h-7 px-2 text-xs rounded-md">Tiny</Button>
+      <Button size="none" variant="secondary" appearance="outline" className="h-7 px-2 text-xs rounded-md">Tiny</Button>
+      <Button size="none" variant="primary" className="h-14 px-8 text-lg rounded-2xl">Chunky</Button>
     </>
   );
 }`,
@@ -266,13 +369,13 @@ export function Example() {
   },
   render: () => (
     <div className="flex items-center gap-3">
-      <Button size="icon" variant="outline" aria-label="Search (preset)">
+      <Button size="icon" variant="secondary" appearance="outline" aria-label="Search (preset)">
         <Search className="size-5" />
       </Button>
-      <Button size="none" variant="ghost" className="size-6 rounded-md" aria-label="Search (size-6)">
+      <Button size="none" variant="secondary" appearance="ghost" className="size-6 rounded-md" aria-label="Search (size-6)">
         <Search className="size-3.5" />
       </Button>
-      <Button size="none" variant="outline" className="h-7 rounded-md px-2 text-xs">
+      <Button size="none" variant="secondary" appearance="outline" className="h-7 rounded-md px-2 text-xs">
         Tiny
       </Button>
       <Button size="none" variant="primary" className="h-14 rounded-2xl px-8 text-lg">
@@ -282,20 +385,25 @@ export function Example() {
   ),
 };
 
-// Pill: `shape="round"` on a text button gives fully-rounded ends.
+// Pill: `shape="round"` gives fully-rounded ends — works with every severity.
 export const Pill: Story = {
   tags: ["!dev"],
   parameters: {
     docs: {
       source: {
-        code: `import { ArrowRight } from "lucide-react";
-import { Button } from "@bpdm/ui";
+        code: `import { Button } from "@bpdm/ui";
 
 export function Example() {
   return (
     <>
-      <Button shape="round">Rounded pill</Button>
-      <Button shape="round" variant="outline">Filter <ArrowRight className="size-4" /></Button>
+      <Button shape="round" variant="primary">Primary</Button>
+      <Button shape="round" variant="secondary">Secondary</Button>
+      <Button shape="round" variant="success">Success</Button>
+      <Button shape="round" variant="info">Info</Button>
+      <Button shape="round" variant="warning">Warning</Button>
+      <Button shape="round" variant="help">Help</Button>
+      <Button shape="round" variant="destructive">Destructive</Button>
+      <Button shape="round" variant="contrast">Contrast</Button>
     </>
   );
 }`,
@@ -303,11 +411,12 @@ export function Example() {
     },
   },
   render: () => (
-    <div className="flex items-center gap-3">
-      <Button shape="round">Rounded pill</Button>
-      <Button shape="round" variant="outline">
-        Filter <ArrowRight className="size-4" />
-      </Button>
+    <div className="flex flex-wrap items-center gap-3">
+      {COLORS.map((v) => (
+        <Button key={v} shape="round" variant={v} className="capitalize">
+          {v}
+        </Button>
+      ))}
     </div>
   ),
 };

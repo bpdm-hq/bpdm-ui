@@ -49,7 +49,7 @@ class ProgressDynamicDemo implements OnInit, OnDestroy {
         <p class="text-xs text-muted-foreground">4.2 MB</p>
       </div>
       <bpdm-progress-bar [value]="value()" showValue [variant]="value() >= 100 ? 'success' : 'primary'" />
-      <button bpdmButton size="sm" variant="outline" (click)="start()" [disabled]="uploading()">
+      <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="start()" [disabled]="uploading()">
         {{ value() >= 100 ? "Upload again" : "Upload" }}
       </button>
     </div>
@@ -327,7 +327,7 @@ import { BpdmProgressBar, BpdmButton } from '@bpdm/ng';
         <p class="text-xs text-muted-foreground">4.2 MB</p>
       </div>
       <bpdm-progress-bar [value]="value()" showValue [variant]="value() >= 100 ? 'success' : 'primary'" />
-      <button bpdmButton size="sm" variant="outline" (click)="start()" [disabled]="uploading()">
+      <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="start()" [disabled]="uploading()">
         {{ value() >= 100 ? 'Upload again' : 'Upload' }}
       </button>
     </div>

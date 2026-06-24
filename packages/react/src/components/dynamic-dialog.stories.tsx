@@ -65,7 +65,7 @@ function Demo() {
                   <Input defaultValue="Q3 Planning" />
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost" onClick={close}>
+                  <Button size="sm" variant="secondary" appearance="ghost" onClick={close}>
                     Cancel
                   </Button>
                   <Button size="sm" onClick={close}>
@@ -82,7 +82,7 @@ function Demo() {
       </Button>
 
       <Button
-        variant="outline"
+        variant="secondary" appearance="outline"
         onClick={() =>
           dialog.open(
             ({ close }) => (
@@ -121,7 +121,7 @@ function EditButton() {
             <form className="space-y-3">
               <Input defaultValue="Q3 Planning" />
               <div className="flex justify-end gap-2">
-                <Button size="sm" variant="ghost" onClick={close}>Cancel</Button>
+                <Button size="sm" variant="secondary" appearance="ghost" onClick={close}>Cancel</Button>
                 <Button size="sm" onClick={close}>Save</Button>
               </div>
             </form>

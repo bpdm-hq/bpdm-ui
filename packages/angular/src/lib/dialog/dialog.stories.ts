@@ -67,7 +67,7 @@ const meta: Meta<BpdmDialog> = {
     </div>
   </ng-template>
   <ng-template bpdmDialogFooter>
-    <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
     <button bpdmButton bpdmDialogClose>Save changes</button>
   </ng-template>
 </bpdm-dialog>`,
@@ -99,7 +99,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFoot
         </div>
       </ng-template>
       <ng-template bpdmDialogFooter>
-        <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+        <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
         <button bpdmButton bpdmDialogClose>Save changes</button>
       </ng-template>
     </bpdm-dialog>
@@ -119,7 +119,7 @@ export const Sizes: Story = {
     template: `<div class="flex flex-wrap gap-3">
   @for (size of sizes; track size) {
     <bpdm-dialog [size]="size" [title]="'Size: ' + size" description="The panel width adapts to the size prop.">
-      <button bpdmButton variant="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
+      <button bpdmButton variant="secondary" appearance="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
       <ng-template bpdmDialogBody><p class="text-sm text-muted-foreground">Dialog body content.</p></ng-template>
       <ng-template bpdmDialogFooter><button bpdmButton bpdmDialogClose>Got it</button></ng-template>
     </bpdm-dialog>
@@ -139,7 +139,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFoot
     <div class="flex flex-wrap gap-3">
       @for (size of sizes; track size) {
         <bpdm-dialog [size]="size" [title]="'Size: ' + size" description="The panel width adapts to the size prop.">
-          <button bpdmButton variant="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
+          <button bpdmButton variant="secondary" appearance="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
           <ng-template bpdmDialogBody><p class="text-sm text-muted-foreground">Dialog body content.</p></ng-template>
           <ng-template bpdmDialogFooter><button bpdmButton bpdmDialogClose>Got it</button></ng-template>
         </bpdm-dialog>
@@ -161,7 +161,7 @@ export const ScrollableContent: Story = {
   render: () => ({
     props: { lines: Array.from({ length: 14 }, (_, i) => i + 1) },
     template: `<bpdm-dialog title="Terms of service" description="Please review before continuing.">
-  <button bpdmButton variant="outline" bpdmDialogTrigger>Open long content</button>
+  <button bpdmButton variant="secondary" appearance="outline" bpdmDialogTrigger>Open long content</button>
   <ng-template bpdmDialogBody>
     <div class="space-y-3 text-sm text-muted-foreground">
       @for (i of lines; track i) {
@@ -183,7 +183,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFoot
   imports: [BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFooter, BpdmDialogTrigger],
   template: \`
     <bpdm-dialog title="Terms of service" description="Please review before continuing.">
-      <button bpdmButton variant="outline" bpdmDialogTrigger>Open long content</button>
+      <button bpdmButton variant="secondary" appearance="outline" bpdmDialogTrigger>Open long content</button>
       <ng-template bpdmDialogBody>
         <div class="space-y-3 text-sm text-muted-foreground">
           @for (i of lines; track i) {
@@ -301,7 +301,7 @@ export const WithDropdowns: Story = {
     </div>
   </ng-template>
   <ng-template bpdmDialogFooter>
-    <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
     <button bpdmButton bpdmDialogClose>Create</button>
   </ng-template>
 </bpdm-dialog>`,
@@ -341,7 +341,7 @@ import {
         </div>
       </ng-template>
       <ng-template bpdmDialogFooter>
-        <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+        <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
         <button bpdmButton bpdmDialogClose>Create</button>
       </ng-template>
     </bpdm-dialog>

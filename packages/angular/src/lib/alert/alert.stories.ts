@@ -108,7 +108,7 @@ export const WithActions: Story = {
     Your workspace is using 18 of 20 member seats. Upgrade to add more.
     <div bpdmAlertActions>
       <button bpdmButton size="sm">Upgrade plan</button>
-      <button bpdmButton size="sm" variant="ghost">Manage members</button>
+      <button bpdmButton size="sm" variant="secondary" appearance="ghost">Manage members</button>
     </div>
   </bpdm-alert>
 </div>`,
@@ -127,7 +127,7 @@ import { BpdmAlert, BpdmAlertActions, BpdmButton } from '@bpdm/ng';
       Your workspace is using 18 of 20 member seats. Upgrade to add more.
       <div bpdmAlertActions>
         <button bpdmButton size="sm">Upgrade plan</button>
-        <button bpdmButton size="sm" variant="ghost">Manage members</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost">Manage members</button>
       </div>
     </bpdm-alert>
   \`,

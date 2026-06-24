@@ -85,7 +85,7 @@ export interface StepDialogStep {
       </ng-template>
       <ng-template bpdmDialogFooter>
         @if (step() > 0) {
-          <button bpdmButton variant="ghost" (click)="back()">Back</button>
+          <button bpdmButton variant="secondary" appearance="ghost" (click)="back()">Back</button>
         }
         @if (step() < last()) {
           <button bpdmButton (click)="next()">Next</button>

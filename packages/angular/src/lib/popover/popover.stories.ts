@@ -33,7 +33,7 @@ const meta: Meta<BpdmPopover> = {
     template: `<div class="flex min-h-48 items-start justify-center pt-6">
   <button
     bpdmButton
-    variant="outline"
+    variant="secondary" appearance="outline"
     [bpdmPopover]="panel"
     [bpdmPopoverSide]="side"
     [bpdmPopoverAlign]="align"
@@ -65,7 +65,7 @@ import { BpdmButton, BpdmPopover } from '@bpdm/ng';
   selector: 'app-popover-demo',
   imports: [BpdmButton, BpdmPopover],
   template: \`
-    <button bpdmButton variant="outline" [bpdmPopover]="panel">Open popover</button>
+    <button bpdmButton variant="secondary" appearance="outline" [bpdmPopover]="panel">Open popover</button>
     <ng-template #panel>
       <div class="w-64 space-y-1">
         <p class="font-medium">Quick info</p>
@@ -86,7 +86,7 @@ export const Placements: Story = {
     props: { sides: ["top", "right", "bottom", "left"] as const },
     template: `<div class="flex min-h-48 items-center justify-center gap-4">
   @for (side of sides; track side) {
-    <button bpdmButton variant="outline" class="capitalize" [bpdmPopover]="tpl" [bpdmPopoverSide]="side" [bpdmPopoverShowArrow]="true">
+    <button bpdmButton variant="secondary" appearance="outline" class="capitalize" [bpdmPopover]="tpl" [bpdmPopoverSide]="side" [bpdmPopoverShowArrow]="true">
       {{ side }}
     </button>
     <ng-template #tpl><p class="text-sm">Opens on the {{ side }}.</p></ng-template>
@@ -105,7 +105,7 @@ import { BpdmButton, BpdmPopover } from '@bpdm/ng';
   template: \`
     <div class="flex items-center justify-center gap-4">
       @for (side of sides; track side) {
-        <button bpdmButton variant="outline" class="capitalize" [bpdmPopover]="tpl" [bpdmPopoverSide]="side" bpdmPopoverShowArrow>
+        <button bpdmButton variant="secondary" appearance="outline" class="capitalize" [bpdmPopover]="tpl" [bpdmPopoverSide]="side" bpdmPopoverShowArrow>
           {{ side }}
         </button>
         <ng-template #tpl><p class="text-sm">Opens on the {{ side }}.</p></ng-template>
@@ -133,7 +133,7 @@ export const WithForm: Story = {
         <input bpdmInput value="Q3 Planning" />
       </div>
       <div class="flex justify-end gap-2">
-        <button bpdmButton size="sm" variant="ghost" bpdmPopoverClose>Cancel</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost" bpdmPopoverClose>Cancel</button>
         <button bpdmButton size="sm" bpdmPopoverClose>Save</button>
       </div>
     </form>
@@ -158,7 +158,7 @@ import { BpdmButton, BpdmInput, BpdmPopover, BpdmPopoverClose } from '@bpdm/ng';
           <input bpdmInput value="Q3 Planning" />
         </div>
         <div class="flex justify-end gap-2">
-          <button bpdmButton size="sm" variant="ghost" bpdmPopoverClose>Cancel</button>
+          <button bpdmButton size="sm" variant="secondary" appearance="ghost" bpdmPopoverClose>Cancel</button>
           <button bpdmButton size="sm" bpdmPopoverClose>Save</button>
         </div>
       </form>
@@ -185,7 +185,7 @@ import { BpdmButton, BpdmPopover } from '@bpdm/ng';
   selector: 'app-popover-arrow',
   imports: [BpdmButton, BpdmPopover],
   template: \`
-    <button bpdmButton variant="outline" bpdmPopoverShowArrow [bpdmPopover]="panel">Open popover</button>
+    <button bpdmButton variant="secondary" appearance="outline" bpdmPopoverShowArrow [bpdmPopover]="panel">Open popover</button>
     <ng-template #panel>
       <div class="w-64 space-y-1">
         <p class="font-medium">Quick info</p>

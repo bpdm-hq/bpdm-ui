@@ -18,7 +18,7 @@ import { BpdmDialogService } from "./dynamic-dialog";
       </button>
       <button
         bpdmButton
-        variant="outline"
+        variant="secondary" appearance="outline"
         (click)="dialog.open(stackedTpl, { title: 'Stacked dialog', size: 'sm' })"
       >
         Open stacked
@@ -32,7 +32,7 @@ import { BpdmDialogService } from "./dynamic-dialog";
           <input bpdmInput value="Q3 Planning" />
         </div>
         <div class="flex justify-end gap-2">
-          <button bpdmButton size="sm" variant="ghost" (click)="d.close()">Cancel</button>
+          <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="d.close()">Cancel</button>
           <button bpdmButton size="sm" (click)="d.close()">Save</button>
         </div>
       </div>
@@ -94,7 +94,7 @@ import { BpdmButton, BpdmDialogService, BpdmInput } from '@bpdm/ng';
     <ng-template #form let-d>
       <input bpdmInput value="Q3 Planning" />
       <div class="flex justify-end gap-2">
-        <button bpdmButton size="sm" variant="ghost" (click)="d.close()">Cancel</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="d.close()">Cancel</button>
         <button bpdmButton size="sm" (click)="d.close()">Save</button>
       </div>
     </ng-template>

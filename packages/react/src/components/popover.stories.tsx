@@ -57,7 +57,7 @@ const meta: Meta<typeof Popover> = {
   args: { side: "bottom", align: "center" },
   render: (args) => (
     <div className="flex min-h-48 items-start justify-center pt-6">
-      <Popover {...args} trigger={<Button variant="outline">Open popover</Button>}>
+      <Popover {...args} trigger={<Button variant="secondary" appearance="outline">Open popover</Button>}>
         <div className="w-64 space-y-1">
           <p className="font-medium">Quick info</p>
           <p className="text-sm text-muted-foreground">
@@ -89,7 +89,7 @@ export function Example() {
           side={side}
           showArrow
           trigger={
-            <Button variant="outline" className="capitalize">
+            <Button variant="secondary" appearance="outline" className="capitalize">
               {side}
             </Button>
           }
@@ -111,7 +111,7 @@ export function Example() {
           side={side}
           showArrow
           trigger={
-            <Button variant="outline" className="capitalize">
+            <Button variant="secondary" appearance="outline" className="capitalize">
               {side}
             </Button>
           }
@@ -156,7 +156,7 @@ export function Example() {
           </div>
           <div className="flex justify-end gap-2">
             <PopoverClose asChild>
-              <Button size="sm" variant="ghost">
+              <Button size="sm" variant="secondary" appearance="ghost">
                 Cancel
               </Button>
             </PopoverClose>
@@ -180,7 +180,7 @@ export const WithArrow: Story = {
 
 export function Example() {
   return (
-    <Popover showArrow trigger={<Button variant="outline">Open popover</Button>}>
+    <Popover showArrow trigger={<Button variant="secondary" appearance="outline">Open popover</Button>}>
       <div className="w-64 space-y-1">
         <p className="font-medium">Quick info</p>
         <p className="text-sm text-muted-foreground">

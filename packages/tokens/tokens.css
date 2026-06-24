@@ -56,6 +56,8 @@
   --warning-foreground: #ffffff;
   --info: #2563eb;
   --info-foreground: #ffffff;
+  --help: #7c3aed; /* violet — advisory / tips */
+  --help-foreground: #ffffff;
 }
 
 /* ── LIGHT · Cool Mist ────────────────────────────────────────── */
@@ -85,6 +87,8 @@
   --warning-foreground: #ffffff;
   --info: #2563eb;
   --info-foreground: #ffffff;
+  --help: #7c3aed; /* violet — advisory / tips */
+  --help-foreground: #ffffff;
 }
 
 /* ── DARK · Charcoal (default dark) ───────────────────────────── */
@@ -115,6 +119,8 @@
   --warning-foreground: #422006;
   --info: #60a5fa;
   --info-foreground: #0a1f44;
+  --help: #a78bfa; /* brighter violet reads on dark */
+  --help-foreground: #1e1b3a;
 }
 
 /* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
@@ -145,6 +151,8 @@
   --warning-foreground: #0d1117;
   --info: #58a6ff;
   --info-foreground: #0d1117;
+  --help: #a371f7;
+  --help-foreground: #0d1117;
 }
 
 /* Map Tailwind utilities → raw vars (resolved at runtime). */
@@ -176,6 +184,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-help: var(--help);
+  --color-help-foreground: var(--help-foreground);
 }
 
 /* Overlay entry/exit animations — shared by Tooltip, Popover, Dialog, Drawer.

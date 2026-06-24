@@ -111,7 +111,7 @@ export function StepDialog({
       footer={
         <>
           {step > 0 && (
-            <Button variant="ghost" onClick={() => setStep((s) => s - 1)}>
+            <Button variant="secondary" appearance="ghost" onClick={() => setStep((s) => s - 1)}>
               Back
             </Button>
           )}

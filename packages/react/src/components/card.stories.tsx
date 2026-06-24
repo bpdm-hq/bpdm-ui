@@ -137,7 +137,7 @@ export const Advanced: Story = {
       </CardHeader>
       <CardContent>{BODY}</CardContent>
       <CardFooter>
-        <Button variant="outline" className="flex-1">
+        <Button variant="secondary" appearance="outline" className="flex-1">
           Cancel
         </Button>
         <Button className="flex-1">Save</Button>
@@ -172,7 +172,7 @@ export function Example() {
         overwhelming the reader.
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="flex-1">Cancel</Button>
+        <Button variant="secondary" appearance="outline" className="flex-1">Cancel</Button>
         <Button className="flex-1">Save</Button>
       </CardFooter>
     </Card>

@@ -25,7 +25,7 @@ export class BpdmAlertActions {}
  * ```html
  * <bpdm-alert variant="success" title="Saved" dismissible (closed)="onClose()">
  *   Your changes have been published.
- *   <div bpdmAlertActions><button bpdmButton size="sm" variant="ghost">Undo</button></div>
+ *   <div bpdmAlertActions><button bpdmButton size="sm" variant="secondary" appearance="ghost">Undo</button></div>
  * </bpdm-alert>
  * ```
  *

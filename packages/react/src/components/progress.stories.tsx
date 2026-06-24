@@ -282,7 +282,7 @@ export const InCard: Story = {
           <p className="text-xs text-muted-foreground">4.2 MB</p>
         </div>
         <ProgressBar value={value} showValue variant={value >= 100 ? "success" : "primary"} />
-        <Button size="sm" variant="outline" onClick={start} disabled={uploading}>
+        <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>
           {value >= 100 ? "Upload again" : "Upload"}
         </Button>
       </div>
@@ -320,7 +320,7 @@ export function Example() {
         <p className="text-xs text-muted-foreground">4.2 MB</p>
       </div>
       <ProgressBar value={value} showValue variant={value >= 100 ? "success" : "primary"} />
-      <Button size="sm" variant="outline" onClick={start} disabled={uploading}>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>
         {value >= 100 ? "Upload again" : "Upload"}
       </Button>
     </div>

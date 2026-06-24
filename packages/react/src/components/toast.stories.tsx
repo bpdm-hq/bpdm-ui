@@ -106,7 +106,7 @@ export const Playground: Story = {
     <div className="flex flex-wrap gap-2">
       <Button onClick={() => toast("Workspace settings updated")}>Default</Button>
       <Button
-        variant="ghost"
+        variant="secondary" appearance="ghost"
         onClick={() =>
           toast.success("Deployment complete", {
             description: "Build #482 is live in production.",
@@ -116,7 +116,7 @@ export const Playground: Story = {
         Success
       </Button>
       <Button
-        variant="ghost"
+        variant="secondary" appearance="ghost"
         onClick={() =>
           toast.error("Build failed", {
             description: "3 checks failed on the latest commit.",
@@ -126,7 +126,7 @@ export const Playground: Story = {
         Error
       </Button>
       <Button
-        variant="ghost"
+        variant="secondary" appearance="ghost"
         onClick={() =>
           toast.warning("Approaching seat limit", {
             description: "18 of 20 member seats in use.",
@@ -136,7 +136,7 @@ export const Playground: Story = {
         Warning
       </Button>
       <Button
-        variant="ghost"
+        variant="secondary" appearance="ghost"
         onClick={() =>
           toast.info("New release available", {
             description: "Version 2.4 is ready to install.",
@@ -145,7 +145,7 @@ export const Playground: Story = {
       >
         Info
       </Button>
-      <Button variant="ghost" onClick={() => toast.dismiss()}>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.dismiss()}>
         Dismiss all
       </Button>
       <DemoToaster position={args.position} />
@@ -184,16 +184,16 @@ export const Variants: Story = {
   tags: ["!dev"],
   render: () => (
     <div className="flex flex-wrap gap-2">
-      <Button variant="ghost" onClick={() => toast.success("Invite sent")}>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.success("Invite sent")}>
         Success
       </Button>
-      <Button variant="ghost" onClick={() => toast.error("Couldn’t save changes")}>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.error("Couldn’t save changes")}>
         Error
       </Button>
-      <Button variant="ghost" onClick={() => toast.warning("Storage almost full")}>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.warning("Storage almost full")}>
         Warning
       </Button>
-      <Button variant="ghost" onClick={() => toast.info("Sync finished")}>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.info("Sync finished")}>
         Info
       </Button>
       <DemoToaster />
@@ -207,10 +207,10 @@ export const Variants: Story = {
 export function Example() {
   return (
     <div className="flex flex-wrap gap-2">
-      <Button variant="ghost" onClick={() => toast.success("Invite sent")}>Success</Button>
-      <Button variant="ghost" onClick={() => toast.error("Couldn’t save changes")}>Error</Button>
-      <Button variant="ghost" onClick={() => toast.warning("Storage almost full")}>Warning</Button>
-      <Button variant="ghost" onClick={() => toast.info("Sync finished")}>Info</Button>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.success("Invite sent")}>Success</Button>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.error("Couldn’t save changes")}>Error</Button>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.warning("Storage almost full")}>Warning</Button>
+      <Button variant="secondary" appearance="ghost" onClick={() => toast.info("Sync finished")}>Info</Button>
       <Toaster position="bottom-right" />
     </div>
   );
@@ -288,7 +288,7 @@ export const PromiseToast: Story = {
         Deploy (resolves)
       </Button>
       <Button
-        variant="ghost"
+        variant="secondary" appearance="ghost"
         onClick={() =>
           toast.promise(
             new Promise<void>((_, reject) => setTimeout(reject, 2000)),
@@ -344,7 +344,8 @@ export const Positions: Story = {
           <Button
             key={p}
             size="sm"
-            variant={p === position ? "primary" : "ghost"}
+            variant={p === position ? "primary" : "secondary"}
+            appearance={p === position ? "solid" : "ghost"}
             onClick={() => {
               setPosition(p);
               setOwnerPosition?.(p);

@@ -17,7 +17,7 @@ import { BpdmButton } from "../button/button";
         <p class="mt-1 text-xs text-success">+8.2% this week</p>
         <bpdm-loading-overlay [show]="loading()" label="Fetching…" size="md" />
       </div>
-      <button bpdmButton size="sm" variant="outline" (click)="refetch()">Refetch</button>
+      <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch</button>
     </div>
   `,
 })
@@ -47,7 +47,7 @@ class SpinnerOverlayDemo {
         </div>
         <p class="mt-1 text-xs text-success">+8.2% this week</p>
       </div>
-      <button bpdmButton size="sm" variant="outline" (click)="refetch()">Refetch amount</button>
+      <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch amount</button>
     </div>
   `,
 })
@@ -192,7 +192,7 @@ import { BpdmLoadingOverlay, BpdmButton } from '@bpdm/ng';
         <p class="mt-1 text-xs text-success">+8.2% this week</p>
         <bpdm-loading-overlay [show]="loading()" label="Fetching…" size="md" />
       </div>
-      <button bpdmButton size="sm" variant="outline" (click)="refetch()">Refetch</button>
+      <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch</button>
     </div>
   \`,
 })
@@ -338,7 +338,7 @@ export const InButton: Story = {
   render: () => ({
     template: `<div class="flex items-center gap-3">
   <button bpdmButton disabled><bpdm-spinner size="sm" class="text-current" /> Saving…</button>
-  <button bpdmButton variant="outline" disabled><bpdm-spinner size="sm" variant="dots" class="text-current" /> Loading</button>
+  <button bpdmButton variant="secondary" appearance="outline" disabled><bpdm-spinner size="sm" variant="dots" class="text-current" /> Loading</button>
 </div>`,
   }),
   parameters: {
@@ -353,7 +353,7 @@ import { BpdmSpinner, BpdmButton } from '@bpdm/ng';
   template: \`
     <div class="flex items-center gap-3">
       <button bpdmButton disabled><bpdm-spinner size="sm" class="text-current" /> Saving…</button>
-      <button bpdmButton variant="outline" disabled>
+      <button bpdmButton variant="secondary" appearance="outline" disabled>
         <bpdm-spinner size="sm" variant="dots" class="text-current" /> Loading
       </button>
     </div>
