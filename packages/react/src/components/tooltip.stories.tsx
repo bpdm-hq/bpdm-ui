@@ -180,9 +180,11 @@ export function Example() {
   ),
 };
 
+// the `disabled` prop turns the *tooltip* off — the trigger stays interactive.
+// Shown as a contrast so the effect is visible: left shows on hover, right never does.
 export const Disabled: Story = {
+  name: "Disabled (tooltip off)",
   tags: ["!dev"],
-  args: { disabled: true, content: "You won't see me" },
   parameters: {
     docs: {
       source: {
@@ -190,12 +192,66 @@ export const Disabled: Story = {
 
 export function Example() {
   return (
-    <Tooltip content="You won't see me" disabled>
-      <Button variant="outline">Hover me</Button>
+    <div className="flex gap-10">
+      {/* tooltip on → shows on hover */}
+      <Tooltip content="Saves your changes">
+        <Button variant="outline">Tooltip on</Button>
+      </Tooltip>
+
+      {/* disabled → tooltip suppressed; the button still works */}
+      <Tooltip content="Saves your changes" disabled>
+        <Button variant="outline">Tooltip off</Button>
+      </Tooltip>
+    </div>
+  );
+}`,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex min-h-24 items-center justify-center gap-12">
+      <div className="flex flex-col items-center gap-2">
+        <Tooltip content="Saves your changes">
+          <Button variant="outline">Tooltip on</Button>
+        </Tooltip>
+        <span className="text-xs text-muted-foreground">hover → tooltip shows</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Tooltip content="Saves your changes" disabled>
+          <Button variant="outline">Tooltip off</Button>
+        </Tooltip>
+        <span className="text-xs text-muted-foreground">disabled → nothing on hover</span>
+      </div>
+    </div>
+  ),
+};
+
+// the useful case: a tooltip on a *disabled* control explaining why it's off.
+// Disabled buttons don't emit hover/focus events, so the tooltip transparently
+// wraps the trigger to keep it reachable — by pointer and by keyboard.
+export const OnDisabledTrigger: Story = {
+  name: "On a disabled control",
+  tags: ["!dev"],
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Button, Tooltip } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <Tooltip content="You need the Admin role to publish">
+      <Button disabled>Publish</Button>
     </Tooltip>
   );
 }`,
       },
     },
   },
+  render: () => (
+    <div className="flex min-h-24 items-center justify-center">
+      <Tooltip content="You need the Admin role to publish">
+        <Button disabled>Publish</Button>
+      </Tooltip>
+    </div>
+  ),
 };
