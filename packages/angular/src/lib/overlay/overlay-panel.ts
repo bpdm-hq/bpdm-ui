@@ -50,12 +50,12 @@ import { cn } from "@bpdm/variants";
       </div>
       @if (body()) {
         <div class="min-h-0 flex-1 overflow-y-auto px-6 py-2">
-          <ng-container [ngTemplateOutlet]="body()!" />
+          <ng-container [ngTemplateOutlet]="body()!" [ngTemplateOutletContext]="ctx()" />
         </div>
       }
       @if (footer()) {
         <div class="flex flex-col-reverse gap-2 p-6 pt-2 sm:flex-row sm:justify-end">
-          <ng-container [ngTemplateOutlet]="footer()!" />
+          <ng-container [ngTemplateOutlet]="footer()!" [ngTemplateOutletContext]="ctx()" />
         </div>
       }
       @if (showClose()) {
@@ -87,6 +87,8 @@ export class BpdmOverlayPanel {
   readonly showClose = input(true);
   readonly body = input<TemplateRef<unknown> | null>(null);
   readonly footer = input<TemplateRef<unknown> | null>(null);
+  /** Context passed to the body/footer template outlets (e.g. `{ close }`). */
+  readonly ctx = input<unknown>(undefined);
   readonly labelId = input("");
   readonly descId = input("");
   readonly closing = input(false);
