@@ -23,3 +23,6 @@ export * from "./lib/step-dialog/step-dialog";
 export * from "./lib/tabs/tabs";
 export * from "./lib/accordion/accordion";
 export * from "./lib/stepper/stepper";
+export * from "./lib/select/select";
+export * from "./lib/multi-select/multi-select";
+export * from "./lib/tree-select/tree-select";

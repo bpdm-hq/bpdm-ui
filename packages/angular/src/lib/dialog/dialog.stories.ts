@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { BpdmButton } from "../button/button";
 import { BpdmInput } from "../input/input";
+import { BpdmSelect } from "../select/select";
+import { BpdmMultiSelect } from "../multi-select/multi-select";
+import { BpdmTreeSelect } from "../tree-select/tree-select";
 import {
   BpdmDialog,
   BpdmDialogBody,
@@ -18,6 +21,9 @@ const DIALOG_IMPORTS = [
   BpdmDialogFooter,
   BpdmButton,
   BpdmInput,
+  BpdmSelect,
+  BpdmMultiSelect,
+  BpdmTreeSelect,
 ];
 
 /**
@@ -233,4 +239,70 @@ export class DialogControlledComponent {
       },
     },
   },
+};
+
+/** Select / MultiSelect / TreeSelect all work inside the dialog — each dropdown
+ * portals out and stays clickable + scrollable without changing the dialog's height. */
+export const WithDropdowns: Story = {
+  render: () => ({
+    props: {
+      visibility: [
+        { value: "private", label: "Private" },
+        { value: "team", label: "Team" },
+        { value: "org", label: "Organization" },
+        { value: "public", label: "Public" },
+        { value: "archived", label: "Archived" },
+        { value: "draft", label: "Draft" },
+      ],
+      labels: [
+        { value: "frontend", label: "Frontend" },
+        { value: "backend", label: "Backend" },
+        { value: "design", label: "Design" },
+        { value: "docs", label: "Docs" },
+        { value: "bug", label: "Bug" },
+      ],
+      categories: [
+        {
+          value: "engineering",
+          label: "Engineering",
+          children: [
+            { value: "web", label: "Web" },
+            { value: "mobile", label: "Mobile" },
+            { value: "infra", label: "Infrastructure" },
+          ],
+        },
+        {
+          value: "product",
+          label: "Product",
+          children: [
+            { value: "design", label: "Design" },
+            { value: "research", label: "Research" },
+          ],
+        },
+      ],
+    },
+    template: `<bpdm-dialog size="sm" title="New project" description="Every dropdown portals out — clickable, scrollable, no height change.">
+  <button bpdmButton bpdmDialogTrigger>New project</button>
+  <ng-template bpdmDialogBody>
+    <div class="space-y-3">
+      <div class="space-y-1.5">
+        <label class="text-sm font-medium">Visibility</label>
+        <bpdm-select searchable [maxHeight]="150" [options]="visibility" defaultValue="team" />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-sm font-medium">Labels</label>
+        <bpdm-multi-select searchable [maxHeight]="150" [options]="labels" [defaultValue]="['frontend']" placeholder="Add labels" />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-sm font-medium">Category</label>
+        <bpdm-tree-select searchable [maxHeight]="170" [options]="categories" placeholder="Pick categories" />
+      </div>
+    </div>
+  </ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton variant="ghost" bpdmDialogClose>Cancel</button>
+    <button bpdmButton bpdmDialogClose>Create</button>
+  </ng-template>
+</bpdm-dialog>`,
+  }),
 };

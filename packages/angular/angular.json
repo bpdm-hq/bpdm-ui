@@ -33,7 +33,8 @@
             "configDir": ".storybook",
             "browserTarget": "bpdm-ng:build",
             "tsConfig": ".storybook/tsconfig.json",
-            "compodoc": false,
+            "compodoc": true,
+            "compodocArgs": ["-e", "json", "-d", ".", "--disableLifeCycleHooks", "--disableProtected", "--disablePrivate", "--disableInternal"],
             "styles": [".storybook/styles.css"],
             "port": 8001
           }
@@ -43,7 +44,8 @@
           "options": {
             "configDir": ".storybook",
             "tsConfig": ".storybook/tsconfig.json",
-            "compodoc": false,
+            "compodoc": true,
+            "compodocArgs": ["-e", "json", "-d", ".", "--disableLifeCycleHooks", "--disableProtected", "--disablePrivate", "--disableInternal"],
             "styles": [".storybook/styles.css"],
             "outputDir": "storybook-static"
           }
