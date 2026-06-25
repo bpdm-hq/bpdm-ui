@@ -4,7 +4,7 @@
 export { cn, type ClassValue } from "./cn";
 export { buttonVariants, type ButtonVariants } from "./button";
 export { cardVariants, type CardVariants } from "./card";
-export { alertTones, type AlertVariant, type AlertTone } from "./alert";
+export { alertTones, type AlertVariant, type AlertAppearance, type AlertTone } from "./alert";
 export {
   progressTrack,
   progressFill,

@@ -100,6 +100,36 @@ export class AlertVariantsComponent {}`,
   },
 };
 
+/** Three appearances — soft (tinted), solid (filled), outline (border). */
+export const Appearances: Story = {
+  render: () => ({
+    template: `<div class="flex w-full max-w-xl flex-col gap-3">
+  <bpdm-alert variant="info" appearance="soft" title="Soft (default)">A tinted icon and a colored accent on a neutral surface.</bpdm-alert>
+  <bpdm-alert variant="success" appearance="solid" title="Solid">Filled with the severity color for maximum emphasis.</bpdm-alert>
+  <bpdm-alert variant="error" appearance="outline" title="Outline">A colored border with a transparent background.</bpdm-alert>
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-alert-appearances',
+  imports: [BpdmAlert],
+  template: \`
+    <bpdm-alert variant="info" appearance="soft" title="Soft (default)">A tinted icon and a colored accent on a neutral surface.</bpdm-alert>
+    <bpdm-alert variant="success" appearance="solid" title="Solid">Filled with the severity color for maximum emphasis.</bpdm-alert>
+    <bpdm-alert variant="error" appearance="outline" title="Outline">A colored border with a transparent background.</bpdm-alert>
+  \`,
+})
+export class AlertAppearancesComponent {}`,
+      },
+    },
+  },
+};
+
 /** Title + body + action buttons. */
 export const WithActions: Story = {
   render: () => ({

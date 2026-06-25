@@ -30,11 +30,14 @@ import { Badge, NotificationBadge } from "@bpdm/ui";
 
 const VARIANTS: BadgeVariant[] = [
   "neutral",
+  "secondary",
   "primary",
   "success",
-  "warning",
   "info",
+  "warning",
+  "help",
   "destructive",
+  "contrast",
 ];
 
 const meta: Meta<typeof Badge> = {

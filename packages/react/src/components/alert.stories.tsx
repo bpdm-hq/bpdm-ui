@@ -122,6 +122,46 @@ export function Example() {
   },
 };
 
+// three appearances — soft (tinted), solid (filled), outline (border)
+export const Appearances: Story = {
+  render: () => (
+    <div className="flex w-full max-w-xl flex-col gap-3">
+      <Alert variant="info" appearance="soft" title="Soft (default)">
+        A tinted icon and a colored accent on a neutral surface.
+      </Alert>
+      <Alert variant="success" appearance="solid" title="Solid">
+        Filled with the severity color for maximum emphasis.
+      </Alert>
+      <Alert variant="error" appearance="outline" title="Outline">
+        A colored border with a transparent background.
+      </Alert>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Alert } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <div className="flex w-full max-w-xl flex-col gap-3">
+      <Alert variant="info" appearance="soft" title="Soft (default)">
+        A tinted icon and a colored accent on a neutral surface.
+      </Alert>
+      <Alert variant="success" appearance="solid" title="Solid">
+        Filled with the severity color for maximum emphasis.
+      </Alert>
+      <Alert variant="error" appearance="outline" title="Outline">
+        A colored border with a transparent background.
+      </Alert>
+    </div>
+  );
+}`,
+      },
+    },
+  },
+};
+
 // title + body + action buttons
 export const WithActions: Story = {
   render: () => (

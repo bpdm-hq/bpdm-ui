@@ -8,7 +8,7 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
+import { type AlertAppearance, alertTones, cn, type AlertVariant } from "@bpdm/variants";
 
 /** Actions row inside an alert — lays its buttons out with the right spacing. */
 @Directive({
@@ -18,8 +18,9 @@ import { alertTones, cn, type AlertVariant } from "@bpdm/variants";
 export class BpdmAlertActions {}
 
 /**
- * `<bpdm-alert>` — an inline, persistent alert: a colored left accent, a tinted
- * icon, a title and body, with an optional actions slot and a dismiss button.
+ * `<bpdm-alert>` — an inline, persistent alert: a colored accent, a tinted icon,
+ * a title and body, with an optional actions slot and a dismiss button. Three
+ * appearances (`soft` / `solid` / `outline`) × the full severity palette.
  * Theme-aware across all four themes. For transient notifications use a toast.
  *
  * ```html
@@ -45,14 +46,11 @@ export class BpdmAlertActions {}
   },
   template: `
     <div class="min-h-0 overflow-hidden">
-      <div
-        role="alert"
-        [class]="boxClass()"
-      >
+      <div role="alert" [class]="boxClass()">
         @if (showIcon()) {
           <span
             class="flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]"
-            [class]="tone().tint"
+            [class]="iconWrapClass()"
           >
             <svg
               viewBox="0 0 24 24"
@@ -62,7 +60,7 @@ export class BpdmAlertActions {}
               stroke-linecap="round"
               stroke-linejoin="round"
               class="size-4"
-              [class]="tone().fg"
+              [class]="iconColor()"
               aria-hidden="true"
             >
               @switch (variant()) {
@@ -74,6 +72,9 @@ export class BpdmAlertActions {}
                 }
                 @case ("error") {
                   <circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" />
+                }
+                @case ("help") {
+                  <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" />
                 }
                 @default {
                   <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
@@ -87,7 +88,7 @@ export class BpdmAlertActions {}
           @if (title()) {
             <p class="text-sm font-semibold">{{ title() }}</p>
           }
-          <div class="text-sm text-muted-foreground empty:hidden" [class.mt-1]="!!title()">
+          <div class="text-sm empty:hidden" [class]="bodyClass()" [class.mt-1]="!!title()">
             <ng-content />
           </div>
           <ng-content select="[bpdmAlertActions]" />
@@ -98,7 +99,8 @@ export class BpdmAlertActions {}
             type="button"
             (click)="dismiss()"
             aria-label="Dismiss"
-            class="absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            [class]="closeClass()"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
               <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -112,6 +114,8 @@ export class BpdmAlertActions {}
 export class BpdmAlert {
   /** Color + default icon. */
   readonly variant = input<AlertVariant>("default");
+  /** Visual style — `soft` (tinted, default), `solid` (filled), `outline` (border). */
+  readonly appearance = input<AlertAppearance>("soft");
   /** Bold heading line. */
   readonly title = input<string>();
   /** Show a dismiss button; emits `closed` after the collapse animation. */
@@ -123,12 +127,26 @@ export class BpdmAlert {
 
   protected readonly closing = signal(false);
   protected readonly tone = computed(() => alertTones[this.variant()]);
-  protected readonly boxClass = computed(() =>
-    cn(
-      "relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm",
-      "before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
+  private readonly solid = computed(() => this.appearance() === "solid");
+
+  protected readonly boxClass = computed(() => {
+    const base = "relative flex w-full gap-3 overflow-hidden rounded-lg border p-4 shadow-sm";
+    const a = this.appearance();
+    if (a === "solid") return cn(base, this.tone().solid);
+    if (a === "outline") return cn(base, "bg-card text-card-foreground", this.tone().outline);
+    return cn(
+      base,
+      "border-border bg-card text-card-foreground before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
       this.tone().accent,
-    ),
+    );
+  });
+  protected readonly iconWrapClass = computed(() => (this.solid() ? "bg-white/15" : this.tone().tint));
+  protected readonly iconColor = computed(() => (this.solid() ? "" : this.tone().fg));
+  protected readonly bodyClass = computed(() => (this.solid() ? "text-current/90" : "text-muted-foreground"));
+  protected readonly closeClass = computed(() =>
+    this.solid()
+      ? "text-current/70 hover:bg-white/15 hover:text-current"
+      : "text-muted-foreground/70 hover:bg-muted hover:text-foreground",
   );
 
   protected dismiss(): void {
