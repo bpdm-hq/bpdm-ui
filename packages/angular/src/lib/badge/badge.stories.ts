@@ -89,7 +89,7 @@ const meta: Meta<BpdmBadge> = {
   argTypes: {
     variant: {
       control: "inline-radio",
-      options: ["neutral", "primary", "success", "warning", "info", "destructive"],
+      options: ["neutral", "secondary", "primary", "success", "info", "warning", "help", "destructive", "contrast"],
     },
     appearance: { control: "inline-radio", options: ["soft", "solid", "outline", "ghost"] },
     size: { control: "inline-radio", options: ["sm", "md"] },
@@ -131,7 +131,7 @@ export const Variants: Story = {
   @for (appearance of ['soft','solid','outline']; track appearance) {
     <div class="flex flex-wrap items-center gap-2">
       <span class="w-16 text-xs text-muted-foreground">{{ appearance }}</span>
-      @for (variant of ['neutral','primary','success','warning','info','destructive']; track variant) {
+      @for (variant of ['neutral','secondary','primary','success','info','warning','help','destructive','contrast']; track variant) {
         <bpdm-badge [variant]="variant" [appearance]="appearance">{{ variant }}</bpdm-badge>
       }
     </div>
