@@ -25,3 +25,16 @@ export const FIELD_TRIGGER_SIZE: Record<FieldSize, string> = {
 /** The dropdown panel chrome (shared by all three). */
 export const FIELD_PANEL =
   "z-50 flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)]";
+
+/**
+ * Wrapper shell for the boxed text-input family (MoneyInput / PasswordInput /
+ * SecureField) — a bordered row that holds the input plus inline adornments
+ * (symbol, toggle, copy). `focus-within` lifts the ring; `aria-invalid` reddens.
+ */
+export const WRAP_FIELD_BASE =
+  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-within:ring-destructive";
+export const WRAP_FIELD_SIZE: Record<FieldSize, string> = {
+  sm: "h-8 px-2.5 text-sm",
+  md: "h-10 px-3 text-sm",
+  lg: "h-12 px-4 text-base",
+};
