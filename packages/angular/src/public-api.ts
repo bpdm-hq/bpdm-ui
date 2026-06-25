@@ -16,6 +16,8 @@ export * from "./lib/input-otp/input-otp";
 export * from "./lib/calendar/date-utils";
 export * from "./lib/calendar/calendar";
 export * from "./lib/calendar/date-picker";
+export * from "./lib/data-table/data-table-types";
+export * from "./lib/data-table/data-table";
 export * from "./lib/textarea/textarea";
 export * from "./lib/checkbox/checkbox";
 export * from "./lib/switch/switch";
