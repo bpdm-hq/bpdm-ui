@@ -11,6 +11,7 @@ import {
   addMonths,
   buildGrid,
   clampDay,
+  type DatePredicate,
   type DateRange,
   inRange,
   isAfter,
@@ -174,7 +175,7 @@ export class BpdmCalendar {
   readonly min = input<Date | undefined>(undefined);
   readonly max = input<Date | undefined>(undefined);
   /** Disable specific days, e.g. weekends. */
-  readonly disabled = input<((date: Date) => boolean) | undefined>(undefined);
+  readonly disabled = input<DatePredicate | undefined>(undefined);
   /** 0 = Sunday, 1 = Monday. Default 1. */
   readonly weekStartsOn = input<0 | 1>(1);
   /** Shape of the day highlight: "circle" (default) or "rounded" (squircle). */

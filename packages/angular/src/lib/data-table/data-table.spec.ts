@@ -120,3 +120,60 @@ describe("BpdmDataTable", () => {
     expect(fixture.nativeElement.textContent).toContain("No data");
   });
 });
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns"
+      [data]="data"
+      [rowKey]="rowKey"
+      multiSort
+      [defaultSort]="[{ id: 'name', dir: 'desc' }, { id: 'tasks', dir: 'asc' }]"
+    />
+  `,
+})
+class MultiSortHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+}
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" [expandedTemplate]="tpl" [defaultExpandedKeys]="['b']" />
+    <ng-template #tpl let-row><span class="detail">detail for {{ row.name }}</span></ng-template>
+  `,
+})
+class ExpandHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+}
+
+describe("BpdmDataTable defaults", () => {
+
+  it("applies a multi-column defaultSort with numbered badges", () => {
+    const fixture = TestBed.createComponent(MultiSortHost);
+    fixture.detectChanges();
+    const firstCells = Array.from(fixture.nativeElement.querySelectorAll("tbody tr")).map(
+      (tr) => ((tr as HTMLElement).querySelector("td") as HTMLElement)?.textContent?.trim(),
+    );
+    // name desc → Sara, Hugo, Ava
+    expect(firstCells).toEqual(["Sara", "Hugo", "Ava"]);
+    // two numbered order badges (1, 2) appear in the headers
+    const badges = Array.from(fixture.nativeElement.querySelectorAll("thead th span")).filter(
+      (s) => /^[12]$/.test((s as HTMLElement).textContent?.trim() ?? ""),
+    );
+    expect(badges.length).toBe(2);
+  });
+
+  it("auto-expands rows from defaultExpandedKeys and renders the panel content", () => {
+    const fixture = TestBed.createComponent(ExpandHost);
+    fixture.detectChanges();
+    const detail = fixture.nativeElement.querySelector(".detail") as HTMLElement;
+    expect(detail).toBeTruthy();
+    expect(detail.textContent).toContain("detail for Ava"); // key 'b' = Ava
+  });
+});

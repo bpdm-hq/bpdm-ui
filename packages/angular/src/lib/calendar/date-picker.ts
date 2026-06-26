@@ -11,6 +11,7 @@ import { cn } from "@bpdm/variants";
 import { BpdmPopover } from "../popover/popover";
 import { BpdmCalendar, type CalendarCaptionLayout, type CalendarDayShape, type CalendarMode } from "./calendar";
 import {
+  type DatePredicate,
   type DateRange,
   type DateRangePreset,
   fmtValue,
@@ -121,7 +122,7 @@ export class BpdmDatePicker {
   readonly value = model<Date | DateRange | null>(null);
   readonly min = input<Date | undefined>(undefined);
   readonly max = input<Date | undefined>(undefined);
-  readonly disabled = input<((date: Date) => boolean) | undefined>(undefined);
+  readonly disabled = input<DatePredicate | undefined>(undefined);
   readonly weekStartsOn = input<0 | 1>(1);
   readonly dayShape = input<CalendarDayShape>("circle");
   readonly numberOfMonths = input<number | undefined>(undefined);

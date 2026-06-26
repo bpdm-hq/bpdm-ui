@@ -34,6 +34,10 @@ import {
   getSortValue,
   nextDirection,
   pageList,
+  type RowClassFn,
+  type RowClickFn,
+  type RowKeyFn,
+  type RowPredicate,
   type SortDirection,
 } from "./data-table-types";
 
@@ -444,20 +448,20 @@ interface RenderRow<T> {
 export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly columns = input<DataTableColumn<T>[]>([]);
   readonly data = input<T[]>([]);
-  readonly rowKey = input<((row: T, index: number) => Key) | undefined>(undefined);
+  readonly rowKey = input<RowKeyFn<T> | undefined>(undefined);
   readonly size = input<"sm" | "md" | "lg">("md");
   readonly striped = input(false, { transform: booleanAttribute });
   readonly bordered = input(false, { transform: booleanAttribute });
   readonly frame = input(true, { transform: booleanAttribute });
   readonly divided = input(true, { transform: booleanAttribute });
   readonly cellClassName = input<string>("");
-  readonly rowClassName = input<string | ((row: T, index: number) => string) | undefined>(undefined);
+  readonly rowClassName = input<string | RowClassFn<T> | undefined>(undefined);
   readonly rowSpacing = input<number | undefined>(undefined);
   readonly hoverable = input(true, { transform: booleanAttribute });
   readonly stickyHeader = input(false, { transform: booleanAttribute });
   readonly maxHeight = input<number | string | undefined>(undefined);
   readonly emptyContent = input<string>("No data");
-  readonly onRowClick = input<((row: T, index: number) => void) | undefined>(undefined);
+  readonly onRowClick = input<RowClickFn<T> | undefined>(undefined);
   readonly multiSort = input(false, { transform: booleanAttribute });
   readonly sort = input<DataTableSort[] | undefined>(undefined);
   readonly defaultSort = input<DataTableSort[]>([]);
@@ -470,7 +474,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly pagination = input<DataTablePagination | undefined>(undefined);
   readonly expandedTemplate = input<TemplateRef<CellContext<T>> | undefined>(undefined);
   readonly expandMode = input<"single" | "multiple">("multiple");
-  readonly rowExpandable = input<((row: T) => boolean) | undefined>(undefined);
+  readonly rowExpandable = input<RowPredicate<T> | undefined>(undefined);
   readonly expandedKeys = input<Key[] | undefined>(undefined);
   readonly defaultExpandedKeys = input<Key[]>([]);
   readonly expandedChange = output<Key[]>();
@@ -494,11 +498,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   // --- mutable UI state ---
   protected readonly query = signal("");
   protected readonly filters = signal<Record<string, ColumnFilter>>({});
-  private readonly internalSort = signal<DataTableSort[]>([]);
-  private readonly internalSelection = signal<Key[]>([]);
-  private readonly internalExpanded = signal<Key[]>([]);
+  // null = "untouched" → fall back to the matching default* input (reactively, so
+  // a binding that resolves after construction is still picked up)
+  private readonly internalSort = signal<DataTableSort[] | null>(null);
+  private readonly internalSelection = signal<Key[] | null>(null);
+  private readonly internalExpanded = signal<Key[] | null>(null);
   private readonly hiddenIds = signal<Set<string>>(new Set());
-  private readonly runtimePins = signal<Record<string, "left" | "right" | undefined>>({});
+  private readonly runtimePins = signal<Record<string, "left" | "right" | undefined> | null>(null);
   private readonly columnOrder = signal<string[]>([]);
   protected readonly dragColId = signal<string | null>(null);
   private readonly rowOrder = signal<Key[]>([]);
@@ -509,40 +515,12 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   protected readonly pinPx = signal<{ left: Record<string, number>; right: Record<string, number> }>({ left: {}, right: {} });
   protected readonly isMobile = signal(false);
   private readonly scrollTop = signal(0);
-  private seededSort = false;
-  private seededSelection = false;
-  private seededExpanded = false;
-  private seededPins = false;
 
   private mq?: MediaQueryList;
   private mqHandler = () => this.isMobile.set(!!this.mq?.matches);
   private ro?: ResizeObserver;
 
   constructor() {
-    // seed controlled/uncontrolled state once from defaults
-    effect(() => {
-      const ds = this.defaultSort();
-      untracked(() => { if (!this.seededSort) { this.seededSort = true; if (ds.length) this.internalSort.set(ds); } });
-    });
-    effect(() => {
-      const dk = this.defaultSelectedKeys();
-      untracked(() => { if (!this.seededSelection) { this.seededSelection = true; if (dk.length) this.internalSelection.set(dk); } });
-    });
-    effect(() => {
-      const de = this.defaultExpandedKeys();
-      untracked(() => { if (!this.seededExpanded) { this.seededExpanded = true; if (de.length) this.internalExpanded.set(de); } });
-    });
-    effect(() => {
-      const cols = this.columns();
-      untracked(() => {
-        if (this.seededPins) return;
-        this.seededPins = true;
-        const m: Record<string, "left" | "right" | undefined> = {};
-        cols.forEach((c) => { if (c.pin) m[c.id] = c.pin; });
-        this.runtimePins.set(m);
-      });
-    });
-
     // responsive media query
     effect(() => {
       const on = this.responsive();
@@ -622,10 +600,15 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     const idx = new Map(order.map((id, i) => [id, i]));
     return [...cols].sort((a, b) => (idx.get(a.id) ?? 0) - (idx.get(b.id) ?? 0));
   });
+  private readonly declaredPins = computed(() => {
+    const m: Record<string, "left" | "right" | undefined> = {};
+    this.columns().forEach((c) => { if (c.pin) m[c.id] = c.pin; });
+    return m;
+  });
   private readonly effectiveColumns = computed(() => {
     const base = this.orderedBase();
     if (!this.pinnable()) return base;
-    const pins = this.runtimePins();
+    const pins = this.runtimePins() ?? this.declaredPins();
     return base.map((c) => ({ ...c, pin: pins[c.id] ?? c.pin }));
   });
   private readonly colById = computed(() => {
@@ -663,7 +646,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   });
 
   // ---- sort ----
-  private readonly sortState = computed(() => this.sort() ?? this.internalSort());
+  private readonly sortState = computed(() => this.sort() ?? this.internalSort() ?? this.defaultSort());
   protected dirOf(id: string): SortDirection | null {
     return this.sortState().find((s) => s.id === id)?.dir ?? null;
   }
@@ -961,7 +944,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
 
   // ---- selection ----
-  private readonly selectionArr = computed(() => this.selectedKeys() ?? this.internalSelection());
+  private readonly selectionArr = computed(() => this.selectedKeys() ?? this.internalSelection() ?? this.defaultSelectedKeys());
   protected readonly selectedSet = computed(() => new Set(this.selectionArr()));
   private readonly allKeys = computed(() => this.pageRows().map((rr) => rr.key));
   protected readonly allSelected = computed(() => {
@@ -989,7 +972,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
 
   // ---- expansion ----
-  private readonly expandedArr = computed(() => this.expandedKeys() ?? this.internalExpanded());
+  private readonly expandedArr = computed(() => this.expandedKeys() ?? this.internalExpanded() ?? this.defaultExpandedKeys());
   protected readonly expandedSet = computed(() => new Set(this.expandedArr()));
   private applyExpanded(nextKeys: Key[]): void {
     if (this.expandedKeys() === undefined) this.internalExpanded.set(nextKeys);
@@ -1020,7 +1003,8 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
 
   // ---- pinning ----
   protected setPin(id: string, side: "left" | "right" | undefined): void {
-    this.runtimePins.update((s) => ({ ...s, [id]: side }));
+    const base = this.runtimePins() ?? this.declaredPins();
+    this.runtimePins.set({ ...base, [id]: side });
     this.columnPinChange.emit({ id, pin: side });
   }
   private measurePins(row: HTMLElement): void {

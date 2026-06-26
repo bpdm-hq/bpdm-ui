@@ -13,11 +13,19 @@ empty state, and \`onRowClick\` are all inputs. Opt into sorting, selection,
 pagination, expandable rows, frozen columns, a column toggle, global search, and
 per-column filters. The wrapper scrolls horizontally, so it is responsive by default.
 
-A complete, copy-paste setup:
+\`\`\`html
+<bpdm-data-table [columns]="columns()" [data]="rows" [rowKey]="rowKey" selectable searchable />
+\`\`\`
 
-\`\`\`ts
-import { Component, computed, TemplateRef, viewChild } from "@angular/core";
-import { BpdmDataTable, type DataTableColumn } from "@bpdm/ng";
+Custom cells use an \`<ng-template>\` referenced from a column's \`cell\` (with
+\`sortAccessor\` so sort/search/filter still have a value); plain columns use
+\`accessor\`. See the Playground's source for a complete setup. Each example below
+focuses on one feature; combine the inputs freely.
+`;
+
+// full copy-paste setup shown under the Playground demo's "Show code"
+const PLAYGROUND_SOURCE = `import { Component, computed, TemplateRef, viewChild } from "@angular/core";
+import { BpdmDataTable, type CellContext, type DataTableColumn } from "@bpdm/ng";
 
 type Member = {
   id: string;
@@ -65,11 +73,7 @@ export class MembersComponent {
   onSelection(e: { keys: (string | number)[]; rows: Member[] }) {
     console.log(e.keys, e.rows);
   }
-}
-\`\`\`
-
-Each example below focuses on one feature; combine the inputs freely.
-`;
+}`;
 
 type Member = {
   id: string;
@@ -443,7 +447,7 @@ class DtBorderlessHost {
       [columns]="columns()"
       [data]="data"
       [rowKey]="rowKey"
-      [expandedTemplate]="details()"
+      [expandedTemplate]="details"
       [defaultExpandedKeys]="['m_03']"
     />
     <ng-template #email let-row><span class="font-mono text-xs">{{ row.email }}</span></ng-template>
@@ -479,7 +483,6 @@ class DtBorderlessHost {
 class DtExpandableHost {
   readonly emailTpl = viewChild<TemplateRef<CellContext<Member>>>("email");
   readonly statusTpl = viewChild<TemplateRef<CellContext<Member>>>("status");
-  readonly details = viewChild<TemplateRef<CellContext<Member>>>("details");
   readonly statusStyle = STATUS_STYLE;
   readonly data = MEMBERS;
   readonly rowKey = (r: Member) => r.id;
@@ -716,6 +719,14 @@ const meta: Meta = {
     rowKey: { table: { disable: true } },
     pagination: { table: { disable: true } },
     expandedTemplate: { table: { disable: true } },
+    // outputs are real API but kept out of the args table so the autodocs reads
+    // like React's single props table (no separate "Outputs" section)
+    sortChange: { table: { disable: true } },
+    selectionChange: { table: { disable: true } },
+    expandedChange: { table: { disable: true } },
+    columnPinChange: { table: { disable: true } },
+    columnOrderChange: { table: { disable: true } },
+    rowReorder: { table: { disable: true } },
   },
   args: { size: "md" },
 };
@@ -728,6 +739,7 @@ export const Playground: Story = {
     props: args,
     template: `<dt-members [size]="size" [striped]="striped" [bordered]="bordered" [frame]="frame" [divided]="divided" [hoverable]="hoverable" [stickyHeader]="stickyHeader" [multiSort]="multiSort" [selectable]="selectable" [selectionMode]="selectionMode" [pinnable]="pinnable" />`,
   }),
+  parameters: { docs: { source: { code: PLAYGROUND_SOURCE } } },
 };
 
 export const Sizes: Story = {
@@ -1265,7 +1277,7 @@ export const ExpandableRows: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Component, computed, TemplateRef, viewChild } from "@angular/core";
+        code: `import { Component, computed } from "@angular/core";
 import { BpdmDataTable, type DataTableColumn } from "@bpdm/ng";
 
 type Member = { id: string; name: string; role: string; email: string; tasks: number };
@@ -1280,7 +1292,7 @@ type Member = { id: string; name: string; role: string; email: string; tasks: nu
       [columns]="columns()"
       [data]="data"
       [rowKey]="rowKey"
-      [expandedTemplate]="details()"
+      [expandedTemplate]="details"
       [defaultExpandedKeys]="['m_03']"
     />
     <ng-template #details let-row>
@@ -1292,7 +1304,6 @@ type Member = { id: string; name: string; role: string; email: string; tasks: nu
   \`,
 })
 export class TableExpandableComponent {
-  readonly details = viewChild<TemplateRef<CellContext<Member>>>("details");
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
     { id: "m_01", name: "Hugo Lindberg", role: "Owner", email: "hugo@example.com", tasks: 128 },

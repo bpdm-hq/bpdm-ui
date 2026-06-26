@@ -3,6 +3,9 @@
 
 export type DateRange = { from: Date | null; to: Date | null };
 
+/** Predicate marking individual days as disabled. */
+export type DatePredicate = (date: Date) => boolean;
+
 export const MONTHS = [
   "January",
   "February",

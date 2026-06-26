@@ -3,6 +3,15 @@ import type { TemplateRef } from "@angular/core";
 /** A value the table can compare when sorting a column. */
 export type SortValue = string | number | boolean | Date | null | undefined;
 
+/** Stable per-row key. */
+export type RowKeyFn<T> = (row: T, index: number) => string | number;
+/** Row click handler (also enables pointer cursor + keyboard activation). */
+export type RowClickFn<T> = (row: T, index: number) => void;
+/** Predicate over a row (e.g. which rows can expand). */
+export type RowPredicate<T> = (row: T) => boolean;
+/** Per-row class function for conditional styling. */
+export type RowClassFn<T> = (row: T, index: number) => string;
+
 /** One column's sort direction. */
 export type SortDirection = "asc" | "desc";
 
