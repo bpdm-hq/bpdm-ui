@@ -86,8 +86,11 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark">
-      <body>
+    // suppressHydrationWarning: browser extensions (e.g. ColorZilla, Grammarly)
+    // inject attributes on <html>/<body> that aren't in the SSR'd HTML — this
+    // silences only those top-level attribute mismatches, not the rest of the tree.
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {children}
         <script
           type="application/ld+json"
