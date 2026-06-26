@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { InstallTabs } from "./install-tabs";
 import { ThemeToggle } from "./theme-toggle";
+import { HeroPreview } from "./hero-preview";
 
 const REACT_DOCS = "/react/?path=/docs/introduction--docs";
 const ANGULAR_DOCS = "/angular/?path=/docs/introduction--docs";
@@ -50,7 +51,8 @@ export default function Home() {
       <main>
         {/* hero */}
         <section className="hero">
-          <div className="wrap">
+          <div className="wrap hero-grid">
+            <div className="hero-copy">
             <span className="eyebrow">bpdm · design system</span>
             <h1>
               One design system,<br />
@@ -76,40 +78,37 @@ export default function Home() {
               <span>Tree-shakeable</span><span className="dot">·</span>
               <span>React &amp; Angular</span>
             </div>
+            </div>
 
-            {/* product window — a curated component snapshot */}
+            {/* hero collage — the bpdm story: one component, both frameworks, one token set */}
             <div className="hero-window" aria-hidden="true">
-              <div className="window">
-                <div className="window-bar">
-                  <span className="dots"><i className="wd r" /><i className="wd y" /><i className="wd g" /></span>
-                  <span className="window-title">bpdm/ui — Account settings</span>
+              {/* the same component, rendered in React and Angular — interactive */}
+              <HeroPreview />
+
+              {/* a second, distinct component — a believable data table */}
+              <div className="hero-card">
+                <div className="mt-cardhead">
+                  <span className="mt-cardtitle">Team members</span>
+                  <span className="d-badge d-badge-neutral">3 of 10</span>
                 </div>
-                <div className="window-body">
-                  <div className="panel">
-                    <div className="panel-head">
-                      <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BD</span>
-                      <div className="panel-id">
-                        <strong>Bpdm</strong>
-                        <span>Administrator</span>
-                      </div>
-                      <span className="d-badge d-badge-success" style={{ marginLeft: "auto" }}><i></i> Pro</span>
-                    </div>
-                    <div className="d-field">
-                      <label>Display name</label>
-                      <div className="d-input">bpdm design system</div>
-                    </div>
-                    <div className="panel-row">
-                      <span>Email notifications</span>
-                      <span className="d-switch"><i></i></span>
-                    </div>
-                    <div className="panel-row">
-                      <span>Two-factor authentication</span>
-                      <span className="d-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
-                    </div>
-                    <div className="panel-actions">
-                      <span className="d-btn d-btn-primary">Save changes</span>
-                      <span className="d-btn d-btn-ghost">Cancel</span>
-                    </div>
+                <div className="mt">
+                  <div className="mt-row mt-head">
+                    <span>Member</span><span>Role</span><span>Status</span>
+                  </div>
+                  <div className="mt-row">
+                    <span className="mt-name"><span className="mt-av">AK</span>Alex Kim</span>
+                    <span>Admin</span>
+                    <span><span className="d-badge d-badge-success"><i></i> Active</span></span>
+                  </div>
+                  <div className="mt-row">
+                    <span className="mt-name"><span className="mt-av">SL</span>Sam Lee</span>
+                    <span>Editor</span>
+                    <span><span className="d-badge d-badge-info"><i></i> Invited</span></span>
+                  </div>
+                  <div className="mt-row">
+                    <span className="mt-name"><span className="mt-av">MR</span>Mia Ross</span>
+                    <span>Viewer</span>
+                    <span><span className="d-badge d-badge-success"><i></i> Active</span></span>
                   </div>
                 </div>
               </div>
