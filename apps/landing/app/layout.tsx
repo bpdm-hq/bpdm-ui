@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const SITE = "https://bpdm.dev";
+const SITE = "https://ui.bpdm.dev";
 const DESCRIPTION =
   "bpdm — an accessible, themeable design system with one shared set of design tokens for every framework. Pick React or Angular and explore the live docs.";
 
