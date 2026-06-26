@@ -4,7 +4,7 @@
   "private": true,
   "description": "bpdm design system — a monorepo of framework implementations sharing one set of design tokens.",
   "license": "MIT",
-  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "author": "bpdm (https://bpdm.dev)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BDev-9/bpdm-ui.git"

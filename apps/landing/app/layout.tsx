@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     "accessible components",
     "themeable ui",
   ],
-  authors: [{ name: "Bhavin P. Devamorari", url: SITE }],
-  creator: "Bhavin P. Devamorari",
+  authors: [{ name: "bpdm", url: SITE }],
+  creator: "bpdm",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -52,9 +52,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e0e11",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0e0e11" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
+  ],
+  colorScheme: "dark light",
 };
+
+// Runs before paint: pick the saved theme (or system preference) and set it on
+// <html>, so there's no flash of the wrong theme. SSR defaults to dark.
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('bpdm-theme');if(t!=='light'&&t!=='dark'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.dataset.theme=t;}catch(e){}})();`;
 
 // Structured data: the site + the software (component library) it documents.
 const jsonLd = {
@@ -66,12 +73,12 @@ const jsonLd = {
       url: SITE,
       name: "bpdm/ui",
       description: DESCRIPTION,
-      publisher: { "@id": `${SITE}/#person` },
+      publisher: { "@id": `${SITE}/#org` },
     },
     {
-      "@type": "Person",
-      "@id": `${SITE}/#person`,
-      name: "Bhavin P. Devamorari",
+      "@type": "Organization",
+      "@id": `${SITE}/#org`,
+      name: "bpdm",
       url: SITE,
     },
     {
@@ -82,7 +89,7 @@ const jsonLd = {
       operatingSystem: "Web",
       description: DESCRIPTION,
       url: SITE,
-      author: { "@id": `${SITE}/#person` },
+      author: { "@id": `${SITE}/#org` },
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       license: "https://opensource.org/licenses/MIT",
     },
@@ -134,6 +141,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // silences only those top-level attribute mismatches, not the rest of the tree.
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         {children}
         <script
           type="application/ld+json"

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A modern, themeable, accessible Angular component library — Angular CDK, Tailwind 4, and the bpdm design system.",
   "license": "MIT",
-  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "author": "bpdm (https://bpdm.dev)",
   "homepage": "https://bpdm.dev",
   "repository": {
     "type": "git",

@@ -4,7 +4,7 @@
   "description": "Framework-agnostic styling primitives for the bpdm design system — class-merge (cn) and cva variant maps shared by every framework package.",
   "type": "module",
   "license": "MIT",
-  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "author": "bpdm (https://bpdm.dev)",
   "homepage": "https://bpdm.dev",
   "repository": {
     "type": "git",

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { InstallTabs } from "./install-tabs";
+import { ThemeToggle } from "./theme-toggle";
 
 const REACT_DOCS = "/react/?path=/docs/introduction--docs";
 const ANGULAR_DOCS = "/angular/?path=/docs/introduction--docs";
@@ -40,6 +41,7 @@ export default function Home() {
               </svg>
               GitHub
             </a>
+            <ThemeToggle />
             <a className="nav-cta" href={REACT_DOCS}>Get started</a>
           </nav>
         </div>
@@ -85,9 +87,9 @@ export default function Home() {
                 <div className="window-body">
                   <div className="panel">
                     <div className="panel-head">
-                      <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BP</span>
+                      <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BD</span>
                       <div className="panel-id">
-                        <strong>Bhavin P.</strong>
+                        <strong>Bpdm</strong>
                         <span>Administrator</span>
                       </div>
                       <span className="d-badge d-badge-success" style={{ marginLeft: "auto" }}><i></i> Pro</span>
@@ -194,7 +196,7 @@ export default function Home() {
               <div className="demo">
                 <span className="demo-label">Avatars</span>
                 <div className="demo-row d-avatars">
-                  <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BP</span>
+                  <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BD</span>
                   <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--react) 26%, var(--card))", color: "var(--react)" }}>RX</span>
                   <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--angular) 26%, var(--card))", color: "var(--angular)" }}>NG</span>
                   <span className="d-avatar d-avatar-more">+12</span>

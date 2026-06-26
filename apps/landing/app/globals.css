@@ -12,6 +12,16 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --maxw: 66rem;
 }
+/* light theme — overrides the neutral palette; amber/react/angular stay shared */
+[data-theme="light"] {
+  --bg: #fbfbfa;
+  --bg-soft: #f3f3f1;
+  --card: #ffffff;
+  --card-hover: #f6f6f4;
+  --border: #e6e4df;
+  --fg: #1c1a17;
+  --muted: #6b6862;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -20,6 +30,7 @@ body {
   color: var(--fg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
   background-image: radial-gradient(
     55rem 32rem at 50% -8%,
     color-mix(in srgb, var(--primary) 11%, transparent),
@@ -285,15 +296,25 @@ h1 .amber {
 .btn-primary { box-shadow: 0 10px 34px -10px color-mix(in srgb, var(--primary) 78%, transparent); }
 .btn-primary:hover { box-shadow: 0 16px 46px -10px color-mix(in srgb, var(--primary) 92%, transparent); }
 
-/* nav CTA button */
-.nav-cta {
+/* nav CTA button — selector outranks `.nav-links a` so the dark label stays readable */
+.nav-links a.nav-cta {
   padding: 0.45rem 0.95rem; border-radius: 0.6rem; background: var(--primary); color: #1a1205;
   font-weight: 600; font-size: 0.85rem; text-decoration: none;
   box-shadow: 0 6px 20px -6px color-mix(in srgb, var(--primary) 70%, transparent);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
-.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--primary) 88%, transparent); }
-@media (max-width: 640px) { .nav-cta { display: none; } }
+.nav-links a.nav-cta:hover { color: #1a1205; transform: translateY(-1px); box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--primary) 88%, transparent); }
+@media (max-width: 640px) { .nav-links a.nav-cta { display: none; } }
+
+/* theme toggle */
+.theme-toggle {
+  display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 0.55rem;
+  border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.theme-toggle:hover { color: var(--fg); border-color: color-mix(in srgb, var(--fg) 30%, var(--border)); }
+.theme-toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary); }
+.theme-toggle svg { width: 1rem; height: 1rem; }
 
 /* ── window chrome (hero product shot + code) ─────────── */
 .window-bar { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.85rem; border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); background: color-mix(in srgb, var(--bg-soft) 70%, transparent); }

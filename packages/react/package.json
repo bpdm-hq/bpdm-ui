@@ -4,7 +4,7 @@
   "description": "A modern, themeable, accessible React component library — Radix primitives, Tailwind 4, and a warm amber design system.",
   "type": "module",
   "license": "MIT",
-  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "author": "bpdm (https://bpdm.dev)",
   "homepage": "https://bpdm.dev",
   "repository": {
     "type": "git",
