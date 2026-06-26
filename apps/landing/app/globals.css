@@ -12,16 +12,21 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --maxw: 66rem;
 }
-/* light theme — overrides the neutral palette; amber/react/angular stay shared */
+/* light theme — cool-neutral, enterprise/SaaS palette: crisp white cards on a
+   faint cool canvas. Amber/react/angular accents stay shared. */
 [data-theme="light"] {
-  --bg: #fbfbfa;
-  --bg-soft: #f3f3f1;
+  --bg: #f7f8fa;
+  --bg-soft: #eef0f4;
   --card: #ffffff;
-  --card-hover: #f6f6f4;
-  --border: #e6e4df;
-  --fg: #1c1a17;
-  --muted: #6b6862;
+  --card-hover: #f3f5f8;
+  --border: #e3e6ec;
+  --fg: #1b1f27;
+  --muted: #5b6472;
 }
+/* softer, faintly-tinted shadows in light mode (harsh black reads muddy) */
+[data-theme="light"] .window { box-shadow: 0 28px 64px -28px rgba(24, 33, 54, 0.28), 0 0 0 1px rgba(24, 33, 54, 0.04); }
+[data-theme="light"] .code-window { box-shadow: 0 18px 44px -26px rgba(24, 33, 54, 0.22); }
+[data-theme="light"] .card--active:hover { box-shadow: 0 16px 38px -16px rgba(24, 33, 54, 0.2); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
