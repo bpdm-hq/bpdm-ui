@@ -248,6 +248,50 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* FAQ — honest positioning + the questions people actually search */}
+        <section id="faq">
+          <div className="wrap">
+            <div className="section-head">
+              <h2>shadcn-style — now for Angular too</h2>
+              <p>The shadcn approach (Radix + Tailwind on React), extended to Angular on one shared token set.</p>
+            </div>
+            <div className="faq">
+              <div className="faq-item">
+                <h3>Is bpdm/ui like shadcn/ui?</h3>
+                <p>
+                  Yes — on React, bpdm/ui is built on the same foundation as shadcn/ui (Radix UI
+                  primitives + Tailwind CSS), with the same accessible, themeable philosophy. It then
+                  brings that same approach to Angular.
+                </p>
+              </div>
+              <div className="faq-item">
+                <h3>Is there a shadcn for Angular?</h3>
+                <p>
+                  shadcn/ui itself is React-only. bpdm/ui&apos;s Angular library fills that gap — the
+                  same components and design tokens, built natively with Angular standalone components
+                  and the Angular CDK.
+                </p>
+              </div>
+              <div className="faq-item">
+                <h3>React or Angular — which does it support?</h3>
+                <p>
+                  Both. One design system and one shared set of design tokens, with native React and
+                  Angular implementations, so the components look and behave identically across
+                  frameworks.
+                </p>
+              </div>
+              <div className="faq-item">
+                <h3>Is bpdm/ui free and open source?</h3>
+                <p>
+                  Yes — bpdm/ui is MIT-licensed and open source on{" "}
+                  <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a> for both the
+                  React and Angular libraries.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer>

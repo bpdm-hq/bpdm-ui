@@ -131,6 +131,19 @@ section { padding: 3.25rem 0; }
 .theme-name { font-size: 0.92rem; font-weight: 650; }
 .theme-name small { display: block; font-weight: 400; font-size: 0.78rem; opacity: 0.7; }
 
+/* ── faq ─────────────────────────────────────────────── */
+.faq { display: grid; gap: 1rem; grid-template-columns: 1fr; max-width: 50rem; margin: 0 auto; }
+@media (min-width: 720px) { .faq { grid-template-columns: 1fr 1fr; } }
+.faq-item {
+  padding: 1.4rem; border: 1px solid var(--border); border-radius: 0.9rem; background: var(--card);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.faq-item:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+.faq-item h3 { font-size: 1.02rem; font-weight: 650; margin-bottom: 0.4rem; }
+.faq-item p { color: var(--muted); font-size: 0.9rem; }
+.faq-item a { color: var(--primary); text-decoration: none; }
+.faq-item a:hover { text-decoration: underline; }
+
 /* ── footer ──────────────────────────────────────────── */
 footer { border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent); padding: 2.5rem 0; }
 .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: 0.85rem; }
