@@ -1,18 +1,24 @@
 // Assemble the deployed site:
-//   site/            → landing page (framework picker)
+//   site/            → landing page (Next.js static export — apps/landing/out)
 //   site/react/      → React Storybook (built to packages/react/storybook-static)
-//   site/angular/    → Angular Storybook (added in a later phase)
-// Run after the Storybooks are built. Output dir (`site`) is what Vercel serves.
+//   site/angular/    → Angular Storybook (packages/angular/storybook-static)
+// Run after the Storybooks and the landing are built. `site` is what Vercel serves.
 import { rmSync, mkdirSync, cpSync, existsSync } from "node:fs";
 
 const SITE = "site";
 const REACT_SB = "packages/react/storybook-static";
+const LANDING = "apps/landing/out";
 
 rmSync(SITE, { recursive: true, force: true });
 mkdirSync(SITE, { recursive: true });
 
-// landing page (index.html + favicon)
-cpSync("landing", SITE, { recursive: true });
+// landing page — Next.js static export (HTML + SEO: sitemap, robots, OG image)
+if (!existsSync(LANDING)) {
+  console.error(`assemble-site: ${LANDING} not found — build the landing first (pnpm --filter @bpdm/landing build).`);
+  process.exit(1);
+}
+cpSync(LANDING, SITE, { recursive: true });
+// keep /favicon.svg for the Storybooks (the landing ships its own /icon.svg)
 if (existsSync("packages/react/public/favicon.svg")) {
   cpSync("packages/react/public/favicon.svg", `${SITE}/favicon.svg`);
 }
