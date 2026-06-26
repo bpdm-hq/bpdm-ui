@@ -1,0 +1,22 @@
+{
+  "name": "@bpdm/landing",
+  "version": "0.1.0",
+  "private": true,
+  "description": "bpdm.dev landing page — framework picker for the bpdm design system.",
+  "scripts": {
+    "dev": "next dev -p 8109",
+    "build": "next build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  }
+}

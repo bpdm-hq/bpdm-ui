@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm build:site",
   "outputDirectory": "site",
-  "framework": null
+  "framework": null,
+  "headers": [
+    {
+      "source": "/opengraph-image",
+      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+    }
+  ]
 }
