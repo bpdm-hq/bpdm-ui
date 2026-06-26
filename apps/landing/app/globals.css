@@ -252,3 +252,77 @@ footer a:focus-visible, .nav-links a:focus-visible { outline: none; box-shadow: 
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════
+   modern polish — gradient mesh, glass, glows, window chrome
+   ════════════════════════════════════════════════════════ */
+
+/* layered mesh background + faint grid */
+body {
+  background-image:
+    radial-gradient(60rem 34rem at 50% -10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+    radial-gradient(42rem 30rem at 92% 2%, color-mix(in srgb, var(--react) 9%, transparent), transparent 60%),
+    radial-gradient(42rem 30rem at 4% 8%, color-mix(in srgb, var(--angular) 8%, transparent), transparent 60%);
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.5;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border) 55%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 35%, transparent 78%);
+}
+
+/* gradient headline highlight */
+h1 .amber {
+  background: linear-gradient(110deg, var(--primary) 8%, #ffd27a 55%, var(--primary) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+
+/* glowing primary CTA */
+.btn-primary { box-shadow: 0 10px 34px -10px color-mix(in srgb, var(--primary) 78%, transparent); }
+.btn-primary:hover { box-shadow: 0 16px 46px -10px color-mix(in srgb, var(--primary) 92%, transparent); }
+
+/* nav CTA button */
+.nav-cta {
+  padding: 0.45rem 0.95rem; border-radius: 0.6rem; background: var(--primary); color: #1a1205;
+  font-weight: 600; font-size: 0.85rem; text-decoration: none;
+  box-shadow: 0 6px 20px -6px color-mix(in srgb, var(--primary) 70%, transparent);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--primary) 88%, transparent); }
+@media (max-width: 640px) { .nav-cta { display: none; } }
+
+/* ── window chrome (hero product shot + code) ─────────── */
+.window-bar { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.85rem; border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); background: color-mix(in srgb, var(--bg-soft) 70%, transparent); }
+.dots { display: flex; gap: 0.42rem; }
+.wd { width: 0.7rem; height: 0.7rem; border-radius: 999px; display: block; }
+.wd.r { background: #ff5f57; } .wd.y { background: #febc2e; } .wd.g { background: #28c840; }
+.window-title { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.76rem; color: var(--muted); }
+
+.hero-window { margin: 3.25rem auto 0; max-width: 30rem; }
+.window {
+  border: 1px solid color-mix(in srgb, var(--fg) 9%, var(--border)); border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--card) 82%, transparent); backdrop-filter: blur(10px);
+  box-shadow: 0 34px 80px -24px rgba(0, 0, 0, 0.75), 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
+  overflow: hidden; animation: floaty 7s var(--ease) infinite;
+}
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.window-body { padding: 1.15rem; }
+.panel { display: flex; flex-direction: column; gap: 0.95rem; }
+.panel-head { display: flex; align-items: center; gap: 0.7rem; }
+.panel-id { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
+.panel-id strong { font-size: 0.9rem; font-weight: 650; }
+.panel-id span { font-size: 0.74rem; color: var(--muted); }
+.panel-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.86rem; color: var(--fg); }
+.panel-actions { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+
+/* ── code window ─────────────────────────────────────── */
+.code-window { border: 1px solid var(--border); border-radius: 0.85rem; background: var(--card); overflow: hidden; box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.6); }
+.code-window .code { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .window { animation: none; }
+}

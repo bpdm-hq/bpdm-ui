@@ -40,6 +40,7 @@ export default function Home() {
               </svg>
               GitHub
             </a>
+            <a className="nav-cta" href={REACT_DOCS}>Get started</a>
           </nav>
         </div>
       </header>
@@ -72,6 +73,44 @@ export default function Home() {
               <span>Themeable</span><span className="dot">·</span>
               <span>Tree-shakeable</span><span className="dot">·</span>
               <span>React &amp; Angular</span>
+            </div>
+
+            {/* product window — a curated component snapshot */}
+            <div className="hero-window" aria-hidden="true">
+              <div className="window">
+                <div className="window-bar">
+                  <span className="dots"><i className="wd r" /><i className="wd y" /><i className="wd g" /></span>
+                  <span className="window-title">bpdm/ui — Account settings</span>
+                </div>
+                <div className="window-body">
+                  <div className="panel">
+                    <div className="panel-head">
+                      <span className="d-avatar" style={{ background: "color-mix(in srgb, var(--primary) 30%, var(--card))", color: "var(--primary)" }}>BP</span>
+                      <div className="panel-id">
+                        <strong>Bhavin P.</strong>
+                        <span>Administrator</span>
+                      </div>
+                      <span className="d-badge d-badge-success" style={{ marginLeft: "auto" }}><i></i> Pro</span>
+                    </div>
+                    <div className="d-field">
+                      <label>Display name</label>
+                      <div className="d-input">bpdm design system</div>
+                    </div>
+                    <div className="panel-row">
+                      <span>Email notifications</span>
+                      <span className="d-switch"><i></i></span>
+                    </div>
+                    <div className="panel-row">
+                      <span>Two-factor authentication</span>
+                      <span className="d-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
+                    </div>
+                    <div className="panel-actions">
+                      <span className="d-btn d-btn-primary">Save changes</span>
+                      <span className="d-btn d-btn-ghost">Cancel</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -324,8 +363,13 @@ export default function Home() {
             </div>
             <div className="quickstart">
               <InstallTabs />
-              <pre className="code">
-                <code>{`import { Button, Badge } from "@bpdm/ui";
+              <div className="code-window">
+                <div className="window-bar">
+                  <span className="dots"><i className="wd r" /><i className="wd y" /><i className="wd g" /></span>
+                  <span className="window-title">app.tsx</span>
+                </div>
+                <pre className="code">
+                  <code>{`import { Button, Badge } from "@bpdm/ui";
 
 export function Example() {
   return (
@@ -334,7 +378,8 @@ export function Example() {
     </Button>
   );
 }`}</code>
-              </pre>
+                </pre>
+              </div>
             </div>
           </div>
         </section>
