@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Framework-agnostic design tokens for the bpdm design system — CSS variables, four themes, and one motion language.",
   "license": "MIT",
-  "author": "Bhavin P. Devamorari (https://bpdm.dev)",
+  "author": "bpdm (https://bpdm.dev)",
   "homepage": "https://bpdm.dev",
   "repository": {
     "type": "git",
