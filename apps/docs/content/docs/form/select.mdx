@@ -7,7 +7,9 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import {
   SelectBasicDemo,
   SelectSearchableDemo,
+  SelectWithIconsDemo,
   SelectGroupsDemo,
+  SelectBigDemo,
   SelectSizesDemo,
   SelectStatesDemo,
 } from '@/components/select-demos';
@@ -100,10 +102,60 @@ export function SelectSearchable({ frameworks }) {
   </Tab>
 </Tabs>
 
+## With icons
+
+Each option (and group) accepts an `icon` — rendered before the label in both
+the trigger and the dropdown.
+
+<Preview>
+  <SelectWithIconsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-icons.tsx"
+import { Circle, CircleDashed, CircleCheck, CircleX } from 'lucide-react';
+import { Select } from '@bpdm/ui/select';
+
+const STATUSES = [
+  { value: 'todo', label: 'Todo', icon: <Circle className="size-4 text-muted-foreground" /> },
+  { value: 'in-progress', label: 'In progress', icon: <CircleDashed className="size-4 text-primary" /> },
+  { value: 'done', label: 'Done', icon: <CircleCheck className="size-4 text-primary" /> },
+  { value: 'canceled', label: 'Canceled', icon: <CircleX className="size-4 text-destructive" /> },
+];
+
+export function SelectWithIcons() {
+  return <Select options={STATUSES} placeholder="Set status" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular, `icon` takes a string template (or any renderable the component
+supports); pass your status options with an icon per entry:
+
+```ts title="select-icons.ts"
+readonly statuses = [
+  { value: 'todo', label: 'Todo', icon: '○' },
+  { value: 'in-progress', label: 'In progress', icon: '◐' },
+  { value: 'done', label: 'Done', icon: '✓' },
+  { value: 'canceled', label: 'Canceled', icon: '✕' },
+];
+```
+
+```html title="select-icons.html"
+<bpdm-select [options]="statuses" placeholder="Set status" />
+```
+
+  </Tab>
+</Tabs>
+
 ## Grouped options
 
 Pass groups (`{ label, options }`) instead of flat options to show labelled
-sections.
+sections. The group `label` can include an emoji or icon.
 
 <Preview>
   <SelectGroupsDemo />
@@ -117,19 +169,20 @@ import { Select } from '@bpdm/ui/select';
 
 const CITIES = [
   {
-    label: 'Europe',
+    label: '🇩🇪 Germany',
     options: [
-      { value: 'lon', label: 'London' },
-      { value: 'par', label: 'Paris' },
-      { value: 'ber', label: 'Berlin' },
+      { value: 'berlin', label: 'Berlin' },
+      { value: 'frankfurt', label: 'Frankfurt' },
+      { value: 'hamburg', label: 'Hamburg' },
+      { value: 'munich', label: 'Munich' },
     ],
   },
   {
-    label: 'Americas',
+    label: '🇺🇸 USA',
     options: [
       { value: 'nyc', label: 'New York' },
-      { value: 'sf', label: 'San Francisco' },
-      { value: 'tor', label: 'Toronto' },
+      { value: 'la', label: 'Los Angeles' },
+      { value: 'chicago', label: 'Chicago' },
     ],
   },
 ];
@@ -144,21 +197,64 @@ export function SelectGroups() {
 
 ```ts title="select-groups.ts"
 readonly cities = [
-  { label: 'Europe', options: [
-    { value: 'lon', label: 'London' },
-    { value: 'par', label: 'Paris' },
-    { value: 'ber', label: 'Berlin' },
+  { label: '🇩🇪 Germany', options: [
+    { value: 'berlin', label: 'Berlin' },
+    { value: 'frankfurt', label: 'Frankfurt' },
+    { value: 'hamburg', label: 'Hamburg' },
+    { value: 'munich', label: 'Munich' },
   ] },
-  { label: 'Americas', options: [
+  { label: '🇺🇸 USA', options: [
     { value: 'nyc', label: 'New York' },
-    { value: 'sf', label: 'San Francisco' },
-    { value: 'tor', label: 'Toronto' },
+    { value: 'la', label: 'Los Angeles' },
+    { value: 'chicago', label: 'Chicago' },
   ] },
 ];
 ```
 
 ```html title="select-groups.html"
 <bpdm-select [options]="cities" placeholder="Select a city" />
+```
+
+  </Tab>
+</Tabs>
+
+## Large datasets
+
+The dropdown is **virtualized** — only the visible rows render — so it stays
+smooth even with thousands of options. Open it and scroll through 10,000 rows.
+
+<Preview>
+  <SelectBigDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-large.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+
+export function SelectLarge() {
+  return <Select options={options} placeholder="Scroll 10,000 records" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="select-large.ts"
+readonly options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+```
+
+```html title="select-large.html"
+<bpdm-select [options]="options" placeholder="Scroll 10,000 records" />
 ```
 
   </Tab>
@@ -257,7 +353,7 @@ export function SelectControlled({ frameworks }) {
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `SelectItems` (flat `{ value, label, disabled? }[]` or grouped `{ label, options }[]`) | — | **Required.** The data-driven options. |
+| `options` | `SelectItems` (flat `{ value, label, icon?, disabled? }[]` or grouped `{ label, icon?, options }[]`) | — | **Required.** Data-driven options; each option/group may carry an `icon`. |
 | `value` / `defaultValue` | `string` | — | Controlled / uncontrolled selection. |
 | `onValueChange` | `(value: string) => void` | — | **React** — fires on selection. Angular uses two-way `[(value)]`. |
 | `placeholder` | `string` | `Select…` | Text when nothing is selected. |
