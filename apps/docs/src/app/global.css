@@ -148,8 +148,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--primary) 20%, transparent), transparent 60%),
-    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--accent) 15%, transparent), transparent 60%);
+    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--primary) 25%, transparent), transparent 60%),
+    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%);
   -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent);
   animation: bpdm-aurora-drift 20s ease-in-out infinite alternate;
@@ -212,6 +212,49 @@ figure.shiki:not(.not-fumadocs-codeblock *) button {
 }
 figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
   color: #e6e8eb;
+}
+
+/* ── Smooth sidebar expand/collapse (PrimeNG-style) ──────────────────────────
+   Fumadocs' sidebar folders are Radix Collapsibles but ship without an open/close
+   animation, so children appear instantly (harsh). Radix exposes the content
+   height as --radix-collapsible-content-height; animate against it for an elegant,
+   eased reveal. Radix keeps the closing content mounted while an animation runs. */
+@keyframes bpdm-collapse-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+@keyframes bpdm-collapse-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+#nd-sidebar div[id^='radix-'][data-state='open'] {
+  animation: bpdm-collapse-down 240ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+#nd-sidebar div[id^='radix-'][data-state='closed'] {
+  animation: bpdm-collapse-up 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* slightly softer, longer ease on the item hover/active swap so clicks don't snap */
+#nd-sidebar a {
+  transition:
+    background-color 200ms cubic-bezier(0.32, 0.72, 0, 1),
+    color 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  #nd-sidebar div[id^='radix-'][data-state] {
+    animation: none;
+  }
 }
 
 /* Fumadocs renders the sidebar/nav markup itself, so we can't add a className to
