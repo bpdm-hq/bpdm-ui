@@ -221,6 +221,27 @@ figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
   color: #e6e8eb;
 }
 
+/* ── Callout accent bar: full edge-to-edge, clipped to the card's corners ─────
+   Fumadocs' Callout puts a short inset accent bar (w-0.5, rounded-sm) inside a
+   p-3 box, so it floats with gaps top/bottom. Pin it absolutely so it spans the
+   full height; the box's overflow-hidden + rounded-xl then curve its corners to
+   match the card (the "mod"). Solid brand-tinted colour, a touch bolder. */
+#nd-page [style*='--callout-color'] {
+  position: relative;
+  overflow: hidden;
+  padding-inline-start: 1.15rem;
+}
+#nd-page [style*='--callout-color'] > div:first-child {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 0.25rem;
+  height: auto;
+  border-radius: 0;
+  background-color: var(--callout-color);
+  opacity: 0.9;
+}
+
 /* ── Smooth sidebar expand/collapse (PrimeNG-style) ──────────────────────────
    Fumadocs' sidebar folders are Radix Collapsibles but ship without an open/close
    animation, so children appear instantly (harsh). Radix exposes the content
