@@ -6,8 +6,10 @@ description: Select multiple options — chips or count display, searchable, acc
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import {
   MultiSelectBasicDemo,
+  MultiSelectOverflowDemo,
   MultiSelectCountDemo,
   MultiSelectGroupedDemo,
+  MultiSelectBigDemo,
   MultiSelectStatesDemo,
 } from '@/components/multi-select-demos';
 import { Preview } from '@/components/preview';
@@ -66,6 +68,42 @@ export class MultiSelectUsage {
 
 ```html title="multi-select-usage.html"
 <bpdm-multi-select [options]="frameworks" [defaultValue]="['react', 'vue']" placeholder="Select frameworks" />
+```
+
+  </Tab>
+</Tabs>
+
+## Chip overflow
+
+`maxDisplay` caps how many chips show; the rest collapse into a **"+N"**. Here
+`maxDisplay={2}` with four selected shows two chips and "+2".
+
+<Preview>
+  <MultiSelectOverflowDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-overflow.tsx"
+<MultiSelect
+  options={frameworks}
+  maxDisplay={2}
+  defaultValue={['react', 'vue', 'svelte', 'solid']}
+  placeholder="Select frameworks"
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-overflow.html"
+<bpdm-multi-select
+  [options]="frameworks"
+  [maxDisplay]="2"
+  [defaultValue]="['react', 'vue', 'svelte', 'solid']"
+  placeholder="Select frameworks"
+/>
 ```
 
   </Tab>
@@ -131,6 +169,41 @@ const CITIES = [
 
 ```html title="multi-select-grouped.html"
 <bpdm-multi-select [options]="cities" searchable placeholder="Select cities" />
+```
+
+  </Tab>
+</Tabs>
+
+## Large datasets
+
+The dropdown is **virtualized** — only visible rows render — so it stays smooth
+with thousands of options. Combine with `searchable` to filter.
+
+<Preview>
+  <MultiSelectBigDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-large.tsx"
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+
+export function MultiSelectLarge() {
+  return <MultiSelect searchable options={options} placeholder="Pick records" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-large.html"
+<bpdm-multi-select [options]="options" searchable placeholder="Pick records" />
 ```
 
   </Tab>

@@ -67,24 +67,51 @@ you own.
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="status.test.tsx"
+```tsx title="status-select.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const STATUSES = [
+  { value: 'todo', label: 'Todo' },
+  { value: 'done', label: 'Done' },
+];
+
+export function StatusSelect() {
+  return (
+    // aria-label gives the trigger an accessible name for getByRole;
+    // the wrapper test id is an optional fallback
+    <div data-testid="status">
+      <Select options={STATUSES} aria-label="Status" placeholder="Set status" />
+    </div>
+  );
+}
+```
+
+```tsx title="status-select.test.tsx"
 import { render, screen } from '@testing-library/react';
+import { StatusSelect } from './status-select';
+
+render(<StatusSelect />);
 
 // 1) Accessible query (recommended) — the trigger is a combobox
 screen.getByRole('combobox', { name: /status/i });
 
-// 2) Or wrap it with your own test id
-// <div data-testid="status"><Select … /></div>
+// 2) Or the wrapper you control
 screen.getByTestId('status');
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```ts title="status.spec.ts"
+```html title="status-select.html"
+<div data-testid="status">
+  <bpdm-select [options]="statuses" aria-label="Status" placeholder="Set status" />
+</div>
+```
+
+```ts title="status-select.spec.ts"
 import { By } from '@angular/platform-browser';
 
-// query the host element by tag, or a wrapper you control
+// query the host element by tag, or the wrapper you control
 fixture.debugElement.query(By.css('bpdm-select'));
 fixture.debugElement.query(By.css('[data-testid="status"]'));
 ```
@@ -92,19 +119,9 @@ fixture.debugElement.query(By.css('[data-testid="status"]'));
   </Tab>
 </Tabs>
 
-## Other attributes
-
-The same forwarding (`id`, `aria-*`, `data-*`) works on simple components — handy
-for label relationships, analytics hooks, or query selectors.
-
-```tsx
-<Button id="checkout" aria-describedby="checkout-hint" data-analytics="cta-primary">
-  Checkout
-</Button>
-```
-
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
-  robust approach — it works across every component and doubles as an
-  accessibility check.
+  robust approach — it works across every component (simple or composed) and
+  doubles as an accessibility check. The same forwarding shown above also works
+  for `id`, `aria-*`, and any `data-*` on simple components.
 </Callout>

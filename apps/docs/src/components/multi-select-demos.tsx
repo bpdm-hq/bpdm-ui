@@ -30,6 +30,12 @@ const CITIES = [
   },
 ];
 
+/** 10,000 options — virtualized, no lag. */
+const BIG = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+
 function Box({ children }: { children: ReactNode }) {
   return <div className="mx-auto w-full max-w-sm">{children}</div>;
 }
@@ -38,6 +44,27 @@ export function MultiSelectBasicDemo() {
   return (
     <Box>
       <MultiSelect options={FRAMEWORKS} defaultValue={['react', 'vue']} placeholder="Select frameworks" />
+    </Box>
+  );
+}
+
+export function MultiSelectOverflowDemo() {
+  return (
+    <Box>
+      <MultiSelect
+        options={FRAMEWORKS}
+        maxDisplay={2}
+        defaultValue={['react', 'vue', 'svelte', 'solid']}
+        placeholder="Select frameworks"
+      />
+    </Box>
+  );
+}
+
+export function MultiSelectBigDemo() {
+  return (
+    <Box>
+      <MultiSelect searchable maxDisplay={3} options={BIG} placeholder="Pick records" />
     </Box>
   );
 }
