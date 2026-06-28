@@ -63,6 +63,128 @@
 
 html {
   scrollbar-gutter: stable;
+  background-color: var(--background);
+}
+
+/* ── Side gutters: keep the whole layout off the viewport edges so it breathes
+   (modern docs sit in a comfortable frame, not flush to the left). ── */
+#nd-docs-layout {
+  padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
+}
+
+/* ── Seamless sidebar: blend it into the page (no card surface, no divider) for a
+   modern single-surface feel instead of a boxed panel. The active item keeps its
+   amber highlight; the brand glow at top washes across the full width. ── */
+#nd-sidebar {
+  background-color: transparent;
+  border-inline-end-width: 0;
+}
+/* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */
+#nd-sidebar p {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  color: color-mix(in oklab, var(--muted-foreground) 85%, transparent);
+}
+#nd-sidebar header {
+  /* breathing space above the logo + a frosted sticky header so the nav list
+     softly blurs behind it on scroll (no hard bg/divider) */
+  padding-top: 0.85rem;
+  background-color: color-mix(in oklab, var(--background) 55%, transparent);
+  border-bottom-width: 0;
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  backdrop-filter: blur(8px) saturate(1.4);
+}
+
+/* ── Premium reading typography (Linear / Stripe / Vercel direction): big, tight,
+   confident headings; generous section rhythm; relaxed body line-height. Clarity
+   over decoration. ── */
+#nd-page h1 {
+  font-size: clamp(2rem, 1.4rem + 2vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+}
+#nd-page h2 {
+  margin-top: 3.5rem;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+}
+#nd-page h3 {
+  margin-top: 2.25rem;
+  letter-spacing: -0.012em;
+}
+#nd-page :is(p, li) {
+  line-height: 1.7;
+}
+/* the page description (subtitle) — softer, larger, set apart */
+#nd-page h1 + p {
+  font-size: 1.075rem;
+  color: var(--muted-foreground);
+}
+/* links: amber, with a refined underline offset */
+#nd-page a:not([data-card]):not([class*='not-prose']) {
+  text-decoration-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+/* ── Brand touch: a gently-drifting two-tone aurora (amber + accent) plus a fine
+   dotted texture at the top, both fading out before the reading area. On-trend
+   (layered radial gradients + subtle motion), brand-consistent with the landing,
+   and decorative only (fixed, pointer-events:none, z-index:-1). ── */
+body {
+  background-color: transparent;
+  position: relative;
+}
+
+/* aurora — two soft, slowly-drifting brand blobs (anchored to the top of the
+   page, so they scroll away as you read) */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 30rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--primary) 20%, transparent), transparent 60%),
+    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--accent) 15%, transparent), transparent 60%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  animation: bpdm-aurora-drift 20s ease-in-out infinite alternate;
+}
+
+/* fine dotted texture — elegant, not a hard grid */
+body::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 24rem;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--primary) 38%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 1.5rem 1.5rem;
+  -webkit-mask-image: radial-gradient(80% 100% at 50% 0, #000 0, transparent 68%);
+  mask-image: radial-gradient(80% 100% at 50% 0, #000 0, transparent 68%);
+}
+
+@keyframes bpdm-aurora-drift {
+  from {
+    transform: translate3d(-1.5rem, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5rem, 0.5rem, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 html > body[data-scroll-locked] {
