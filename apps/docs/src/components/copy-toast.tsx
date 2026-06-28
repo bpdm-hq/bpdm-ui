@@ -20,8 +20,9 @@ export function CopyToast() {
       const message = /anchor|link/i.test(label) ? 'Link copied' : 'Copied to clipboard';
       toast.success(message, { id: 'copy', duration: 2000 });
     }
-    document.addEventListener('click', onClick);
-    return () => document.removeEventListener('click', onClick);
+    // capture phase so it still fires if a button stops propagation in bubbling
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
   }, []);
 
   return <Toaster position="top-right" />;

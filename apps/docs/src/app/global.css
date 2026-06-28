@@ -64,13 +64,6 @@
 html {
   scrollbar-gutter: stable;
   background-color: var(--background);
-  /* Lock the page horizontally (PrimeNG-style): nothing can scroll the whole
-     layout sideways, so the sticky sidebar/header never shift on a trackpad
-     swipe. `clip` (not `hidden`) doesn't create a scroll container, so sticky
-     positioning keeps working. Wide content (tables, code) still scrolls inside
-     its own overflow-auto box; only stray decorative overflow (the drifting
-     aurora) is contained. */
-  overflow-x: clip;
 }
 
 /* ── Side gutters: keep the whole layout off the viewport edges so it breathes
@@ -143,6 +136,14 @@ html {
 body {
   background-color: transparent;
   position: relative;
+  /* Lock the page horizontally (PrimeNG-style): the drifting aurora below is the
+     only thing that overflows sideways, and it lives inside <body>, so clipping
+     here contains it — the sticky sidebar/header never shift on a trackpad swipe.
+     `clip` (not `hidden`) creates no scroll container, so sticky keeps working;
+     and because this is <body> (not the root <html>), it does NOT clip the
+     position:fixed toast viewport — its containing block is the viewport, not
+     body. Wide content (tables, code) still scrolls inside its own box. */
+  overflow-x: clip;
 }
 
 /* aurora — two soft, slowly-drifting brand blobs (anchored to the top of the
