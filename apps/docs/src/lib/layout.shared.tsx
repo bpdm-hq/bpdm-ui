@@ -17,5 +17,7 @@ export function baseOptions(): BaseLayoutProps {
       ),
     },
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    // single toggle whose icon swaps with the theme (not two side-by-side icons)
+    themeSwitch: { mode: 'light-dark' },
   };
 }
