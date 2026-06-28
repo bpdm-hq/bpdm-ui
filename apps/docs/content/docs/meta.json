@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "index",
+    "getting-started",
+    "---Components---",
+    "form",
+    "button",
+    "data",
+    "panel",
+    "overlay",
+    "messages",
+    "misc"
+  ]
+}

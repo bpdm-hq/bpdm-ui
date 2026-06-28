@@ -1,0 +1,74 @@
+---
+title: Testing
+description: Target bpdm/ui components in your tests with test ids and forwarded attributes.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+bpdm/ui components are thin wrappers over native elements, so you test them like
+any normal element — pass a `data-testid` (or `id`, `aria-*`, any `data-*`) and
+it lands on the underlying DOM node.
+
+## Adding a test id
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+Components extend the native element's attributes and forward every extra prop,
+so `data-testid` reaches the rendered element.
+
+```tsx title="save-button.tsx"
+import { Button } from '@bpdm/ui/button';
+
+export function SaveButton() {
+  return <Button data-testid="save">Save</Button>;
+}
+```
+
+```tsx title="save-button.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { SaveButton } from './save-button';
+
+test('renders the save button', () => {
+  render(<SaveButton />);
+  expect(screen.getByTestId('save')).toBeInTheDocument();
+});
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`bpdmButton` is a directive on a native element, so put `data-testid` straight
+on the element.
+
+```html title="save.html"
+<button bpdmButton data-testid="save">Save</button>
+```
+
+```ts title="save.spec.ts"
+import { By } from '@angular/platform-browser';
+
+const el = fixture.debugElement.query(By.css('[data-testid="save"]'));
+expect(el).toBeTruthy();
+```
+
+  </Tab>
+</Tabs>
+
+## Other attributes
+
+The same forwarding applies to `id`, `aria-*`, and `data-*` — useful for
+analytics hooks, labelled-by relationships, or query selectors.
+
+```tsx
+<Button id="checkout" aria-describedby="checkout-hint" data-analytics="cta-primary">
+  Checkout
+</Button>
+```
+
+<Callout type="warn">
+  A few **complex composed components** (e.g. Multi-select) don't yet forward
+  arbitrary attributes onto their root. Until that's added, target a wrapper you
+  control, or query an inner element by role/text. Simple components (Button,
+  Input, and most others) forward attributes today.
+</Callout>

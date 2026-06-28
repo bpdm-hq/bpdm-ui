@@ -1,0 +1,87 @@
+---
+title: Installation
+description: Add bpdm/ui to a React or Angular project.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+bpdm/ui ships two framework packages built on one shared token set — `@bpdm/ui`
+for React and `@bpdm/ng` for Angular. Pick the one for your app; the components
+look and behave identically across both.
+
+<Callout type="info">
+  The packages live in the monorepo and npm publishing is in progress. Until
+  then, browse every component live in [Storybook](https://ui.bpdm.dev).
+</Callout>
+
+## 1. Install the package
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```bash
+npm install @bpdm/ui
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```bash
+npm install @bpdm/ng
+```
+
+  </Tab>
+</Tabs>
+
+## 2. Set up Tailwind + tokens
+
+bpdm/ui is built on **Tailwind CSS v4** and the `@bpdm/tokens` package. Import
+Tailwind first, then the bpdm tokens, in your global stylesheet:
+
+```css title="globals.css"
+@import 'tailwindcss';
+@import '@bpdm/tokens/tokens.css';
+```
+
+That's it — the tokens register the design system's colours, radius and motion
+as CSS variables and Tailwind utilities (`bg-primary`, `text-foreground`, …).
+
+## 3. Verify
+
+Drop a button into your app to confirm everything is wired up.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx
+import { Button } from '@bpdm/ui/button';
+
+export function App() {
+  return <Button>It works 🎉</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts
+import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-root',
+  imports: [BpdmButton],
+  template: `<button bpdmButton>It works 🎉</button>`,
+})
+export class App {}
+```
+
+  </Tab>
+</Tabs>
+
+## Next
+
+<Cards>
+  <Card title="Configuration" href="/docs/getting-started/configuration" description="Themes, dark mode, and tokens" />
+  <Card title="Components" href="/docs/button/button" description="Browse all 38 components" />
+</Cards>

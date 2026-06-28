@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+/* shadcn theme: maps every --color-fd-* to shadcn-style vars (--primary,
+   --background, --border, --ring…) — exactly what @bpdm/tokens defines. */
+@import 'fumadocs-ui/css/shadcn.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* bpdm design tokens — CSS variables + 4 themes (data-theme). Defines --primary
+   (amber), --background, etc. that the shadcn theme above reads via var(). */
+@import '@bpdm/tokens/tokens.css';
+
+/* Tailwind v4 doesn't scan workspace packages by default. Point it at the bpdm
+   source so the utility classes used by @bpdm/ui components (bg-primary,
+   text-primary-foreground, border-input…) get generated in this app's CSS. */
+@source '../../../../packages/react/src';
+@source '../../../../packages/variants/src';
+
+/* ONE dark signal: next-themes toggles `.dark` (which Fumadocs + its shiki code
+   highlighting already key off). Mirror bpdm's "slate" dark palette under `.dark`
+   so the whole UI — background, components AND code — switches together, with no
+   light-bg/dark-code desync. (Sidebar vars below reference these, so they follow.) */
+.dark {
+  color-scheme: dark;
+  --background: #0d1117;
+  --foreground: #e6e8eb;
+  --card: #161b22;
+  --card-foreground: #e6e8eb;
+  --popover: #161b22;
+  --popover-foreground: #e6e8eb;
+  --muted: #1c2128;
+  --muted-foreground: #8b949e;
+  --border: #2a313c;
+  --input: #30363d;
+  --ring: #f5a623;
+  --primary: #f5a623;
+  --primary-foreground: #1a1205;
+  --secondary: #1c2128;
+  --secondary-foreground: #e6e8eb;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #f0616d;
+  --destructive-foreground: #0d1117;
+  --success: #3fb950;
+  --success-foreground: #052e16;
+  --warning: #d29922;
+  --warning-foreground: #0d1117;
+  --info: #58a6ff;
+  --info-foreground: #0d1117;
+  --help: #a371f7;
+  --help-foreground: #0d1117;
+}
+
+/* @bpdm/tokens has no sidebar tokens; map them onto existing bpdm tokens so the
+   Fumadocs shadcn theme renders a correct, on-brand sidebar in every theme. */
+:root {
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-ring: var(--ring);
+  --sidebar-primary-foreground: var(--primary-foreground);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* ── Always-dark code blocks (PrimeNG / Tailwind-docs style) ──────────────────
+   Block code panels stay dark in BOTH page themes — crisp, high-contrast, and
+   consistent. Overrides the figure's themed bg + forces the dark token palette. */
+figure.shiki:not(.not-fumadocs-codeblock *) {
+  background-color: #161b22 !important; /* bpdm slate surface */
+  border-color: #2a313c !important;
+  --color-fd-muted-foreground: #8b949e; /* line numbers / counters readable on dark */
+}
+
+figure.shiki:not(.not-fumadocs-codeblock *) code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style);
+}
+
+/* keep the copy button + any controls legible on the dark panel */
+figure.shiki:not(.not-fumadocs-codeblock *) button {
+  color: #8b949e;
+}
+figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
+  color: #e6e8eb;
+}
+
+/* Fumadocs renders the sidebar/nav markup itself, so we can't add a className to
+   those links — we target its DOM and apply the Tailwind utility via @apply. */
+#nd-sidebar a,
+#nd-sidebar button,
+#nd-subnav a,
+#nd-subnav button,
+#nd-tocnav a,
+[role='tab'],
+figure button {
+  @apply cursor-pointer;
+}

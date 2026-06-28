@@ -1,0 +1,10 @@
+{
+  "title": "Panel",
+  "icon": "PanelsTopLeft",
+  "pages": [
+    "accordion",
+    "card",
+    "tabs",
+    "stepper"
+  ]
+}
