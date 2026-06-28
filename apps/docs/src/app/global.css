@@ -64,6 +64,13 @@
 html {
   scrollbar-gutter: stable;
   background-color: var(--background);
+  /* Lock the page horizontally (PrimeNG-style): nothing can scroll the whole
+     layout sideways, so the sticky sidebar/header never shift on a trackpad
+     swipe. `clip` (not `hidden`) doesn't create a scroll container, so sticky
+     positioning keeps working. Wide content (tables, code) still scrolls inside
+     its own overflow-auto box; only stray decorative overflow (the drifting
+     aurora) is contained. */
+  overflow-x: clip;
 }
 
 /* ── Side gutters: keep the whole layout off the viewport edges so it breathes
