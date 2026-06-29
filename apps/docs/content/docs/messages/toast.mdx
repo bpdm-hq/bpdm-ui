@@ -255,6 +255,38 @@ import { Toaster } from '@bpdm/ui/toast';
   above appear there.
 </Callout>
 
+## Across navigation
+
+To confirm an action _after_ a redirect — the **flash message** pattern (submit on
+one page, see the result on the next) — stash the message before navigating and
+fire it when the destination mounts. The `toast` store is global and `<Toaster>`
+lives at the app root, so for in-app client navigation a toast already persists
+across the route change; stashing also makes it survive a full page reload.
+
+```ts title="flash.ts"
+// page A — before navigating
+sessionStorage.setItem('flash', JSON.stringify({ type: 'success', message: 'Order placed' }));
+
+// page B — fire it once, on mount
+import { useEffect } from 'react';
+import { toast } from '@bpdm/ui/toast';
+
+export function useFlash() {
+  useEffect(() => {
+    const raw = sessionStorage.getItem('flash');
+    if (!raw) return;
+    sessionStorage.removeItem('flash'); // clear so it only fires once
+    const { type, message } = JSON.parse(raw) as { type: 'success' | 'error'; message: string };
+    toast[type](message);
+  }, []);
+}
+```
+
+<Callout type="info">
+  Angular has no toast — persist the same way (`sessionStorage` or router
+  `state`) and render a [`<bpdm-alert>`](/docs/messages/alert) on the destination.
+</Callout>
+
 ## API
 
 ### `toast(title, options?)`
