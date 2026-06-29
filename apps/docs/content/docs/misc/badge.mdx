@@ -1,11 +1,386 @@
 ---
 title: Badge
-description: Badge — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A compact label for status, counts and tags — tones, appearances, status dots, removable chips, and corner notifications, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Badge** component — available in React (`@bpdm/ui/badge`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  BadgeBasicDemo,
+  BadgeVariantsDemo,
+  BadgeAppearancesDemo,
+  BadgeSizesDemo,
+  BadgeStatusDemo,
+  BadgeRemovableDemo,
+  BadgeNotificationsDemo,
+  BadgeLinkDemo,
+} from '@/components/badge-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Badge** is a compact label for status, categories, counts, and tags. It
+comes in nine tones across four appearances, with an optional status dot (and a
+`pulse` for live states) and a removable mode. **`NotificationBadge`** overlays a
+count or dot on the corner of an icon or button. In Angular these are
+`<bpdm-badge>` and `<bpdm-notification-badge>`.
+
+## Usage
+
+<Preview>
+  <BadgeBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-usage.tsx"
+import { Badge } from '@bpdm/ui/badge';
+
+export function BadgeUsage() {
+  return <Badge variant="success">Active</Badge>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="badge-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-usage',
+  imports: [BpdmBadge],
+  templateUrl: './badge-usage.html',
+})
+export class BadgeUsage {}
+```
+
+```html title="badge-usage.html"
+<bpdm-badge variant="success">Active</bpdm-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+The `variant` prop sets the tone: `neutral`, `secondary`, `primary`, `success`,
+`warning`, `info`, `help`, `destructive`, and `contrast`.
+
+<Preview>
+  <BadgeVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-variants.tsx"
+<Badge variant="primary">Primary</Badge>
+<Badge variant="success">Success</Badge>
+<Badge variant="warning">Warning</Badge>
+<Badge variant="destructive">Error</Badge>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="badge-variants.html"
+<bpdm-badge variant="primary">Primary</bpdm-badge>
+<bpdm-badge variant="success">Success</bpdm-badge>
+<bpdm-badge variant="warning">Warning</bpdm-badge>
+<bpdm-badge variant="destructive">Error</bpdm-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Appearances
+
+The `appearance` prop styles each tone — `soft` (tinted, default), `solid`
+(filled), `outline` (bordered), and `ghost` (no chrome — pair with `dot` for
+table cells and dense lists).
+
+<Preview>
+  <BadgeAppearancesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-appearances.tsx"
+<Badge variant="primary" appearance="soft">Soft</Badge>
+<Badge variant="primary" appearance="solid">Solid</Badge>
+<Badge variant="primary" appearance="outline">Outline</Badge>
+<Badge variant="primary" appearance="ghost" dot>Ghost</Badge>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="badge-appearances.html"
+<bpdm-badge variant="primary" appearance="soft">Soft</bpdm-badge>
+<bpdm-badge variant="primary" appearance="solid">Solid</bpdm-badge>
+<bpdm-badge variant="primary" appearance="outline">Outline</bpdm-badge>
+<bpdm-badge variant="primary" appearance="ghost" dot>Ghost</bpdm-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm` and `md` (default).
+
+<Preview>
+  <BadgeSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-sizes.tsx"
+<Badge variant="primary" size="sm">Small</Badge>
+<Badge variant="primary" size="md">Medium</Badge>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="badge-sizes.html"
+<bpdm-badge variant="primary" size="sm">Small</bpdm-badge>
+<bpdm-badge variant="primary" size="md">Medium</bpdm-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Status dots
+
+Add `dot` for a leading status dot, and `pulse` for live / in-progress states. The
+`ghost` appearance keeps just the dot and label — ideal inside tables and lists.
+
+<Preview>
+  <BadgeStatusDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-status.tsx"
+<Badge variant="success" dot pulse>Live</Badge>
+<Badge variant="info" dot pulse>Deploying</Badge>
+<Badge variant="warning" dot>Degraded</Badge>
+<Badge variant="destructive" dot>Offline</Badge>
+
+{/* ghost — bare dot + label, no chrome */}
+<Badge appearance="ghost" variant="success" dot>Healthy</Badge>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="badge-status.html"
+<bpdm-badge variant="success" dot pulse>Live</bpdm-badge>
+<bpdm-badge variant="info" dot pulse>Deploying</bpdm-badge>
+<bpdm-badge variant="warning" dot>Degraded</bpdm-badge>
+<bpdm-badge variant="destructive" dot>Offline</bpdm-badge>
+
+<!-- ghost — bare dot + label, no chrome -->
+<bpdm-badge appearance="ghost" variant="success" dot>Healthy</bpdm-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Removable
+
+Set `onRemove` (React) / `removable` with `(removed)` (Angular) to show a remove
+button. The chip collapses and fades out, then fires the callback.
+
+<Preview>
+  <BadgeRemovableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-removable.tsx"
+import { useState } from 'react';
+import { Badge } from '@bpdm/ui/badge';
+
+export function TagList() {
+  const [tags, setTags] = useState(['Frontend', 'Backend', 'Design']);
+  return (
+    <div className="flex flex-wrap gap-2">
+      {tags.map((t) => (
+        <Badge key={t} variant="neutral" onRemove={() => setTags((cur) => cur.filter((x) => x !== t))}>
+          {t}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="badge-removable.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'tag-list',
+  imports: [BpdmBadge],
+  templateUrl: './badge-removable.html',
+})
+export class TagList {
+  readonly tags = signal(['Frontend', 'Backend', 'Design']);
+  drop(tag: string) {
+    this.tags.update((cur) => cur.filter((t) => t !== tag));
+  }
+}
+```
+
+```html title="badge-removable.html"
+@for (t of tags(); track t) {
+  <bpdm-badge variant="neutral" removable (removed)="drop(t)">{{ t }}</bpdm-badge>
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Notifications
+
+`NotificationBadge` overlays a `count` (capped by `max`, e.g. `99+`) or a `dot` on
+the corner of any child — a bell, an inbox, an avatar. By default a count of `0`
+hides it; pass `showZero` to keep it.
+
+<Preview>
+  <BadgeNotificationsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-notifications.tsx"
+import { Bell, Mail } from 'lucide-react';
+import { NotificationBadge } from '@bpdm/ui/badge';
+import { Button } from '@bpdm/ui/button';
+
+export function Notifications() {
+  return (
+    <>
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
+        <NotificationBadge count={8}>
+          <Bell />
+        </NotificationBadge>
+      </Button>
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
+        <NotificationBadge count={128} max={99}>
+          <Mail />
+        </NotificationBadge>
+      </Button>
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Status">
+        <NotificationBadge dot variant="success">
+          <Bell />
+        </NotificationBadge>
+      </Button>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="badge-notifications.html"
+<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
+  <bpdm-notification-badge [count]="8">
+    <!-- bell icon -->
+  </bpdm-notification-badge>
+</button>
+<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
+  <bpdm-notification-badge [count]="128" [max]="99">
+    <!-- mail icon -->
+  </bpdm-notification-badge>
+</button>
+<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Status">
+  <bpdm-notification-badge dot variant="success">
+    <!-- bell icon -->
+  </bpdm-notification-badge>
+</button>
+```
+
+  </Tab>
+</Tabs>
+
+## As a link
+
+In React, `asChild` renders the badge as its child element — e.g. an anchor — so
+it stays a single, semantic, interactive element.
+
+<Preview>
+  <BadgeLinkDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge-link.tsx"
+<Badge asChild variant="primary" appearance="soft">
+  <a href="/docs">View docs →</a>
+</Badge>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Angular has no `asChild`. Wrap the badge in the link, or set `interactive` and
+bind a `(click)`:
+
+```html title="badge-link.html"
+<a href="/docs"><bpdm-badge variant="primary" appearance="soft" interactive>View docs →</bpdm-badge></a>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Badge` / `<bpdm-badge>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `neutral \| secondary \| primary \| success \| warning \| info \| help \| destructive \| contrast` | `neutral` | Colour tone. |
+| `appearance` | `soft \| solid \| outline \| ghost` | `soft` | Fill style. |
+| `size` | `sm \| md` | `md` | Badge height and text size. |
+| `dot` | `boolean` | `false` | Leading status dot, tinted to the variant. |
+| `pulse` | `boolean` | `false` | Animate the dot with a pulse ring (live status). |
+| `onRemove` | `() => void` | — | **React** — show a remove button; collapses + fades, then fires. Angular: `removable` + `(removed)`. |
+| `asChild` | `boolean` | `false` | **React** — render as the child element (e.g. an `<a>`). |
+
+### `NotificationBadge` / `<bpdm-notification-badge>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `count` | `number` | — | Number to display in the corner. |
+| `max` | `number` | `99` | Cap; values above show `{max}+`. |
+| `dot` | `boolean` | `false` | Show a dot instead of a number. |
+| `showZero` | `boolean` | `false` | Keep the badge when `count` is `0`. |
+| `variant` | `BadgeVariant` | `destructive` | Colour of the overlay. |
+
+In Angular, `<bpdm-badge>` accepts the same inputs plus `interactive`; both are
+content-projection components.
+
+## Accessibility
+
+- A badge is a text label — its meaning comes from its content, so write it
+  plainly (`"Active"`, `"3 errors"`), not from colour alone.
+- `NotificationBadge` is decorative chrome on top of an interactive control —
+  give the **control** the accessible name (e.g. `aria-label="Notifications"`),
+  and surface the live count in text for assistive tech where it matters.
+- A removable badge's remove button has an `aria-label="Remove"` and is keyboard
+  focusable.
+- When using `asChild` with an `<a>`/`<button>`, the underlying element keeps its
+  native role and keyboard behaviour.

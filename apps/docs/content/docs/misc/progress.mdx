@@ -1,11 +1,321 @@
 ---
 title: Progress
-description: Progress — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A process indicator — determinate or indeterminate, five colours, three sizes, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Progress** component — available in React (`@bpdm/ui/progress`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  ProgressBasicDemo,
+  ProgressLabelDemo,
+  ProgressInsideDemo,
+  ProgressFormatDemo,
+  ProgressSizesDemo,
+  ProgressVariantsDemo,
+  ProgressIndeterminateDemo,
+  ProgressDynamicDemo,
+} from '@/components/progress-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Progress** bar shows how far along a task is — **determinate** (drive
+`value`, the fill animates to its width) or **indeterminate** (an animated sweep
+when there's no known total). Five colours, three sizes, an optional value/label
+row, and accessible by default. In Angular it's `<bpdm-progress-bar>`.
+
+## Usage
+
+<Preview>
+  <ProgressBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-usage.tsx"
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function ProgressUsage() {
+  return <ProgressBar value={60} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="progress-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'progress-usage',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-usage.html',
+})
+export class ProgressUsage {}
+```
+
+```html title="progress-usage.html"
+<bpdm-progress-bar [value]="60" />
+```
+
+  </Tab>
+</Tabs>
+
+## Value & label
+
+Set `showValue` to show the percentage, and `label` for leading text (e.g.
+"Uploading…"). They sit in a row above the bar.
+
+<Preview>
+  <ProgressLabelDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-label.tsx"
+<ProgressBar value={72} showValue label="Uploading…" variant="success" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="progress-label.html"
+<bpdm-progress-bar [value]="72" showValue label="Uploading…" variant="success" />
+```
+
+  </Tab>
+</Tabs>
+
+## Value inside the bar
+
+Set `valuePosition="inside"` to render the value within the bar itself — handy
+in tight layouts.
+
+<Preview>
+  <ProgressInsideDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-inside.tsx"
+<ProgressBar value={72} valuePosition="inside" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="progress-inside.html"
+<bpdm-progress-bar [value]="72" valuePosition="inside" />
+```
+
+  </Tab>
+</Tabs>
+
+## Custom format
+
+Pass `format` to replace the percentage with your own label — e.g. a `value/max`
+readout. It implies `showValue`.
+
+<Preview>
+  <ProgressFormatDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-format.tsx"
+<ProgressBar value={50} max={100} label="Storage" format={(v, max) => `${v}/${max} GB`} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`format` is a function input — define it on the component and bind it.
+
+```ts title="progress-format.ts"
+export class StorageBar {
+  readonly storageFormat = (v: number, max: number) => `${v}/${max} GB`;
+}
+```
+
+```html title="progress-format.html"
+<bpdm-progress-bar [value]="50" [max]="100" label="Storage" [format]="storageFormat" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <ProgressSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-sizes.tsx"
+<ProgressBar size="sm" value={62} />
+<ProgressBar size="md" value={62} />
+<ProgressBar size="lg" value={62} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="progress-sizes.html"
+<bpdm-progress-bar size="sm" [value]="62" />
+<bpdm-progress-bar size="md" [value]="62" />
+<bpdm-progress-bar size="lg" [value]="62" />
+```
+
+  </Tab>
+</Tabs>
+
+## Colours
+
+The `variant` prop offers `primary` (default), `success`, `warning`,
+`destructive`, and `info`.
+
+<Preview>
+  <ProgressVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-colours.tsx"
+<ProgressBar variant="primary" value={18} showValue label="primary" />
+<ProgressBar variant="success" value={36} showValue label="success" />
+<ProgressBar variant="warning" value={54} showValue label="warning" />
+<ProgressBar variant="destructive" value={72} showValue label="destructive" />
+<ProgressBar variant="info" value={90} showValue label="info" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="progress-colours.html"
+<bpdm-progress-bar variant="primary" [value]="18" showValue label="primary" />
+<bpdm-progress-bar variant="success" [value]="36" showValue label="success" />
+<bpdm-progress-bar variant="warning" [value]="54" showValue label="warning" />
+<bpdm-progress-bar variant="destructive" [value]="72" showValue label="destructive" />
+<bpdm-progress-bar variant="info" [value]="90" showValue label="info" />
+```
+
+  </Tab>
+</Tabs>
+
+## Indeterminate
+
+When there's no known total, set `indeterminate` for an animated sweep.
+
+<Preview>
+  <ProgressIndeterminateDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-indeterminate.tsx"
+<ProgressBar indeterminate />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="progress-indeterminate.html"
+<bpdm-progress-bar indeterminate />
+```
+
+  </Tab>
+</Tabs>
+
+## Dynamic value
+
+Drive `value` from state and the fill animates smoothly to each new width. Switch
+the `variant` to `success` when it completes.
+
+<Preview>
+  <ProgressDynamicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-dynamic.tsx"
+import { useEffect, useState } from 'react';
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function Syncing() {
+  const [value, setValue] = useState(20);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setValue((v) => (v >= 100 ? 0 : Math.min(100, v + 10)));
+    }, 700);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <ProgressBar value={value} showValue label="Syncing" variant={value >= 100 ? 'success' : 'primary'} />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="progress-dynamic.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'syncing',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-dynamic.html',
+})
+export class Syncing {
+  readonly value = signal(20);
+
+  constructor() {
+    setInterval(() => this.value.update((v) => (v >= 100 ? 0 : Math.min(100, v + 10))), 700);
+  }
+}
+```
+
+```html title="progress-dynamic.html"
+<bpdm-progress-bar [value]="value()" showValue label="Syncing"
+  [variant]="value() >= 100 ? 'success' : 'primary'" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | `0` | Current value (ignored when `indeterminate`). |
+| `max` | `number` | `100` | Maximum value. |
+| `indeterminate` | `boolean` | `false` | Animated sweep when there's no known total. |
+| `size` | `sm \| md \| lg` | `md` | Track height. |
+| `variant` | `primary \| success \| warning \| destructive \| info` | `primary` | Fill colour. |
+| `showValue` | `boolean` | `false` | Show the value (defaults to the percentage). |
+| `valuePosition` | `outside \| inside` | `outside` | Value in a row above, or inside the bar. |
+| `format` | `(value, max) => ReactNode` | — | Custom value label. Implies `showValue`. |
+| `label` | `ReactNode` | — | Leading text shown opposite the value. |
+
+In Angular, every prop above is an `@Input` on `<bpdm-progress-bar>` (`format` is
+a function input, `label` is a `string`).
+
+## Accessibility
+
+- Renders `role="progressbar"` with `aria-valuemin`, `aria-valuemax`,
+  `aria-valuenow`, and `aria-valuetext`, so assistive tech announces progress.
+- When `indeterminate`, `aria-valuenow`/`aria-valuemax` are omitted and
+  `aria-valuetext` reads "Loading".
+- Pass a `label` (or wrap with your own labelled text) to name what's loading;
+  it's used as the bar's `aria-label`.

@@ -1,11 +1,295 @@
 ---
 title: Spinner
-description: Spinner — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A loading indicator in six looks — sizes xs–xl, colour-inheriting, with a LoadingOverlay, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Spinner** component — available in React (`@bpdm/ui/spinner`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  SpinnerBasicDemo,
+  SpinnerVariantsDemo,
+  SpinnerSizesDemo,
+  SpinnerColorsDemo,
+  SpinnerInlineDemo,
+  SpinnerOverlayDemo,
+} from '@/components/spinner-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Spinner** signals indeterminate loading. It inherits the current text
+colour (recolour with a `text-*` class), comes in five sizes, and announces
+itself to assistive tech. `LoadingOverlay` pairs it with a blurred scrim to cover
+a card or the whole screen while it loads. In Angular they're `<bpdm-spinner>`
+and `<bpdm-loading-overlay>`.
+
+## Usage
+
+<Preview>
+  <SpinnerBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-usage.tsx"
+import { Spinner } from '@bpdm/ui/spinner';
+
+export function SpinnerUsage() {
+  return <Spinner size="lg" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="spinner-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner } from '@bpdm/ng';
+
+@Component({
+  selector: 'spinner-usage',
+  imports: [BpdmSpinner],
+  templateUrl: './spinner-usage.html',
+})
+export class SpinnerUsage {}
+```
+
+```html title="spinner-usage.html"
+<bpdm-spinner size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+Six looks: `ring` (default), `gradient`, `square`, `dots`, `bars`, and `flip`.
+
+<Preview>
+  <SpinnerVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-variants.tsx"
+<Spinner variant="ring" size="lg" />
+<Spinner variant="gradient" size="lg" />
+<Spinner variant="square" size="lg" />
+<Spinner variant="dots" size="lg" />
+<Spinner variant="bars" size="lg" />
+<Spinner variant="flip" size="lg" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="spinner-variants.html"
+<bpdm-spinner variant="ring" size="lg" />
+<bpdm-spinner variant="gradient" size="lg" />
+<bpdm-spinner variant="square" size="lg" />
+<bpdm-spinner variant="dots" size="lg" />
+<bpdm-spinner variant="bars" size="lg" />
+<bpdm-spinner variant="flip" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+Five sizes: `xs`, `sm`, `md` (default), `lg`, and `xl`.
+
+<Preview>
+  <SpinnerSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-sizes.tsx"
+<Spinner size="xs" />
+<Spinner size="sm" />
+<Spinner size="md" />
+<Spinner size="lg" />
+<Spinner size="xl" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="spinner-sizes.html"
+<bpdm-spinner size="xs" />
+<bpdm-spinner size="sm" />
+<bpdm-spinner size="md" />
+<bpdm-spinner size="lg" />
+<bpdm-spinner size="xl" />
+```
+
+  </Tab>
+</Tabs>
+
+## Colour
+
+The spinner draws in the current text colour, so a `text-*` class recolours it —
+no variant prop needed.
+
+<Preview>
+  <SpinnerColorsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-colour.tsx"
+<Spinner size="lg" className="text-primary" />
+<Spinner size="lg" className="text-success" />
+<Spinner size="lg" className="text-warning" />
+<Spinner size="lg" className="text-destructive" />
+<Spinner size="lg" className="text-muted-foreground" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="spinner-colour.html"
+<bpdm-spinner size="lg" class="text-primary" />
+<bpdm-spinner size="lg" class="text-success" />
+<bpdm-spinner size="lg" class="text-warning" />
+<bpdm-spinner size="lg" class="text-destructive" />
+<bpdm-spinner size="lg" class="text-muted-foreground" />
+```
+
+  </Tab>
+</Tabs>
+
+## Inline
+
+Drop a small spinner inside a button or beside text — it inherits that element's
+colour via `text-current`.
+
+<Preview>
+  <SpinnerInlineDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-inline.tsx"
+import { Spinner } from '@bpdm/ui/spinner';
+import { Button } from '@bpdm/ui/button';
+
+<Button disabled>
+  <Spinner size="sm" className="text-current" />
+  Saving…
+</Button>
+
+<span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+  <Spinner size="sm" variant="dots" className="text-current" />
+  Loading results
+</span>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="spinner-inline.html"
+<button bpdmButton disabled>
+  <bpdm-spinner size="sm" class="text-current" />
+  Saving…
+</button>
+
+<span class="inline-flex items-center gap-2 text-sm text-muted-foreground">
+  <bpdm-spinner size="sm" variant="dots" class="text-current" />
+  Loading results
+</span>
+```
+
+  </Tab>
+</Tabs>
+
+## Loading overlay
+
+`LoadingOverlay` covers its nearest positioned ancestor (give it `relative`) with
+a blurred scrim and a centred spinner. Set `fullPage` to cover the viewport
+instead. Click **Refresh** below to see it scoped to the card.
+
+<Preview>
+  <SpinnerOverlayDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="loading-overlay.tsx"
+import { useState } from 'react';
+import { LoadingOverlay } from '@bpdm/ui/spinner';
+import { Button } from '@bpdm/ui/button';
+
+export function Card() {
+  const [loading, setLoading] = useState(false);
+  const refetch = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1800);
+  };
+  return (
+    <div className="space-y-3">
+      <div className="relative overflow-hidden rounded-xl border bg-card p-5">
+        <p className="text-sm text-muted-foreground">Active users</p>
+        <p className="mt-1 text-2xl font-semibold">12,480</p>
+        <LoadingOverlay show={loading} label="Fetching…" />
+      </div>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
+        Refresh
+      </Button>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="loading-overlay.html"
+<div class="relative overflow-hidden rounded-xl border bg-card p-5">
+  <p class="text-sm text-muted-foreground">Active users</p>
+  <p class="mt-1 text-2xl font-semibold">12,480</p>
+  <bpdm-loading-overlay [show]="loading()" label="Fetching…" />
+</div>
+
+<!-- whole screen instead of a card -->
+<bpdm-loading-overlay [show]="loading()" fullPage label="Loading…" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Spinner` / `<bpdm-spinner>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `ring \| gradient \| square \| dots \| bars \| flip` | `ring` | Visual style. |
+| `size` | `xs \| sm \| md \| lg \| xl` | `md` | Spinner size. |
+| `label` | `string` | `Loading` | Visually-hidden accessible label. |
+
+Recolour with any `text-*` class — the spinner inherits `currentColor`.
+
+### `LoadingOverlay` / `<bpdm-loading-overlay>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `show` | `boolean` | `true` | Render the overlay. |
+| `label` | `string` | — | Message shown under the spinner. |
+| `variant` | `SpinnerVariant` | `ring` | Spinner style. |
+| `size` | `SpinnerSize` | `md` (`lg` if `fullPage`) | Spinner size. |
+| `fullPage` | `boolean` | `false` | Cover the viewport instead of the ancestor. |
+| `blur` | `boolean` | `true` | Blur the content behind the scrim. |
+
+## Accessibility
+
+- The spinner is a live region — `role="status"` with `aria-live="polite"` — and
+  carries a visually-hidden `label` (default "Loading") so screen readers
+  announce the loading state.
+- Set a meaningful `label` for context (e.g. "Loading results", "Saving").
+- `LoadingOverlay` also sets `aria-busy="true"` while shown.
+- The animation respects `prefers-reduced-motion`.
