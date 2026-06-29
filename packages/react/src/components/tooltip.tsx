@@ -102,7 +102,15 @@ export function Tooltip({
           >
             {content}
             {!hideArrow && (
-              <TooltipPrimitive.Arrow className="fill-popover" width={12} height={6} />
+              // the arrow is a separate SVG and doesn't inherit the bubble's
+              // box-shadow, so on a light surface it's only visible on the side
+              // where the bubble's shadow happens to fall. A tight all-around
+              // drop-shadow gives it the same lift on every side.
+              <TooltipPrimitive.Arrow
+                className="fill-popover [filter:drop-shadow(0_0_1.5px_rgb(0_0_0/0.22))]"
+                width={12}
+                height={6}
+              />
             )}
           </TooltipPrimitive.Content>
         </TooltipPrimitive.Portal>
