@@ -1,11 +1,313 @@
 ---
 title: Checkbox
-description: Checkbox — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: An accessible checkbox — sizes, indeterminate and invalid states, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Checkbox** component — available in React (`@bpdm/ui/checkbox`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  CheckboxBasicDemo,
+  CheckboxStatesDemo,
+  CheckboxSizesDemo,
+  CheckboxInvalidDemo,
+  CheckboxGroupDemo,
+  CheckboxSelectAllDemo,
+} from '@/components/checkbox-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Checkbox** toggles a single value on or off, with support for an
+**indeterminate** ("some selected") state. Built on Radix — controlled (`checked`
++ `onCheckedChange`) or uncontrolled (`defaultChecked`). In Angular it's
+`<bpdm-checkbox>`, driven by `[(checked)]`, `[(ngModel)]`, or reactive forms.
+
+## Usage
+
+Pair the checkbox with a `<label>` linked by `id` so clicking the text toggles it.
+
+<Preview>
+  <CheckboxBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-usage.tsx"
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+export function Terms() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <Checkbox id="terms" defaultChecked />
+      <label htmlFor="terms">Accept terms &amp; conditions</label>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="checkbox-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'terms',
+  imports: [BpdmCheckbox],
+  templateUrl: './checkbox-usage.html',
+})
+export class Terms {}
+```
+
+```html title="checkbox-usage.html"
+<label class="flex items-center gap-2.5">
+  <bpdm-checkbox [checked]="true" /> Accept terms &amp; conditions
+</label>
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Unchecked, checked, **indeterminate**, and `disabled` (on or off). Set
+`checked="indeterminate"` (React) / `indeterminate` (Angular) for the mixed state.
+
+<Preview>
+  <CheckboxStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-states.tsx"
+<Checkbox />
+<Checkbox defaultChecked />
+<Checkbox checked="indeterminate" />
+<Checkbox disabled />
+<Checkbox disabled defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="checkbox-states.html"
+<bpdm-checkbox />
+<bpdm-checkbox [checked]="true" />
+<bpdm-checkbox indeterminate />
+<bpdm-checkbox disabled />
+<bpdm-checkbox disabled [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <CheckboxSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-sizes.tsx"
+<Checkbox size="sm" defaultChecked />
+<Checkbox size="md" defaultChecked />
+<Checkbox size="lg" defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="checkbox-sizes.html"
+<bpdm-checkbox size="sm" [checked]="true" />
+<bpdm-checkbox size="md" [checked]="true" />
+<bpdm-checkbox size="lg" [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## Invalid
+
+Set `aria-invalid` for the error state (turns destructive-coloured) and link an
+error message with `aria-describedby` so screen readers announce it.
+
+<Preview>
+  <CheckboxInvalidDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-invalid.tsx"
+<div className="flex flex-col gap-1.5">
+  <div className="flex items-center gap-2.5">
+    <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
+    <label htmlFor="agree">I agree to the terms</label>
+  </div>
+  <p id="agree-err" className="text-xs text-destructive">
+    You must accept before continuing.
+  </p>
+</div>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="checkbox-invalid.html"
+<div class="flex flex-col gap-1.5">
+  <label class="flex items-center gap-2.5">
+    <bpdm-checkbox aria-invalid="true" aria-describedby="agree-err" /> I agree to the terms
+  </label>
+  <p id="agree-err" class="text-xs text-destructive">You must accept before continuing.</p>
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Checkbox group
+
+A set of independent options — each is its own checkbox with a linked label.
+
+<Preview>
+  <CheckboxGroupDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-group.tsx"
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+const prefs = [
+  { id: 'g-email', label: 'Email notifications', checked: true },
+  { id: 'g-sms', label: 'SMS notifications', checked: false },
+  { id: 'g-push', label: 'Push notifications', checked: true },
+];
+
+export function Preferences() {
+  return (
+    <div className="flex flex-col gap-3">
+      {prefs.map((o) => (
+        <div key={o.id} className="flex items-center gap-2.5">
+          <Checkbox id={o.id} defaultChecked={o.checked} />
+          <label htmlFor={o.id}>{o.label}</label>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="checkbox-group.html"
+<label class="flex items-center gap-2.5"><bpdm-checkbox [checked]="true" /> Email notifications</label>
+<label class="flex items-center gap-2.5"><bpdm-checkbox /> SMS notifications</label>
+<label class="flex items-center gap-2.5"><bpdm-checkbox [checked]="true" /> Push notifications</label>
+```
+
+  </Tab>
+</Tabs>
+
+## Select all (indeterminate)
+
+A parent checkbox reflects its children: **checked** when all are on,
+**indeterminate** when only some are, **unchecked** when none. Toggling it sets
+them all.
+
+<Preview>
+  <CheckboxSelectAllDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox-select-all.tsx"
+import { useState } from 'react';
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+const toppings = ['Cheese', 'Mushrooms', 'Olives'];
+
+export function SelectAll() {
+  const [checked, setChecked] = useState([true, false, false]);
+  const all = checked.every(Boolean);
+  const some = checked.some(Boolean);
+  const parent = all ? true : some ? 'indeterminate' : false;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <label className="flex items-center gap-2.5 font-medium">
+        <Checkbox
+          checked={parent}
+          onCheckedChange={(v) => setChecked(toppings.map(() => v === true))}
+        />
+        Select all
+      </label>
+      {toppings.map((t, i) => (
+        <label key={t} className="flex items-center gap-2.5 ps-1">
+          <Checkbox
+            checked={checked[i]}
+            onCheckedChange={(v) =>
+              setChecked((prev) => prev.map((c, j) => (j === i ? v === true : c)))
+            }
+          />
+          {t}
+        </label>
+      ))}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`indeterminate` is a separate input from `[(checked)]`, so compute it from the
+children in your component:
+
+```html title="checkbox-select-all.html"
+<label class="flex items-center gap-2.5 font-medium">
+  <bpdm-checkbox [checked]="allChecked()" [indeterminate]="someChecked()" (checkedChange)="toggleAll($event)" />
+  Select all
+</label>
+@for (t of toppings; track t.name) {
+  <label class="flex items-center gap-2.5 ps-1">
+    <bpdm-checkbox [(checked)]="t.on" /> {{ t.name }}
+  </label>
+}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `checked` / `defaultChecked` | `boolean \| 'indeterminate'` | — | Controlled / uncontrolled state. `'indeterminate'` shows the mixed glyph. |
+| `onCheckedChange` | `(checked: boolean \| 'indeterminate') => void` | — | **React** — fires on toggle. Angular uses `[(checked)]` / `[(ngModel)]`. |
+| `indeterminate` | `boolean` | `false` | **Angular** — mixed state (React uses `checked="indeterminate"`). |
+| `size` | `sm \| md \| lg` | `md` | Control size. |
+| `disabled` | `boolean` | `false` | Disable the control. |
+| `aria-invalid` | `boolean` | — | Error state. |
+
+In React, all native Radix Checkbox props (`name`, `value`, `required`, `id`, …)
+are supported. In Angular, `size` / `indeterminate` / `aria-invalid` are `@Input`s
+on `<bpdm-checkbox>`, which is a `ControlValueAccessor`.
+
+## Accessibility
+
+- Built on Radix Checkbox — `role="checkbox"`, `aria-checked` (`true` / `false` /
+  `mixed`), and keyboard support (**Space** toggles).
+- Always link a `<label>` by `id` (`htmlFor` in React, `for` in Angular), or wrap
+  the control in the label.
+- Set **`aria-invalid`** when validation fails and link the message with
+  **`aria-describedby`** so assistive tech reads the error.
+- The indeterminate state is communicated as `aria-checked="mixed"`, not by the
+  glyph alone.
