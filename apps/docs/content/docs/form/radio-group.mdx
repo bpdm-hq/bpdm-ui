@@ -1,11 +1,275 @@
 ---
 title: Radio Group
-description: Radio Group — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A single-choice group — sizes, orientation, invalid state, accessible, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Radio Group** component — available in React (`@bpdm/ui/radio-group`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  RadioGroupBasicDemo,
+  RadioGroupHorizontalDemo,
+  RadioGroupSizesDemo,
+  RadioGroupDisabledDemo,
+  RadioGroupInvalidDemo,
+  RadioGroupControlledDemo,
+} from '@/components/radio-group-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Radio Group** lets users pick exactly one option from a set (use a checkbox
+group for multiple). Built on Radix — controlled (`value` + `onValueChange`) or
+uncontrolled (`defaultValue`). In Angular it's `<bpdm-radio-group>` with
+`<bpdm-radio>` items, driven by `[(value)]`, `[(ngModel)]`, or reactive forms.
+
+## Usage
+
+Pair each `RadioGroupItem` with a `<label>` linked by `id` so clicking the text
+selects the option.
+
+<Preview>
+  <RadioGroupBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-usage.tsx"
+import { RadioGroup, RadioGroupItem } from '@bpdm/ui/radio-group';
+
+export function PlanPicker() {
+  return (
+    <RadioGroup defaultValue="pro">
+      <div className="flex items-center gap-2.5">
+        <RadioGroupItem value="free" id="free" />
+        <label htmlFor="free">Free</label>
+      </div>
+      <div className="flex items-center gap-2.5">
+        <RadioGroupItem value="pro" id="pro" />
+        <label htmlFor="pro">Pro</label>
+      </div>
+      <div className="flex items-center gap-2.5">
+        <RadioGroupItem value="enterprise" id="enterprise" />
+        <label htmlFor="enterprise">Enterprise</label>
+      </div>
+    </RadioGroup>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="radio-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
+
+@Component({
+  selector: 'plan-picker',
+  imports: [BpdmRadioGroup, BpdmRadio],
+  templateUrl: './radio-usage.html',
+})
+export class PlanPicker {}
+```
+
+```html title="radio-usage.html"
+<bpdm-radio-group [(value)]="plan">
+  <label class="flex items-center gap-2.5">
+    <bpdm-radio value="free" /> Free
+  </label>
+  <label class="flex items-center gap-2.5">
+    <bpdm-radio value="pro" /> Pro
+  </label>
+  <label class="flex items-center gap-2.5">
+    <bpdm-radio value="enterprise" /> Enterprise
+  </label>
+</bpdm-radio-group>
+```
+
+  </Tab>
+</Tabs>
+
+## Orientation
+
+Vertical by default; set `orientation="horizontal"` to lay items in a row.
+
+<Preview>
+  <RadioGroupHorizontalDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-horizontal.tsx"
+<RadioGroup defaultValue="pro" orientation="horizontal">
+  {/* …items… */}
+</RadioGroup>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="radio-horizontal.html"
+<bpdm-radio-group [(value)]="plan" orientation="horizontal">
+  <!-- …items… -->
+</bpdm-radio-group>
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The item `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <RadioGroupSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-sizes.tsx"
+<RadioGroupItem value="sm" id="sm" size="sm" />
+<RadioGroupItem value="md" id="md" size="md" />
+<RadioGroupItem value="lg" id="lg" size="lg" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="radio-sizes.html"
+<bpdm-radio value="sm" size="sm" />
+<bpdm-radio value="md" size="md" />
+<bpdm-radio value="lg" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Disabled
+
+Set `disabled` on the group to disable every option at once.
+
+<Preview>
+  <RadioGroupDisabledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-disabled.tsx"
+<RadioGroup defaultValue="pro" disabled>
+  {/* …items… */}
+</RadioGroup>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="radio-disabled.html"
+<bpdm-radio-group [(value)]="plan" disabled>
+  <!-- …items… -->
+</bpdm-radio-group>
+```
+
+  </Tab>
+</Tabs>
+
+## Invalid
+
+Set `aria-invalid` on the items to show the error state — the controls turn
+destructive-coloured and screen readers announce the invalid state.
+
+<Preview>
+  <RadioGroupInvalidDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-invalid.tsx"
+<RadioGroupItem value="free" id="free" aria-invalid />
+<RadioGroupItem value="pro" id="pro" aria-invalid />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="radio-invalid.html"
+<bpdm-radio value="free" aria-invalid="true" />
+<bpdm-radio value="pro" aria-invalid="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled value
+
+Drive the selection yourself with `value` + `onValueChange` (React) or two-way
+`[(value)]` / `[(ngModel)]` (Angular).
+
+<Preview>
+  <RadioGroupControlledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="radio-controlled.tsx"
+import { useState } from 'react';
+import { RadioGroup, RadioGroupItem } from '@bpdm/ui/radio-group';
+
+export function Controlled() {
+  const [value, setValue] = useState('pro');
+  return (
+    <RadioGroup value={value} onValueChange={setValue} orientation="horizontal">
+      {/* …items… */}
+    </RadioGroup>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="radio-controlled.html"
+<bpdm-radio-group [(value)]="plan">…</bpdm-radio-group>
+<!-- or with forms -->
+<bpdm-radio-group [(ngModel)]="plan">…</bpdm-radio-group>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `RadioGroup` / `<bpdm-radio-group>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` | `string` | — | Controlled / uncontrolled selection. |
+| `onValueChange` | `(value: string) => void` | — | **React** — fires on change. Angular uses `[(value)]` / `[(ngModel)]`. |
+| `orientation` | `vertical \| horizontal` | `vertical` | Layout direction. |
+| `disabled` | `boolean` | `false` | Disable the whole group. |
+| `name` | `string` | — | Form field name (React). |
+
+### `RadioGroupItem` / `<bpdm-radio>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | — | **Required.** The item's value. |
+| `size` | `sm \| md \| lg` | `md` | Control size. |
+| `aria-invalid` | `boolean` | — | Error state. |
+
+In React, all native Radix RadioGroup props are supported. In Angular,
+`orientation` / `disabled` are `@Input`s on `<bpdm-radio-group>` (a
+`ControlValueAccessor`), and `value` / `size` / `aria-invalid` on `<bpdm-radio>`.
+
+## Accessibility
+
+- Built on Radix Radio Group — `role="radiogroup"`, roving focus, and full
+  keyboard support (**arrow keys** move and select, **Space** selects).
+- Always link each item to a `<label>` by `id` (`htmlFor` in React, `for` in
+  Angular), or wrap the control in the label.
+- Set **`aria-invalid`** on items that fail validation; bpdm styles them with the
+  destructive colour and assistive tech announces the state.
+- Give the group an accessible name with `aria-label` / `aria-labelledby` when
+  there's no visible group heading.
