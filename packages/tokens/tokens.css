@@ -314,32 +314,22 @@
   [data-bpdm-countdown] { display: none; }
 }
 
-/* ── Button click pulse (bpdm signature) ──────────────────────────────────────
-   A brand-amber ring snaps to the button's edge on press and expands + fades on
-   release. Built with the :active→release transition trick (no JS) so it plays to
-   completion even on a quick click — unlike a press-only effect that ends the
-   moment you let go. Pairs with the tactile press (scale/translate) on the button. */
+/* ── Button click feedback — OPTION 1: squish-spring (no colour) ───────────────
+   The press snaps in instantly (:active has no transition) and on release the
+   scale/translate spring back with a punchy overshoot — so even a quick click
+   shows a satisfying "squish → pop". Plain tactile motion, no glow/ring. */
 .bpdm-btn {
   position: relative;
-}
-.bpdm-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  /* resting/exit state: a wide, soft, invisible halo */
-  box-shadow: 0 0 22px 6px color-mix(in oklab, var(--primary) 45%, transparent);
   transition:
-    opacity 460ms var(--bpdm-ease-out),
-    box-shadow 460ms var(--bpdm-ease-out);
+    scale 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    translate 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    color var(--bpdm-duration-fast) var(--bpdm-ease-out),
+    background-color var(--bpdm-duration-fast) var(--bpdm-ease-out),
+    border-color var(--bpdm-duration-fast) var(--bpdm-ease-out),
+    box-shadow var(--bpdm-duration-fast) var(--bpdm-ease-out);
 }
-.bpdm-btn:active::after {
-  /* press: a tight soft glow hugging the edge — snaps in, then blooms out + fades on release */
-  opacity: 0.5;
-  box-shadow: 0 0 6px 1px color-mix(in oklab, var(--primary) 60%, transparent);
-  transition: none;
+.bpdm-btn:active {
+  transition: none; /* squish in instantly; spring back on release */
 }
 
 /* Respect reduced-motion everywhere: keep state changes, drop the movement. */
