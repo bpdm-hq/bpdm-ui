@@ -8,8 +8,7 @@ import { Preview } from '@/components/preview';
 import {
   ButtonBasicDemo,
   ButtonVariantsDemo,
-  ButtonOutlinedDemo,
-  ButtonGhostDemo,
+  ButtonAppearancesDemo,
   ButtonSizesDemo,
   ButtonIconTextDemo,
   ButtonIconSizesDemo,
@@ -137,32 +136,28 @@ export class ButtonVariants {}
   </Tab>
 </Tabs>
 
-## Outlined
+## Appearances
 
-Set `appearance="outline"` for a bordered button with a transparent fill. Works
-with every variant.
+The `appearance` prop sets the style — `solid` (default, filled), `outline`
+(bordered with a transparent fill), and `ghost` (no border or fill, for
+low-emphasis actions and toolbars). It composes with every `variant`.
 
 <Preview>
-  <ButtonOutlinedDemo />
+  <ButtonAppearancesDemo />
 </Preview>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="button-outlined.tsx"
+```tsx title="button-appearances.tsx"
 import { Button } from '@bpdm/ui/button';
 
-export function ButtonOutlined() {
+export function ButtonAppearances() {
   return (
     <div className="flex flex-wrap gap-3">
-      <Button appearance="outline" variant="primary">Primary</Button>
-      <Button appearance="outline" variant="secondary">Secondary</Button>
-      <Button appearance="outline" variant="success">Success</Button>
-      <Button appearance="outline" variant="info">Info</Button>
-      <Button appearance="outline" variant="warning">Warning</Button>
-      <Button appearance="outline" variant="help">Help</Button>
-      <Button appearance="outline" variant="destructive">Destructive</Button>
-      <Button appearance="outline" variant="contrast">Contrast</Button>
+      <Button appearance="solid">Solid</Button>
+      <Button appearance="outline">Outline</Button>
+      <Button appearance="ghost">Ghost</Button>
     </div>
   );
 }
@@ -171,91 +166,22 @@ export function ButtonOutlined() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="button-outlined.ts"
+```ts title="button-appearances.ts"
 import { Component } from '@angular/core';
 import { BpdmButton } from '@bpdm/ng';
 
 @Component({
-  selector: 'button-outlined',
+  selector: 'button-appearances',
   imports: [BpdmButton],
-  templateUrl: './button-outlined.html',
+  templateUrl: './button-appearances.html',
 })
-export class ButtonOutlined {}
+export class ButtonAppearances {}
 ```
 
-```html title="button-outlined.html"
-<div class="flex flex-wrap gap-3">
-  <button bpdmButton appearance="outline" variant="primary">Primary</button>
-  <button bpdmButton appearance="outline" variant="secondary">Secondary</button>
-  <button bpdmButton appearance="outline" variant="success">Success</button>
-  <button bpdmButton appearance="outline" variant="info">Info</button>
-  <button bpdmButton appearance="outline" variant="warning">Warning</button>
-  <button bpdmButton appearance="outline" variant="help">Help</button>
-  <button bpdmButton appearance="outline" variant="destructive">Destructive</button>
-  <button bpdmButton appearance="outline" variant="contrast">Contrast</button>
-</div>
-```
-
-  </Tab>
-</Tabs>
-
-## Ghost
-
-Set `appearance="ghost"` for a button with no border or fill — ideal for
-low-emphasis actions and toolbars.
-
-<Preview>
-  <ButtonGhostDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="button-ghost.tsx"
-import { Button } from '@bpdm/ui/button';
-
-export function ButtonGhost() {
-  return (
-    <div className="flex flex-wrap gap-3">
-      <Button appearance="ghost" variant="primary">Primary</Button>
-      <Button appearance="ghost" variant="secondary">Secondary</Button>
-      <Button appearance="ghost" variant="success">Success</Button>
-      <Button appearance="ghost" variant="info">Info</Button>
-      <Button appearance="ghost" variant="warning">Warning</Button>
-      <Button appearance="ghost" variant="help">Help</Button>
-      <Button appearance="ghost" variant="destructive">Destructive</Button>
-      <Button appearance="ghost" variant="contrast">Contrast</Button>
-    </div>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="button-ghost.ts"
-import { Component } from '@angular/core';
-import { BpdmButton } from '@bpdm/ng';
-
-@Component({
-  selector: 'button-ghost',
-  imports: [BpdmButton],
-  templateUrl: './button-ghost.html',
-})
-export class ButtonGhost {}
-```
-
-```html title="button-ghost.html"
-<div class="flex flex-wrap gap-3">
-  <button bpdmButton appearance="ghost" variant="primary">Primary</button>
-  <button bpdmButton appearance="ghost" variant="secondary">Secondary</button>
-  <button bpdmButton appearance="ghost" variant="success">Success</button>
-  <button bpdmButton appearance="ghost" variant="info">Info</button>
-  <button bpdmButton appearance="ghost" variant="warning">Warning</button>
-  <button bpdmButton appearance="ghost" variant="help">Help</button>
-  <button bpdmButton appearance="ghost" variant="destructive">Destructive</button>
-  <button bpdmButton appearance="ghost" variant="contrast">Contrast</button>
-</div>
+```html title="button-appearances.html"
+<button bpdmButton appearance="solid">Solid</button>
+<button bpdmButton appearance="outline">Outline</button>
+<button bpdmButton appearance="ghost">Ghost</button>
 ```
 
   </Tab>

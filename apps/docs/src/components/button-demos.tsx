@@ -70,26 +70,12 @@ export function ButtonVariantsDemo() {
   );
 }
 
-export function ButtonOutlinedDemo() {
+export function ButtonAppearancesDemo() {
   return (
     <Row>
-      {VARIANTS.map((variant) => (
-        <Button key={variant} variant={variant} appearance="outline" className="capitalize">
-          {variant}
-        </Button>
-      ))}
-    </Row>
-  );
-}
-
-export function ButtonGhostDemo() {
-  return (
-    <Row>
-      {VARIANTS.map((variant) => (
-        <Button key={variant} variant={variant} appearance="ghost" className="capitalize">
-          {variant}
-        </Button>
-      ))}
+      <Button appearance="solid">Solid</Button>
+      <Button appearance="outline">Outline</Button>
+      <Button appearance="ghost">Ghost</Button>
     </Row>
   );
 }
