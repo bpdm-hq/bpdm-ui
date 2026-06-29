@@ -40,9 +40,9 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
 }
 
 /**
- * Inline, persistent alert — a colored accent, a tinted icon, a title and body,
- * with optional actions and a dismiss button. Three appearances (`soft` / `solid`
- * / `outline`) × the full severity palette. Theme-aware across all four themes.
+ * Inline, persistent alert — a severity-tinted surface, an inline icon, a title
+ * and body, with optional actions and a dismiss button. Three appearances
+ * (`soft` / `solid` / `outline`) × the full severity palette. Theme-aware.
  * For transient notifications use `toast` / `<Toaster>` instead.
  */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
@@ -55,31 +55,39 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const showIcon = icon !== null && (icon !== undefined || Icon);
     const [closing, setClosing] = React.useState(false);
     const solid = appearance === "solid";
+    const soft = appearance === "soft";
 
     const box = (
       <div
         ref={ref}
         role="alert"
         className={cn(
-          "relative flex w-full gap-3 overflow-hidden rounded-lg border p-4 shadow-sm",
-          appearance === "soft" && "border-border bg-card text-card-foreground before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
-          appearance === "soft" && tone.accent,
-          appearance === "outline" && cn("bg-card text-card-foreground", tone.outline),
+          "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4",
+          // soft = tinted inline-message surface (distinct from the white floating Toast)
+          soft && tone.soft,
+          appearance === "outline" && cn("bg-card text-card-foreground shadow-sm", tone.outline),
           solid && tone.solid,
           className,
         )}
         {...props}
       >
-        {showIcon && (
-          <span
-            className={cn(
-              "flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]",
-              solid ? "bg-white/15" : tone.tint,
-            )}
-          >
-            {icon ?? (Icon ? <Icon className={cn("size-4", !solid && tone.fg)} /> : null)}
-          </span>
-        )}
+        {showIcon &&
+          (soft ? (
+            // inline coloured icon (no tinted box) — the inline-message look; the
+            // size-5 icon matches the title's line height, so it reads aligned.
+            <span className={cn("flex shrink-0 items-center [&>svg]:size-5", tone.fg)}>
+              {icon ?? (Icon ? <Icon className="size-5" /> : null)}
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]",
+                solid ? "bg-white/15" : tone.tint,
+              )}
+            >
+              {icon ?? (Icon ? <Icon className={cn("size-4", !solid && tone.fg)} /> : null)}
+            </span>
+          ))}
         <div className={cn("min-w-0 flex-1", onClose && "pr-6")}>
           {title && <p className="text-sm font-semibold">{title}</p>}
           {children != null && (
