@@ -192,29 +192,60 @@ Long bodies scroll inside the panel while the header and footer stay pinned.
   <Tab value="React">
 
 ```tsx title="dialog-scrollable.tsx"
-<Dialog
-  trigger={<Button>Terms of service</Button>}
-  title="Terms of service"
-  description="Please review before continuing."
-  footer={
-    <DialogClose asChild>
-      <Button>I agree</Button>
-    </DialogClose>
-  }
->
-  {/* a tall block of content — it scrolls; the header/footer don't */}
-  <div className="space-y-3">{/* …long content… */}</div>
-</Dialog>
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+const sections = Array.from({ length: 12 }, (_, i) => `Section ${i + 1}`);
+
+export function Terms() {
+  return (
+    <Dialog
+      trigger={<Button>Terms of service</Button>}
+      title="Terms of service"
+      description="Please review before continuing."
+      footer={
+        <DialogClose asChild>
+          <Button>I agree</Button>
+        </DialogClose>
+      }
+    >
+      {/* a tall block of content — it scrolls; the header/footer stay pinned */}
+      <div className="space-y-3">
+        {sections.map((s) => (
+          <p key={s}>{s}: lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        ))}
+      </div>
+    </Dialog>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="dialog-scrollable.html"
+```ts title="terms.ts"
+import { Component } from '@angular/core';
+import { BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'terms',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton],
+  templateUrl: './terms.html',
+})
+export class Terms {
+  readonly sections = Array.from({ length: 12 }, (_, i) => `Section ${i + 1}`);
+}
+```
+
+```html title="terms.html"
 <bpdm-dialog title="Terms of service" description="Please review before continuing.">
   <button bpdmButton bpdmDialogTrigger>Terms of service</button>
   <ng-template bpdmDialogBody>
-    <div class="space-y-3"><!-- …long content… --></div>
+    <div class="space-y-3">
+      @for (s of sections; track s) {
+        <p>{{ s }}: lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      }
+    </div>
   </ng-template>
   <ng-template bpdmDialogFooter>
     <button bpdmButton bpdmDialogClose>I agree</button>
