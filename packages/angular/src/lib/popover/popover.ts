@@ -96,6 +96,7 @@ class BpdmPopoverPanel {
   readonly injector = input<Injector | null>(null);
   readonly side = input<PopoverSide>("bottom");
   readonly showArrow = input(false);
+  readonly bordered = input(true);
   readonly modal = input(false);
   readonly closing = input(false);
   readonly width = input<number | string | undefined>(undefined);
@@ -114,6 +115,7 @@ class BpdmPopoverPanel {
   protected readonly boxClass = computed(() =>
     cn(
       "relative z-50 rounded-[var(--radius)] bg-popover p-4 text-popover-foreground shadow-lg outline-none",
+      this.bordered() && "border border-border",
       OVERLAY_ORIGIN[this.side()],
       this.closing()
         ? // `forwards` holds the faded-out frame until teardown — without it the
@@ -172,6 +174,8 @@ export class BpdmPopover implements OnDestroy {
   /** Trap focus + block outside interaction (a mini-modal). Default false. */
   readonly modal = input(false, { alias: "bpdmPopoverModal", transform: booleanAttribute });
   /** Show a little arrow pointing at the trigger. Default false. */
+  /** Draw a border around the panel. Default true; set false for a borderless panel. */
+  readonly bordered = input(true, { alias: "bpdmPopoverBordered", transform: booleanAttribute });
   readonly showArrow = input(false, {
     alias: "bpdmPopoverShowArrow",
     transform: booleanAttribute,
@@ -240,6 +244,7 @@ export class BpdmPopover implements OnDestroy {
     p.setInput("injector", tplInjector);
     p.setInput("side", this.side());
     p.setInput("showArrow", this.showArrow());
+    p.setInput("bordered", this.bordered());
     p.setInput("modal", this.modal());
     p.setInput("width", this.width());
     p.setInput("panelClassInput", this.classInput());

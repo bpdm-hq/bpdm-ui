@@ -39,6 +39,19 @@ export function PopoverPlacementsDemo() {
   );
 }
 
+export function PopoverBorderlessDemo() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Popover trigger={<Button variant="secondary" appearance="outline">Bordered</Button>}>
+        <p className="max-w-xs text-sm text-fd-muted-foreground">Default — a subtle border defines the edge.</p>
+      </Popover>
+      <Popover bordered={false} trigger={<Button variant="secondary" appearance="outline">Borderless</Button>}>
+        <p className="max-w-xs text-sm text-fd-muted-foreground">Borderless — relies on the shadow alone.</p>
+      </Popover>
+    </div>
+  );
+}
+
 export function PopoverArrowDemo() {
   return (
     <Popover showArrow trigger={<Button>With arrow</Button>}>

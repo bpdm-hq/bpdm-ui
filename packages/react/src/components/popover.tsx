@@ -20,6 +20,8 @@ export interface PopoverProps {
   modal?: boolean;
   /** Show a little arrow pointing at the trigger. Default false. */
   showArrow?: boolean;
+  /** Draw a border around the panel. Default true; set false for a borderless panel. */
+  bordered?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -42,6 +44,7 @@ export function Popover({
   width,
   modal = false,
   showArrow = false,
+  bordered = true,
   open,
   defaultOpen,
   onOpenChange,
@@ -74,6 +77,7 @@ export function Popover({
           style={width !== undefined ? { width } : undefined}
           className={cn(
             "z-50 rounded-[var(--radius)] bg-popover p-4 text-popover-foreground shadow-lg outline-none",
+            bordered && "border border-border",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             className,
           )}

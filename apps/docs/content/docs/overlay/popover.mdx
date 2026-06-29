@@ -7,6 +7,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import {
   PopoverBasicDemo,
   PopoverPlacementsDemo,
+  PopoverBorderlessDemo,
   PopoverArrowDemo,
   PopoverFormDemo,
 } from '@/components/popover-demos';
@@ -119,6 +120,51 @@ export class Placements {}
 <ng-template #p2><p>Opens on the right.</p></ng-template>
 <ng-template #p3><p>Opens on the bottom.</p></ng-template>
 <ng-template #p4><p>Opens on the left.</p></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Border
+
+The panel has a subtle border by default so its edge reads clearly against any
+background. Set `bordered={false}` for a borderless panel that relies on the
+shadow alone.
+
+<Preview>
+  <PopoverBorderlessDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-border.tsx"
+import { Popover } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+export function Borderless() {
+  return (
+    <>
+      <Popover trigger={<Button>Bordered</Button>}>
+        <p>Default — a subtle border defines the edge.</p>
+      </Popover>
+      <Popover bordered={false} trigger={<Button>Borderless</Button>}>
+        <p>Borderless — relies on the shadow alone.</p>
+      </Popover>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="popover-border.html"
+<button bpdmButton [bpdmPopover]="bordered">Bordered</button>
+<button bpdmButton [bpdmPopover]="plain" [bpdmPopoverBordered]="false">Borderless</button>
+
+<ng-template #bordered><p>Default — a subtle border defines the edge.</p></ng-template>
+<ng-template #plain><p>Borderless — relies on the shadow alone.</p></ng-template>
 ```
 
   </Tab>
@@ -239,6 +285,7 @@ export class UpdateName {}
 | `sideOffset` | `number` | `8` | Gap from the trigger, in px. Angular: `bpdmPopoverOffset`. |
 | `width` | `number \| string` | fit-content | Fixed panel width. Angular: `bpdmPopoverWidth`. |
 | `showArrow` | `boolean` | `false` | Draw an arrow at the trigger. Angular: `bpdmPopoverShowArrow`. |
+| `bordered` | `boolean` | `true` | Draw a border around the panel; `false` for borderless. Angular: `bpdmPopoverBordered`. |
 | `modal` | `boolean` | `false` | Trap focus + block outside interaction. Angular: `bpdmPopoverModal`. |
 | `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(bpdmPopoverOpen)]`. |
 
