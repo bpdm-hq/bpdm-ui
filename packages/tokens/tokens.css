@@ -327,18 +327,19 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  border: 2px solid var(--primary);
-  opacity: 0;
-  scale: 1.3;
   pointer-events: none;
+  opacity: 0;
+  /* resting/exit state: a wide, soft, invisible halo */
+  box-shadow: 0 0 22px 6px color-mix(in oklab, var(--primary) 45%, transparent);
   transition:
-    opacity 480ms var(--bpdm-ease-out),
-    scale 480ms var(--bpdm-ease-out);
+    opacity 460ms var(--bpdm-ease-out),
+    box-shadow 460ms var(--bpdm-ease-out);
 }
 .bpdm-btn:active::after {
-  opacity: 0.55;
-  scale: 1;
-  transition: none; /* snap to the edge instantly on press; animate out on release */
+  /* press: a tight soft glow hugging the edge — snaps in, then blooms out + fades on release */
+  opacity: 0.5;
+  box-shadow: 0 0 6px 1px color-mix(in oklab, var(--primary) 60%, transparent);
+  transition: none;
 }
 
 /* Respect reduced-motion everywhere: keep state changes, drop the movement. */
