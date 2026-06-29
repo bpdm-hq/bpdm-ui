@@ -83,7 +83,14 @@ export class BpdmPopoverClose {
       @if (showArrow()) {
         <span [class]="arrowClass()" aria-hidden="true">
           <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-popover">
-            <path d="M0 0L6 6L12 0Z" />
+            <!-- open path (no base line) so the bordered stroke only outlines the
+                 two visible sides — no seam where the arrow meets the panel -->
+            <path
+              d="M0 0L6 6L12 0"
+              [attr.stroke]="bordered() ? 'var(--border)' : null"
+              [attr.stroke-width]="bordered() ? 1 : null"
+              stroke-linejoin="round"
+            />
           </svg>
         </span>
       }

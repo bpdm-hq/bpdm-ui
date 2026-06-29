@@ -84,10 +84,10 @@ export function Popover({
         >
           {children}
           {showArrow && (
-            // borderless panel + matching fill → the notch is seamless in every
-            // theme (same approach as Tooltip)
+            // fill matches the panel; when bordered, a border-coloured stroke keeps
+            // the notch visible against any background and consistent with the edge
             <PopoverPrimitive.Arrow
-              className="fill-popover"
+              className={cn("fill-popover", bordered && "stroke-border [stroke-width:1px]")}
               width={12}
               height={6}
             />
