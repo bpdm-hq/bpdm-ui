@@ -71,16 +71,36 @@ Six looks: `ring` (default), `gradient`, `square`, `dots`, `bars`, and `flip`.
   <Tab value="React">
 
 ```tsx title="spinner-variants.tsx"
-<Spinner variant="ring" size="lg" />
-<Spinner variant="gradient" size="lg" />
-<Spinner variant="square" size="lg" />
-<Spinner variant="dots" size="lg" />
-<Spinner variant="bars" size="lg" />
-<Spinner variant="flip" size="lg" />
+import { Spinner } from '@bpdm/ui/spinner';
+
+export function SpinnerVariants() {
+  return (
+    <>
+      <Spinner variant="ring" size="lg" />
+      <Spinner variant="gradient" size="lg" />
+      <Spinner variant="square" size="lg" />
+      <Spinner variant="dots" size="lg" />
+      <Spinner variant="bars" size="lg" />
+      <Spinner variant="flip" size="lg" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="spinner-variants.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner } from '@bpdm/ng';
+
+@Component({
+  selector: 'spinner-variants',
+  imports: [BpdmSpinner],
+  templateUrl: './spinner-variants.html',
+})
+export class SpinnerVariants {}
+```
 
 ```html title="spinner-variants.html"
 <bpdm-spinner variant="ring" size="lg" />
@@ -106,15 +126,35 @@ Five sizes: `xs`, `sm`, `md` (default), `lg`, and `xl`.
   <Tab value="React">
 
 ```tsx title="spinner-sizes.tsx"
-<Spinner size="xs" />
-<Spinner size="sm" />
-<Spinner size="md" />
-<Spinner size="lg" />
-<Spinner size="xl" />
+import { Spinner } from '@bpdm/ui/spinner';
+
+export function SpinnerSizes() {
+  return (
+    <>
+      <Spinner size="xs" />
+      <Spinner size="sm" />
+      <Spinner size="md" />
+      <Spinner size="lg" />
+      <Spinner size="xl" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="spinner-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner } from '@bpdm/ng';
+
+@Component({
+  selector: 'spinner-sizes',
+  imports: [BpdmSpinner],
+  templateUrl: './spinner-sizes.html',
+})
+export class SpinnerSizes {}
+```
 
 ```html title="spinner-sizes.html"
 <bpdm-spinner size="xs" />
@@ -140,15 +180,35 @@ no variant prop needed.
   <Tab value="React">
 
 ```tsx title="spinner-colour.tsx"
-<Spinner size="lg" className="text-primary" />
-<Spinner size="lg" className="text-success" />
-<Spinner size="lg" className="text-warning" />
-<Spinner size="lg" className="text-destructive" />
-<Spinner size="lg" className="text-muted-foreground" />
+import { Spinner } from '@bpdm/ui/spinner';
+
+export function SpinnerColours() {
+  return (
+    <>
+      <Spinner size="lg" className="text-primary" />
+      <Spinner size="lg" className="text-success" />
+      <Spinner size="lg" className="text-warning" />
+      <Spinner size="lg" className="text-destructive" />
+      <Spinner size="lg" className="text-muted-foreground" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="spinner-colour.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner } from '@bpdm/ng';
+
+@Component({
+  selector: 'spinner-colour',
+  imports: [BpdmSpinner],
+  templateUrl: './spinner-colour.html',
+})
+export class SpinnerColours {}
+```
 
 ```html title="spinner-colour.html"
 <bpdm-spinner size="lg" class="text-primary" />
@@ -177,19 +237,37 @@ colour via `text-current`.
 import { Spinner } from '@bpdm/ui/spinner';
 import { Button } from '@bpdm/ui/button';
 
-<Button disabled>
-  <Spinner size="sm" className="text-current" />
-  Saving…
-</Button>
+export function InlineSpinners() {
+  return (
+    <>
+      <Button disabled>
+        <Spinner size="sm" className="text-current" />
+        Saving…
+      </Button>
 
-<span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-  <Spinner size="sm" variant="dots" className="text-current" />
-  Loading results
-</span>
+      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner size="sm" variant="dots" className="text-current" />
+        Loading results
+      </span>
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="spinner-inline.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'inline-spinners',
+  imports: [BpdmSpinner, BpdmButton],
+  templateUrl: './spinner-inline.html',
+})
+export class InlineSpinners {}
+```
 
 ```html title="spinner-inline.html"
 <button bpdmButton disabled>
@@ -248,12 +326,31 @@ export function Card() {
   </Tab>
   <Tab value="Angular">
 
+```ts title="loading-overlay.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmLoadingOverlay, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'overlay-card',
+  imports: [BpdmLoadingOverlay, BpdmButton],
+  templateUrl: './loading-overlay.html',
+})
+export class OverlayCard {
+  readonly loading = signal(false);
+  refetch() {
+    this.loading.set(true);
+    setTimeout(() => this.loading.set(false), 1800);
+  }
+}
+```
+
 ```html title="loading-overlay.html"
 <div class="relative overflow-hidden rounded-xl border bg-card p-5">
   <p class="text-sm text-muted-foreground">Active users</p>
   <p class="mt-1 text-2xl font-semibold">12,480</p>
   <bpdm-loading-overlay [show]="loading()" label="Fetching…" />
 </div>
+<button bpdmButton (click)="refetch()">Refresh</button>
 
 <!-- whole screen instead of a card -->
 <bpdm-loading-overlay [show]="loading()" fullPage label="Loading…" />

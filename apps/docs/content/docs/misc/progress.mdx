@@ -73,11 +73,27 @@ Set `showValue` to show the percentage, and `label` for leading text (e.g.
   <Tab value="React">
 
 ```tsx title="progress-label.tsx"
-<ProgressBar value={72} showValue label="Uploading…" variant="success" />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function UploadProgress() {
+  return <ProgressBar value={72} showValue label="Uploading…" variant="success" />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="progress-label.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'upload-progress',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-label.html',
+})
+export class UploadProgress {}
+```
 
 ```html title="progress-label.html"
 <bpdm-progress-bar [value]="72" showValue label="Uploading…" variant="success" />
@@ -99,11 +115,27 @@ in tight layouts.
   <Tab value="React">
 
 ```tsx title="progress-inside.tsx"
-<ProgressBar value={72} valuePosition="inside" />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function InsideProgress() {
+  return <ProgressBar value={72} valuePosition="inside" />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="progress-inside.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'inside-progress',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-inside.html',
+})
+export class InsideProgress {}
+```
 
 ```html title="progress-inside.html"
 <bpdm-progress-bar [value]="72" valuePosition="inside" />
@@ -125,7 +157,13 @@ readout. It implies `showValue`.
   <Tab value="React">
 
 ```tsx title="progress-format.tsx"
-<ProgressBar value={50} max={100} label="Storage" format={(v, max) => `${v}/${max} GB`} />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function StorageBar() {
+  return (
+    <ProgressBar value={50} max={100} label="Storage" format={(v, max) => `${v}/${max} GB`} />
+  );
+}
 ```
 
   </Tab>
@@ -134,6 +172,14 @@ readout. It implies `showValue`.
 `format` is a function input — define it on the component and bind it.
 
 ```ts title="progress-format.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'storage-bar',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-format.html',
+})
 export class StorageBar {
   readonly storageFormat = (v: number, max: number) => `${v}/${max} GB`;
 }
@@ -158,13 +204,33 @@ The `size` prop offers `sm`, `md` (default), and `lg`.
   <Tab value="React">
 
 ```tsx title="progress-sizes.tsx"
-<ProgressBar size="sm" value={62} />
-<ProgressBar size="md" value={62} />
-<ProgressBar size="lg" value={62} />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function ProgressSizes() {
+  return (
+    <div className="flex flex-col gap-4">
+      <ProgressBar size="sm" value={62} />
+      <ProgressBar size="md" value={62} />
+      <ProgressBar size="lg" value={62} />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="progress-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'progress-sizes',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-sizes.html',
+})
+export class ProgressSizes {}
+```
 
 ```html title="progress-sizes.html"
 <bpdm-progress-bar size="sm" [value]="62" />
@@ -188,15 +254,35 @@ The `variant` prop offers `primary` (default), `success`, `warning`,
   <Tab value="React">
 
 ```tsx title="progress-colours.tsx"
-<ProgressBar variant="primary" value={18} showValue label="primary" />
-<ProgressBar variant="success" value={36} showValue label="success" />
-<ProgressBar variant="warning" value={54} showValue label="warning" />
-<ProgressBar variant="destructive" value={72} showValue label="destructive" />
-<ProgressBar variant="info" value={90} showValue label="info" />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function ProgressColours() {
+  return (
+    <div className="flex flex-col gap-3">
+      <ProgressBar variant="primary" value={18} showValue label="primary" />
+      <ProgressBar variant="success" value={36} showValue label="success" />
+      <ProgressBar variant="warning" value={54} showValue label="warning" />
+      <ProgressBar variant="destructive" value={72} showValue label="destructive" />
+      <ProgressBar variant="info" value={90} showValue label="info" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="progress-colours.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'progress-colours',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-colours.html',
+})
+export class ProgressColours {}
+```
 
 ```html title="progress-colours.html"
 <bpdm-progress-bar variant="primary" [value]="18" showValue label="primary" />
@@ -221,11 +307,27 @@ When there's no known total, set `indeterminate` for an animated sweep.
   <Tab value="React">
 
 ```tsx title="progress-indeterminate.tsx"
-<ProgressBar indeterminate />
+import { ProgressBar } from '@bpdm/ui/progress';
+
+export function IndeterminateProgress() {
+  return <ProgressBar indeterminate />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="progress-indeterminate.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar } from '@bpdm/ng';
+
+@Component({
+  selector: 'indeterminate-progress',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-indeterminate.html',
+})
+export class IndeterminateProgress {}
+```
 
 ```html title="progress-indeterminate.html"
 <bpdm-progress-bar indeterminate />

@@ -74,19 +74,39 @@ The `variant` prop sets the tone: `neutral`, `secondary`, `primary`, `success`,
   <Tab value="React">
 
 ```tsx title="badge-variants.tsx"
-<Badge variant="neutral">Neutral</Badge>
-<Badge variant="secondary">Secondary</Badge>
-<Badge variant="primary">Primary</Badge>
-<Badge variant="success">Success</Badge>
-<Badge variant="warning">Warning</Badge>
-<Badge variant="info">Info</Badge>
-<Badge variant="help">Help</Badge>
-<Badge variant="destructive">Error</Badge>
-<Badge variant="contrast">Contrast</Badge>
+import { Badge } from '@bpdm/ui/badge';
+
+export function BadgeVariants() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Badge variant="neutral">Neutral</Badge>
+      <Badge variant="secondary">Secondary</Badge>
+      <Badge variant="primary">Primary</Badge>
+      <Badge variant="success">Success</Badge>
+      <Badge variant="warning">Warning</Badge>
+      <Badge variant="info">Info</Badge>
+      <Badge variant="help">Help</Badge>
+      <Badge variant="destructive">Error</Badge>
+      <Badge variant="contrast">Contrast</Badge>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="badge-variants.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-variants',
+  imports: [BpdmBadge],
+  templateUrl: './badge-variants.html',
+})
+export class BadgeVariants {}
+```
 
 ```html title="badge-variants.html"
 <bpdm-badge variant="neutral">Neutral</bpdm-badge>
@@ -117,14 +137,34 @@ table cells and dense lists).
   <Tab value="React">
 
 ```tsx title="badge-appearances.tsx"
-<Badge variant="primary" appearance="soft">Soft</Badge>
-<Badge variant="primary" appearance="solid">Solid</Badge>
-<Badge variant="primary" appearance="outline">Outline</Badge>
-<Badge variant="primary" appearance="ghost" dot>Ghost</Badge>
+import { Badge } from '@bpdm/ui/badge';
+
+export function BadgeAppearances() {
+  return (
+    <div className="flex flex-wrap items-center gap-2.5">
+      <Badge variant="primary" appearance="soft">Soft</Badge>
+      <Badge variant="primary" appearance="solid">Solid</Badge>
+      <Badge variant="primary" appearance="outline">Outline</Badge>
+      <Badge variant="primary" appearance="ghost" dot>Ghost</Badge>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="badge-appearances.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-appearances',
+  imports: [BpdmBadge],
+  templateUrl: './badge-appearances.html',
+})
+export class BadgeAppearances {}
+```
 
 ```html title="badge-appearances.html"
 <bpdm-badge variant="primary" appearance="soft">Soft</bpdm-badge>
@@ -148,12 +188,32 @@ The `size` prop offers `sm` and `md` (default).
   <Tab value="React">
 
 ```tsx title="badge-sizes.tsx"
-<Badge variant="primary" size="sm">Small</Badge>
-<Badge variant="primary" size="md">Medium</Badge>
+import { Badge } from '@bpdm/ui/badge';
+
+export function BadgeSizes() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <Badge variant="primary" size="sm">Small</Badge>
+      <Badge variant="primary" size="md">Medium</Badge>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="badge-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-sizes',
+  imports: [BpdmBadge],
+  templateUrl: './badge-sizes.html',
+})
+export class BadgeSizes {}
+```
 
 ```html title="badge-sizes.html"
 <bpdm-badge variant="primary" size="sm">Small</bpdm-badge>
@@ -176,26 +236,59 @@ Add `dot` for a leading status dot, and `pulse` for live / in-progress states. T
   <Tab value="React">
 
 ```tsx title="badge-status.tsx"
-<Badge variant="success" dot pulse>Live</Badge>
-<Badge variant="info" dot pulse>Deploying</Badge>
-<Badge variant="warning" dot>Degraded</Badge>
-<Badge variant="destructive" dot>Offline</Badge>
+import { Badge } from '@bpdm/ui/badge';
 
-{/* ghost — bare dot + label, no chrome */}
-<Badge appearance="ghost" variant="success" dot>Healthy</Badge>
+export function BadgeStatus() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <Badge variant="success" dot pulse>Live</Badge>
+        <Badge variant="info" dot pulse>Deploying</Badge>
+        <Badge variant="warning" dot>Degraded</Badge>
+        <Badge variant="destructive" dot>Offline</Badge>
+        <Badge variant="neutral" dot>Draft</Badge>
+      </div>
+      {/* ghost — bare dot + label, no chrome */}
+      <div className="flex flex-wrap items-center gap-4">
+        <Badge appearance="ghost" variant="success" dot>Healthy</Badge>
+        <Badge appearance="ghost" variant="info" dot pulse>Syncing</Badge>
+        <Badge appearance="ghost" variant="destructive" dot>Blocked</Badge>
+      </div>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
+```ts title="badge-status.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-status',
+  imports: [BpdmBadge],
+  templateUrl: './badge-status.html',
+})
+export class BadgeStatus {}
+```
+
 ```html title="badge-status.html"
-<bpdm-badge variant="success" dot pulse>Live</bpdm-badge>
-<bpdm-badge variant="info" dot pulse>Deploying</bpdm-badge>
-<bpdm-badge variant="warning" dot>Degraded</bpdm-badge>
-<bpdm-badge variant="destructive" dot>Offline</bpdm-badge>
+<div class="flex flex-wrap items-center gap-2.5">
+  <bpdm-badge variant="success" dot pulse>Live</bpdm-badge>
+  <bpdm-badge variant="info" dot pulse>Deploying</bpdm-badge>
+  <bpdm-badge variant="warning" dot>Degraded</bpdm-badge>
+  <bpdm-badge variant="destructive" dot>Offline</bpdm-badge>
+  <bpdm-badge variant="neutral" dot>Draft</bpdm-badge>
+</div>
 
 <!-- ghost — bare dot + label, no chrome -->
-<bpdm-badge appearance="ghost" variant="success" dot>Healthy</bpdm-badge>
+<div class="flex flex-wrap items-center gap-4">
+  <bpdm-badge appearance="ghost" variant="success" dot>Healthy</bpdm-badge>
+  <bpdm-badge appearance="ghost" variant="info" dot pulse>Syncing</bpdm-badge>
+  <bpdm-badge appearance="ghost" variant="destructive" dot>Blocked</bpdm-badge>
+</div>
 ```
 
   </Tab>
@@ -216,16 +309,28 @@ button. The chip collapses and fades out, then fires the callback.
 ```tsx title="badge-removable.tsx"
 import { useState } from 'react';
 import { Badge } from '@bpdm/ui/badge';
+import { Button } from '@bpdm/ui/button';
+
+const INITIAL_TAGS = ['Frontend', 'Backend', 'Design', 'Infra', 'Docs'];
 
 export function TagList() {
-  const [tags, setTags] = useState(['Frontend', 'Backend', 'Design']);
+  const [tags, setTags] = useState(INITIAL_TAGS);
   return (
-    <div className="flex flex-wrap gap-2">
-      {tags.map((t) => (
-        <Badge key={t} variant="neutral" onRemove={() => setTags((cur) => cur.filter((x) => x !== t))}>
-          {t}
-        </Badge>
-      ))}
+    <div className="flex flex-col items-start gap-4">
+      <div className="flex min-h-7 flex-wrap gap-2">
+        {tags.map((t) => (
+          <Badge
+            key={t}
+            variant="neutral"
+            onRemove={() => setTags((cur) => cur.filter((x) => x !== t))}
+          >
+            {t}
+          </Badge>
+        ))}
+      </div>
+      <Button size="sm" variant="secondary" appearance="ghost" onClick={() => setTags(INITIAL_TAGS)}>
+        Reset
+      </Button>
     </div>
   );
 }
@@ -236,25 +341,37 @@ export function TagList() {
 
 ```ts title="badge-removable.ts"
 import { Component, signal } from '@angular/core';
-import { BpdmBadge } from '@bpdm/ng';
+import { BpdmBadge, BpdmButton } from '@bpdm/ng';
+
+const INITIAL_TAGS = ['Frontend', 'Backend', 'Design', 'Infra', 'Docs'];
 
 @Component({
   selector: 'tag-list',
-  imports: [BpdmBadge],
+  imports: [BpdmBadge, BpdmButton],
   templateUrl: './badge-removable.html',
 })
 export class TagList {
-  readonly tags = signal(['Frontend', 'Backend', 'Design']);
+  readonly tags = signal(INITIAL_TAGS);
+
   drop(tag: string) {
     this.tags.update((cur) => cur.filter((t) => t !== tag));
+  }
+
+  reset() {
+    this.tags.set(INITIAL_TAGS);
   }
 }
 ```
 
 ```html title="badge-removable.html"
-@for (t of tags(); track t) {
-  <bpdm-badge variant="neutral" removable (removed)="drop(t)">{{ t }}</bpdm-badge>
-}
+<div class="flex flex-col items-start gap-4">
+  <div class="flex min-h-7 flex-wrap gap-2">
+    @for (t of tags(); track t) {
+      <bpdm-badge variant="neutral" removable (removed)="drop(t)">{{ t }}</bpdm-badge>
+    }
+  </div>
+  <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="reset()">Reset</button>
+</div>
 ```
 
   </Tab>
@@ -274,29 +391,41 @@ hides it; pass `showZero` to keep it.
   <Tab value="React">
 
 ```tsx title="badge-notifications.tsx"
+import { useState } from 'react';
 import { Bell, Mail } from 'lucide-react';
 import { NotificationBadge } from '@bpdm/ui/badge';
 import { Button } from '@bpdm/ui/button';
 
 export function Notifications() {
+  const [count, setCount] = useState(8);
   return (
-    <>
-      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
-        <NotificationBadge count={8}>
-          <Bell />
-        </NotificationBadge>
-      </Button>
-      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
-        <NotificationBadge count={128} max={99}>
-          <Mail />
-        </NotificationBadge>
-      </Button>
-      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Status">
-        <NotificationBadge dot variant="success">
-          <Bell />
-        </NotificationBadge>
-      </Button>
-    </>
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex items-center gap-5">
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
+          <NotificationBadge count={count}>
+            <Bell />
+          </NotificationBadge>
+        </Button>
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
+          <NotificationBadge count={128} max={99}>
+            <Mail />
+          </NotificationBadge>
+        </Button>
+        <Button size="icon" variant="secondary" appearance="ghost" aria-label="Status">
+          <NotificationBadge dot variant="success">
+            <Bell />
+          </NotificationBadge>
+        </Button>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button size="sm" variant="secondary" appearance="outline" onClick={() => setCount((c) => c + 1)}>
+          Add
+        </Button>
+        <Button size="sm" variant="secondary" appearance="ghost" onClick={() => setCount(0)}>
+          Clear
+        </Button>
+      </div>
+    </div>
   );
 }
 ```
@@ -304,22 +433,46 @@ export function Notifications() {
   </Tab>
   <Tab value="Angular">
 
+Angular has no lucide component, so inline the icon SVGs (any icon works):
+
+```ts title="badge-notifications.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmNotificationBadge, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'notifications',
+  imports: [BpdmNotificationBadge, BpdmButton],
+  templateUrl: './badge-notifications.html',
+})
+export class Notifications {
+  readonly count = signal(8);
+}
+```
+
 ```html title="badge-notifications.html"
-<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
-  <bpdm-notification-badge [count]="8">
-    <!-- bell icon -->
-  </bpdm-notification-badge>
-</button>
-<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
-  <bpdm-notification-badge [count]="128" [max]="99">
-    <!-- mail icon -->
-  </bpdm-notification-badge>
-</button>
-<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Status">
-  <bpdm-notification-badge dot variant="success">
-    <!-- bell icon -->
-  </bpdm-notification-badge>
-</button>
+<div class="flex items-center gap-5">
+  <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
+    <bpdm-notification-badge [count]="count()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
+        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+        <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+      </svg>
+    </bpdm-notification-badge>
+  </button>
+  <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Inbox">
+    <bpdm-notification-badge [count]="128" [max]="99">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg>
+    </bpdm-notification-badge>
+  </button>
+</div>
+
+<div class="flex items-center gap-2">
+  <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="count.set(count() + 1)">Add</button>
+  <button bpdmButton size="sm" variant="secondary" appearance="ghost" (click)="count.set(0)">Clear</button>
+</div>
 ```
 
   </Tab>
@@ -338,9 +491,15 @@ it stays a single, semantic, interactive element.
   <Tab value="React">
 
 ```tsx title="badge-link.tsx"
-<Badge asChild variant="primary" appearance="soft">
-  <a href="/docs">View docs →</a>
-</Badge>
+import { Badge } from '@bpdm/ui/badge';
+
+export function BadgeLink() {
+  return (
+    <Badge asChild variant="primary" appearance="soft">
+      <a href="/docs">View docs →</a>
+    </Badge>
+  );
+}
 ```
 
   </Tab>
@@ -349,8 +508,22 @@ it stays a single, semantic, interactive element.
 Angular has no `asChild`. Wrap the badge in the link, or set `interactive` and
 bind a `(click)`:
 
+```ts title="badge-link.ts"
+import { Component } from '@angular/core';
+import { BpdmBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badge-link',
+  imports: [BpdmBadge],
+  templateUrl: './badge-link.html',
+})
+export class BadgeLink {}
+```
+
 ```html title="badge-link.html"
-<a href="/docs"><bpdm-badge variant="primary" appearance="soft" interactive>View docs →</bpdm-badge></a>
+<a href="/docs">
+  <bpdm-badge variant="primary" appearance="soft" interactive>View docs →</bpdm-badge>
+</a>
 ```
 
   </Tab>

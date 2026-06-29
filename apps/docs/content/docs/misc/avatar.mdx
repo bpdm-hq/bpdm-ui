@@ -82,13 +82,33 @@ a stable colour per name.
   <Tab value="React">
 
 ```tsx title="avatar-initials.tsx"
-<Avatar name="Aria Lindqvist" size="lg" />
-<Avatar name="Theo Brandt" size="lg" />
-<Avatar name="Lena Cho" size="lg" />
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarInitials() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" size="lg" />
+      <Avatar name="Theo Brandt" size="lg" />
+      <Avatar name="Lena Cho" size="lg" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="avatar-initials.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-initials',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-initials.html',
+})
+export class AvatarInitials {}
+```
 
 ```html title="avatar-initials.html"
 <bpdm-avatar name="Aria Lindqvist" size="lg" />
@@ -115,15 +135,37 @@ auto colour.
 
 ```tsx title="avatar-fallback.tsx"
 import { Building2 } from 'lucide-react';
+import { Avatar } from '@bpdm/ui/avatar';
 
-<Avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" /> {/* → initials */}
-<Avatar size="lg" /> {/* no name → built-in user icon */}
-<Avatar size="lg" icon={<Building2 />} /> {/* custom fallback icon */}
-<Avatar name="JD" colorful={false} size="lg" /> {/* neutral */}
+export function AvatarFallbacks() {
+  return (
+    <>
+      <Avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" /> {/* → initials */}
+      <Avatar size="lg" /> {/* no name → built-in user icon */}
+      <Avatar size="lg" icon={<Building2 />} /> {/* custom fallback icon */}
+      <Avatar name="JD" colorful={false} size="lg" /> {/* neutral */}
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+`icon` is React-only; Angular always uses the built-in user icon when there's no
+image and no name.
+
+```ts title="avatar-fallback.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-fallback',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-fallback.html',
+})
+export class AvatarFallback {}
+```
 
 ```html title="avatar-fallback.html"
 <bpdm-avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" />
@@ -146,16 +188,36 @@ Six sizes: `xs`, `sm`, `md` (default), `lg`, `xl`, `2xl`.
   <Tab value="React">
 
 ```tsx title="avatar-sizes.tsx"
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="xs" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="sm" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="md" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="xl" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" size="2xl" />
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarSizes() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="xs" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="sm" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="md" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="xl" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="2xl" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="avatar-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-sizes',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-sizes.html',
+})
+export class AvatarSizes {}
+```
 
 ```html title="avatar-sizes.html"
 <bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="xs" />
@@ -181,12 +243,32 @@ Six sizes: `xs`, `sm`, `md` (default), `lg`, `xl`, `2xl`.
   <Tab value="React">
 
 ```tsx title="avatar-shapes.tsx"
-<Avatar name="Aria Lindqvist" src="/aria.jpg" shape="circle" size="lg" />
-<Avatar name="Aria Lindqvist" src="/aria.jpg" shape="square" size="lg" />
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarShapes() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" shape="circle" size="lg" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" shape="square" size="lg" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="avatar-shapes.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-shapes',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-shapes.html',
+})
+export class AvatarShapes {}
+```
 
 ```html title="avatar-shapes.html"
 <bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" shape="circle" size="lg" />
@@ -208,14 +290,34 @@ A presence dot via `status`: `online`, `busy`, `away`, or `offline`.
   <Tab value="React">
 
 ```tsx title="avatar-status.tsx"
-<Avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
-<Avatar name="Theo Brandt" status="busy" size="lg" />
-<Avatar name="Lena Cho" src="/lena.jpg" status="away" size="lg" />
-<Avatar name="Mateo Silva" status="offline" size="lg" />
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarStatus() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
+      <Avatar name="Theo Brandt" status="busy" size="lg" />
+      <Avatar name="Lena Cho" src="/lena.jpg" status="away" size="lg" />
+      <Avatar name="Mateo Silva" status="offline" size="lg" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="avatar-status.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-status',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-status.html',
+})
+export class AvatarStatus {}
+```
 
 ```html title="avatar-status.html"
 <bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
