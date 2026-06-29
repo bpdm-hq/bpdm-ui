@@ -62,7 +62,16 @@ function StackedButton() {
                 <Button
                   onClick={() =>
                     dialog.open(
-                      'This dialog opened on top of the first one.',
+                      ({ close }) => (
+                        <div className="flex flex-col gap-3">
+                          <p className="text-sm text-fd-muted-foreground">
+                            This dialog opened on top of the first — they stack independently.
+                          </p>
+                          <div className="flex justify-end">
+                            <Button onClick={close}>Done</Button>
+                          </div>
+                        </div>
+                      ),
                       { title: 'Second dialog', size: 'sm' },
                     )
                   }

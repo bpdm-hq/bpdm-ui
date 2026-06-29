@@ -148,7 +148,19 @@ export function StackedButton() {
         <div className="flex justify-end gap-2">
           <Button variant="secondary" appearance="ghost" onClick={close}>Close</Button>
           <Button
-            onClick={() => dialog.open('Opened on top of the first.', { title: 'Second dialog', size: 'sm' })}
+            onClick={() =>
+              dialog.open(
+                ({ close }) => (
+                  <div className="flex flex-col gap-3">
+                    <p>This dialog opened on top of the first — they stack independently.</p>
+                    <div className="flex justify-end">
+                      <Button onClick={close}>Done</Button>
+                    </div>
+                  </div>
+                ),
+                { title: 'Second dialog', size: 'sm' },
+              )
+            }
           >
             Open second
           </Button>
@@ -174,7 +186,14 @@ export function StackedButton() {
     <button bpdmButton (click)="dialog.open(secondTpl, { title: 'Second dialog', size: 'sm' })">Open second</button>
   </div>
 </ng-template>
-<ng-template #secondTpl>Opened on top of the first.</ng-template>
+<ng-template #secondTpl let-d>
+  <div class="flex flex-col gap-3">
+    <p>This dialog opened on top of the first — they stack independently.</p>
+    <div class="flex justify-end">
+      <button bpdmButton (click)="d.close()">Done</button>
+    </div>
+  </div>
+</ng-template>
 ```
 
   </Tab>
