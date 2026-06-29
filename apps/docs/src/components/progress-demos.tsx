@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect, useState } from 'react';
 import { ProgressBar } from '@bpdm/ui/progress';
+import { Button } from '@bpdm/ui/button';
 
 const VARIANTS = ['primary', 'success', 'warning', 'destructive', 'info'] as const;
 
@@ -77,6 +78,37 @@ export function ProgressIndeterminateDemo() {
     <Box>
       <ProgressBar indeterminate />
     </Box>
+  );
+}
+
+export function ProgressInCardDemo() {
+  const [value, setValue] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const start = () => {
+    setUploading(true);
+    setValue(0);
+    const id = setInterval(() => {
+      setValue((v) => {
+        if (v >= 100) {
+          clearInterval(id);
+          setUploading(false);
+          return 100;
+        }
+        return v + 8;
+      });
+    }, 220);
+  };
+  return (
+    <div className="w-72 space-y-4 rounded-xl border border-fd-border bg-fd-card p-5 shadow-sm">
+      <div>
+        <p className="text-sm font-medium text-fd-foreground">report-2025.pdf</p>
+        <p className="text-xs text-fd-muted-foreground">4.2 MB</p>
+      </div>
+      <ProgressBar value={value} showValue variant={value >= 100 ? 'success' : 'primary'} />
+      <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>
+        {value >= 100 ? 'Upload again' : 'Upload'}
+      </Button>
+    </div>
   );
 }
 

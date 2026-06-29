@@ -13,6 +13,7 @@ import {
   ProgressVariantsDemo,
   ProgressIndeterminateDemo,
   ProgressDynamicDemo,
+  ProgressInCardDemo,
 } from '@/components/progress-demos';
 import { Preview } from '@/components/preview';
 
@@ -391,6 +392,105 @@ export class Syncing {
 ```html title="progress-dynamic.html"
 <bpdm-progress-bar [value]="value()" showValue label="Syncing"
   [variant]="value() >= 100 ? 'success' : 'primary'" />
+```
+
+  </Tab>
+</Tabs>
+
+## In a card
+
+A real-world layout — a progress bar inside a file-upload card, climbing on
+**Upload** and flipping to `success` at 100%.
+
+<Preview>
+  <ProgressInCardDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-in-card.tsx"
+import { useState } from 'react';
+import { ProgressBar } from '@bpdm/ui/progress';
+import { Button } from '@bpdm/ui/button';
+
+export function UploadCard() {
+  const [value, setValue] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const start = () => {
+    setUploading(true);
+    setValue(0);
+    const id = setInterval(() => {
+      setValue((v) => {
+        if (v >= 100) {
+          clearInterval(id);
+          setUploading(false);
+          return 100;
+        }
+        return v + 8;
+      });
+    }, 220);
+  };
+
+  return (
+    <div className="w-72 space-y-4 rounded-xl border bg-card p-5 shadow-sm">
+      <div>
+        <p className="text-sm font-medium">report-2025.pdf</p>
+        <p className="text-xs text-muted-foreground">4.2 MB</p>
+      </div>
+      <ProgressBar value={value} showValue variant={value >= 100 ? 'success' : 'primary'} />
+      <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>
+        {value >= 100 ? 'Upload again' : 'Upload'}
+      </Button>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="progress-in-card.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmProgressBar, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'upload-card',
+  imports: [BpdmProgressBar, BpdmButton],
+  templateUrl: './progress-in-card.html',
+})
+export class UploadCard {
+  readonly value = signal(0);
+  readonly uploading = signal(false);
+
+  start() {
+    this.uploading.set(true);
+    this.value.set(0);
+    const id = setInterval(() => {
+      this.value.update((v) => {
+        if (v >= 100) {
+          clearInterval(id);
+          this.uploading.set(false);
+          return 100;
+        }
+        return v + 8;
+      });
+    }, 220);
+  }
+}
+```
+
+```html title="progress-in-card.html"
+<div class="w-72 space-y-4 rounded-xl border bg-card p-5 shadow-sm">
+  <div>
+    <p class="text-sm font-medium">report-2025.pdf</p>
+    <p class="text-xs text-muted-foreground">4.2 MB</p>
+  </div>
+  <bpdm-progress-bar [value]="value()" showValue [variant]="value() >= 100 ? 'success' : 'primary'" />
+  <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="start()" [disabled]="uploading()">
+    {{ value() >= 100 ? 'Upload again' : 'Upload' }}
+  </button>
+</div>
 ```
 
   </Tab>

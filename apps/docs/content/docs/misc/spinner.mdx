@@ -10,6 +10,7 @@ import {
   SpinnerSizesDemo,
   SpinnerColorsDemo,
   SpinnerInlineDemo,
+  SpinnerInlineValueDemo,
   SpinnerOverlayDemo,
 } from '@/components/spinner-demos';
 import { Preview } from '@/components/preview';
@@ -279,6 +280,95 @@ export class InlineSpinners {}
   <bpdm-spinner size="sm" variant="dots" class="text-current" />
   Loading results
 </span>
+```
+
+  </Tab>
+</Tabs>
+
+## Inline value
+
+Swap a single value for a small spinner while it refetches — reserve the row
+height so the layout doesn't jump when the spinner and value trade places.
+
+<Preview>
+  <SpinnerInlineValueDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-inline-value.tsx"
+import { useState } from 'react';
+import { Spinner } from '@bpdm/ui/spinner';
+import { Button } from '@bpdm/ui/button';
+
+export function ActiveUsers() {
+  const [loading, setLoading] = useState(false);
+  const refetch = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1600);
+  };
+  return (
+    <div className="w-72 space-y-3">
+      <div className="rounded-xl border bg-card p-5 shadow-sm">
+        <p className="text-sm text-muted-foreground">Active users</p>
+        {/* reserve the height so swapping spinner ↔ value doesn't shift layout */}
+        <div className="mt-1 flex h-8 items-center">
+          {loading ? (
+            <Spinner size="sm" variant="dots" className="text-muted-foreground" />
+          ) : (
+            <span className="text-2xl font-semibold tabular-nums">12,480</span>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-success">+8.2% this week</p>
+      </div>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
+        Refetch amount
+      </Button>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="spinner-inline-value.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmSpinner, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'active-users',
+  imports: [BpdmSpinner, BpdmButton],
+  templateUrl: './spinner-inline-value.html',
+})
+export class ActiveUsers {
+  readonly loading = signal(false);
+  refetch() {
+    this.loading.set(true);
+    setTimeout(() => this.loading.set(false), 1600);
+  }
+}
+```
+
+```html title="spinner-inline-value.html"
+<div class="w-72 space-y-3">
+  <div class="rounded-xl border bg-card p-5 shadow-sm">
+    <p class="text-sm text-muted-foreground">Active users</p>
+    <!-- reserve the height so swapping spinner ↔ value doesn't shift layout -->
+    <div class="mt-1 flex h-8 items-center">
+      @if (loading()) {
+        <bpdm-spinner size="sm" variant="dots" class="text-muted-foreground" />
+      } @else {
+        <span class="text-2xl font-semibold tabular-nums">12,480</span>
+      }
+    </div>
+    <p class="mt-1 text-xs text-success">+8.2% this week</p>
+  </div>
+  <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">
+    Refetch amount
+  </button>
+</div>
 ```
 
   </Tab>

@@ -96,6 +96,33 @@ export function SpinnerInlineDemo() {
   );
 }
 
+export function SpinnerInlineValueDemo() {
+  const [loading, setLoading] = useState(false);
+  const refetch = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1600);
+  };
+  return (
+    <div className="w-72 space-y-3">
+      <div className="rounded-xl border border-fd-border bg-fd-card p-5 shadow-sm">
+        <p className="text-sm text-fd-muted-foreground">Active users</p>
+        {/* reserve the height so swapping spinner ↔ value doesn't shift layout */}
+        <div className="mt-1 flex h-8 items-center">
+          {loading ? (
+            <Spinner size="sm" variant="dots" className="text-fd-muted-foreground" />
+          ) : (
+            <span className="text-2xl font-semibold tabular-nums text-fd-foreground">12,480</span>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-success">+8.2% this week</p>
+      </div>
+      <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
+        Refetch amount
+      </Button>
+    </div>
+  );
+}
+
 export function SpinnerOverlayDemo() {
   const [loading, setLoading] = useState(false);
   const refetch = () => {
