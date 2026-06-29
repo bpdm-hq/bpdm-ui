@@ -1,11 +1,388 @@
 ---
 title: Dialog
-description: Dialog — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A modal dialog — focus-trapped, scroll-locked, ESC/outside-click to close, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Dialog** component — available in React (`@bpdm/ui/dialog`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  DialogBasicDemo,
+  DialogSizesDemo,
+  DialogControlledDemo,
+  DialogScrollableDemo,
+  DialogDropdownDemo,
+  DialogCompositionDemo,
+} from '@/components/dialog-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Dialog** is a modal built on Radix — focus trap, scroll lock, `Esc` and
+outside-click to close, and full ARIA are handled for you. Use the low-config
+`Dialog` (pass a `trigger`, `title`, body and `footer`), or compose the primitives
+(`DialogRoot`, `DialogContent`, …) for full control. In Angular it's
+`<bpdm-dialog>` with `[bpdmDialogTrigger]` / `[bpdmDialogBody]` / `[bpdmDialogFooter]`.
+
+## Usage
+
+<Preview>
+  <DialogBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-usage.tsx"
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function EditProfile() {
+  return (
+    <Dialog
+      trigger={<Button>Edit profile</Button>}
+      title="Edit profile"
+      description="Update your details. Changes are saved when you click Save."
+      footer={
+        <>
+          <DialogClose asChild>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button>Save changes</Button>
+          </DialogClose>
+        </>
+      }
+    >
+      <p>Your profile is visible to everyone in the workspace.</p>
+    </Dialog>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="dialog-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose } from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'edit-profile',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton],
+  templateUrl: './dialog-usage.html',
+})
+export class EditProfile {}
+```
+
+```html title="dialog-usage.html"
+<bpdm-dialog title="Edit profile" description="Update your details.">
+  <button bpdmButton bpdmDialogTrigger>Edit profile</button>
+  <ng-template bpdmDialogBody>
+    <p>Your profile is visible to everyone in the workspace.</p>
+  </ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
+    <button bpdmButton bpdmDialogClose>Save changes</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop sets the panel width: `sm`, `md` (default), `lg`, and `xl`.
+
+<Preview>
+  <DialogSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-sizes.tsx"
+import { Dialog } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function Sizes() {
+  return (
+    <>
+      <Dialog size="sm" trigger={<Button>SM</Button>} title="SM dialog" />
+      <Dialog size="md" trigger={<Button>MD</Button>} title="MD dialog" />
+      <Dialog size="lg" trigger={<Button>LG</Button>} title="LG dialog" />
+      <Dialog size="xl" trigger={<Button>XL</Button>} title="XL dialog" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="dialog-sizes.html"
+<bpdm-dialog size="sm" title="SM dialog"><button bpdmButton bpdmDialogTrigger>SM</button></bpdm-dialog>
+<bpdm-dialog size="md" title="MD dialog"><button bpdmButton bpdmDialogTrigger>MD</button></bpdm-dialog>
+<bpdm-dialog size="lg" title="LG dialog"><button bpdmButton bpdmDialogTrigger>LG</button></bpdm-dialog>
+<bpdm-dialog size="xl" title="XL dialog"><button bpdmButton bpdmDialogTrigger>XL</button></bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled
+
+Drive the open state yourself with `open` + `onOpenChange` (React) or two-way
+`[(open)]` (Angular) — handy for opening from a menu, a keyboard shortcut, or
+after an async step.
+
+<Preview>
+  <DialogControlledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-controlled.tsx"
+import { useState } from 'react';
+import { Dialog } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function Controlled() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open from outside</Button>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Controlled dialog"
+        description="Its open state is driven by your own React state."
+        footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <p>Open it from anywhere.</p>
+      </Dialog>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="dialog-controlled.html"
+<button bpdmButton (click)="open.set(true)">Open from outside</button>
+<bpdm-dialog [(open)]="open" title="Controlled dialog" description="Driven by your own state.">
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton (click)="open.set(false)">Close</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## Scrollable content
+
+Long bodies scroll inside the panel while the header and footer stay pinned.
+
+<Preview>
+  <DialogScrollableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-scrollable.tsx"
+<Dialog
+  trigger={<Button>Terms of service</Button>}
+  title="Terms of service"
+  description="Please review before continuing."
+  footer={
+    <DialogClose asChild>
+      <Button>I agree</Button>
+    </DialogClose>
+  }
+>
+  {/* a tall block of content — it scrolls; the header/footer don't */}
+  <div className="space-y-3">{/* …long content… */}</div>
+</Dialog>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="dialog-scrollable.html"
+<bpdm-dialog title="Terms of service" description="Please review before continuing.">
+  <button bpdmButton bpdmDialogTrigger>Terms of service</button>
+  <ng-template bpdmDialogBody>
+    <div class="space-y-3"><!-- …long content… --></div>
+  </ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton bpdmDialogClose>I agree</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## With a dropdown inside
+
+Other overlays — a `Select`, popover, or tooltip — work correctly inside the
+dialog (focus and layering are handled).
+
+<Preview>
+  <DialogDropdownDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-dropdown.tsx"
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+import { Select } from '@bpdm/ui/select';
+
+const plans = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'enterprise', label: 'Enterprise' },
+];
+
+export function ChoosePlan() {
+  return (
+    <Dialog
+      trigger={<Button>Choose a plan</Button>}
+      title="Choose a plan"
+      footer={
+        <DialogClose asChild>
+          <Button>Confirm</Button>
+        </DialogClose>
+      }
+    >
+      <Select options={plans} defaultValue="pro" aria-label="Plan" />
+    </Dialog>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="dialog-dropdown.html"
+<bpdm-dialog title="Choose a plan">
+  <button bpdmButton bpdmDialogTrigger>Choose a plan</button>
+  <ng-template bpdmDialogBody>
+    <bpdm-select [options]="plans" defaultValue="pro" aria-label="Plan" />
+  </ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton bpdmDialogClose>Confirm</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## Composition
+
+For full control over the layout, compose the primitives instead of the
+convenience `Dialog`: `DialogRoot` → `DialogTrigger` + `DialogContent`
+(`DialogHeader` / `DialogTitle` / `DialogDescription` / `DialogFooter` /
+`DialogClose`).
+
+<Preview>
+  <DialogCompositionDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-composition.tsx"
+import {
+  DialogRoot,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function Compose() {
+  return (
+    <DialogRoot>
+      <DialogTrigger asChild>
+        <Button variant="secondary" appearance="outline">Compose it</Button>
+      </DialogTrigger>
+      <DialogContent size="md">
+        <DialogHeader>
+          <DialogTitle>Invite teammates</DialogTitle>
+          <DialogDescription>Build the layout from the primitives.</DialogDescription>
+        </DialogHeader>
+        <div className="px-6 py-2">Full control over header, body, and footer.</div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button>Send invites</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogRoot>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular the same `<bpdm-dialog>` already exposes the slots — use the
+`[bpdmDialogBody]` and `[bpdmDialogFooter]` templates (shown above) for custom
+layouts; there's no separate primitive set to assemble.
+
+```html title="dialog-composition.html"
+<bpdm-dialog title="Invite teammates" description="Build the layout with the slots.">
+  <button bpdmButton variant="secondary" appearance="outline" bpdmDialogTrigger>Compose it</button>
+  <ng-template bpdmDialogBody>Full control over the body.</ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Cancel</button>
+    <button bpdmButton bpdmDialogClose>Send invites</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Dialog` (convenience) / `<bpdm-dialog>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open state. Angular: `[(open)]`. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. |
+| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: `[bpdmDialogTrigger]`. |
+| `title` | `ReactNode` | — | Heading (a hidden one is supplied if omitted, for a11y). |
+| `description` | `ReactNode` | — | Sub-heading line. |
+| `footer` | `ReactNode` | — | Footer area (React). Angular: `[bpdmDialogFooter]` template. |
+| `size` | `sm \| md \| lg \| xl` | `md` | Panel width. |
+| `showClose` | `boolean` | `true` | Show the top-right close button. |
+
+**Primitives (React):** `DialogRoot`, `DialogTrigger`, `DialogClose`,
+`DialogContent` (`size`, `showClose`), `DialogHeader`, `DialogFooter`,
+`DialogTitle`, `DialogDescription`.
+
+## Accessibility
+
+- Built on Radix Dialog: it's a focus **trap** (focus moves in on open, returns
+  to the trigger on close), the background is `inert`/scroll-locked, and `Esc`
+  or an outside click closes it.
+- Renders `role="dialog"` + `aria-modal`, wired to the **title** and
+  **description** via `aria-labelledby` / `aria-describedby`. Always provide a
+  `title` (the component adds a visually-hidden one if you don't).
+- The close button has an `aria-label`; the trigger keeps its own role and
+  keyboard behaviour.
