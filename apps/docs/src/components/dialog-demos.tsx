@@ -14,6 +14,8 @@ import {
 } from '@bpdm/ui/dialog';
 import { Button } from '@bpdm/ui/button';
 import { Select } from '@bpdm/ui/select';
+import { MultiSelect } from '@bpdm/ui/multi-select';
+import { TreeSelect } from '@bpdm/ui/tree-select';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -122,20 +124,48 @@ const PLANS = [
   { value: 'enterprise', label: 'Enterprise' },
 ];
 
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+];
+
+const TREE = [
+  {
+    value: 'frontend',
+    label: 'Frontend',
+    children: [
+      { value: 'react', label: 'React' },
+      { value: 'angular', label: 'Angular' },
+    ],
+  },
+  {
+    value: 'backend',
+    label: 'Backend',
+    children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+    ],
+  },
+];
+
 export function DialogDropdownDemo() {
   return (
     <Dialog
-      trigger={<Button>Choose a plan</Button>}
-      title="Choose a plan"
-      description="A Select (its own overlay) works correctly inside the dialog."
+      trigger={<Button>Configure project</Button>}
+      title="Configure project"
+      description="Select, Multi-select and Tree Select — each its own overlay — all work inside the dialog."
       footer={
         <DialogClose asChild>
           <Button>Confirm</Button>
         </DialogClose>
       }
     >
-      <div className="py-1">
+      <div className="flex flex-col gap-3 py-1">
         <Select options={PLANS} defaultValue="pro" aria-label="Plan" />
+        <MultiSelect options={FRAMEWORKS} defaultValue={['react']} aria-label="Frameworks" placeholder="Frameworks" />
+        <TreeSelect options={TREE} defaultValue={['react']} aria-label="Stack" placeholder="Stack" />
       </div>
     </Dialog>
   );

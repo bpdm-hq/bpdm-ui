@@ -227,8 +227,9 @@ Long bodies scroll inside the panel while the header and footer stay pinned.
 
 ## With a dropdown inside
 
-Other overlays — a `Select`, popover, or tooltip — work correctly inside the
-dialog (focus and layering are handled).
+Other overlays — `Select`, `MultiSelect`, `TreeSelect`, popovers, tooltips — work
+correctly inside the dialog (focus and layering are handled), so nested pickers
+behave as expected.
 
 <Preview>
   <DialogDropdownDemo />
@@ -241,25 +242,47 @@ dialog (focus and layering are handled).
 import { Dialog, DialogClose } from '@bpdm/ui/dialog';
 import { Button } from '@bpdm/ui/button';
 import { Select } from '@bpdm/ui/select';
+import { MultiSelect } from '@bpdm/ui/multi-select';
+import { TreeSelect } from '@bpdm/ui/tree-select';
 
 const plans = [
   { value: 'free', label: 'Free' },
   { value: 'pro', label: 'Pro' },
   { value: 'enterprise', label: 'Enterprise' },
 ];
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+];
+const tree = [
+  { value: 'frontend', label: 'Frontend', children: [
+    { value: 'react', label: 'React' },
+    { value: 'angular', label: 'Angular' },
+  ] },
+  { value: 'backend', label: 'Backend', children: [
+    { value: 'node', label: 'Node.js' },
+    { value: 'go', label: 'Go' },
+  ] },
+];
 
-export function ChoosePlan() {
+export function ConfigureProject() {
   return (
     <Dialog
-      trigger={<Button>Choose a plan</Button>}
-      title="Choose a plan"
+      trigger={<Button>Configure project</Button>}
+      title="Configure project"
       footer={
         <DialogClose asChild>
           <Button>Confirm</Button>
         </DialogClose>
       }
     >
-      <Select options={plans} defaultValue="pro" aria-label="Plan" />
+      <div className="flex flex-col gap-3">
+        <Select options={plans} defaultValue="pro" aria-label="Plan" />
+        <MultiSelect options={frameworks} defaultValue={['react']} aria-label="Frameworks" placeholder="Frameworks" />
+        <TreeSelect options={tree} defaultValue={['react']} aria-label="Stack" placeholder="Stack" />
+      </div>
     </Dialog>
   );
 }
@@ -269,10 +292,14 @@ export function ChoosePlan() {
   <Tab value="Angular">
 
 ```html title="dialog-dropdown.html"
-<bpdm-dialog title="Choose a plan">
-  <button bpdmButton bpdmDialogTrigger>Choose a plan</button>
+<bpdm-dialog title="Configure project">
+  <button bpdmButton bpdmDialogTrigger>Configure project</button>
   <ng-template bpdmDialogBody>
-    <bpdm-select [options]="plans" defaultValue="pro" aria-label="Plan" />
+    <div class="flex flex-col gap-3">
+      <bpdm-select [options]="plans" defaultValue="pro" aria-label="Plan" />
+      <bpdm-multi-select [options]="frameworks" [defaultValue]="['react']" aria-label="Frameworks" placeholder="Frameworks" />
+      <bpdm-tree-select [options]="tree" [defaultValue]="['react']" aria-label="Stack" placeholder="Stack" />
+    </div>
   </ng-template>
   <ng-template bpdmDialogFooter>
     <button bpdmButton bpdmDialogClose>Confirm</button>
