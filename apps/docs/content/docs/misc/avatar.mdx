@@ -102,8 +102,9 @@ a stable colour per name.
 ## Fallbacks
 
 The chain is **image → initials → icon**. A broken `src` falls back to initials;
-with no `name` either, a default user icon shows. Set `colorful={false}` for a
-neutral grey tint instead of the auto colour.
+with no `name`, it shows a custom **`icon`** if you pass one (React), otherwise a
+built-in user icon. Set `colorful={false}` for a neutral grey tint instead of the
+auto colour.
 
 <Preview>
   <AvatarFallbackDemo />
@@ -113,8 +114,11 @@ neutral grey tint instead of the auto colour.
   <Tab value="React">
 
 ```tsx title="avatar-fallback.tsx"
+import { Building2 } from 'lucide-react';
+
 <Avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" /> {/* → initials */}
-<Avatar size="lg" /> {/* no name → icon */}
+<Avatar size="lg" /> {/* no name → built-in user icon */}
+<Avatar size="lg" icon={<Building2 />} /> {/* custom fallback icon */}
 <Avatar name="JD" colorful={false} size="lg" /> {/* neutral */}
 ```
 
@@ -343,7 +347,7 @@ export function Badged() {
 | `name` | `string` | — | Drives the initials, auto-colour, and alt text. |
 | `src` | `string` | — | Image URL; falls back to initials, then icon. |
 | `alt` | `string` | `name` | Image alt text. |
-| `icon` | `ReactNode` | user glyph | Shown when there's no image and no name. |
+| `icon` | `ReactNode` | user glyph | **React only** — custom fallback when there's no image and no name. Angular shows the built-in user icon. |
 | `size` | `xs \| sm \| md \| lg \| xl \| 2xl` | `md` | Avatar size. |
 | `shape` | `circle \| square` | `circle` | Circle or rounded square. |
 | `status` | `online \| busy \| away \| offline` | — | Presence dot. |

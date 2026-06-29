@@ -1,18 +1,22 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { Building2 } from 'lucide-react';
 import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
 import { NotificationBadge } from '@bpdm/ui/badge';
 
-/** Stable royalty-free placeholder faces; if they ever fail to load the Avatar
- *  gracefully falls back to initials, so the demos render offline too. */
+/** DiceBear generated avatars (CC0 "thumbs" style) — no real people, no licensing
+ *  concerns, and stable per seed. If they ever fail to load the Avatar gracefully
+ *  falls back to initials, so the demos still render offline. */
+const img = (seed: string) => `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(seed)}`;
+
 const PEOPLE = [
-  { name: 'Aria Lindqvist', src: 'https://i.pravatar.cc/150?img=47' },
-  { name: 'Theo Brandt', src: 'https://i.pravatar.cc/150?img=12' },
-  { name: 'Lena Cho', src: 'https://i.pravatar.cc/150?img=32' },
-  { name: 'Mateo Silva', src: 'https://i.pravatar.cc/150?img=15' },
-  { name: 'Ines Vidal', src: 'https://i.pravatar.cc/150?img=45' },
-  { name: 'Sam Reyes', src: 'https://i.pravatar.cc/150?img=8' },
+  { name: 'Aria Lindqvist', src: img('Aria') },
+  { name: 'Theo Brandt', src: img('Theo') },
+  { name: 'Lena Cho', src: img('Lena') },
+  { name: 'Mateo Silva', src: img('Mateo') },
+  { name: 'Ines Vidal', src: img('Ines') },
+  { name: 'Sam Reyes', src: img('Sam') },
 ];
 
 function Row({ children }: { children: ReactNode }) {
@@ -43,8 +47,10 @@ export function AvatarFallbackDemo() {
     <Row>
       {/* image fails → initials */}
       <Avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" />
-      {/* no name → default user icon */}
+      {/* no name, no icon → built-in user icon */}
       <Avatar size="lg" />
+      {/* no name + custom icon → your icon */}
+      <Avatar size="lg" icon={<Building2 />} />
       {/* neutral (no auto-tint) */}
       <Avatar size="lg" name="JD" colorful={false} />
     </Row>
