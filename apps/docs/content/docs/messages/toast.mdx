@@ -140,11 +140,12 @@ export function Example() {
 }
 ```
 
-## Promise
+## Async flows
 
-`toast.promise` shows a loading toast, then resolves it to success or error when
-the promise settles. `success` / `error` can be a string or a function of the
-resolved value / error.
+Drive a toast through an async task with a **single call** — `toast.promise()`
+shows a loading toast, then **swaps it in place** to success or error when the
+promise settles (no manual add-then-clear). `success` / `error` take a string or
+a function of the resolved value / error.
 
 <Preview>
   <ToastPromiseDemo />
