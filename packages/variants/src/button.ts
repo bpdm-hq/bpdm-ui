@@ -10,7 +10,11 @@ import { cva, type VariantProps } from "class-variance-authority";
  * buttons, so they stay pixel-identical.
  */
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,transform,scale,translate] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] active:scale-[0.95] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  // Click feedback (a bpdm signature): a springy tactile press (scale + push-down,
+  // baseline scale-100/translate-y-0 so it interpolates). The `bpdm-btn` marker
+  // class also gets an amber "pulse ring" on click via @bpdm/tokens CSS (an
+  // ::after that expands + fades on release, so even a quick click registers).
+  "bpdm-btn relative inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium scale-100 translate-y-0 transition-[color,background-color,border-color,box-shadow,transform,scale,translate] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] active:scale-[0.95] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       // colour / severity only — appearance is a separate axis
