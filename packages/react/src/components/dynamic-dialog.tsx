@@ -54,12 +54,16 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
   return (
     <DialogServiceContext.Provider value={service}>
       {children}
-      {items.map((item) => (
+      {items.map((item, index) => (
         <Dialog
           key={item.id}
           open
           onOpenChange={(o) => {
-            if (!o) close(item.id);
+            // Only the topmost dialog responds to a dismiss (Esc / outside-click /
+            // close button). Without this, interacting with an upper stacked dialog
+            // counts as an "outside" interaction for the ones beneath and closes
+            // them too.
+            if (!o && index === items.length - 1) close(item.id);
           }}
           title={item.options.title}
           description={item.options.description}
