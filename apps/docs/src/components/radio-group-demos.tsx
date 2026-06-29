@@ -16,18 +16,27 @@ function Option({
   label,
   size,
   invalid,
+  disabled,
 }: {
   prefix: string;
   value: string;
   label: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   invalid?: boolean;
+  disabled?: boolean;
 }) {
   const id = `${prefix}-${value}`;
   return (
     <div className="flex items-center gap-2.5">
       <RadioGroupItem value={value} id={id} size={size} aria-invalid={invalid || undefined} />
-      <label htmlFor={id} className="cursor-pointer text-sm text-fd-foreground">
+      <label
+        htmlFor={id}
+        className={
+          disabled
+            ? 'cursor-not-allowed text-sm text-fd-muted-foreground opacity-70'
+            : 'cursor-pointer text-sm text-fd-foreground'
+        }
+      >
         {label}
       </label>
     </div>
@@ -68,7 +77,7 @@ export function RadioGroupDisabledDemo() {
   return (
     <RadioGroup defaultValue="pro" disabled>
       {PLANS.map((p) => (
-        <Option key={p.value} prefix="d" value={p.value} label={p.label} />
+        <Option key={p.value} prefix="d" value={p.value} label={p.label} disabled />
       ))}
     </RadioGroup>
   );
