@@ -36,9 +36,17 @@ export function App() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="app.config.ts"
-// Nothing to register — BpdmDialogService is `providedIn: 'root'`.
-// Inject it where you need it (see Usage).
+Nothing to register — `BpdmDialogService` is `providedIn: 'root'`. Just inject it
+wherever you need it:
+
+```ts title="dialog-setup.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmDialogService } from '@bpdm/ng';
+
+@Component({ selector: 'example', template: '' })
+export class Example {
+  private readonly dialog = inject(BpdmDialogService);
+}
 ```
 
   </Tab>
@@ -176,6 +184,20 @@ export function StackedButton() {
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="stacked.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmDialogService, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'stacked',
+  imports: [BpdmButton],
+  templateUrl: './stacked.html',
+})
+export class Stacked {
+  readonly dialog = inject(BpdmDialogService);
+}
+```
 
 ```html title="stacked.html"
 <button bpdmButton (click)="dialog.open(firstTpl, { title: 'First dialog' })">Stacked dialogs</button>

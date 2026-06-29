@@ -36,9 +36,17 @@ export function App() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="app.config.ts"
-// Nothing to register — BpdmConfirm is `providedIn: 'root'`.
-// Just inject it where you need it (see Usage).
+Nothing to register — `BpdmConfirm` is `providedIn: 'root'`. Just inject it
+wherever you need it:
+
+```ts title="confirm-setup.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm } from '@bpdm/ng';
+
+@Component({ selector: 'example', template: '' })
+export class Example {
+  private readonly confirm = inject(BpdmConfirm);
+}
 ```
 
   </Tab>

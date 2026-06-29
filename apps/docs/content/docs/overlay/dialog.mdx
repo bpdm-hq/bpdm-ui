@@ -118,6 +118,18 @@ export function Sizes() {
   </Tab>
   <Tab value="Angular">
 
+```ts title="dialog-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmDialog, BpdmDialogTrigger, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'dialog-sizes',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmButton],
+  templateUrl: './dialog-sizes.html',
+})
+export class DialogSizes {}
+```
+
 ```html title="dialog-sizes.html"
 <bpdm-dialog size="sm" title="SM dialog"><button bpdmButton bpdmDialogTrigger>SM</button></bpdm-dialog>
 <bpdm-dialog size="md" title="MD dialog"><button bpdmButton bpdmDialogTrigger>MD</button></bpdm-dialog>
@@ -167,6 +179,20 @@ export function Controlled() {
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="dialog-controlled.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmDialog, BpdmDialogFooter, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'controlled',
+  imports: [BpdmDialog, BpdmDialogFooter, BpdmButton],
+  templateUrl: './controlled.html',
+})
+export class Controlled {
+  readonly open = signal(false);
+}
+```
 
 ```html title="dialog-controlled.html"
 <button bpdmButton (click)="open.set(true)">Open from outside</button>
@@ -322,7 +348,61 @@ export function ConfigureProject() {
   </Tab>
   <Tab value="Angular">
 
-```html title="dialog-dropdown.html"
+```ts title="configure-project.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmDialog,
+  BpdmDialogTrigger,
+  BpdmDialogBody,
+  BpdmDialogFooter,
+  BpdmDialogClose,
+  BpdmButton,
+  BpdmSelect,
+  BpdmMultiSelect,
+  BpdmTreeSelect,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'configure-project',
+  imports: [
+    BpdmDialog,
+    BpdmDialogTrigger,
+    BpdmDialogBody,
+    BpdmDialogFooter,
+    BpdmDialogClose,
+    BpdmButton,
+    BpdmSelect,
+    BpdmMultiSelect,
+    BpdmTreeSelect,
+  ],
+  templateUrl: './configure-project.html',
+})
+export class ConfigureProject {
+  readonly plans = [
+    { value: 'free', label: 'Free' },
+    { value: 'pro', label: 'Pro' },
+    { value: 'enterprise', label: 'Enterprise' },
+  ];
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'angular', label: 'Angular' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'svelte', label: 'Svelte' },
+  ];
+  readonly tree = [
+    { value: 'frontend', label: 'Frontend', children: [
+      { value: 'react', label: 'React' },
+      { value: 'angular', label: 'Angular' },
+    ] },
+    { value: 'backend', label: 'Backend', children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+    ] },
+  ];
+}
+```
+
+```html title="configure-project.html"
 <bpdm-dialog title="Configure project">
   <button bpdmButton bpdmDialogTrigger>Configure project</button>
   <ng-template bpdmDialogBody>
@@ -400,6 +480,25 @@ export function Compose() {
 In Angular the same `<bpdm-dialog>` already exposes the slots — use the
 `[bpdmDialogBody]` and `[bpdmDialogFooter]` templates (shown above) for custom
 layouts; there's no separate primitive set to assemble.
+
+```ts title="dialog-composition.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmDialog,
+  BpdmDialogTrigger,
+  BpdmDialogBody,
+  BpdmDialogFooter,
+  BpdmDialogClose,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'compose',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton],
+  templateUrl: './dialog-composition.html',
+})
+export class Compose {}
+```
 
 ```html title="dialog-composition.html"
 <bpdm-dialog title="Invite teammates" description="Build the layout with the slots.">
