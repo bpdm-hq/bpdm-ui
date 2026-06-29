@@ -54,16 +54,19 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
   return (
     <DialogServiceContext.Provider value={service}>
       {children}
-      {items.map((item, index) => (
+      {items.map((item, index) => {
+        const isTop = index === items.length - 1;
+        return (
         <Dialog
           key={item.id}
           open
+          // Only the topmost dialog may be dismissed by Esc / outside-click — the
+          // ones beneath ignore those, so interacting with (or closing) an upper
+          // dialog never tears down the stack below it.
+          onEscapeKeyDown={isTop ? undefined : (e) => e.preventDefault()}
+          onInteractOutside={isTop ? undefined : (e) => e.preventDefault()}
           onOpenChange={(o) => {
-            // Only the topmost dialog responds to a dismiss (Esc / outside-click /
-            // close button). Without this, interacting with an upper stacked dialog
-            // counts as an "outside" interaction for the ones beneath and closes
-            // them too.
-            if (!o && index === items.length - 1) close(item.id);
+            if (!o && isTop) close(item.id);
           }}
           title={item.options.title}
           description={item.options.description}
@@ -74,7 +77,8 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
             ? item.content({ close: () => close(item.id) })
             : item.content}
         </Dialog>
-      ))}
+        );
+      })}
     </DialogServiceContext.Provider>
   );
 }
