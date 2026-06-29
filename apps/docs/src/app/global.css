@@ -82,6 +82,13 @@ html {
   background-color: var(--background);
   border-inline-end-width: 0;
 }
+/* Collapsed → hover-reveal: the sidebar floats OVER the page content, so restore
+   a divider + a lift shadow there so it reads as a distinct panel and doesn't
+   look merged with the buttons/text underneath. The docked state stays seamless. */
+#nd-sidebar[data-collapsed='true'] {
+  border-inline-end-width: 1px;
+  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--foreground) 28%, transparent);
+}
 /* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */
 #nd-sidebar p {
   text-transform: uppercase;
