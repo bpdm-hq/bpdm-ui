@@ -1,11 +1,205 @@
 ---
 title: Dynamic Dialog
-description: Dynamic Dialog — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Open dialogs with arbitrary content imperatively from anywhere — stackable, with a close callback, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Dynamic Dialog** component — available in React (`@bpdm/ui/dynamic-dialog`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicUsageDemo, DynamicStackedDemo } from '@/components/dynamic-dialog-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Dynamic Dialog** opens a dialog with **any content** imperatively — no
+per-dialog open state or prop drilling. Mount the provider once, then
+`dialog.open(content, options)` from anywhere; the content receives a `close`
+callback, and dialogs **stack**. It's built on the [Dialog](/docs/overlay/dialog).
+In Angular it's the injectable `BpdmDialogService` with an `<ng-template>`.
+
+## Setup
+
+Mount `DialogProvider` once near your app root (React); in Angular the service is
+provided in root.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="app.tsx"
+import { DialogProvider } from '@bpdm/ui/dynamic-dialog';
+
+export function App() {
+  return (
+    <DialogProvider>
+      <YourApp />
+    </DialogProvider>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="app.config.ts"
+// Nothing to register — BpdmDialogService is `providedIn: 'root'`.
+// Inject it where you need it (see Usage).
+```
+
+  </Tab>
+</Tabs>
+
+## Usage
+
+Pass content as a function to receive `close`, plus options (`title`,
+`description`, `size`, `footer`). `open()` returns an id (React) / a ref
+(Angular) you can close programmatically.
+
+<Preview>
+  <DynamicUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="edit-project.tsx"
+import { useDialog } from '@bpdm/ui/dynamic-dialog';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+export function EditProjectButton() {
+  const dialog = useDialog();
+
+  function openEditor() {
+    dialog.open(
+      ({ close }) => (
+        <div className="flex flex-col gap-3">
+          <Input defaultValue="Acme website" aria-label="Project name" />
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" appearance="ghost" onClick={close}>Cancel</Button>
+            <Button onClick={close}>Save</Button>
+          </div>
+        </div>
+      ),
+      { title: 'Edit project', description: 'Rename your project.' },
+    );
+  }
+
+  return <Button onClick={openEditor}>Edit project</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="edit-project.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmDialogService } from '@bpdm/ng';
+import { BpdmButton, BpdmInput } from '@bpdm/ng';
+import type { TemplateRef } from '@angular/core';
+
+@Component({
+  selector: 'edit-project',
+  imports: [BpdmButton, BpdmInput],
+  templateUrl: './edit-project.html',
+})
+export class EditProject {
+  readonly dialog = inject(BpdmDialogService);
+  open(tpl: TemplateRef<unknown>) {
+    this.dialog.open(tpl, { title: 'Edit project', description: 'Rename your project.' });
+  }
+}
+```
+
+```html title="edit-project.html"
+<button bpdmButton (click)="open(formTpl)">Edit project</button>
+
+<ng-template #formTpl let-d>
+  <div class="flex flex-col gap-3">
+    <input bpdmInput value="Acme website" aria-label="Project name" />
+    <div class="flex justify-end gap-2">
+      <button bpdmButton variant="secondary" appearance="ghost" (click)="d.close()">Cancel</button>
+      <button bpdmButton (click)="d.close()">Save</button>
+    </div>
+  </div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Stacked dialogs
+
+Open a dialog from inside another — they stack, each with its own focus trap and
+close handling.
+
+<Preview>
+  <DynamicStackedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stacked.tsx"
+import { useDialog } from '@bpdm/ui/dynamic-dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function StackedButton() {
+  const dialog = useDialog();
+
+  function openFirst() {
+    dialog.open(
+      ({ close }) => (
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" appearance="ghost" onClick={close}>Close</Button>
+          <Button
+            onClick={() => dialog.open('Opened on top of the first.', { title: 'Second dialog', size: 'sm' })}
+          >
+            Open second
+          </Button>
+        </div>
+      ),
+      { title: 'First dialog' },
+    );
+  }
+
+  return <Button onClick={openFirst}>Stacked dialogs</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="stacked.html"
+<button bpdmButton (click)="dialog.open(firstTpl, { title: 'First dialog' })">Stacked dialogs</button>
+
+<ng-template #firstTpl let-d>
+  <div class="flex justify-end gap-2">
+    <button bpdmButton variant="secondary" appearance="ghost" (click)="d.close()">Close</button>
+    <button bpdmButton (click)="dialog.open(secondTpl, { title: 'Second dialog', size: 'sm' })">Open second</button>
+  </div>
+</ng-template>
+<ng-template #secondTpl>Opened on top of the first.</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+`open(content, options)` → React: returns an id (`close(id)`); Angular: returns a
+`BpdmDialogRef` (`ref.close()`). The content gets a `{ close }` callback.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` / `string` | — | Heading. |
+| `description` | `ReactNode` / `string` | — | Supporting text. |
+| `size` | `sm \| md \| lg \| xl` | `md` | Panel width. |
+| `footer` | `ReactNode` / `TemplateRef` | — | Footer area. |
+
+**React:** `DialogProvider`, `useDialog()` → `{ open, close }`. **Angular:**
+`BpdmDialogService.open(templateRef, options)` → `BpdmDialogRef`; the template
+receives `{ close }` (`<ng-template let-d>` → `d.close()`).
+
+## Accessibility
+
+- Each dialog inherits the [Dialog](/docs/overlay/dialog)'s focus trap, scroll
+  lock, `role="dialog"` + `aria-modal`, and `Esc` / outside-click to close.
+- Stacked dialogs trap focus in the topmost layer; closing it returns focus to
+  the one beneath.
+- Provide a `title` for every dialog so it has an accessible name.
