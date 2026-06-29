@@ -1,11 +1,285 @@
 ---
 title: Tooltip
-description: Tooltip — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A hover/focus tooltip — accessible, portaled, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Tooltip** component — available in React (`@bpdm/ui/tooltip`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  TooltipBasicDemo,
+  TooltipSidesDemo,
+  TooltipIconDemo,
+  TooltipRichDemo,
+  TooltipDisabledTriggerDemo,
+} from '@/components/tooltip-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Tooltip** shows a short label on hover or focus, built on Radix —
+keyboard-accessible, screen-reader friendly, portaled, and theme-aware.
+Zero-config: wrap a trigger and pass `content`. Wrap the app in `TooltipProvider`
+only if you want a shared open delay. In Angular it's the `[bpdmTooltip]` directive.
+
+## Usage
+
+<Preview>
+  <TooltipBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-usage.tsx"
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function CopyButton() {
+  return (
+    <Tooltip content="Copy address">
+      <Button variant="secondary" appearance="outline">Copy</Button>
+    </Tooltip>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="copy-button.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'copy-button',
+  imports: [BpdmTooltip, BpdmButton],
+  template: `<button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Copy address">Copy</button>`,
+})
+export class CopyButton {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sides
+
+The `side` prop (`top` — default — `right`, `bottom`, `left`) sets where it
+appears; it's collision-aware and flips to stay in view.
+
+<Preview>
+  <TooltipSidesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-sides.tsx"
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function Sides() {
+  return (
+    <>
+      <Tooltip side="top" content="On the top"><Button>Top</Button></Tooltip>
+      <Tooltip side="right" content="On the right"><Button>Right</Button></Tooltip>
+      <Tooltip side="bottom" content="On the bottom"><Button>Bottom</Button></Tooltip>
+      <Tooltip side="left" content="On the left"><Button>Left</Button></Tooltip>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sides.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'sides',
+  imports: [BpdmTooltip, BpdmButton],
+  templateUrl: './sides.html',
+})
+export class Sides {}
+```
+
+```html title="sides.html"
+<button bpdmButton bpdmTooltip="On the top" bpdmTooltipSide="top">Top</button>
+<button bpdmButton bpdmTooltip="On the right" bpdmTooltipSide="right">Right</button>
+<button bpdmButton bpdmTooltip="On the bottom" bpdmTooltipSide="bottom">Bottom</button>
+<button bpdmButton bpdmTooltip="On the left" bpdmTooltipSide="left">Left</button>
+```
+
+  </Tab>
+</Tabs>
+
+## On an icon button
+
+The most common use — naming an icon-only control so it's clear (and accessible).
+
+<Preview>
+  <TooltipIconDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-icon.tsx"
+import { Bell } from 'lucide-react';
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function NotificationsButton() {
+  return (
+    <Tooltip content="Notifications">
+      <Button size="icon" variant="secondary" appearance="ghost" aria-label="Notifications">
+        <Bell />
+      </Button>
+    </Tooltip>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="tooltip-icon.html"
+<button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications" bpdmTooltip="Notifications">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
+    <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+  </svg>
+</button>
+```
+
+  </Tab>
+</Tabs>
+
+## Rich content
+
+`content` accepts any node — a heading, shortcut hint, or small block — not just
+a string.
+
+<Preview>
+  <TooltipRichDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-rich.tsx"
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function RichTooltip() {
+  return (
+    <Tooltip
+      content={
+        <div className="space-y-1">
+          <p className="font-medium">Keyboard shortcut</p>
+          <p className="text-muted-foreground">Press ⌘K to open search.</p>
+        </div>
+      }
+    >
+      <Button variant="secondary" appearance="outline">Rich content</Button>
+    </Tooltip>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Pass a `TemplateRef` for rich content.
+
+```ts title="rich-tooltip.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'rich-tooltip',
+  imports: [BpdmTooltip, BpdmButton],
+  templateUrl: './rich-tooltip.html',
+})
+export class RichTooltip {}
+```
+
+```html title="rich-tooltip.html"
+<button bpdmButton variant="secondary" appearance="outline" [bpdmTooltip]="rich">Rich content</button>
+
+<ng-template #rich>
+  <div class="space-y-1">
+    <p class="font-medium">Keyboard shortcut</p>
+    <p class="text-muted-foreground">Press ⌘K to open search.</p>
+  </div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## On a disabled trigger
+
+A disabled control emits no hover/focus events, so a tooltip can't open on it
+directly. bpdm handles this — pass a `disabled` child and it's wrapped in a
+focusable element, so the "why is this disabled?" tooltip still works and stays
+keyboard-reachable.
+
+<Preview>
+  <TooltipDisabledTriggerDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-disabled-trigger.tsx"
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function PublishButton() {
+  return (
+    <Tooltip content="You need the Admin role to publish">
+      <Button disabled>Publish</Button>
+    </Tooltip>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular, put the directive on a focusable wrapper and disable the child:
+
+```html title="publish.html"
+<span bpdmTooltip="You need the Admin role to publish" tabindex="0" class="inline-flex">
+  <button bpdmButton disabled class="pointer-events-none">Publish</button>
+</span>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `content` | `ReactNode` | — | What the tooltip shows. Empty/nullish → no tooltip. Angular: `[bpdmTooltip]` (string or `TemplateRef`). |
+| `side` | `top \| right \| bottom \| left` | `top` | Edge it appears on. Angular: `bpdmTooltipSide`. |
+| `align` | `start \| center \| end` | `center` | Alignment along the side. Angular: `bpdmTooltipAlign`. |
+| `delayDuration` | `number` | `200` | Delay before opening, in ms. |
+| `sideOffset` | `number` | `6` | Gap from the trigger, in px. |
+| `hideArrow` | `boolean` | `false` | Hide the little arrow. |
+| `disabled` | `boolean` | `false` | Turn the tooltip off (the trigger stays fully interactive). |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. |
+
+Wrap the app in **`TooltipProvider`** (React) only to share one `delayDuration`
+across tooltips — a standalone `Tooltip` works without it.
+
+## Accessibility
+
+- Built on Radix Tooltip — opens on **hover and keyboard focus**, closes on
+  blur / `Esc`, and is announced to screen readers.
+- It's for supplementary hints, not essential info or interactive content — for
+  that use a [Popover](/docs/overlay/popover).
+- On an icon-only trigger, still give the control its own `aria-label` (the
+  tooltip names it visually; the label names it for assistive tech).
+- For a disabled control, the trigger is wrapped in a focusable element so the
+  explanation remains reachable by keyboard.

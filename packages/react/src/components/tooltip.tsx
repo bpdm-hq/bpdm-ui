@@ -95,7 +95,7 @@ export function Tooltip({
             align={align}
             sideOffset={sideOffset}
             className={cn(
-              "z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
+              "z-50 max-w-xs rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
               "origin-[var(--radix-tooltip-content-transform-origin)] animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_100ms_ease-in]",
               className,
             )}
@@ -103,7 +103,7 @@ export function Tooltip({
             {content}
             {!hideArrow && (
               <TooltipPrimitive.Arrow
-                className="fill-popover"
+                className="fill-popover stroke-border [stroke-width:1px]"
                 width={12}
                 height={6}
               />
