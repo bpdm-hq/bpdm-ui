@@ -29,6 +29,13 @@ export function CheckboxBasicDemo() {
   );
 }
 
+/** Starts indeterminate; clicking transitions it (indeterminate → checked → …)
+ *  so the demo cell is interactive like the others, not frozen. */
+function IndeterminateCell() {
+  const [value, setValue] = useState<boolean | 'indeterminate'>('indeterminate');
+  return <Checkbox checked={value} onCheckedChange={setValue} aria-label="Indeterminate" />;
+}
+
 export function CheckboxStatesDemo() {
   return (
     <Row>
@@ -39,7 +46,7 @@ export function CheckboxStatesDemo() {
         <Checkbox defaultChecked aria-label="Checked" />
       </Labeled>
       <Labeled label="indeterminate">
-        <Checkbox checked="indeterminate" aria-label="Indeterminate" />
+        <IndeterminateCell />
       </Labeled>
       <Labeled label="disabled">
         <Checkbox disabled aria-label="Disabled" />
