@@ -1,11 +1,295 @@
 ---
 title: Toast
-description: Toast — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Transient notifications fired imperatively from anywhere — variants, descriptions, actions, promises, and six dock positions (@bpdm/ui).
 ---
 
-The **Toast** component — available in React (`@bpdm/ui/toast`) and Angular (`@bpdm/ng`), from the same design tokens.
+import {
+  ToastBasicDemo,
+  ToastVariantsDemo,
+  ToastDescriptionDemo,
+  ToastActionDemo,
+  ToastPromiseDemo,
+  ToastDurationDemo,
+  ToastDismissDemo,
+} from '@/components/toast-demos';
+import { Preview } from '@/components/preview';
+
+The **Toast** is a transient notification. Call `toast(...)` from anywhere — no
+provider or hook needed — and render `<Toaster />` once near your app root.
+Variants, an optional description and action, swipe-to-dismiss, six dock
+positions, and `toast.promise(...)` for async flows.
 
 <Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
+  Toast is currently **React-only** (`@bpdm/ui`). `@bpdm/ng` doesn't ship a toast
+  yet — for Angular, use the [Alert](/docs/messages/alert) component for inline
+  messages until it lands.
 </Callout>
+
+## Setup
+
+Mount a single `<Toaster />` near your app root — it listens to the global store
+and renders every toast. Everything else is just calling `toast(...)`.
+
+```tsx title="app.tsx"
+import { Toaster } from '@bpdm/ui/toast';
+
+export function App() {
+  return (
+    <>
+      <YourApp />
+      <Toaster position="bottom-right" />
+    </>
+  );
+}
+```
+
+## Usage
+
+<Preview>
+  <ToastBasicDemo />
+</Preview>
+
+```tsx title="toast-usage.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return <Button onClick={() => toast('Workspace settings updated')}>Show toast</Button>;
+}
+```
+
+## Variants
+
+`toast.success`, `toast.error`, `toast.warning`, and `toast.info` each carry their
+own icon and accent colour; plain `toast()` is the neutral default.
+
+<Preview>
+  <ToastVariantsDemo />
+</Preview>
+
+```tsx title="toast-variants.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return (
+    <>
+      <Button onClick={() => toast('Workspace updated')}>Default</Button>
+      <Button onClick={() => toast.success('Invite sent')}>Success</Button>
+      <Button onClick={() => toast.error('Couldn’t save changes')}>Error</Button>
+      <Button onClick={() => toast.warning('Storage almost full')}>Warning</Button>
+      <Button onClick={() => toast.info('Sync finished')}>Info</Button>
+    </>
+  );
+}
+```
+
+## With description
+
+Pass a `description` for a secondary line under the title.
+
+<Preview>
+  <ToastDescriptionDemo />
+</Preview>
+
+```tsx title="toast-description.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return (
+    <Button
+      onClick={() =>
+        toast.success('Deployment complete', {
+          description: 'Build #482 is live in production.',
+        })
+      }
+    >
+      Deploy
+    </Button>
+  );
+}
+```
+
+## With action
+
+Add an `action` ({`label`, `onClick`}) for a one-tap follow-up — an Undo, a
+Retry, a View.
+
+<Preview>
+  <ToastActionDemo />
+</Preview>
+
+```tsx title="toast-action.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return (
+    <Button
+      onClick={() =>
+        toast('Member removed', {
+          description: 'Jonas Weber no longer has access.',
+          action: { label: 'Undo', onClick: () => toast.success('Restored Jonas’s access') },
+        })
+      }
+    >
+      Remove member
+    </Button>
+  );
+}
+```
+
+## Promise
+
+`toast.promise` shows a loading toast, then resolves it to success or error when
+the promise settles. `success` / `error` can be a string or a function of the
+resolved value / error.
+
+<Preview>
+  <ToastPromiseDemo />
+</Preview>
+
+```tsx title="toast-promise.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  const deploy = () => new Promise<void>((resolve) => setTimeout(resolve, 1800));
+  return (
+    <Button
+      onClick={() =>
+        toast.promise(deploy(), {
+          loading: 'Deploying…',
+          success: 'Deployment complete',
+          error: 'Deploy failed',
+        })
+      }
+    >
+      Deploy
+    </Button>
+  );
+}
+```
+
+## Duration & persistence
+
+Toasts auto-dismiss after `duration` ms (the `<Toaster>` default is 4000). Pass a
+per-toast `duration`, or `Infinity` to keep it until the user dismisses it.
+
+<Preview>
+  <ToastDurationDemo />
+</Preview>
+
+```tsx title="toast-duration.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return (
+    <>
+      <Button onClick={() => toast('Saved', { duration: 1500 })}>Short (1.5s)</Button>
+      <Button
+        onClick={() =>
+          toast.info('Heads up', {
+            description: 'This stays until you dismiss it.',
+            duration: Infinity,
+          })
+        }
+      >
+        Persistent
+      </Button>
+    </>
+  );
+}
+```
+
+## Dismiss
+
+`toast.dismiss(id)` closes one toast; `toast.dismiss()` clears them all. Reuse an
+`id` to update a toast in place instead of stacking a new one.
+
+<Preview>
+  <ToastDismissDemo />
+</Preview>
+
+```tsx title="toast-dismiss.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function Example() {
+  return (
+    <>
+      <Button
+        onClick={() => {
+          toast.info('First notification');
+          toast.success('Second notification');
+        }}
+      >
+        Show two
+      </Button>
+      <Button onClick={() => toast.dismiss()}>Dismiss all</Button>
+    </>
+  );
+}
+```
+
+## Positions
+
+The dock corner is set once on the `<Toaster>` via `position` — one of
+`top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, or
+`bottom-right`.
+
+```tsx title="toaster-position.tsx"
+import { Toaster } from '@bpdm/ui/toast';
+
+// every toast docks here
+<Toaster position="top-center" />;
+```
+
+<Callout type="info">
+  In these docs the `<Toaster>` is docked **top-right**, so the toasts you trigger
+  above appear there.
+</Callout>
+
+## API
+
+### `toast(title, options?)`
+
+Also `toast.success` / `toast.error` / `toast.warning` / `toast.info` (same
+signature), plus `toast.dismiss(id?)` and `toast.promise(promise, messages)`.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `description` | `ReactNode` | — | Secondary line under the title. |
+| `variant` | `default \| success \| error \| warning \| info` | `default` | Icon + accent colour. |
+| `duration` | `number` | `4000` | Auto-dismiss in ms; `Infinity` / `0` keeps it open. |
+| `action` | `{ label: string; onClick: () => void }` | — | Action button. |
+| `icon` | `ReactNode \| null` | variant icon | Override the leading icon; `null` hides it. |
+| `dismissible` | `boolean` | `true` | Show the close button. |
+| `onDismiss` | `() => void` | — | Fires when the toast closes. |
+| `id` | `string` | auto | Reuse to update an existing toast in place. |
+
+`toast.promise(promise, { loading, success, error })` — `success` / `error` may be
+a string or a function of the resolved value / error.
+
+### `<Toaster>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `position` | `ToastPosition` | `bottom-right` | Dock corner (six options). |
+| `duration` | `number` | `4000` | Default auto-dismiss for all toasts. |
+| `className` | `string` | — | Extra classes on the viewport. |
+
+## Accessibility
+
+- Built on Radix Toast — toasts render into an `aria-live` region, so assistive
+  tech announces them without stealing focus.
+- The toast viewport is reachable with the **F8** hotkey; from there the close
+  button and any action button are keyboard focusable, and **Esc** / swipe
+  dismisses.
+- Keep titles short and meaningful — they're what gets announced. Put detail in
+  the `description`.
+- For messages the user must act on, set `duration: Infinity` so the toast doesn't
+  disappear before it's read; never rely on a toast alone for critical,
+  must-not-miss information.
