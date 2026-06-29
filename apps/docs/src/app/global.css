@@ -91,13 +91,12 @@ html {
   color: color-mix(in oklab, var(--muted-foreground) 85%, transparent);
 }
 #nd-sidebar header {
-  /* breathing space above the logo + a frosted sticky header so the nav list
-     softly blurs behind it on scroll (no hard bg/divider) */
+  /* breathing space above the logo + a solid (opaque) sticky header. It must be
+     opaque so the collapsed→hover-reveal floating panel isn't see-through at the
+     top; matching the page colour keeps it seamless when docked. */
   padding-top: 0.85rem;
-  background-color: color-mix(in oklab, var(--background) 55%, transparent);
+  background-color: var(--background);
   border-bottom-width: 0;
-  -webkit-backdrop-filter: blur(8px) saturate(1.4);
-  backdrop-filter: blur(8px) saturate(1.4);
 }
 
 /* ── Premium reading typography (Linear / Stripe / Vercel direction): big, tight,

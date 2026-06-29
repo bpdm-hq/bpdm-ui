@@ -51,7 +51,7 @@ let uid = 0;
     }
     @if (!hideArrow()) {
       <span [class]="arrowClass()" aria-hidden="true">
-        <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-foreground">
+        <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-popover">
           <path d="M0 0L6 6L12 0Z" />
         </svg>
       </span>
@@ -72,7 +72,7 @@ class BpdmTooltipContent {
 
   protected readonly boxClass = computed(() =>
     cn(
-      "relative z-50 max-w-xs rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-lg",
+      "relative z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
       OVERLAY_ORIGIN[this.side()],
       this.closing()
         ? // `forwards` holds the faded-out frame until teardown (no snap-back flicker)
