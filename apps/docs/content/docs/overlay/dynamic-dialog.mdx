@@ -13,10 +13,10 @@ per-dialog open state or prop drilling. Mount the provider once, then
 callback, and dialogs **stack**. It's built on the [Dialog](/docs/overlay/dialog).
 In Angular it's the injectable `BpdmDialogService` with an `<ng-template>`.
 
-## Setup
-
-Mount `DialogProvider` once near your app root (React); in Angular the service is
-provided in root.
+<Callout type="info">
+  **Setup** — mount `DialogProvider` once near your app root (React). In Angular
+  there's nothing to mount: `BpdmDialogService` is `providedIn: 'root'`, so just inject it.
+</Callout>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
