@@ -89,6 +89,12 @@ html {
   border-inline-end-width: 1px;
   box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--foreground) 28%, transparent);
 }
+/* The floating collapse+search pill (shown when collapsed) defaults to the very
+   left edge, where it clashes with the sidebar's peeking edges. Nudge it right a
+   touch so it sits clear of them. */
+[data-sidebar-panel] {
+  inset-inline-start: 2rem;
+}
 /* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */
 #nd-sidebar p {
   text-transform: uppercase;
