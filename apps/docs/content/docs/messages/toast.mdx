@@ -175,7 +175,9 @@ export function Example() {
 ## Duration & persistence
 
 Toasts auto-dismiss after `duration` ms (the `<Toaster>` default is 4000). Pass a
-per-toast `duration`, or `Infinity` to keep it until the user dismisses it.
+per-toast `duration`, or `Infinity` to keep it until the user dismisses it. A thin
+**countdown bar** tracks the remaining time and pauses while the pointer is over
+the toast, so it never vanishes mid-read.
 
 <Preview>
   <ToastDurationDemo />
