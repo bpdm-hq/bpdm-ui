@@ -52,16 +52,6 @@ export function PopoverBorderlessDemo() {
   );
 }
 
-export function PopoverArrowDemo() {
-  return (
-    <Popover showArrow trigger={<Button>With arrow</Button>}>
-      <p className="max-w-xs text-sm text-fd-muted-foreground">
-        A small arrow points back at the trigger.
-      </p>
-    </Popover>
-  );
-}
-
 export function PopoverFormDemo() {
   return (
     <Popover width={260} trigger={<Button>Update name</Button>}>

@@ -8,7 +8,6 @@ import {
   PopoverBasicDemo,
   PopoverPlacementsDemo,
   PopoverBorderlessDemo,
-  PopoverArrowDemo,
   PopoverFormDemo,
 } from '@/components/popover-demos';
 import { Preview } from '@/components/preview';
@@ -159,47 +158,24 @@ export function Borderless() {
   </Tab>
   <Tab value="Angular">
 
-```html title="popover-border.html"
+```ts title="border.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'border-example',
+  imports: [BpdmPopover, BpdmButton],
+  templateUrl: './border.html',
+})
+export class BorderExample {}
+```
+
+```html title="border.html"
 <button bpdmButton [bpdmPopover]="bordered">Bordered</button>
 <button bpdmButton [bpdmPopover]="plain" [bpdmPopoverBordered]="false">Borderless</button>
 
 <ng-template #bordered><p>Default — a subtle border defines the edge.</p></ng-template>
 <ng-template #plain><p>Borderless — relies on the shadow alone.</p></ng-template>
-```
-
-  </Tab>
-</Tabs>
-
-## With an arrow
-
-Set `showArrow` to draw a small notch pointing back at the trigger.
-
-<Preview>
-  <PopoverArrowDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="popover-arrow.tsx"
-import { Popover } from '@bpdm/ui/popover';
-import { Button } from '@bpdm/ui/button';
-
-export function WithArrow() {
-  return (
-    <Popover showArrow trigger={<Button>With arrow</Button>}>
-      <p>A small arrow points back at the trigger.</p>
-    </Popover>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```html title="popover-arrow.html"
-<button bpdmButton bpdmPopoverShowArrow [bpdmPopover]="panel">With arrow</button>
-<ng-template #panel><p>A small arrow points back at the trigger.</p></ng-template>
 ```
 
   </Tab>
