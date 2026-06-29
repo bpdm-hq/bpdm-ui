@@ -60,11 +60,13 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
         <Dialog
           key={item.id}
           open
-          // Only the topmost dialog may be dismissed by Esc / outside-click — the
-          // ones beneath ignore those, so interacting with (or closing) an upper
-          // dialog never tears down the stack below it.
+          // Stacked dialogs close only via an explicit action (a button / the X)
+          // or Esc on the topmost one. We always block outside-interaction
+          // dismissal: when the top closes, focus shifts and would otherwise be
+          // read as an "interact outside" on the dialog beneath (now the top),
+          // tearing down the whole stack. Esc stays enabled on the top only.
+          onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={isTop ? undefined : (e) => e.preventDefault()}
-          onInteractOutside={isTop ? undefined : (e) => e.preventDefault()}
           onOpenChange={(o) => {
             if (!o && isTop) close(item.id);
           }}
