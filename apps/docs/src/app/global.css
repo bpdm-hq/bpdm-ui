@@ -76,7 +76,10 @@ html {
    modern single-surface feel instead of a boxed panel. The active item keeps its
    amber highlight; the brand glow at top washes across the full width. ── */
 #nd-sidebar {
-  background-color: transparent;
+  /* same colour as the page so it still reads as one seamless surface when
+     docked, but OPAQUE — so the collapsed→hover-reveal floating panel doesn't
+     let the page content bleed through it. */
+  background-color: var(--background);
   border-inline-end-width: 0;
 }
 /* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */

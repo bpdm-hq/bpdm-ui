@@ -47,7 +47,7 @@ export function TooltipRichDemo() {
       content={
         <div className="space-y-1">
           <p className="font-medium">Keyboard shortcut</p>
-          <p className="text-fd-muted-foreground">Press ⌘K to open search.</p>
+          <p className="text-background/70">Press ⌘K to open search.</p>
         </div>
       }
     >
