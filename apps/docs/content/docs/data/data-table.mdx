@@ -1230,7 +1230,7 @@ export function ExpandableTable() {
       rowKey={(r) => r.id}
       expandMode="single"
       renderExpanded={(r) => (
-        <div className="flex items-center justify-between gap-4 px-2 py-2">
+        <div className="flex max-w-2xl flex-col gap-5 px-2 py-2 sm:flex-row sm:items-center sm:gap-8">
           <div className="flex items-center gap-3">
             <Avatar name={r.name} size="lg" />
             <div className="leading-tight">
@@ -1242,7 +1242,7 @@ export function ExpandableTable() {
               </div>
             </div>
           </div>
-          <div className="w-full max-w-xs">
+          <div className="w-full sm:w-56">
             <ProgressBar
               value={r.tasks}
               max={240}
@@ -1275,7 +1275,7 @@ type Member = { id: string; name: string; email: string; role: string; team: str
     <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" expandMode="single" [expandedTemplate]="detail" />
 
     <ng-template #detail let-row>
-      <div class="flex items-center justify-between gap-4 px-2 py-2">
+      <div class="flex max-w-2xl flex-col gap-5 px-2 py-2 sm:flex-row sm:items-center sm:gap-8">
         <div class="flex items-center gap-3">
           <bpdm-avatar [name]="row.name" size="lg" />
           <div class="leading-tight">
@@ -1287,7 +1287,7 @@ type Member = { id: string; name: string; email: string; role: string; team: str
             </div>
           </div>
         </div>
-        <div class="w-full max-w-xs">
+        <div class="w-full sm:w-56">
           <bpdm-progress-bar [value]="row.tasks" [max]="240" variant="primary" showValue label="Tasks completed" />
         </div>
       </div>

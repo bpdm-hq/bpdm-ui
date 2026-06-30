@@ -216,7 +216,7 @@ function RowActions({ member }: { member: Member }) {
 // rich expanded-row detail panel — reused by the Expandable + Responsive demos
 function MemberDetail({ member: r }: { member: Member }) {
   return (
-    <div className="flex flex-col gap-4 px-2 py-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex max-w-2xl flex-col gap-5 px-2 py-2 sm:flex-row sm:items-center sm:gap-8">
       <div className="flex items-center gap-3">
         <Avatar name={r.name} size="lg" />
         <div className="leading-tight">
@@ -229,7 +229,7 @@ function MemberDetail({ member: r }: { member: Member }) {
           </div>
         </div>
       </div>
-      <div className="flex w-full flex-col gap-3 sm:max-w-xs">
+      <div className="flex w-full flex-col gap-3 sm:w-56">
         <ProgressBar value={r.tasks} max={240} variant="primary" showValue label="Tasks completed" format={(v, m) => `${v}/${m}`} />
         <div className="flex gap-2">
           <Button variant="secondary" appearance="outline" size="sm">View profile</Button>
