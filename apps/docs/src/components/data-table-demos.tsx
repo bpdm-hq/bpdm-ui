@@ -599,16 +599,27 @@ const responsiveColumns: DataTableColumn<Member>[] = [
 ];
 
 export function DataTableResponsiveDemo() {
+  const size = 4;
+  const [start, setStart] = useState(0);
+  const visible = MEMBERS.slice(start, start + size);
   return (
     <Box>
       <DataTable
         columns={responsiveColumns}
-        data={MEMBERS}
+        data={visible}
         rowKey={key}
         responsive
         pinnable
         expandMode="single"
         renderExpanded={(r) => <MemberDetail member={r} />}
+        pagination={{
+          mode: 'cursor',
+          hasPreviousPage: start > 0,
+          hasNextPage: start + size < MEMBERS.length,
+          onPreviousPage: () => setStart((s) => Math.max(0, s - size)),
+          onNextPage: () => setStart((s) => s + size),
+          rangeLabel: `Showing ${start + 1}–${Math.min(start + size, MEMBERS.length)} of ${MEMBERS.length}`,
+        }}
       />
     </Box>
   );

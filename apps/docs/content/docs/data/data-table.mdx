@@ -1649,6 +1649,156 @@ export class SummaryTable {
   </Tab>
 </Tabs>
 
+## Reordering
+
+`reorderableColumns` lets users drag column headers; `reorderableRows` adds a drag
+handle per row (requires `rowKey`). Persist via `onColumnOrderChange` / `onRowReorder`.
+
+<Preview>
+  <DataTableReorderDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-reorder.tsx"
+import { useState } from 'react';
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const initial: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function ReorderableTable() {
+  const [rows, setRows] = useState(initial);
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      reorderableColumns
+      reorderableRows
+      onRowReorder={setRows}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-reorder.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'reorderable-table',
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns"
+      [data]="rows()"
+      [rowKey]="rowKey"
+      reorderableColumns
+      reorderableRows
+      (rowReorder)="rows.set($event)"
+    />
+  `,
+})
+export class ReorderableTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly rows = signal<Member[]>([
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ]);
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Virtualized
+
+For very large datasets, `virtualized` renders only the visible rows (uses
+`maxHeight`, default 440). Best with uniform row heights.
+
+<Preview>
+  <DataTableVirtualizedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-virtualized.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = Array.from({ length: 10000 }, (_, i) => ({
+  id: `m${i}`,
+  name: `Member ${i + 1}`,
+  role: i % 2 ? 'Editor' : 'Viewer',
+  tasks: i % 240,
+}));
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function HugeTable() {
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame virtualized maxHeight={320} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-virtualized.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'huge-table',
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame virtualized [maxHeight]="320" />`,
+})
+export class HugeTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = Array.from({ length: 10000 }, (_, i) => ({
+    id: `m${i}`,
+    name: `Member ${i + 1}`,
+    role: i % 2 ? 'Editor' : 'Viewer',
+    tasks: i % 240,
+  }));
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Responsive
 
 On narrow screens, `responsive` stacks each row into a label/value card instead of
@@ -1830,156 +1980,6 @@ export class ResponsiveTable {
     <button bpdmButton variant="destructive" appearance="ghost" size="iconSm" [attr.aria-label]="'Remove ' + row.name"><!-- trash icon --></button>
   </div>
 </ng-template>
-```
-
-  </Tab>
-</Tabs>
-
-## Reordering
-
-`reorderableColumns` lets users drag column headers; `reorderableRows` adds a drag
-handle per row (requires `rowKey`). Persist via `onColumnOrderChange` / `onRowReorder`.
-
-<Preview>
-  <DataTableReorderDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-reorder.tsx"
-import { useState } from 'react';
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const initial: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function ReorderableTable() {
-  const [rows, setRows] = useState(initial);
-  return (
-    <DataTable
-      columns={columns}
-      data={rows}
-      rowKey={(r) => r.id}
-      reorderableColumns
-      reorderableRows
-      onRowReorder={setRows}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-reorder.ts"
-import { Component, signal } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'reorderable-table',
-  imports: [BpdmDataTable],
-  template: `
-    <bpdm-data-table
-      [columns]="columns"
-      [data]="rows()"
-      [rowKey]="rowKey"
-      reorderableColumns
-      reorderableRows
-      (rowReorder)="rows.set($event)"
-    />
-  `,
-})
-export class ReorderableTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly rows = signal<Member[]>([
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ]);
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
-## Virtualized
-
-For very large datasets, `virtualized` renders only the visible rows (uses
-`maxHeight`, default 440). Best with uniform row heights.
-
-<Preview>
-  <DataTableVirtualizedDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-virtualized.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = Array.from({ length: 10000 }, (_, i) => ({
-  id: `m${i}`,
-  name: `Member ${i + 1}`,
-  role: i % 2 ? 'Editor' : 'Viewer',
-  tasks: i % 240,
-}));
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function HugeTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame virtualized maxHeight={320} />;
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-virtualized.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'huge-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame virtualized [maxHeight]="320" />`,
-})
-export class HugeTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = Array.from({ length: 10000 }, (_, i) => ({
-    id: `m${i}`,
-    name: `Member ${i + 1}`,
-    role: i % 2 ? 'Editor' : 'Viewer',
-    tasks: i % 240,
-  }));
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-}
 ```
 
   </Tab>
