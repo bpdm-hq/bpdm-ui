@@ -1110,7 +1110,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
       JUSTIFY_CLASS[align],
-      this.dirOf(col.id) && "text-primary",
+      // keep the active-sort LABEL dark/strong (enterprise-restrained);
+      // the small amber arrow + order badge signal the sort
+      this.dirOf(col.id) && "text-foreground",
     );
   }
   private readonly pinnedBg = computed(() =>

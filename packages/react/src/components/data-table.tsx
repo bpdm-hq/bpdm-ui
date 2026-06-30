@@ -1840,7 +1840,9 @@ export function DataTable<T>({
                         className={cn(
                           "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
                           justifyClass[align],
-                          dir && "text-primary",
+                          // keep the active-sort LABEL dark/strong (enterprise-restrained);
+                          // the small amber arrow + order badge signal the sort
+                          dir && "text-foreground",
                         )}
                       >
                         <span>{col.header ?? col.id}</span>
