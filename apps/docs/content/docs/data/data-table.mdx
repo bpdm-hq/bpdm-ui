@@ -349,6 +349,17 @@ Style the table to fit your product. Three hooks cover most needs:
 These compose with `cellClassName` (every body cell) and `className` (the table). Below,
 the header is tinted, the **Tasks** column is accented, and disabled members are flagged.
 
+<Callout type="info">
+  **Theming, not styling.** The table's focus accents — row hover, the selected-row
+  tint + left bar, and the active-sort arrow — all follow your `--primary` token, so
+  they adopt your brand automatically. Override it once and every table re-tints:
+  ```css
+  :root { --primary: #2563eb; }   /* your brand → blue hover, blue accent bar */
+  .dark { --primary: #3b82f6; }
+  ```
+  Use the `className` hooks above only for one-off, per-table overrides.
+</Callout>
+
 <Preview>
   <DataTableCustomizeDemo />
 </Preview>

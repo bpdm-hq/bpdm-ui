@@ -1675,11 +1675,13 @@ export function DataTable<T>({
       ) : (
       <div
         className={cn(
-          "w-full",
-          // framed = a floating, elevated card: a light hairline border + a soft
-          // layered shadow do the lifting (premium panel feel, not a boxed grid)
-          frame &&
-            "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]",
+          // every table rests on a soft, blended surface that whisper-floats off
+          // the page; `frame` adds a hairline border + a stronger lift (defined
+          // card), the borderless default just floats gently so it blends in
+          "w-full overflow-hidden bg-card",
+          frame
+            ? "rounded-xl border border-border/70 shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+            : "rounded-lg shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
           className,
         )}
       >
