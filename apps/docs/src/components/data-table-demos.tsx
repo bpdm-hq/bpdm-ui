@@ -161,7 +161,7 @@ export function DataTableStripedDemo() {
 export function DataTableStickyDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={BIG} rowKey={key} frame stickyHeader maxHeight={260} />
+      <DataTable columns={columns} data={BIG} rowKey={key} stickyHeader maxHeight={260} />
     </Box>
   );
 }

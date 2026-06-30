@@ -1073,7 +1073,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       "w-[1%]",
-      (this.frame() || (canPin && this.hasLeftPin())) ? "bg-card" : this.stickyHeader() ? "bg-background" : "bg-transparent",
+      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
       canPin && this.bordered() && "border-r border-border",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
@@ -1089,10 +1089,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "whitespace-nowrap font-semibold text-foreground",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
-      // framed/pinned headers sit on the card surface (clean white header +
-      // divider, not a heavy grey band); borderless stay transparent; a sticky
-      // header must be opaque or scrolling rows bleed through
-      this.frame() || col.pin ? "bg-card" : this.stickyHeader() ? "bg-background" : "bg-transparent",
+      // framed/pinned/sticky headers sit on the card surface (clean header +
+      // divider, not a heavy grey band) and stay opaque so scrolling rows never
+      // bleed through; otherwise transparent
+      this.frame() || col.pin || this.stickyHeader() ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
       this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",

@@ -1708,7 +1708,7 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame ? "bg-card" : stickyHeader ? "bg-background" : "bg-transparent",
+                  frame || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   stickyHeader && "sticky top-0 z-10",
                 )}
@@ -1726,7 +1726,7 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame || hasLeftPin ? "bg-card" : stickyHeader ? "bg-background" : "bg-transparent",
+                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
@@ -1745,7 +1745,7 @@ export function DataTable<T>({
                   cellPad({ size }),
                   "w-[1%]",
                   "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
-                  frame || hasLeftPin ? "bg-card" : stickyHeader ? "bg-background" : "bg-transparent",
+                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                 )}
@@ -1812,11 +1812,10 @@ export function DataTable<T>({
                     "whitespace-nowrap font-semibold text-foreground",
                     reorderableColumns && "cursor-grab active:cursor-grabbing",
                     dragColId === col.id && "opacity-40",
-                    // framed/pinned headers sit on the card surface (clean white
-                    // header + divider, not a heavy grey band); borderless headers
-                    // stay transparent — but a sticky header must be opaque or
-                    // scrolling rows bleed through
-                    frame || col.pin ? "bg-card" : stickyHeader ? "bg-background" : "bg-transparent",
+                    // framed/pinned/sticky headers sit on the card surface (clean
+                    // header + divider, not a heavy grey band) and stay opaque so
+                    // scrolling rows never bleed through; otherwise transparent
+                    frame || col.pin || stickyHeader ? "bg-card" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
                     bordered && "border-r border-border/55 last:border-r-0",

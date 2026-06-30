@@ -363,7 +363,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 export function ScrollingTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame stickyHeader maxHeight={260} />;
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} stickyHeader maxHeight={260} />;
 }
 ```
 
@@ -379,7 +379,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'scrolling-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame stickyHeader [maxHeight]="260" />`,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" stickyHeader [maxHeight]="260" />`,
 })
 export class ScrollingTable {
   readonly rowKey = (r: Member) => r.id;
