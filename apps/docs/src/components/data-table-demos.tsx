@@ -4,6 +4,7 @@ import { type ReactNode, useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
 import { Avatar } from '@bpdm/ui/avatar';
+import { Tabs } from '@bpdm/ui/tabs';
 
 // ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
 type Member = {
@@ -116,29 +117,32 @@ export function DataTableUsageDemo() {
 }
 
 export function DataTableSizesDemo() {
+  const data = MEMBERS.slice(0, 4);
   return (
-    <Box>
-      <DataTable columns={columns} data={MEMBERS.slice(0, 3)} rowKey={key} size="sm" />
-    </Box>
+    <Tabs
+      variant="pill"
+      defaultValue="md"
+      items={[
+        { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={data} rowKey={key} size="sm" /> },
+        { value: 'md', label: 'Medium', content: <DataTable columns={columns} data={data} rowKey={key} size="md" /> },
+        { value: 'lg', label: 'Large', content: <DataTable columns={columns} data={data} rowKey={key} size="lg" /> },
+      ]}
+    />
   );
 }
 
 export function DataTableStripedDemo() {
+  const data = MEMBERS.slice(0, 4);
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-fd-muted-foreground">Default — borderless</p>
-        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} />
-      </div>
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-fd-muted-foreground">striped</p>
-        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} striped />
-      </div>
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-fd-muted-foreground">frame bordered — outlined</p>
-        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} frame bordered />
-      </div>
-    </div>
+    <Tabs
+      variant="pill"
+      defaultValue="borderless"
+      items={[
+        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={data} rowKey={key} /> },
+        { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={data} rowKey={key} striped /> },
+        { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={data} rowKey={key} frame bordered /> },
+      ]}
+    />
   );
 }
 

@@ -149,7 +149,9 @@ export class MembersTable {
 
 ## Sizes
 
-Cell density: `sm`, `md` (default), `lg`.
+Set the `size` prop for cell density — `sm`, `md` (default) or `lg`. The preview
+switches between them with our own [`Tabs`](/docs/panel/tabs) (`pill` variant) — a
+neat way to compare densities, and a small example of composing two components.
 
 <Preview>
   <DataTableSizesDemo />
@@ -160,6 +162,7 @@ Cell density: `sm`, `md` (default), `lg`.
 
 ```tsx title="data-table-sizes.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Tabs } from '@bpdm/ui/tabs';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
@@ -173,8 +176,18 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-export function CompactTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" />;
+export function SizedTables() {
+  return (
+    <Tabs
+      variant="pill"
+      defaultValue="md"
+      items={[
+        { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" /> },
+        { value: 'md', label: 'Medium', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="md" /> },
+        { value: 'lg', label: 'Large', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="lg" /> },
+      ]}
+    />
+  );
 }
 ```
 
@@ -182,17 +195,21 @@ export function CompactTable() {
   <Tab value="Angular">
 
 ```ts title="data-table-sizes.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
-  selector: 'compact-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" />`,
+  selector: 'sized-tables',
+  imports: [BpdmDataTable, BpdmTabs],
+  templateUrl: './sized-tables.html',
 })
-export class CompactTable {
+export class SizedTables {
+  readonly sm = viewChild.required<TemplateRef<unknown>>('sm');
+  readonly md = viewChild.required<TemplateRef<unknown>>('md');
+  readonly lg = viewChild.required<TemplateRef<unknown>>('lg');
+
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
     { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
@@ -204,7 +221,21 @@ export class CompactTable {
     { id: 'role', header: 'Role', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
+
+  readonly tabs = computed<TabItem[]>(() => [
+    { value: 'sm', label: 'Small', content: this.sm() },
+    { value: 'md', label: 'Medium', content: this.md() },
+    { value: 'lg', label: 'Large', content: this.lg() },
+  ]);
 }
+```
+
+```html title="sized-tables.html"
+<bpdm-tabs [items]="tabs()" variant="pill" defaultValue="md" />
+
+<ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
+<ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
+<ng-template #lg><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="lg" /></ng-template>
 ```
 
   </Tab>
@@ -215,6 +246,7 @@ export class CompactTable {
 The table is **borderless by default** — just a clean header rule and soft row
 dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
 into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
+The preview toggles the three looks with our `Tabs`.
 
 <Preview>
   <DataTableStripedDemo />
@@ -223,8 +255,9 @@ into an outlined card with `frame` (outer border) and `bordered` (column gridlin
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="data-table-striped.tsx"
+```tsx title="data-table-borders.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Tabs } from '@bpdm/ui/tabs';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
@@ -240,14 +273,15 @@ const columns: DataTableColumn<Member>[] = [
 
 export function BorderTables() {
   return (
-    <div className="flex flex-col gap-6">
-      {/* default — borderless */}
-      <DataTable columns={columns} data={members} rowKey={(r) => r.id} />
-      {/* zebra rows */}
-      <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped />
-      {/* outlined card with column gridlines */}
-      <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered />
-    </div>
+    <Tabs
+      variant="pill"
+      defaultValue="borderless"
+      items={[
+        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} /> },
+        { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped /> },
+        { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered /> },
+      ]}
+    />
   );
 }
 ```
@@ -255,24 +289,22 @@ export function BorderTables() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="data-table-striped.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+```ts title="data-table-borders.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
   selector: 'border-tables',
-  imports: [BpdmDataTable],
-  template: `
-    <div class="flex flex-col gap-6">
-      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />
-      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped />
-      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered />
-    </div>
-  `,
+  imports: [BpdmDataTable, BpdmTabs],
+  templateUrl: './border-tables.html',
 })
 export class BorderTables {
+  readonly borderless = viewChild.required<TemplateRef<unknown>>('borderless');
+  readonly striped = viewChild.required<TemplateRef<unknown>>('striped');
+  readonly outlined = viewChild.required<TemplateRef<unknown>>('outlined');
+
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
     { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
@@ -284,7 +316,21 @@ export class BorderTables {
     { id: 'role', header: 'Role', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
+
+  readonly tabs = computed<TabItem[]>(() => [
+    { value: 'borderless', label: 'Borderless', content: this.borderless() },
+    { value: 'striped', label: 'Striped', content: this.striped() },
+    { value: 'outlined', label: 'Outlined', content: this.outlined() },
+  ]);
 }
+```
+
+```html title="border-tables.html"
+<bpdm-tabs [items]="tabs()" variant="pill" defaultValue="borderless" />
+
+<ng-template #borderless><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" /></ng-template>
+<ng-template #striped><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped /></ng-template>
+<ng-template #outlined><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered /></ng-template>
 ```
 
   </Tab>
