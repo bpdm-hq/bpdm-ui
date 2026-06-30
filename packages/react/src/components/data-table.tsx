@@ -300,7 +300,7 @@ function SortIcon({ dir }: { dir: SortDirection | null }) {
     );
   }
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-foreground" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-primary" fill="none" aria-hidden>
       <path d={dir === "asc" ? "M4 10l4-4 4 4" : "M4 6l4 4 4-4"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -1475,7 +1475,7 @@ export function DataTable<T>({
   // so they resolve under @theme inline.
   const pinnedBg = cn(
     "bg-card",
-    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))]",
+    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
     "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
   );
 
@@ -1840,7 +1840,7 @@ export function DataTable<T>({
                         className={cn(
                           "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
                           justifyClass[align],
-                          dir && "text-foreground",
+                          dir && "text-primary",
                         )}
                       >
                         <span>{col.header ?? col.id}</span>
@@ -1963,8 +1963,11 @@ export function DataTable<T>({
                   rowSpacing &&
                     "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
                   striped && "even:bg-muted/40",
-                  hoverable && "hover:bg-muted/60",
-                  selected && "bg-primary/10",
+                  // bpdm signature: a warm amber focus language — soft amber hover,
+                  // and selected rows get an amber tint + a left accent bar
+                  hoverable && "hover:bg-primary/[0.04]",
+                  selected && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+                  hoverable && selected && "hover:bg-primary/[0.14]",
                   // insertion line while reordering rows
                   dropTarget?.key === key &&
                     dropTarget.pos === "before" &&

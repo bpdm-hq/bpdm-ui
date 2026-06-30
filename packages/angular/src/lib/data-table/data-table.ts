@@ -239,7 +239,7 @@ interface RenderRow<T> {
                           @if (dir === null) {
                             <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 opacity-40" fill="none" aria-hidden="true"><path d="M5 6.5 8 3.5l3 3M5 9.5 8 12.5l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           } @else {
-                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-foreground" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-primary" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           }
                           @if (sortOrder(col.id) > 0) {
                             <span class="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">{{ sortOrder(col.id) }}</span>
@@ -1110,13 +1110,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
       JUSTIFY_CLASS[align],
-      this.dirOf(col.id) && "text-foreground",
+      this.dirOf(col.id) && "text-primary",
     );
   }
   private readonly pinnedBg = computed(() =>
     cn(
       "bg-card",
-      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))]",
+      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
       "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
     ),
   );
@@ -1172,8 +1172,11 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-border",
       this.rowSpacing() && "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
       this.striped() && "even:bg-muted/40",
-      this.hoverable() && "hover:bg-muted/60",
-      this.selectedSet().has(rr.key) && "bg-primary/10",
+      // bpdm signature: a warm amber focus language — soft amber hover, and
+      // selected rows get an amber tint + a left accent bar
+      this.hoverable() && "hover:bg-primary/[0.04]",
+      this.selectedSet().has(rr.key) && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+      this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-primary/[0.14]",
       t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--primary)]",
       t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--primary)]",
       this.clickable() && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
