@@ -1,11 +1,713 @@
 ---
 title: Data Table
-description: Data Table — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A fully data-driven table — sorting, selection, pagination, filtering, pinning, expansion and more, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Data Table** component — available in React (`@bpdm/ui/data-table`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  DataTableUsageDemo,
+  DataTableSizesDemo,
+  DataTableStripedDemo,
+  DataTableStickyDemo,
+  DataTableClickableDemo,
+  DataTableSortingDemo,
+  DataTableSelectionDemo,
+  DataTablePaginationDemo,
+  DataTableExpandableDemo,
+  DataTableFrozenDemo,
+  DataTableFiltersDemo,
+  DataTableSearchDemo,
+  DataTableColumnToggleDemo,
+  DataTableFooterDemo,
+  DataTableResponsiveDemo,
+  DataTableReorderDemo,
+  DataTableVirtualizedDemo,
+  DataTableEmptyDemo,
+} from '@/components/data-table-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Data Table** is fully data-driven: describe your `columns` once and pass an
+array of `data` — no per-cell markup. Density, striping, sorting, selection,
+pagination, filtering, column pinning, row expansion, a column toggle, global
+search, reordering and virtualization are all opt-in props. In Angular it's
+`<bpdm-data-table>` with the same `columns` / `data` inputs; custom cells use an
+`<ng-template>` instead of React's inline `cell`.
+
+## Usage
+
+Each column has an `id`, a `header`, and an `accessor` (plain value) or `cell`
+(custom node). Pass a `rowKey` so selection/expansion survive sorting.
+
+<Preview>
+  <DataTableUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="members-table.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: 'active' | 'invited' | 'disabled';
+  tasks: number;
+};
+
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', status: 'active', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', status: 'active', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', status: 'disabled', tasks: 12 },
+];
+
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+  { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+export function MembersTable() {
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`accessor` columns render as text; for a custom cell use an `<ng-template>` and
+point the column's `cell` at it.
+
+```ts title="members-table.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; email: string; role: string; status: string; tasks: number };
+
+@Component({
+  selector: 'members-table',
+  imports: [BpdmDataTable],
+  templateUrl: './members-table.html',
+})
+export class MembersTable {
+  readonly statusCell = viewChild.required<TemplateRef<unknown>>('statusCell');
+
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', status: 'active', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', status: 'active', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', status: 'disabled', tasks: 12 },
+  ];
+
+  readonly columns = computed<DataTableColumn<Member>[]>(() => [
+    { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
+    { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+    { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
+    { id: 'status', header: 'Status', align: 'center', cell: this.statusCell() },
+    { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
+  ]);
+}
+```
+
+```html title="members-table.html"
+<bpdm-data-table [columns]="columns()" [data]="members" [rowKey]="(r) => r.id" />
+
+<ng-template #statusCell let-row>
+  <span class="rounded-full px-2 py-0.5 text-xs capitalize">{{ row.status }}</span>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+Cell density: `sm`, `md` (default), `lg`.
+
+<Preview>
+  <DataTableSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-sizes.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-sizes.html"
+<bpdm-data-table [columns]="columns()" [data]="members" size="sm" />
+```
+
+  </Tab>
+</Tabs>
+
+## Striped, bordered & borderless
+
+`striped` zebra-stripes rows, `bordered` adds column dividers, and `frame={false}`
+drops the outer border for a bare table.
+
+<Preview>
+  <DataTableStripedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-striped.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} striped bordered />
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} frame={false} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-striped.html"
+<bpdm-data-table [columns]="columns()" [data]="members" striped bordered />
+<bpdm-data-table [columns]="columns()" [data]="members" [frame]="false" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sticky header & scroll
+
+Cap the height with `maxHeight` and set `stickyHeader` — the body scrolls while
+the header stays pinned.
+
+<Preview>
+  <DataTableStickyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-sticky.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} stickyHeader maxHeight={260} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-sticky.html"
+<bpdm-data-table [columns]="columns()" [data]="members" stickyHeader [maxHeight]="260" />
+```
+
+  </Tab>
+</Tabs>
+
+## Clickable rows
+
+`onRowClick` makes rows interactive (pointer cursor + hover).
+
+<Preview>
+  <DataTableClickableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-clickable.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} onRowClick={(row) => open(row)} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-clickable.html"
+<bpdm-data-table [columns]="columns()" [data]="members" [onRowClick]="open" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sorting
+
+Mark a column `sortable`; clicking its header cycles asc → desc → none. Add
+`multiSort` to sort by several columns (Shift+click appends one). For server-side
+ordering, control `sort` + handle `onSortChange`.
+
+<Preview>
+  <DataTableSortingDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-sorting.tsx"
+<DataTable
+  columns={columns}   // columns with `sortable: true`
+  data={members}
+  rowKey={(r) => r.id}
+  multiSort
+  defaultSort={[{ id: 'tasks', dir: 'desc' }]}
+  onSortChange={(sort) => console.log(sort)}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-sorting.html"
+<bpdm-data-table
+  [columns]="columns()"
+  [data]="members"
+  multiSort
+  [defaultSort]="[{ id: 'tasks', dir: 'desc' }]"
+  (sortChange)="onSort($event)"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+## Selection
+
+`selectable` adds a checkbox column (or radios with `selectionMode="single"`).
+Drive it with `selectedKeys` + `onSelectionChange` to build a selection toolbar.
+
+<Preview>
+  <DataTableSelectionDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-selection.tsx"
+import { useState } from 'react';
+import { DataTable } from '@bpdm/ui/data-table';
+
+export function SelectableTable() {
+  const [keys, setKeys] = useState<React.Key[]>([]);
+  return (
+    <>
+      {keys.length > 0 && <p>{keys.length} selected</p>}
+      <DataTable
+        columns={columns}
+        data={members}
+        rowKey={(r) => r.id}
+        selectable
+        selectedKeys={keys}
+        onSelectionChange={(next) => setKeys(next)}
+      />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-selection.html"
+<bpdm-data-table
+  [columns]="columns()"
+  [data]="members"
+  selectable
+  [selectedKeys]="keys()"
+  (selectionChange)="keys.set($event)"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+## Pagination
+
+Pass `pagination` for client paging (the table slices `data`). Use
+`mode: 'server'` (offset — you supply `total` + handle `onPageChange`) or
+`mode: 'cursor'` (prev/next only) for server-driven data.
+
+<Preview>
+  <DataTablePaginationDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-pagination.tsx"
+// client (default) — the table pages the data itself
+<DataTable columns={columns} data={members} rowKey={(r) => r.id}
+  pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 32] }} />
+
+// server (offset) — you provide the current page's rows + total
+<DataTable columns={columns} data={pageRows} rowKey={(r) => r.id}
+  pagination={{ mode: 'server', page, pageSize: 20, total, onPageChange: setPage }} />
+
+// cursor — prev/next only
+<DataTable columns={columns} data={pageRows} rowKey={(r) => r.id}
+  pagination={{ mode: 'cursor', hasNextPage, hasPreviousPage, onNextPage, onPreviousPage }} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-pagination.html"
+<bpdm-data-table [columns]="columns()" [data]="members"
+  [pagination]="{ pageSize: 8, pageSizeOptions: [8, 16, 32] }" />
+```
+
+  </Tab>
+</Tabs>
+
+## Expandable rows
+
+`renderExpanded` shows a detail panel under a row. `expandMode="single"` keeps
+only one open.
+
+<Preview>
+  <DataTableExpandableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-expandable.tsx"
+<DataTable
+  columns={columns}
+  data={members}
+  rowKey={(r) => r.id}
+  expandMode="single"
+  renderExpanded={(row) => <div>{row.name} — {row.role}, {row.tasks} tasks.</div>}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-expandable.html"
+<bpdm-data-table [columns]="columns()" [data]="members" expandMode="single" [expandedTemplate]="detail" />
+
+<ng-template #detail let-row>
+  <div>{{ row.name }} — {{ row.role }}, {{ row.tasks }} tasks.</div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Frozen & pinnable columns
+
+Give a column `pin: 'left' | 'right'` (with a numeric `width`) to freeze it while
+the table scrolls horizontally. Add `pinnable` for a per-column header menu.
+
+<Preview>
+  <DataTableFrozenDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-frozen.tsx"
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', pin: 'left', width: 180, accessor: (r) => r.name },
+  { id: 'email', header: 'Email', width: 220, accessor: (r) => r.email },
+  { id: 'role', header: 'Role', width: 140, accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', width: 120, numeric: true, accessor: (r) => r.tasks },
+];
+
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} pinnable />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-frozen.html"
+<bpdm-data-table [columns]="columns()" [data]="members" pinnable />
+<!-- in columns(): set `pin: 'left'` + a numeric `width` on the frozen column -->
+```
+
+  </Tab>
+</Tabs>
+
+## Column filters
+
+Set `filterable` on a column for a header filter menu — `filterType` is `text`,
+`number`, or `select` (pick from the column's distinct values).
+
+<Preview>
+  <DataTableFiltersDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-filters.tsx"
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+  { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
+];
+
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-filters.html"
+<bpdm-data-table [columns]="columns()" [data]="members" />
+<!-- in columns(): set `filterable: true` (+ optional `filterType`) per column -->
+```
+
+  </Tab>
+</Tabs>
+
+## Search
+
+`searchable` adds a global search box that filters rows across all columns.
+
+<Preview>
+  <DataTableSearchDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-search.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} searchable searchPlaceholder="Search members…" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-search.html"
+<bpdm-data-table [columns]="columns()" [data]="members" searchable searchPlaceholder="Search members…" />
+```
+
+  </Tab>
+</Tabs>
+
+## Column toggle
+
+`columnToggle` adds a "Columns" control to show/hide columns at runtime (set a
+column `hideable: false` to keep it always visible).
+
+<Preview>
+  <DataTableColumnToggleDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-column-toggle.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} columnToggle />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-column-toggle.html"
+<bpdm-data-table [columns]="columns()" [data]="members" columnToggle />
+```
+
+  </Tab>
+</Tabs>
+
+## Footer summary
+
+Give a column a `footer` — a node, or a function over the filtered rows to compute
+an aggregate. Any column with a `footer` renders a sticky summary row.
+
+<Preview>
+  <DataTableFooterDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-footer.tsx"
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name, footer: 'Total' },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks,
+    footer: (rows) => rows.reduce((sum, r) => sum + r.tasks, 0) },
+];
+
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-footer.html"
+<bpdm-data-table [columns]="columns()" [data]="members" />
+<!-- in columns(): set `footer` (a value or `(rows) => …` aggregate) per column -->
+```
+
+  </Tab>
+</Tabs>
+
+## Responsive
+
+On narrow screens, `responsive` stacks each row into a label/value card instead of
+scrolling horizontally.
+
+<Preview>
+  <DataTableResponsiveDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-responsive.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} responsive />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-responsive.html"
+<bpdm-data-table [columns]="columns()" [data]="members" responsive />
+```
+
+  </Tab>
+</Tabs>
+
+## Reordering
+
+`reorderableColumns` lets users drag column headers; `reorderableRows` adds a drag
+handle per row (requires `rowKey`). Persist via `onColumnOrderChange` / `onRowReorder`.
+
+<Preview>
+  <DataTableReorderDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-reorder.tsx"
+import { useState } from 'react';
+import { DataTable } from '@bpdm/ui/data-table';
+
+export function ReorderableTable() {
+  const [rows, setRows] = useState(members);
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      reorderableColumns
+      reorderableRows
+      onRowReorder={setRows}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-reorder.html"
+<bpdm-data-table
+  [columns]="columns()"
+  [data]="rows()"
+  reorderableColumns
+  reorderableRows
+  (rowReorder)="rows.set($event)"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+## Virtualized
+
+For very large datasets, `virtualized` renders only the visible rows (uses
+`maxHeight`, default 440). Best with uniform row heights.
+
+<Preview>
+  <DataTableVirtualizedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-virtualized.tsx"
+<DataTable columns={columns} data={tenThousandRows} rowKey={(r) => r.id} virtualized maxHeight={320} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-virtualized.html"
+<bpdm-data-table [columns]="columns()" [data]="tenThousandRows" virtualized [maxHeight]="320" />
+```
+
+  </Tab>
+</Tabs>
+
+## Empty state
+
+`emptyContent` is shown when `data` is empty.
+
+<Preview>
+  <DataTableEmptyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-empty.tsx"
+<DataTable
+  columns={columns}
+  data={[]}
+  rowKey={(r) => r.id}
+  emptyContent={<div className="py-8 text-center">No members yet — invite your team.</div>}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-empty.html"
+<bpdm-data-table [columns]="columns()" [data]="[]" [emptyTemplate]="empty" />
+<ng-template #empty><div class="py-8 text-center">No members yet — invite your team.</div></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `DataTable` / `<bpdm-data-table>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `columns` | `DataTableColumn<T>[]` | — | **Required.** Column definitions. |
+| `data` | `T[]` | — | **Required.** Row data. |
+| `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
+| `size` | `sm \| md \| lg` | `md` | Cell density. |
+| `striped` / `bordered` / `frame` / `divided` | `boolean` | — / — / `true` / `true` | Zebra rows / column dividers / outer frame / row dividers. |
+| `hoverable` | `boolean` | `true` | Highlight the hovered row. |
+| `stickyHeader` + `maxHeight` | `boolean` + `number \| string` | — | Pin the header while the body scrolls. |
+| `onRowClick` | `(row, i) => void` | — | Make rows clickable. |
+| `multiSort` / `sort` / `defaultSort` / `onSortChange` | — | — | Sorting (per-column `sortable`). |
+| `selectable` / `selectionMode` / `selectedKeys` / `onSelectionChange` | — | — | Row selection (`multiple` \| `single`). |
+| `pagination` | `client \| server \| cursor` | — | Paging config. |
+| `renderExpanded` / `expandMode` / `expandedKeys` | — | — | Expandable detail rows. |
+| `pinnable` / `columnToggle` / `searchable` / `responsive` / `virtualized` | `boolean` | — | Opt-in features. |
+| `reorderableColumns` / `reorderableRows` | `boolean` | — | Drag to reorder columns / rows. |
+| `emptyContent` | `ReactNode` | `No data` | Empty-state content. |
+
+### `DataTableColumn<T>`
+
+`id`, `header`, `accessor`, `cell` (React node / Angular `<ng-template>`),
+`footer`, `align`, `width`, `numeric`, `pin`, `hideable`, `filterable`,
+`filterType`, `filterOptions`, `sortable`, `sortAccessor`, `className`.
+
+## Accessibility
+
+- Renders a real semantic `<table>` (`thead` / `tbody` / `th` / `td`), so screen
+  readers and keyboard navigation work natively.
+- Sortable headers are buttons and expose **`aria-sort`**; the selection column's
+  checkboxes/radios are labelled, and "select all" toggles the page.
+- The sticky header and horizontal scroll keep headers associated with their
+  cells; pinned columns stay reachable.
+- Provide a meaningful `header` per column — it's the accessible name for every
+  cell in that column.
