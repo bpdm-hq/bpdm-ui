@@ -1315,7 +1315,9 @@ export class ExpandableTable {
 ## Frozen & pinnable columns
 
 Give a column `pin: 'left' | 'right'` (with a numeric `width`) to freeze it while
-the table scrolls horizontally. Add `pinnable` for a per-column header menu.
+the table scrolls horizontally. **Scroll the table sideways** — *Name* stays pinned
+on the left and *Tasks* on the right while the middle columns move. Add `pinnable`
+for a per-column header menu to pin/unpin at runtime.
 
 <Preview>
   <DataTableFrozenDemo />
@@ -1327,17 +1329,21 @@ the table scrolls horizontally. Add `pinnable` for a per-column header menu.
 ```tsx title="data-table-frozen.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
-type Member = { id: string; name: string; email: string; role: string; tasks: number };
+type Member = { id: string; name: string; email: string; role: string; team: string; country: string; seats: number; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', tasks: 12 },
+  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
 ];
+// wide columns force horizontal scroll → the pinned edges (left + right) stay put
 const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', pin: 'left', width: 180, accessor: (r) => r.name },
+  { id: 'name', header: 'Name', pin: 'left', width: 200, accessor: (r) => r.name },
   { id: 'email', header: 'Email', width: 220, accessor: (r) => r.email },
   { id: 'role', header: 'Role', width: 140, accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', width: 120, numeric: true, accessor: (r) => r.tasks },
+  { id: 'team', header: 'Team', width: 150, accessor: (r) => r.team },
+  { id: 'country', header: 'Country', width: 160, accessor: (r) => r.country },
+  { id: 'seats', header: 'Seats', width: 110, numeric: true, accessor: (r) => r.seats },
+  { id: 'tasks', header: 'Tasks', pin: 'right', width: 120, numeric: true, accessor: (r) => r.tasks },
 ];
 
 export function FrozenTable() {
@@ -1352,7 +1358,7 @@ export function FrozenTable() {
 import { Component } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
-type Member = { id: string; name: string; email: string; role: string; tasks: number };
+type Member = { id: string; name: string; email: string; role: string; team: string; country: string; seats: number; tasks: number };
 
 @Component({
   selector: 'frozen-table',
@@ -1362,15 +1368,19 @@ type Member = { id: string; name: string; email: string; role: string; tasks: nu
 export class FrozenTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', tasks: 12 },
+    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
   ];
+  // wide columns force horizontal scroll → the pinned edges (left + right) stay put
   readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', pin: 'left', width: 180, accessor: (r) => r.name },
+    { id: 'name', header: 'Name', pin: 'left', width: 200, accessor: (r) => r.name },
     { id: 'email', header: 'Email', width: 220, accessor: (r) => r.email },
     { id: 'role', header: 'Role', width: 140, accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', width: 120, numeric: true, accessor: (r) => r.tasks },
+    { id: 'team', header: 'Team', width: 150, accessor: (r) => r.team },
+    { id: 'country', header: 'Country', width: 160, accessor: (r) => r.country },
+    { id: 'seats', header: 'Seats', width: 110, numeric: true, accessor: (r) => r.seats },
+    { id: 'tasks', header: 'Tasks', pin: 'right', width: 120, numeric: true, accessor: (r) => r.tasks },
   ];
 }
 ```

@@ -521,13 +521,17 @@ export function DataTableExpandableDemo() {
   );
 }
 
+// enough wide columns to force horizontal scroll — Name stays frozen on the left,
+// Tasks frozen on the right, while the middle columns scroll between them
 const pinnedColumns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', pin: 'left', width: 180, accessor: (r) => r.name },
+  { id: 'name', header: 'Name', pin: 'left', width: 210, cell: (r) => <NameCell member={r} /> },
   { id: 'email', header: 'Email', width: 220, accessor: (r) => r.email, className: 'font-mono text-xs' },
   { id: 'role', header: 'Role', width: 140, accessor: (r) => r.role },
-  { id: 'team', header: 'Team', width: 160, accessor: (r) => r.team },
-  { id: 'status', header: 'Status', width: 140, align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
-  { id: 'tasks', header: 'Tasks', width: 120, numeric: true, accessor: (r) => r.tasks },
+  { id: 'team', header: 'Team', width: 150, accessor: (r) => r.team },
+  { id: 'location', header: 'Location', width: 170, cell: (r) => <FlagCell member={r} /> },
+  { id: 'seats', header: 'Seats', width: 110, numeric: true, accessor: (r) => r.seats },
+  { id: 'status', header: 'Status', width: 150, align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', pin: 'right', width: 120, numeric: true, accessor: (r) => r.tasks },
 ];
 
 export function DataTableFrozenDemo() {
