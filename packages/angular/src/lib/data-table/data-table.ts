@@ -161,7 +161,7 @@ interface RenderRow<T> {
               <dl class="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
                 @for (col of cols; track col.id) {
                   <dt class="truncate text-muted-foreground">{{ col.header ?? col.id }}</dt>
-                  <dd [class]="'min-w-0 text-right ' + (col.numeric ? 'tabular-nums' : '')">
+                  <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-right ' + (col.numeric ? 'tabular-nums' : '')">
                     @if (col.cell) {
                       <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="cellCtx(rr)" />
                     } @else {

@@ -1661,7 +1661,7 @@ export function DataTable<T>({
                         <dt className="truncate text-muted-foreground">
                           {col.header ?? col.id}
                         </dt>
-                        <dd className={cn("min-w-0 text-right", col.numeric && "tabular-nums")}>
+                        <dd className={cn("flex min-w-0 items-center justify-end gap-2 text-right", col.numeric && "tabular-nums")}>
                           {renderCell(col, row, rowIndex)}
                         </dd>
                       </React.Fragment>
