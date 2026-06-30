@@ -98,6 +98,43 @@ const customizeColumns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
 ];
 
+// ── per-demo variations so each example looks a little different ───────────────
+/** Selection — an AvatarGroup of collaborators. */
+const teamColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <NameCell member={r} /> },
+  { id: 'team', header: 'Collaborators', cell: (r) => <TeamGroup member={r} /> },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+/** Clickable / Search — a flag + country. */
+const flagColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
+  { id: 'location', header: 'Location', cell: (r) => <FlagCell member={r} />, sortAccessor: (r) => r.country },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+];
+
+/** Pagination — a flag + a neutral "amount" (seats). */
+const meteredColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <NameCell member={r} /> },
+  { id: 'location', header: 'Location', cell: (r) => <FlagCell member={r} /> },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'seats', header: 'Seats', numeric: true, accessor: (r) => r.seats },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+];
+
+/** Column toggle — an always-on icon-button actions column. */
+const actionsColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <NameCell member={r} /> },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'actions', header: '', align: 'right', hideable: false, cell: (r) => <RowActions member={r} /> },
+];
+
 const key = (r: Member) => r.id;
 
 function Box({ children }: { children: ReactNode }) {
@@ -317,24 +354,6 @@ export function DataTableEditableDemo() {
   );
 }
 
-// a production-grade mix: identity, an avatar group, a flag, a neutral amount,
-// a status badge and an icon-button action column
-const actionColumns: DataTableColumn<Member>[] = [
-  { id: 'member', header: 'Member', cell: (r) => <MemberCell member={r} /> },
-  { id: 'team', header: 'Collaborators', cell: (r) => <TeamGroup member={r} /> },
-  { id: 'location', header: 'Location', cell: (r) => <FlagCell member={r} /> },
-  { id: 'seats', header: 'Seats', numeric: true, accessor: (r) => r.seats },
-  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
-  { id: 'actions', header: '', align: 'right', cell: (r) => <RowActions member={r} /> },
-];
-
-export function DataTableActionsDemo() {
-  return (
-    <Box>
-      <DataTable columns={actionColumns} data={MEMBERS} rowKey={key} />
-    </Box>
-  );
-}
 
 export function DataTableStickyDemo() {
   return (
@@ -348,7 +367,7 @@ export function DataTableClickableDemo() {
   const [last, setLast] = useState('');
   return (
     <div className="flex w-full flex-col gap-3">
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} onRowClick={(r) => setLast(r.name)} />
+      <DataTable columns={flagColumns} data={MEMBERS} rowKey={key} onRowClick={(r) => setLast(r.name)} />
       {last && (
         <p className="text-sm text-fd-muted-foreground">
           Clicked: <span className="font-medium text-fd-foreground">{last}</span>
@@ -395,7 +414,7 @@ export function DataTableSelectionDemo() {
           </Button>
         </div>
       )}
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} selectable selectedKeys={keys} onSelectionChange={setKeys} />
+      <DataTable columns={teamColumns} data={MEMBERS} rowKey={key} selectable selectedKeys={keys} onSelectionChange={setKeys} />
     </div>
   );
 }
@@ -403,7 +422,7 @@ export function DataTableSelectionDemo() {
 export function DataTablePaginationDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={BIG} rowKey={key} pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 32] }} />
+      <DataTable columns={meteredColumns} data={BIG} rowKey={key} pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 32] }} />
     </Box>
   );
 }
@@ -455,7 +474,7 @@ export function DataTableFiltersDemo() {
 export function DataTableSearchDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} searchable searchPlaceholder="Search members…" />
+      <DataTable columns={flagColumns} data={MEMBERS} rowKey={key} searchable searchPlaceholder="Search members…" />
     </Box>
   );
 }
@@ -463,7 +482,7 @@ export function DataTableSearchDemo() {
 export function DataTableColumnToggleDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} columnToggle />
+      <DataTable columns={actionsColumns} data={MEMBERS} rowKey={key} columnToggle />
     </Box>
   );
 }
