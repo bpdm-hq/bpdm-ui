@@ -1668,8 +1668,12 @@ export function DataTable<T>({
                     ))}
                   </dl>
                   {expanded && (
-                    <div className="mt-3 border-t border-border pt-3">
-                      {renderExpanded!(row, rowIndex)}
+                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                      <div className="overflow-hidden">
+                        <div className="mt-3 border-t border-border pt-3">
+                          {renderExpanded!(row, rowIndex)}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -2113,8 +2117,13 @@ export function DataTable<T>({
               </tr>
               {expanded && (
                 <tr className={cn("bg-muted/30", divided && "border-t border-border")}>
-                  <td colSpan={colCount} className={cellPad({ size })}>
-                    {renderExpanded!(row, rowIndex)}
+                  <td colSpan={colCount} className="p-0">
+                    {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
+                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                      <div className="overflow-hidden">
+                        <div className={cellPad({ size })}>{renderExpanded!(row, rowIndex)}</div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}

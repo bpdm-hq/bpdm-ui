@@ -235,6 +235,12 @@
   from { height: var(--radix-accordion-content-height); opacity: 1; }
   to { height: 0; opacity: 0; }
 }
+/* Smooth reveal to natural height (grid-rows 0fr→1fr trick) — data-table row
+   expansion and other height-auto reveals; no fixed max-height needed. */
+@keyframes bpdm-expand {
+  from { grid-template-rows: 0fr; opacity: 0; }
+  to { grid-template-rows: 1fr; opacity: 1; }
+}
 
 /* Spinner — bouncing dots + equalizer bars (staggered per child via delay). */
 @keyframes bpdm-dot-bounce {

@@ -171,8 +171,12 @@ interface RenderRow<T> {
                 }
               </dl>
               @if (expandedSet().has(rr.key) && expandedTemplate()) {
-                <div class="mt-3 border-t border-border pt-3">
-                  <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                  <div class="overflow-hidden">
+                    <div class="mt-3 border-t border-border pt-3">
+                      <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                    </div>
+                  </div>
                 </div>
               }
             </div>
@@ -336,8 +340,15 @@ interface RenderRow<T> {
                   </tr>
                   @if (expandedSet().has(rr.key) && expandedTemplate()) {
                     <tr [class]="'bg-muted/30 ' + (divided() ? 'border-t border-border' : '')">
-                      <td [attr.colspan]="colCount()" [class]="cellPad()">
-                        <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                      <td [attr.colspan]="colCount()" class="p-0">
+                        <!-- grid 0fr→1fr animates the reveal to natural height smoothly -->
+                        <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                          <div class="overflow-hidden">
+                            <div [class]="cellPad()">
+                              <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                            </div>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   }
