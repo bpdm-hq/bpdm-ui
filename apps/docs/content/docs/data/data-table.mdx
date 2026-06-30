@@ -314,6 +314,135 @@ export class MultiSortTable {
   </Tab>
 </Tabs>
 
+## Column filters
+
+Set `filterable` on a column for a header filter menu — `filterType` is `text`,
+`number`, or `select` (pick from the column's distinct values).
+
+<Preview>
+  <DataTableFiltersDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-filters.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+  { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
+];
+
+export function FilterableTable() {
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-filters.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'filterable-table',
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
+})
+export class FilterableTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+    { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Search
+
+`searchable` adds a global search box that filters rows across all columns.
+
+<Preview>
+  <DataTableSearchDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-search.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function SearchableTable() {
+  return (
+    <DataTable columns={columns} data={members} rowKey={(r) => r.id} searchable searchPlaceholder="Search members…" />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-search.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'searchable-table',
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />`,
+})
+export class SearchableTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Pagination
 
 The `pagination` prop supports three modes — the preview toggles between them with
@@ -543,135 +672,6 @@ export class SelectableTable {
   </Tab>
 </Tabs>
 
-## Search
-
-`searchable` adds a global search box that filters rows across all columns.
-
-<Preview>
-  <DataTableSearchDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-search.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function SearchableTable() {
-  return (
-    <DataTable columns={columns} data={members} rowKey={(r) => r.id} searchable searchPlaceholder="Search members…" />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-search.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'searchable-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />`,
-})
-export class SearchableTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
-## Column filters
-
-Set `filterable` on a column for a header filter menu — `filterType` is `text`,
-`number`, or `select` (pick from the column's distinct values).
-
-<Preview>
-  <DataTableFiltersDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-filters.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
-  { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
-];
-
-export function FilterableTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-filters.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'filterable-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
-})
-export class FilterableTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
-    { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
 ## Clickable rows
 
 `onRowClick` makes rows interactive (pointer cursor + hover).
@@ -859,154 +859,6 @@ export class ExpandableTable {
   </Tab>
 </Tabs>
 
-## Custom styling
-
-Style the table to fit your product. Three hooks cover most needs:
-
-- **`headerClassName`** — classes on every header cell (tint or colour the header row).
-- **`rowClassName`** — a string, or a function `(row, i) => string` for **conditional** rows
-  (e.g. flag a deactivated user with a destructive tint).
-- **`column.className`** — classes on a column's header **and** cells, to accent a key column.
-
-These compose with `cellClassName` (every body cell) and `className` (the table). Below,
-the header is tinted, the **Tasks** column is accented, and disabled members are flagged.
-
-<Callout type="info">
-  **Theming, not styling.** The table's focus accents — row hover, the selected-row
-  tint + left bar, and the active-sort arrow — all follow your `--primary` token, so
-  they adopt your brand automatically. Override it once and every table re-tints:
-  ```css
-  :root { --primary: #2563eb; }   /* your brand → blue hover, blue accent bar */
-  .dark { --primary: #3b82f6; }
-  ```
-  Use the `className` hooks above only for one-off, per-table overrides.
-</Callout>
-
-<Preview>
-  <DataTableCustomizeDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-custom.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-import { Avatar } from '@bpdm/ui/avatar';
-import { Badge } from '@bpdm/ui/badge';
-
-type Member = { id: string; name: string; role: string; status: 'active' | 'disabled'; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
-  { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
-  { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
-];
-
-const columns: DataTableColumn<Member>[] = [
-  {
-    id: 'name',
-    header: 'Name',
-    sortAccessor: (r) => r.name,
-    cell: (r) => (
-      <div className="flex items-center gap-2.5">
-        <Avatar name={r.name} size="sm" />
-        <span className="font-medium">{r.name}</span>
-      </div>
-    ),
-  },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  {
-    id: 'status',
-    header: 'Status',
-    align: 'center',
-    cell: (r) => (
-      <Badge variant={r.status === 'active' ? 'success' : 'neutral'} appearance="soft" dot className="capitalize">
-        {r.status}
-      </Badge>
-    ),
-  },
-  // a column className styles its header + every cell — here a subtle accent
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
-];
-
-export function CustomStyledTable() {
-  return (
-    <DataTable
-      columns={columns}
-      data={members}
-      rowKey={(r) => r.id}
-      // tint the whole header row
-      headerClassName="bg-muted/60"
-      // flag deactivated users with a destructive tint + muted text
-      rowClassName={(r) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '')}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-custom.ts"
-import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
-import { BpdmDataTable, BpdmAvatar, BpdmBadge, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; status: 'active' | 'disabled'; tasks: number };
-
-@Component({
-  selector: 'custom-styled-table',
-  imports: [BpdmDataTable, BpdmAvatar, BpdmBadge],
-  templateUrl: './data-table-custom.html',
-})
-export class CustomStyledTable {
-  readonly nameCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('nameCell');
-  readonly statusCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('statusCell');
-
-  readonly rowKey = (r: Member) => r.id;
-  // flag deactivated users with a destructive tint + muted text
-  readonly rowClass = (r: Member) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '');
-
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
-    { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
-    { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
-  ];
-
-  readonly columns = computed<DataTableColumn<Member>[]>(() => [
-    { id: 'name', header: 'Name', cell: this.nameCell(), sortAccessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'status', header: 'Status', align: 'center', cell: this.statusCell() },
-    // a column className styles its header + every cell — here a subtle accent
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
-  ]);
-}
-```
-
-```html title="data-table-custom.html"
-<bpdm-data-table
-  [columns]="columns()"
-  [data]="members"
-  [rowKey]="rowKey"
-  headerClassName="bg-muted/60"
-  [rowClassName]="rowClass"
-/>
-
-<ng-template #nameCell let-row>
-  <div class="flex items-center gap-2.5">
-    <bpdm-avatar [name]="row.name" size="sm" />
-    <span class="font-medium">{{ row.name }}</span>
-  </div>
-</ng-template>
-
-<ng-template #statusCell let-row>
-  <bpdm-badge [variant]="row.status === 'active' ? 'success' : 'neutral'" appearance="soft" dot class="capitalize">
-    {{ row.status }}
-  </bpdm-badge>
-</ng-template>
-```
-
-  </Tab>
-</Tabs>
-
 ## Editable cells
 
 There's no separate "edit mode" prop — a `cell` is just a renderer, so an editable
@@ -1189,71 +1041,6 @@ export class EditableTable {
   </Tab>
 </Tabs>
 
-## Sticky header & scroll
-
-Cap the height with `maxHeight` and set `stickyHeader` — the body scrolls while
-the header stays pinned.
-
-<Preview>
-  <DataTableStickyDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-sticky.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  // …more rows than fit in 260px → the body scrolls
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function ScrollingTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} stickyHeader maxHeight={260} />;
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-sticky.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'scrolling-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" stickyHeader [maxHeight]="260" />`,
-})
-export class ScrollingTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
 ## Frozen & pinnable columns
 
 Give a column `pin: 'left' | 'right'` (with a numeric `width`) to freeze it while
@@ -1330,6 +1117,71 @@ export class FrozenTable {
   </Tab>
 </Tabs>
 
+## Sticky header & scroll
+
+Cap the height with `maxHeight` and set `stickyHeader` — the body scrolls while
+the header stays pinned.
+
+<Preview>
+  <DataTableStickyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-sticky.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  // …more rows than fit in 260px → the body scrolls
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function ScrollingTable() {
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} stickyHeader maxHeight={260} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-sticky.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'scrolling-table',
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" stickyHeader [maxHeight]="260" />`,
+})
+export class ScrollingTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Column toggle
 
 `columnToggle` adds a "Columns" control to show/hide columns at runtime (set a
@@ -1389,6 +1241,306 @@ export class ToggleableTable {
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
 }
+```
+
+  </Tab>
+</Tabs>
+
+## Reordering
+
+`reorderableColumns` lets users drag column headers; `reorderableRows` adds a drag
+handle per row (requires `rowKey`). Persist via `onColumnOrderChange` / `onRowReorder`.
+
+<Preview>
+  <DataTableReorderDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-reorder.tsx"
+import { useState } from 'react';
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const initial: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function ReorderableTable() {
+  const [rows, setRows] = useState(initial);
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      reorderableColumns
+      reorderableRows
+      onRowReorder={setRows}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-reorder.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'reorderable-table',
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns"
+      [data]="rows()"
+      [rowKey]="rowKey"
+      reorderableColumns
+      reorderableRows
+      (rowReorder)="rows.set($event)"
+    />
+  `,
+})
+export class ReorderableTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly rows = signal<Member[]>([
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ]);
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Footer summary
+
+Give a column a `footer` — a node, or a function over the filtered rows to compute
+an aggregate. Any column with a `footer` renders a sticky summary row.
+
+<Preview>
+  <DataTableFooterDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-footer.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name, footer: 'Total' },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks,
+    footer: (rows) => rows.reduce((sum, r) => sum + r.tasks, 0) },
+];
+
+export function SummaryTable() {
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular a column's `footer` is a string or `(rows) => string`.
+
+```ts title="data-table-footer.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'summary-table',
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
+})
+export class SummaryTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name, footer: 'Total' },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks,
+      footer: (rows) => String(rows.reduce((sum, r) => sum + r.tasks, 0)) },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Custom styling
+
+Style the table to fit your product. Three hooks cover most needs:
+
+- **`headerClassName`** — classes on every header cell (tint or colour the header row).
+- **`rowClassName`** — a string, or a function `(row, i) => string` for **conditional** rows
+  (e.g. flag a deactivated user with a destructive tint).
+- **`column.className`** — classes on a column's header **and** cells, to accent a key column.
+
+These compose with `cellClassName` (every body cell) and `className` (the table). Below,
+the header is tinted, the **Tasks** column is accented, and disabled members are flagged.
+
+<Callout type="info">
+  **Theming, not styling.** The table's focus accents — row hover, the selected-row
+  tint + left bar, and the active-sort arrow — all follow your `--primary` token, so
+  they adopt your brand automatically. Override it once and every table re-tints:
+  ```css
+  :root { --primary: #2563eb; }   /* your brand → blue hover, blue accent bar */
+  .dark { --primary: #3b82f6; }
+  ```
+  Use the `className` hooks above only for one-off, per-table overrides.
+</Callout>
+
+<Preview>
+  <DataTableCustomizeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-custom.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Avatar } from '@bpdm/ui/avatar';
+import { Badge } from '@bpdm/ui/badge';
+
+type Member = { id: string; name: string; role: string; status: 'active' | 'disabled'; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
+  { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
+  { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
+];
+
+const columns: DataTableColumn<Member>[] = [
+  {
+    id: 'name',
+    header: 'Name',
+    sortAccessor: (r) => r.name,
+    cell: (r) => (
+      <div className="flex items-center gap-2.5">
+        <Avatar name={r.name} size="sm" />
+        <span className="font-medium">{r.name}</span>
+      </div>
+    ),
+  },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  {
+    id: 'status',
+    header: 'Status',
+    align: 'center',
+    cell: (r) => (
+      <Badge variant={r.status === 'active' ? 'success' : 'neutral'} appearance="soft" dot className="capitalize">
+        {r.status}
+      </Badge>
+    ),
+  },
+  // a column className styles its header + every cell — here a subtle accent
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
+];
+
+export function CustomStyledTable() {
+  return (
+    <DataTable
+      columns={columns}
+      data={members}
+      rowKey={(r) => r.id}
+      // tint the whole header row
+      headerClassName="bg-muted/60"
+      // flag deactivated users with a destructive tint + muted text
+      rowClassName={(r) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '')}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-custom.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmAvatar, BpdmBadge, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; status: 'active' | 'disabled'; tasks: number };
+
+@Component({
+  selector: 'custom-styled-table',
+  imports: [BpdmDataTable, BpdmAvatar, BpdmBadge],
+  templateUrl: './data-table-custom.html',
+})
+export class CustomStyledTable {
+  readonly nameCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('nameCell');
+  readonly statusCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('statusCell');
+
+  readonly rowKey = (r: Member) => r.id;
+  // flag deactivated users with a destructive tint + muted text
+  readonly rowClass = (r: Member) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '');
+
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
+    { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
+    { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
+  ];
+
+  readonly columns = computed<DataTableColumn<Member>[]>(() => [
+    { id: 'name', header: 'Name', cell: this.nameCell(), sortAccessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'status', header: 'Status', align: 'center', cell: this.statusCell() },
+    // a column className styles its header + every cell — here a subtle accent
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
+  ]);
+}
+```
+
+```html title="data-table-custom.html"
+<bpdm-data-table
+  [columns]="columns()"
+  [data]="members"
+  [rowKey]="rowKey"
+  headerClassName="bg-muted/60"
+  [rowClassName]="rowClass"
+/>
+
+<ng-template #nameCell let-row>
+  <div class="flex items-center gap-2.5">
+    <bpdm-avatar [name]="row.name" size="sm" />
+    <span class="font-medium">{{ row.name }}</span>
+  </div>
+</ng-template>
+
+<ng-template #statusCell let-row>
+  <bpdm-badge [variant]="row.status === 'active' ? 'success' : 'neutral'" appearance="soft" dot class="capitalize">
+    {{ row.status }}
+  </bpdm-badge>
+</ng-template>
 ```
 
   </Tab>
@@ -1576,158 +1728,6 @@ export class SizedTables {
 <ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
 <ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
 <ng-template #lg><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="lg" /></ng-template>
-```
-
-  </Tab>
-</Tabs>
-
-## Footer summary
-
-Give a column a `footer` — a node, or a function over the filtered rows to compute
-an aggregate. Any column with a `footer` renders a sticky summary row.
-
-<Preview>
-  <DataTableFooterDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-footer.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name, footer: 'Total' },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks,
-    footer: (rows) => rows.reduce((sum, r) => sum + r.tasks, 0) },
-];
-
-export function SummaryTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-In Angular a column's `footer` is a string or `(rows) => string`.
-
-```ts title="data-table-footer.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'summary-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
-})
-export class SummaryTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name, footer: 'Total' },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks,
-      footer: (rows) => String(rows.reduce((sum, r) => sum + r.tasks, 0)) },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
-## Reordering
-
-`reorderableColumns` lets users drag column headers; `reorderableRows` adds a drag
-handle per row (requires `rowKey`). Persist via `onColumnOrderChange` / `onRowReorder`.
-
-<Preview>
-  <DataTableReorderDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-reorder.tsx"
-import { useState } from 'react';
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const initial: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function ReorderableTable() {
-  const [rows, setRows] = useState(initial);
-  return (
-    <DataTable
-      columns={columns}
-      data={rows}
-      rowKey={(r) => r.id}
-      reorderableColumns
-      reorderableRows
-      onRowReorder={setRows}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-reorder.ts"
-import { Component, signal } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'reorderable-table',
-  imports: [BpdmDataTable],
-  template: `
-    <bpdm-data-table
-      [columns]="columns"
-      [data]="rows()"
-      [rowKey]="rowKey"
-      reorderableColumns
-      reorderableRows
-      (rowReorder)="rows.set($event)"
-    />
-  `,
-})
-export class ReorderableTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly rows = signal<Member[]>([
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ]);
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-}
 ```
 
   </Tab>
