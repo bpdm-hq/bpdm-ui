@@ -420,10 +420,60 @@ export function DataTableSelectionDemo() {
 }
 
 export function DataTablePaginationDemo() {
+  const size = 8;
+  // server-side: a controlled page; here we slice BIG to stand in for a backend
+  const [page, setPage] = useState(1);
+  // cursor-based: a controlled prev/next offset
+  const [start, setStart] = useState(0);
+
+  const serverData = BIG.slice((page - 1) * size, page * size);
+  const cursorData = BIG.slice(start, start + size);
+
   return (
-    <Box>
-      <DataTable columns={meteredColumns} data={BIG} rowKey={key} pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 32] }} />
-    </Box>
+    <Tabs
+      className="w-full self-start"
+      defaultValue="client"
+      items={[
+        {
+          value: 'client',
+          label: 'Client',
+          content: (
+            <DataTable columns={meteredColumns} data={BIG} rowKey={key} pagination={{ pageSize: size, pageSizeOptions: [8, 16, 32] }} />
+          ),
+        },
+        {
+          value: 'server',
+          label: 'Server',
+          content: (
+            <DataTable
+              columns={meteredColumns}
+              data={serverData}
+              rowKey={key}
+              pagination={{ mode: 'server', page, pageSize: size, total: BIG.length, onPageChange: setPage }}
+            />
+          ),
+        },
+        {
+          value: 'cursor',
+          label: 'Cursor',
+          content: (
+            <DataTable
+              columns={meteredColumns}
+              data={cursorData}
+              rowKey={key}
+              pagination={{
+                mode: 'cursor',
+                hasPreviousPage: start > 0,
+                hasNextPage: start + size < BIG.length,
+                onPreviousPage: () => setStart((s) => Math.max(0, s - size)),
+                onNextPage: () => setStart((s) => s + size),
+                rangeLabel: `Showing ${start + 1}–${Math.min(start + size, BIG.length)} of ${BIG.length}`,
+              }}
+            />
+          ),
+        },
+      ]}
+    />
   );
 }
 

@@ -1053,9 +1053,12 @@ export class SelectableTable {
 
 ## Pagination
 
-Pass `pagination` for client paging (the table slices `data`). For server-driven
-data use `mode: 'server'` (offset — you supply `total` + handle `onPageChange`) or
-`mode: 'cursor'` (prev/next only).
+The `pagination` prop supports three modes — the preview toggles between them with
+our `Tabs`:
+
+- **Client** — the table slices `data` itself (just give it everything).
+- **Server** (offset) — you fetch the current page; supply `total` + handle `onPageChange`.
+- **Cursor** — prev/next only (no page numbers), for cursor-based APIs.
 
 <Preview>
   <DataTablePaginationDemo />
@@ -1065,31 +1068,58 @@ data use `mode: 'server'` (offset — you supply `total` + handle `onPageChange`
   <Tab value="React">
 
 ```tsx title="data-table-pagination.tsx"
+import { useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = Array.from({ length: 40 }, (_, i) => ({
-  id: `m${i}`,
-  name: `Member ${i + 1}`,
-  role: i % 2 ? 'Editor' : 'Viewer',
-  tasks: (i * 7) % 200,
-}));
-const columns: DataTableColumn<Member>[] = [
+type Row = { id: string; name: string; role: string };
+const columns: DataTableColumn<Row>[] = [
   { id: 'name', header: 'Name', accessor: (r) => r.name },
   { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-export function PagedTable() {
-  // client (default) — the table pages the data itself. For server paging use
-  // pagination={{ mode: 'server', page, pageSize: 20, total, onPageChange: setPage }};
-  // for cursor paging use { mode: 'cursor', hasNextPage, hasPreviousPage, onNextPage, onPreviousPage }.
+// 1 — Client: hand the table everything; it pages internally.
+export function ClientPaged({ rows }: { rows: Row[] }) {
   return (
     <DataTable
       columns={columns}
-      data={members}
+      data={rows}
       rowKey={(r) => r.id}
       pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 32] }}
+    />
+  );
+}
+
+// 2 — Server (offset): fetch the current page; supply `total` + handle `onPageChange`.
+export function ServerPaged() {
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
+  const { rows, total } = useMembersPage(page, pageSize); // your data hook
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      pagination={{ mode: 'server', page, pageSize, total, onPageChange: setPage }}
+    />
+  );
+}
+
+// 3 — Cursor: prev/next only — for cursor-based APIs (no page numbers).
+export function CursorPaged() {
+  const { rows, hasNextPage, hasPreviousPage, next, prev, rangeLabel } = useCursor();
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      pagination={{
+        mode: 'cursor',
+        hasNextPage,
+        hasPreviousPage,
+        onNextPage: next,
+        onPreviousPage: prev,
+        rangeLabel,
+      }}
     />
   );
 }
@@ -1099,36 +1129,62 @@ export function PagedTable() {
   <Tab value="Angular">
 
 ```ts title="data-table-pagination.ts"
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
-type Member = { id: string; name: string; role: string; tasks: number };
+type Row = { id: string; name: string; role: string };
 
 @Component({
   selector: 'paged-table',
   imports: [BpdmDataTable],
   template: `
-    <bpdm-data-table
-      [columns]="columns"
-      [data]="members"
-      [rowKey]="rowKey"
-      [pagination]="{ pageSize: 8, pageSizeOptions: [8, 16, 32] }"
-    />
+    <!-- 1 — Client: the table pages internally -->
+    <bpdm-data-table [columns]="columns" [data]="rows()" [rowKey]="rowKey" [pagination]="clientPg" />
+
+    <!-- 2 — Server (offset): bind a computed config; you fetch each page -->
+    <bpdm-data-table [columns]="columns" [data]="pageRows()" [rowKey]="rowKey" [pagination]="serverPg()" />
+
+    <!-- 3 — Cursor: prev/next only -->
+    <bpdm-data-table [columns]="columns" [data]="pageRows()" [rowKey]="rowKey" [pagination]="cursorPg()" />
   `,
 })
 export class PagedTable {
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = Array.from({ length: 40 }, (_, i) => ({
-    id: `m${i}`,
-    name: `Member ${i + 1}`,
-    role: i % 2 ? 'Editor' : 'Viewer',
-    tasks: (i * 7) % 200,
-  }));
-  readonly columns: DataTableColumn<Member>[] = [
+  readonly rowKey = (r: Row) => r.id;
+  readonly columns: DataTableColumn<Row>[] = [
     { id: 'name', header: 'Name', accessor: (r) => r.name },
     { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
+
+  // client
+  readonly clientPg = { pageSize: 8, pageSizeOptions: [8, 16, 32] };
+
+  // server (offset) — `page` drives your data fetch; `total` comes from the backend
+  readonly page = signal(1);
+  readonly total = signal(0);
+  readonly serverPg = computed(() => ({
+    mode: 'server' as const,
+    page: this.page(),
+    pageSize: 8,
+    total: this.total(),
+    onPageChange: (p: number) => this.page.set(p),
+  }));
+
+  // cursor — prev/next only
+  readonly hasNext = signal(true);
+  readonly hasPrev = signal(false);
+  readonly cursorPg = computed(() => ({
+    mode: 'cursor' as const,
+    hasNextPage: this.hasNext(),
+    hasPreviousPage: this.hasPrev(),
+    onNextPage: () => this.loadNext(),
+    onPreviousPage: () => this.loadPrev(),
+  }));
+
+  // your data layer fills these
+  rows = signal<Row[]>([]);
+  pageRows = signal<Row[]>([]);
+  loadNext() {}
+  loadPrev() {}
 }
 ```
 
