@@ -11,6 +11,7 @@ import {
   DataTableStickyDemo,
   DataTableClickableDemo,
   DataTableSortingDemo,
+  DataTableMultiSortDemo,
   DataTableSelectionDemo,
   DataTablePaginationDemo,
   DataTableExpandableDemo,
@@ -229,9 +230,8 @@ the header stays pinned.
 
 ## Sorting
 
-Mark a column `sortable`; clicking its header cycles asc → desc → none. Add
-`multiSort` to sort by several columns (Shift+click appends one). For server-side
-ordering, control `sort` + handle `onSortChange`.
+Mark a column `sortable`; clicking its header cycles asc → desc → none. For
+server-side ordering, control `sort` and handle `onSortChange`.
 
 <Preview>
   <DataTableSortingDemo />
@@ -245,7 +245,6 @@ ordering, control `sort` + handle `onSortChange`.
   columns={columns}   // columns with `sortable: true`
   data={members}
   rowKey={(r) => r.id}
-  multiSort
   defaultSort={[{ id: 'tasks', dir: 'desc' }]}
   onSortChange={(sort) => console.log(sort)}
 />
@@ -258,9 +257,49 @@ ordering, control `sort` + handle `onSortChange`.
 <bpdm-data-table
   [columns]="columns()"
   [data]="members"
-  multiSort
   [defaultSort]="[{ id: 'tasks', dir: 'desc' }]"
   (sortChange)="onSort($event)"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+## Multi-column sort
+
+Add `multiSort` to sort by several columns at once — **Shift+click** a header to
+append it to the sort (each shows its order). Here rows are grouped by **team**,
+then by **tasks** within each team.
+
+<Preview>
+  <DataTableMultiSortDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-multi-sort.tsx"
+<DataTable
+  columns={columns}   // columns with `sortable: true`
+  data={members}
+  rowKey={(r) => r.id}
+  multiSort
+  defaultSort={[
+    { id: 'team', dir: 'asc' },
+    { id: 'tasks', dir: 'desc' },
+  ]}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-multi-sort.html"
+<bpdm-data-table
+  [columns]="columns()"
+  [data]="members"
+  multiSort
+  [defaultSort]="[{ id: 'team', dir: 'asc' }, { id: 'tasks', dir: 'desc' }]"
 />
 ```
 

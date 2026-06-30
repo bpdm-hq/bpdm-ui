@@ -110,7 +110,24 @@ export function DataTableClickableDemo() {
 export function DataTableSortingDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} multiSort defaultSort={[{ id: 'tasks', dir: 'desc' }]} />
+      <DataTable columns={columns} data={MEMBERS} rowKey={key} defaultSort={[{ id: 'tasks', dir: 'desc' }]} />
+    </Box>
+  );
+}
+
+export function DataTableMultiSortDemo() {
+  return (
+    <Box>
+      <DataTable
+        columns={columns}
+        data={MEMBERS}
+        rowKey={key}
+        multiSort
+        defaultSort={[
+          { id: 'team', dir: 'asc' },
+          { id: 'tasks', dir: 'desc' },
+        ]}
+      />
     </Box>
   );
 }
