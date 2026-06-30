@@ -9,6 +9,7 @@ import {
   DataTableSizesDemo,
   DataTableStripedDemo,
   DataTableCustomizeDemo,
+  DataTableEditableDemo,
   DataTableStickyDemo,
   DataTableClickableDemo,
   DataTableSortingDemo,
@@ -466,6 +467,188 @@ export class CustomStyledTable {
   <bpdm-badge [variant]="row.status === 'active' ? 'success' : 'neutral'" appearance="soft" dot class="capitalize">
     {{ row.status }}
   </bpdm-badge>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Editable cells
+
+There's no separate "edit mode" prop — a `cell` is just a renderer, so an editable
+cell is one that swaps its text for an input. Hold the rows in state and commit on
+**Enter** or blur (**Esc** cancels). It composes our [`Input`](/docs/form/input),
+and works with sorting, selection and pagination unchanged.
+
+<Preview>
+  <DataTableEditableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-editable.tsx"
+import { useState } from 'react';
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Input } from '@bpdm/ui/input';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+// click to edit; Enter or blur commits, Esc cancels
+function EditableCell({
+  value,
+  onCommit,
+  numeric = false,
+}: {
+  value: string | number;
+  onCommit: (next: string) => void;
+  numeric?: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(value));
+
+  if (editing) {
+    return (
+      <Input
+        size="sm"
+        autoFocus
+        type={numeric ? 'number' : 'text'}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          onCommit(draft);
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            onCommit(draft);
+            setEditing(false);
+          } else if (e.key === 'Escape') {
+            setEditing(false);
+          }
+        }}
+      />
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setDraft(String(value));
+        setEditing(true);
+      }}
+      className="w-full cursor-text rounded-md px-2 py-1 text-left hover:bg-muted"
+    >
+      {value}
+    </button>
+  );
+}
+
+export function EditableTable() {
+  const [rows, setRows] = useState<Member[]>([
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ]);
+  const patch = (id: string, field: keyof Member, next: string) =>
+    setRows((rs) =>
+      rs.map((r) => (r.id === id ? { ...r, [field]: field === 'tasks' ? Number(next) || 0 : next } : r)),
+    );
+
+  const columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', cell: (r) => <EditableCell value={r.name} onCommit={(v) => patch(r.id, 'name', v)} /> },
+    { id: 'role', header: 'Role', cell: (r) => <EditableCell value={r.role} onCommit={(v) => patch(r.id, 'role', v)} /> },
+    { id: 'tasks', header: 'Tasks', numeric: true, cell: (r) => <EditableCell value={r.tasks} numeric onCommit={(v) => patch(r.id, 'tasks', v)} /> },
+  ];
+
+  return <DataTable columns={columns} data={rows} rowKey={(r) => r.id} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The cell is an `<ng-template>` that shows a `bpdmInput` while editing, tracked by an
+`editing` signal; `commit()` writes back to the rows signal.
+
+```ts title="data-table-editable.ts"
+import { Component, signal, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmInput, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'editable-table',
+  imports: [BpdmDataTable, BpdmInput],
+  templateUrl: './data-table-editable.html',
+})
+export class EditableTable {
+  readonly nameCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('nameCell');
+  readonly roleCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('roleCell');
+  readonly tasksCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('tasksCell');
+
+  readonly rowKey = (r: Member) => r.id;
+  readonly editing = signal<string | null>(null); // `${id}:${field}`
+  readonly rows = signal<Member[]>([
+    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ]);
+
+  edit(id: string, field: 'name' | 'role' | 'tasks') {
+    this.editing.set(`${id}:${field}`);
+  }
+  commit(row: Member, field: 'name' | 'role' | 'tasks', value: string) {
+    const next = field === 'tasks' ? Number(value) || 0 : value;
+    this.rows.update((rs) => rs.map((r) => (r.id === row.id ? { ...r, [field]: next } : r)));
+    this.editing.set(null);
+  }
+
+  readonly columns = computed<DataTableColumn<Member>[]>(() => [
+    { id: 'name', header: 'Name', cell: this.nameCell() },
+    { id: 'role', header: 'Role', cell: this.roleCell() },
+    { id: 'tasks', header: 'Tasks', numeric: true, cell: this.tasksCell() },
+  ]);
+}
+```
+
+```html title="data-table-editable.html"
+<bpdm-data-table [columns]="columns()" [data]="rows()" [rowKey]="rowKey" />
+
+<ng-template #nameCell let-row>
+  @if (editing() === row.id + ':name') {
+    <input bpdmInput size="sm" autofocus [value]="row.name"
+      (blur)="commit(row, 'name', $any($event.target).value)"
+      (keydown.enter)="commit(row, 'name', $any($event.target).value)"
+      (keydown.escape)="editing.set(null)" />
+  } @else {
+    <button type="button" class="w-full cursor-text rounded-md px-2 py-1 text-left hover:bg-muted"
+      (click)="edit(row.id, 'name')">{{ row.name }}</button>
+  }
+</ng-template>
+
+<ng-template #roleCell let-row>
+  @if (editing() === row.id + ':role') {
+    <input bpdmInput size="sm" autofocus [value]="row.role"
+      (blur)="commit(row, 'role', $any($event.target).value)"
+      (keydown.enter)="commit(row, 'role', $any($event.target).value)"
+      (keydown.escape)="editing.set(null)" />
+  } @else {
+    <button type="button" class="w-full cursor-text rounded-md px-2 py-1 text-left hover:bg-muted"
+      (click)="edit(row.id, 'role')">{{ row.role }}</button>
+  }
+</ng-template>
+
+<ng-template #tasksCell let-row>
+  @if (editing() === row.id + ':tasks') {
+    <input bpdmInput size="sm" type="number" autofocus class="text-right" [value]="row.tasks"
+      (blur)="commit(row, 'tasks', $any($event.target).value)"
+      (keydown.enter)="commit(row, 'tasks', $any($event.target).value)"
+      (keydown.escape)="editing.set(null)" />
+  } @else {
+    <button type="button" class="flex w-full cursor-text justify-end rounded-md px-2 py-1 tabular-nums hover:bg-muted"
+      (click)="edit(row.id, 'tasks')">{{ row.tasks }}</button>
+  }
 </ng-template>
 ```
 

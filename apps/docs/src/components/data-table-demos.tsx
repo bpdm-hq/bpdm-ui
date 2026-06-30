@@ -5,6 +5,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
 import { Avatar } from '@bpdm/ui/avatar';
 import { Badge } from '@bpdm/ui/badge';
+import { Input } from '@bpdm/ui/input';
 import { Tabs } from '@bpdm/ui/tabs';
 
 // ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
@@ -121,6 +122,60 @@ function NameCell({ member }: { member: Member }) {
   );
 }
 
+// inline-edit cell — click to edit, Enter/blur commits, Esc cancels (dogfoods Input)
+function EditableCell({
+  value,
+  onCommit,
+  numeric = false,
+}: {
+  value: string | number;
+  onCommit: (next: string) => void;
+  numeric?: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(value));
+
+  if (editing) {
+    return (
+      <Input
+        size="sm"
+        autoFocus
+        type={numeric ? 'number' : 'text'}
+        value={draft}
+        className={numeric ? 'text-right tabular-nums' : undefined}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          onCommit(draft);
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            onCommit(draft);
+            setEditing(false);
+          } else if (e.key === 'Escape') {
+            setEditing(false);
+          }
+        }}
+      />
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setDraft(String(value));
+        setEditing(true);
+      }}
+      className={`group/edit flex w-full cursor-text items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-fd-muted ${numeric ? 'justify-end tabular-nums' : ''}`}
+    >
+      <span>{value}</span>
+      <svg viewBox="0 0 16 16" className="size-3 shrink-0 opacity-0 transition-opacity group-hover/edit:opacity-50" fill="none" aria-hidden>
+        <path d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+}
+
 // Usage demo columns — a plain table (no sorting/filtering), with a rich first cell.
 const usageColumns: DataTableColumn<Member>[] = [
   { id: 'member', header: 'Member', cell: (r) => <MemberCell member={r} /> },
@@ -179,6 +234,28 @@ export function DataTableCustomizeDemo() {
         headerClassName="bg-muted/60"
         rowClassName={(r) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '')}
       />
+    </Box>
+  );
+}
+
+export function DataTableEditableDemo() {
+  const [rows, setRows] = useState(MEMBERS);
+  const patch = (id: string, field: 'name' | 'role' | 'tasks', next: string) =>
+    setRows((rs) =>
+      rs.map((r) => (r.id === id ? ({ ...r, [field]: field === 'tasks' ? Number(next) || 0 : next } as Member) : r)),
+    );
+
+  const editColumns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', cell: (r) => <EditableCell value={r.name} onCommit={(v) => patch(r.id, 'name', v)} /> },
+    { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+    { id: 'role', header: 'Role', cell: (r) => <EditableCell value={r.role} onCommit={(v) => patch(r.id, 'role', v)} /> },
+    { id: 'team', header: 'Team', accessor: (r) => r.team },
+    { id: 'tasks', header: 'Tasks', numeric: true, cell: (r) => <EditableCell value={r.tasks} numeric onCommit={(v) => patch(r.id, 'tasks', v)} /> },
+  ];
+
+  return (
+    <Box>
+      <DataTable columns={editColumns} data={rows} rowKey={key} />
     </Box>
   );
 }
