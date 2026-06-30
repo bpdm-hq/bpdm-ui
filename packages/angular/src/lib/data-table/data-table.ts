@@ -44,9 +44,9 @@ import {
 type Key = string | number;
 
 const CELL_PAD: Record<"sm" | "md" | "lg", string> = {
-  sm: "px-3 py-2 text-sm",
-  md: "px-4 py-2.5 text-sm",
-  lg: "px-5 py-3.5 text-base",
+  sm: "px-3 py-2.5 text-sm",
+  md: "px-4 py-3 text-sm",
+  lg: "px-6 py-4 text-base",
 };
 const ALIGN_CLASS = { left: "text-left", center: "text-center", right: "text-right" } as const;
 const JUSTIFY_CLASS = { left: "justify-start", center: "justify-center", right: "justify-end" } as const;
@@ -1077,7 +1077,8 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       ALIGN_CLASS[align],
-      "font-medium whitespace-nowrap text-muted-foreground",
+      // refined header: small, uppercase, tracked — a polished dashboard look
+      "whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-muted-foreground",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
       this.frame() || col.pin ? "bg-muted" : "bg-transparent",
