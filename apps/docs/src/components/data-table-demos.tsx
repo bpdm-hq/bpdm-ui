@@ -213,6 +213,33 @@ function RowActions({ member }: { member: Member }) {
   );
 }
 
+// rich expanded-row detail panel — reused by the Expandable + Responsive demos
+function MemberDetail({ member: r }: { member: Member }) {
+  return (
+    <div className="flex flex-col gap-4 px-2 py-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-3">
+        <Avatar name={r.name} size="lg" />
+        <div className="leading-tight">
+          <div className="font-medium text-fd-foreground">{r.name}</div>
+          <div className="text-xs text-fd-muted-foreground">{r.email}</div>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <Badge variant="neutral" appearance="soft">{r.role}</Badge>
+            <Badge variant="secondary" appearance="soft">{r.team}</Badge>
+            <StatusBadge status={r.status} />
+          </div>
+        </div>
+      </div>
+      <div className="flex w-full flex-col gap-3 sm:max-w-xs">
+        <ProgressBar value={r.tasks} max={240} variant="primary" showValue label="Tasks completed" format={(v, m) => `${v}/${m}`} />
+        <div className="flex gap-2">
+          <Button variant="secondary" appearance="outline" size="sm">View profile</Button>
+          <Button variant="secondary" appearance="ghost" size="sm">Message</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // inline-edit cell — click to edit, Enter/blur commits, Esc cancels (dogfoods Input)
 function EditableCell({
   value,
@@ -486,36 +513,7 @@ export function DataTableExpandableDemo() {
         data={MEMBERS}
         rowKey={key}
         expandMode="single"
-        renderExpanded={(r) => (
-          <div className="flex flex-col gap-4 px-2 py-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar name={r.name} size="lg" />
-              <div className="leading-tight">
-                <div className="font-medium text-fd-foreground">{r.name}</div>
-                <div className="text-xs text-fd-muted-foreground">{r.email}</div>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <Badge variant="neutral" appearance="soft">{r.role}</Badge>
-                  <Badge variant="secondary" appearance="soft">{r.team}</Badge>
-                  <StatusBadge status={r.status} />
-                </div>
-              </div>
-            </div>
-            <div className="flex w-full flex-col gap-3 sm:max-w-xs">
-              <ProgressBar
-                value={r.tasks}
-                max={240}
-                variant="primary"
-                showValue
-                label="Tasks completed"
-                format={(v, m) => `${v}/${m}`}
-              />
-              <div className="flex gap-2">
-                <Button variant="secondary" appearance="outline" size="sm">View profile</Button>
-                <Button variant="secondary" appearance="ghost" size="sm">Message</Button>
-              </div>
-            </div>
-          </div>
-        )}
+        renderExpanded={(r) => <MemberDetail member={r} />}
       />
     </Box>
   );
@@ -610,14 +608,7 @@ export function DataTableResponsiveDemo() {
         responsive
         pinnable
         expandMode="single"
-        renderExpanded={(r) => (
-          <div className="flex flex-wrap items-center gap-4 px-2 py-1">
-            <span className="text-sm text-fd-muted-foreground">{r.email}</span>
-            <div className="ml-auto w-44">
-              <ProgressBar value={r.tasks} max={240} variant="primary" showValue label="Tasks" format={(v, m) => `${v}/${m}`} />
-            </div>
-          </div>
-        )}
+        renderExpanded={(r) => <MemberDetail member={r} />}
       />
     </Box>
   );
