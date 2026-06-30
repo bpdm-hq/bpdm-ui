@@ -587,10 +587,22 @@ export function DataTableFooterDemo() {
   );
 }
 
+// Responsive demo — a rich, sortable + filterable table that stacks into cards on
+// narrow screens (avatar group, flag, a neutral amount, status, row actions)
+const responsiveColumns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', sortable: true, filterable: true, cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
+  { id: 'team', header: 'Collaborators', cell: (r) => <TeamGroup member={r} /> },
+  { id: 'location', header: 'Location', sortable: true, filterable: true, filterType: 'select', cell: (r) => <FlagCell member={r} />, sortAccessor: (r) => r.country },
+  { id: 'role', header: 'Role', sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'seats', header: 'Seats', numeric: true, sortable: true, accessor: (r) => r.seats },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'actions', header: 'Actions', align: 'right', hideable: false, cell: (r) => <RowActions member={r} /> },
+];
+
 export function DataTableResponsiveDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} responsive />
+      <DataTable columns={responsiveColumns} data={MEMBERS} rowKey={key} responsive />
     </Box>
   );
 }

@@ -1652,7 +1652,10 @@ export class SummaryTable {
 ## Responsive
 
 On narrow screens, `responsive` stacks each row into a label/value card instead of
-scrolling horizontally.
+scrolling horizontally. Everything else still works — **sorting**, **filtering**, and
+rich custom cells (an avatar, an avatar group, a flag, a row-actions column) all
+carry through; on narrow screens they simply become the card's values. **Resize the
+preview** to see it switch.
 
 <Preview>
   <DataTableResponsiveDemo />
@@ -1663,17 +1666,80 @@ scrolling horizontally.
 
 ```tsx title="data-table-responsive.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
+import { Button } from '@bpdm/ui/button';
 
-type Member = { id: string; name: string; role: string; tasks: number };
+type Member = {
+  id: string; name: string; country: string; flag: string;
+  role: string; seats: number; team: string[];
+};
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  { id: 'm1', name: 'Hugo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: ['Sara Kovac', 'Ivan Petrov'] },
+  { id: 'm2', name: 'Leo Martins', country: 'Brazil', flag: '🇧🇷', role: 'Admin', seats: 8, team: ['Noah Bauer'] },
 ];
+
+const Icon = ({ d }: { d: string }) => (
+  <svg viewBox="0 0 16 16" className="size-4" fill="none">
+    <path d={d} stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  {
+    id: 'name',
+    header: 'Name',
+    sortable: true,
+    filterable: true,
+    sortAccessor: (r) => r.name,
+    cell: (r) => (
+      <span className="flex items-center gap-2.5">
+        <Avatar name={r.name} size="sm" /> {r.name}
+      </span>
+    ),
+  },
+  {
+    id: 'team',
+    header: 'Collaborators',
+    cell: (r) => (
+      <AvatarGroup max={3} size="sm">
+        {r.team.map((n) => (
+          <Avatar key={n} name={n} />
+        ))}
+      </AvatarGroup>
+    ),
+  },
+  {
+    id: 'country',
+    header: 'Location',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    sortAccessor: (r) => r.country,
+    cell: (r) => (
+      <span className="flex items-center gap-2">
+        <span className="text-base leading-none">{r.flag}</span>
+        {r.country}
+      </span>
+    ),
+  },
+  { id: 'role', header: 'Role', sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'seats', header: 'Seats', numeric: true, sortable: true, accessor: (r) => r.seats },
+  {
+    id: 'actions',
+    header: 'Actions',
+    align: 'right',
+    hideable: false,
+    cell: (r) => (
+      <div className="flex justify-end gap-0.5">
+        <Button variant="secondary" appearance="ghost" size="iconSm" aria-label={`Edit ${r.name}`}>
+          <Icon d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" />
+        </Button>
+        <Button variant="destructive" appearance="ghost" size="iconSm" aria-label={`Remove ${r.name}`}>
+          <Icon d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
+        </Button>
+      </div>
+    ),
+  },
 ];
 
 export function ResponsiveTable() {
@@ -1685,29 +1751,60 @@ export function ResponsiveTable() {
   <Tab value="Angular">
 
 ```ts title="data-table-responsive.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmAvatar, BpdmAvatarGroup, BpdmButton, type DataTableColumn } from '@bpdm/ng';
 
-type Member = { id: string; name: string; role: string; tasks: number };
+type Member = { id: string; name: string; country: string; flag: string; role: string; seats: number; team: { name: string }[] };
 
 @Component({
   selector: 'responsive-table',
-  imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" responsive />`,
+  imports: [BpdmDataTable, BpdmAvatar, BpdmAvatarGroup, BpdmButton],
+  templateUrl: './data-table-responsive.html',
 })
 export class ResponsiveTable {
+  readonly nameCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('nameCell');
+  readonly teamCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('teamCell');
+  readonly locationCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('locationCell');
+  readonly actionsCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('actionsCell');
+
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+    { id: 'm1', name: 'Hugo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: [{ name: 'Sara Kovac' }, { name: 'Ivan Petrov' }] },
+    { id: 'm2', name: 'Leo Martins', country: 'Brazil', flag: '🇧🇷', role: 'Admin', seats: 8, team: [{ name: 'Noah Bauer' }] },
   ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
+
+  readonly columns = computed<DataTableColumn<Member>[]>(() => [
+    { id: 'name', header: 'Name', sortable: true, filterable: true, sortAccessor: (r) => r.name, cell: this.nameCell() },
+    { id: 'team', header: 'Collaborators', cell: this.teamCell() },
+    { id: 'country', header: 'Location', sortable: true, filterable: true, filterType: 'select', sortAccessor: (r) => r.country, cell: this.locationCell() },
+    { id: 'role', header: 'Role', sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
+    { id: 'seats', header: 'Seats', numeric: true, sortable: true, accessor: (r) => r.seats },
+    { id: 'actions', header: 'Actions', align: 'right', hideable: false, cell: this.actionsCell() },
+  ]);
 }
+```
+
+```html title="data-table-responsive.html"
+<bpdm-data-table [columns]="columns()" [data]="members" [rowKey]="rowKey" responsive />
+
+<ng-template #nameCell let-row>
+  <span class="flex items-center gap-2.5"><bpdm-avatar [name]="row.name" size="sm" /> {{ row.name }}</span>
+</ng-template>
+
+<ng-template #teamCell let-row>
+  <bpdm-avatar-group [users]="row.team" [max]="3" size="sm" />
+</ng-template>
+
+<ng-template #locationCell let-row>
+  <span class="flex items-center gap-2"><span class="text-base leading-none">{{ row.flag }}</span>{{ row.country }}</span>
+</ng-template>
+
+<ng-template #actionsCell let-row>
+  <div class="flex justify-end gap-0.5">
+    <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" [attr.aria-label]="'Edit ' + row.name"><!-- edit icon --></button>
+    <button bpdmButton variant="destructive" appearance="ghost" size="iconSm" [attr.aria-label]="'Remove ' + row.name"><!-- trash icon --></button>
+  </div>
+</ng-template>
 ```
 
   </Tab>
