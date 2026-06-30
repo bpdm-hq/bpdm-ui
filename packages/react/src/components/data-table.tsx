@@ -150,6 +150,8 @@ export interface DataTableProps<T> {
   divided?: boolean;
   /** Extra classes on every body cell — e.g. "py-4" for taller rows. */
   cellClassName?: string;
+  /** Extra classes on every header cell — e.g. to tint/colour the header row. */
+  headerClassName?: string;
   /** Extra classes per body row — a string, or a fn for conditional styling. */
   rowClassName?: string | ((row: T, index: number) => string);
   /**
@@ -990,6 +992,7 @@ export function DataTable<T>({
   frame = false,
   divided = true,
   cellClassName,
+  headerClassName,
   rowClassName,
   rowSpacing,
   hoverable = true,
@@ -1711,6 +1714,7 @@ export function DataTable<T>({
                   frame || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   stickyHeader && "sticky top-0 z-10",
+                  headerClassName,
                 )}
               />
             )}
@@ -1730,6 +1734,7 @@ export function DataTable<T>({
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
+                  headerClassName,
                 )}
               />
             )}
@@ -1748,6 +1753,7 @@ export function DataTable<T>({
                   frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
+                  headerClassName,
                 )}
               >
                 {selectionMode === "multiple" && (
@@ -1822,6 +1828,7 @@ export function DataTable<T>({
                     col.pin ? "z-20" : stickyHeader && "z-10",
                     col.id === lastLeftId && "border-r border-border",
                     col.id === firstRightId && "border-l border-border",
+                    headerClassName,
                     col.className,
                   )}
                 >

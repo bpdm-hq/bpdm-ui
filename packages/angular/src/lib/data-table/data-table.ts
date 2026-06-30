@@ -455,6 +455,8 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly frame = input(false, { transform: booleanAttribute });
   readonly divided = input(true, { transform: booleanAttribute });
   readonly cellClassName = input<string>("");
+  /** Extra classes on every header cell — e.g. to tint/colour the header row. */
+  readonly headerClassName = input<string>("");
   readonly rowClassName = input<string | RowClassFn<T> | undefined>(undefined);
   readonly rowSpacing = input<number | undefined>(undefined);
   readonly hoverable = input(true, { transform: booleanAttribute });
@@ -1077,6 +1079,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "shadow-[inset_0_-1px_0_var(--border)]",
       canPin && this.bordered() && "border-r border-border",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
+      this.headerClassName(),
     );
   }
   protected headCellClass(col: DataTableColumn<T>): string {
@@ -1098,6 +1101,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
+      this.headerClassName(),
       col.className,
     );
   }

@@ -81,6 +81,17 @@ const filterableColumns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
+/** Custom-styling demo — a key column is accented via its `className`. */
+const customizeColumns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  // a className on a column applies to its header + every cell — here a subtle accent
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
+];
+
 const key = (r: Member) => r.id;
 
 function Box({ children }: { children: ReactNode }) {
@@ -155,6 +166,20 @@ export function DataTableStripedDemo() {
         { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={data} rowKey={key} frame bordered /> },
       ]}
     />
+  );
+}
+
+export function DataTableCustomizeDemo() {
+  return (
+    <Box>
+      <DataTable
+        columns={customizeColumns}
+        data={MEMBERS}
+        rowKey={key}
+        headerClassName="bg-muted/60"
+        rowClassName={(r) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '')}
+      />
+    </Box>
   );
 }
 
