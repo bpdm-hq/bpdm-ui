@@ -273,7 +273,7 @@ interface RenderRow<T> {
                 @if (virtualized() && padTop() > 0) {
                   <tr [style.height.px]="padTop()"><td [attr.colspan]="colCount()"></td></tr>
                 }
-                @for (rr of rows; track rr.key) {
+                @for (rr of rows; track rr.key; let last = $last) {
                   <tr
                     [attr.data-selected]="selectedSet().has(rr.key) ? '' : null"
                     [attr.data-expanded]="expandedSet().has(rr.key) ? '' : null"
@@ -282,7 +282,7 @@ interface RenderRow<T> {
                     (click)="clickable() ? onRowClick()!(rr.row, rr.index) : null"
                     [attr.tabindex]="clickable() ? 0 : null"
                     (keydown)="onRowKey($event, rr)"
-                    [class]="rowClass(rr)"
+                    [class]="rowClass(rr, last)"
                   >
                     @if (reorderableRows()) {
                       <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-r border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
@@ -1147,7 +1147,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     if (typeof f === "function") return (f as (rows: T[]) => string)(this.processedRows());
     return (f as string) ?? "";
   }
-  protected rowClass(rr: RenderRow<T>): string {
+  protected rowClass(rr: RenderRow<T>, isLast = false): string {
     const rc = this.rowClassName();
     const extra = typeof rc === "function" ? rc(rr.row, rr.index) : rc;
     const t = this.dropTarget();
@@ -1155,6 +1155,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "transition-colors",
       this.hasPinned() && "group",
       this.divided() && !this.rowSpacing() && "border-t border-border",
+      // borderless tables get a closing rule under the last row
+      // (framed tables are closed by the container border)
+      this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-border",
       this.rowSpacing() && "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
       this.striped() && "even:bg-muted/40",
       this.hoverable() && "hover:bg-muted/60",

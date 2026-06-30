@@ -54,22 +54,39 @@ type Member = {
   name: string;
   email: string;
   role: string;
+  team: string;
   status: 'active' | 'invited' | 'disabled';
   tasks: number;
 };
 
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', status: 'active', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', status: 'active', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', status: 'disabled', tasks: 12 },
+  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
+  { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
+  { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
 ];
 
+// a rich identity cell: avatar + name + secondary line
+function MemberCell({ member }: { member: Member }) {
+  const initials = member.name.split(' ').map((p) => p[0]).slice(0, 2).join('');
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid size-9 place-items-center rounded-full bg-muted text-xs font-semibold">
+        {initials}
+      </span>
+      <div className="leading-tight">
+        <div className="font-medium">{member.name}</div>
+        <div className="text-xs text-muted-foreground">{member.email}</div>
+      </div>
+    </div>
+  );
+}
+
 const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
-  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
-  { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
+  { id: 'member', header: 'Member', cell: (r) => <MemberCell member={r} /> },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
   { id: 'status', header: 'Status', align: 'center', accessor: (r) => r.status },
-  { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
 export function MembersTable() {
@@ -87,7 +104,7 @@ point the column's `cell` at it (see the example below).
 import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
-type Member = { id: string; name: string; email: string; role: string; status: string; tasks: number };
+type Member = { id: string; name: string; email: string; role: string; team: string; status: string; tasks: number };
 
 @Component({
   selector: 'members-table',
@@ -95,22 +112,23 @@ type Member = { id: string; name: string; email: string; role: string; status: s
   templateUrl: './members-table.html',
 })
 export class MembersTable {
-  readonly statusCell = viewChild.required<TemplateRef<unknown>>('statusCell');
+  readonly memberCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('memberCell');
 
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', status: 'active', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', status: 'active', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', status: 'disabled', tasks: 12 },
+    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
+    { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
+    { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
   ];
 
   readonly rowKey = (r: Member) => r.id;
+  readonly initials = (name: string) => name.split(' ').map((p) => p[0]).slice(0, 2).join('');
 
   readonly columns = computed<DataTableColumn<Member>[]>(() => [
-    { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
-    { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
-    { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
-    { id: 'status', header: 'Status', align: 'center', cell: this.statusCell() },
-    { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
+    { id: 'member', header: 'Member', cell: this.memberCell() },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'team', header: 'Team', accessor: (r) => r.team },
+    { id: 'status', header: 'Status', align: 'center', accessor: (r) => r.status },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ]);
 }
 ```
@@ -118,8 +136,16 @@ export class MembersTable {
 ```html title="members-table.html"
 <bpdm-data-table [columns]="columns()" [data]="members" [rowKey]="rowKey" />
 
-<ng-template #statusCell let-row>
-  <span class="rounded-full px-2 py-0.5 text-xs capitalize">{{ row.status }}</span>
+<ng-template #memberCell let-row>
+  <div class="flex items-center gap-3">
+    <span class="grid size-9 place-items-center rounded-full bg-muted text-xs font-semibold">
+      {{ initials(row.name) }}
+    </span>
+    <div class="leading-tight">
+      <div class="font-medium">{{ row.name }}</div>
+      <div class="text-xs text-muted-foreground">{{ row.email }}</div>
+    </div>
+  </div>
 </ng-template>
 ```
 

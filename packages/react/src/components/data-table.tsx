@@ -1901,6 +1901,7 @@ export function DataTable<T>({
             ).map((rowIndex) => {
               const row = rows[rowIndex];
               const key = keyOf(row, rowIndex);
+              const isLast = rowIndex === rows.length - 1;
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
               const canExpand = expandable && (!rowExpandable || rowExpandable(row));
@@ -1946,6 +1947,9 @@ export function DataTable<T>({
                   // `group` lets pinned cells mirror the row's hover/selected state
                   hasPinned && "group",
                   divided && !rowSpacing && "border-t border-border",
+                  // borderless tables get a closing rule under the last row
+                  // (framed tables are closed by the container border)
+                  divided && !rowSpacing && !frame && isLast && "border-b border-border",
                   rowSpacing &&
                     "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
                   striped && "even:bg-muted/40",

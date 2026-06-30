@@ -44,14 +44,37 @@ function StatusBadge({ status }: { status: Member['status'] }) {
   );
 }
 
-/** Base columns reused across the demos. */
+/**
+ * Plain base columns — no feature flags. Each demo adds ONLY the one feature it
+ * documents (sorting, filtering, …) so every example shows just that one thing.
+ */
 const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', sortable: true, filterable: true, accessor: (r) => r.name },
-  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs', sortAccessor: (r) => r.email },
-  { id: 'role', header: 'Role', sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+/** Base + `sortable` — used only by the Sorting / Multi-column sort demos. */
+const sortableColumns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+  { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
+];
+
+/** Base + `filterable` — used only by the Column filters demo. */
+const filterableColumns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
+  { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
   { id: 'team', header: 'Team', filterable: true, filterType: 'select', accessor: (r) => r.team },
-  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} />, sortAccessor: (r) => r.status },
-  { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, filterable: true, accessor: (r) => r.tasks },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
 const key = (r: Member) => r.id;
@@ -60,11 +83,47 @@ function Box({ children }: { children: ReactNode }) {
   return <div className="w-full">{children}</div>;
 }
 
+// rich identity cell: small avatar + name + secondary line (email)
+function initials(name: string) {
+  return name
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+function MemberCell({ member }: { member: Member }) {
+  const hue = (member.name.charCodeAt(0) * 13 + member.name.length * 29) % 360;
+  return (
+    <div className="flex items-center gap-3">
+      <span
+        className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-semibold"
+        style={{ backgroundColor: `hsl(${hue} 70% 90%)`, color: `hsl(${hue} 55% 32%)` }}
+      >
+        {initials(member.name)}
+      </span>
+      <div className="min-w-0 leading-tight">
+        <div className="truncate font-medium text-fd-foreground">{member.name}</div>
+        <div className="truncate text-xs text-fd-muted-foreground">{member.email}</div>
+      </div>
+    </div>
+  );
+}
+
+// Usage demo columns — a plain table (no sorting/filtering), with a rich first cell.
+const usageColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <MemberCell member={r} /> },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'team', header: 'Team', accessor: (r) => r.team },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
 // ── demos ─────────────────────────────────────────────────────────────────────
 export function DataTableUsageDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} />
+      <DataTable columns={usageColumns} data={MEMBERS} rowKey={key} />
     </Box>
   );
 }
@@ -121,7 +180,7 @@ export function DataTableClickableDemo() {
 export function DataTableSortingDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} defaultSort={[{ id: 'tasks', dir: 'desc' }]} />
+      <DataTable columns={sortableColumns} data={MEMBERS} rowKey={key} defaultSort={[{ id: 'tasks', dir: 'desc' }]} />
     </Box>
   );
 }
@@ -130,12 +189,12 @@ export function DataTableMultiSortDemo() {
   return (
     <Box>
       <DataTable
-        columns={columns}
+        columns={sortableColumns}
         data={MEMBERS}
         rowKey={key}
         multiSort
         defaultSort={[
-          { id: 'team', dir: 'asc' },
+          { id: 'role', dir: 'asc' },
           { id: 'tasks', dir: 'desc' },
         ]}
       />
@@ -207,7 +266,7 @@ export function DataTableFrozenDemo() {
 export function DataTableFiltersDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} />
+      <DataTable columns={filterableColumns} data={MEMBERS} rowKey={key} />
     </Box>
   );
 }
