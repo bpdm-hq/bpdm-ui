@@ -1673,7 +1673,10 @@ export function DataTable<T>({
       <div
         className={cn(
           "w-full",
-          frame && "overflow-hidden rounded-xl border border-border bg-card shadow-sm",
+          // framed = a floating, elevated card: a light hairline border + a soft
+          // layered shadow do the lifting (premium panel feel, not a boxed grid)
+          frame &&
+            "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]",
           className,
         )}
       >
@@ -1816,7 +1819,7 @@ export function DataTable<T>({
                     frame || col.pin ? "bg-card" : stickyHeader ? "bg-background" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
-                    bordered && "border-r border-border last:border-r-0",
+                    bordered && "border-r border-border/55 last:border-r-0",
                     col.pin ? "z-20" : stickyHeader && "z-10",
                     col.id === lastLeftId && "border-r border-border",
                     col.id === firstRightId && "border-l border-border",
@@ -2072,7 +2075,7 @@ export function DataTable<T>({
                         cellPad({ size }),
                         alignClass[align],
                         col.numeric && "tabular-nums",
-                        bordered && "border-r border-border last:border-r-0",
+                        bordered && "border-r border-border/55 last:border-r-0",
                         col.pin && `z-10 ${pinnedBg}`,
                         col.id === lastLeftId && "border-r border-border",
                         col.id === firstRightId && "border-l border-border",
@@ -2159,7 +2162,7 @@ export function DataTable<T>({
                       col.numeric && "tabular-nums",
                       "sticky bottom-0 bg-muted font-medium text-foreground",
                       "shadow-[inset_0_1px_0_var(--border)]",
-                      bordered && "border-r border-border last:border-r-0",
+                      bordered && "border-r border-border/55 last:border-r-0",
                       col.pin ? "z-20" : "z-10",
                       col.id === lastLeftId && "border-r border-border",
                       col.id === firstRightId && "border-l border-border",

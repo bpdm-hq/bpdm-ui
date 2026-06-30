@@ -1044,7 +1044,14 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
 
   // ---- class builders ----
   protected frameClass(): string {
-    return cn("w-full", this.frame() && "overflow-hidden rounded-xl border border-border bg-card shadow-sm", this.classInput());
+    return cn(
+      "w-full",
+      // framed = a floating, elevated card: a light hairline border + a soft
+      // layered shadow do the lifting (premium panel feel, not a boxed grid)
+      this.frame() &&
+        "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]",
+      this.classInput(),
+    );
   }
   protected tableClass(): string {
     return cn("w-full text-card-foreground", this.rowSpacing() ? "border-separate" : "border-collapse");
@@ -1087,7 +1094,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // header must be opaque or scrolling rows bleed through
       this.frame() || col.pin ? "bg-card" : this.stickyHeader() ? "bg-background" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
@@ -1118,7 +1125,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.cellPad(),
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin && `z-10 ${this.pinnedBg()}`,
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
@@ -1136,7 +1143,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
       "sticky bottom-0 bg-muted font-medium text-foreground shadow-[inset_0_1px_0_var(--border)]",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin ? "z-20" : "z-10",
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
