@@ -1193,8 +1193,9 @@ export class PagedTable {
 
 ## Expandable rows
 
-`renderExpanded` shows a detail panel under a row. `expandMode="single"` keeps
-only one open.
+`renderExpanded` shows a detail panel under a row — it's any JSX, so compose your
+own components. Here it's an `Avatar`, a couple of `Badge`s and a `ProgressBar`.
+`expandMode="single"` keeps only one open.
 
 <Preview>
   <DataTableExpandableDemo />
@@ -1205,12 +1206,15 @@ only one open.
 
 ```tsx title="data-table-expandable.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Avatar } from '@bpdm/ui/avatar';
+import { Badge } from '@bpdm/ui/badge';
+import { ProgressBar } from '@bpdm/ui/progress';
 
-type Member = { id: string; name: string; role: string; tasks: number };
+type Member = { id: string; name: string; email: string; role: string; team: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', tasks: 12 },
 ];
 const columns: DataTableColumn<Member>[] = [
   { id: 'name', header: 'Name', accessor: (r) => r.name },
@@ -1225,7 +1229,31 @@ export function ExpandableTable() {
       data={members}
       rowKey={(r) => r.id}
       expandMode="single"
-      renderExpanded={(row) => <div>{row.name} — {row.role}, {row.tasks} tasks.</div>}
+      renderExpanded={(r) => (
+        <div className="flex items-center justify-between gap-4 px-2 py-2">
+          <div className="flex items-center gap-3">
+            <Avatar name={r.name} size="lg" />
+            <div className="leading-tight">
+              <div className="font-medium">{r.name}</div>
+              <div className="text-xs text-muted-foreground">{r.email}</div>
+              <div className="mt-2 flex gap-1.5">
+                <Badge variant="neutral" appearance="soft">{r.role}</Badge>
+                <Badge variant="secondary" appearance="soft">{r.team}</Badge>
+              </div>
+            </div>
+          </div>
+          <div className="w-full max-w-xs">
+            <ProgressBar
+              value={r.tasks}
+              max={240}
+              variant="primary"
+              showValue
+              label="Tasks completed"
+              format={(v, m) => `${v}/${m}`}
+            />
+          </div>
+        </div>
+      )}
     />
   );
 }
@@ -1236,32 +1264,42 @@ export function ExpandableTable() {
 
 ```ts title="data-table-expandable.ts"
 import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+import { BpdmDataTable, BpdmAvatar, BpdmBadge, BpdmProgressBar, type DataTableColumn } from '@bpdm/ng';
 
-type Member = { id: string; name: string; role: string; tasks: number };
+type Member = { id: string; name: string; email: string; role: string; team: string; tasks: number };
 
 @Component({
   selector: 'expandable-table',
-  imports: [BpdmDataTable],
+  imports: [BpdmDataTable, BpdmAvatar, BpdmBadge, BpdmProgressBar],
   template: `
-    <bpdm-data-table
-      [columns]="columns"
-      [data]="members"
-      [rowKey]="rowKey"
-      expandMode="single"
-      [expandedTemplate]="detail"
-    />
+    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" expandMode="single" [expandedTemplate]="detail" />
+
     <ng-template #detail let-row>
-      <div>{{ row.name }} — {{ row.role }}, {{ row.tasks }} tasks.</div>
+      <div class="flex items-center justify-between gap-4 px-2 py-2">
+        <div class="flex items-center gap-3">
+          <bpdm-avatar [name]="row.name" size="lg" />
+          <div class="leading-tight">
+            <div class="font-medium">{{ row.name }}</div>
+            <div class="text-xs text-muted-foreground">{{ row.email }}</div>
+            <div class="mt-2 flex gap-1.5">
+              <bpdm-badge variant="neutral" appearance="soft">{{ row.role }}</bpdm-badge>
+              <bpdm-badge variant="secondary" appearance="soft">{{ row.team }}</bpdm-badge>
+            </div>
+          </div>
+        </div>
+        <div class="w-full max-w-xs">
+          <bpdm-progress-bar [value]="row.tasks" [max]="240" variant="primary" showValue label="Tasks completed" />
+        </div>
+      </div>
     </ng-template>
   `,
 })
 export class ExpandableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', tasks: 12 },
   ];
   readonly columns: DataTableColumn<Member>[] = [
     { id: 'name', header: 'Name', accessor: (r) => r.name },

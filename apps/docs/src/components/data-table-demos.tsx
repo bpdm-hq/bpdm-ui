@@ -6,6 +6,7 @@ import { Button } from '@bpdm/ui/button';
 import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
 import { Badge } from '@bpdm/ui/badge';
 import { Input } from '@bpdm/ui/input';
+import { ProgressBar } from '@bpdm/ui/progress';
 import { Tabs } from '@bpdm/ui/tabs';
 
 // ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
@@ -486,9 +487,33 @@ export function DataTableExpandableDemo() {
         rowKey={key}
         expandMode="single"
         renderExpanded={(r) => (
-          <div className="px-2 py-1 text-sm text-fd-muted-foreground">
-            <span className="font-medium text-fd-foreground">{r.name}</span> — {r.role} on the {r.team} team,{' '}
-            {r.tasks} tasks.
+          <div className="flex flex-col gap-4 px-2 py-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar name={r.name} size="lg" />
+              <div className="leading-tight">
+                <div className="font-medium text-fd-foreground">{r.name}</div>
+                <div className="text-xs text-fd-muted-foreground">{r.email}</div>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <Badge variant="neutral" appearance="soft">{r.role}</Badge>
+                  <Badge variant="secondary" appearance="soft">{r.team}</Badge>
+                  <StatusBadge status={r.status} />
+                </div>
+              </div>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:max-w-xs">
+              <ProgressBar
+                value={r.tasks}
+                max={240}
+                variant="primary"
+                showValue
+                label="Tasks completed"
+                format={(v, m) => `${v}/${m}`}
+              />
+              <div className="flex gap-2">
+                <Button variant="secondary" appearance="outline" size="sm">View profile</Button>
+                <Button variant="secondary" appearance="ghost" size="sm">Message</Button>
+              </div>
+            </div>
           </div>
         )}
       />
