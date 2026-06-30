@@ -3,7 +3,7 @@
 import { type ReactNode, useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
-import { Avatar } from '@bpdm/ui/avatar';
+import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
 import { Badge } from '@bpdm/ui/badge';
 import { Input } from '@bpdm/ui/input';
 import { Tabs } from '@bpdm/ui/tabs';
@@ -17,15 +17,20 @@ type Member = {
   team: 'Engineering' | 'Design' | 'Marketing' | 'Support';
   status: 'active' | 'invited' | 'disabled';
   tasks: number;
+  /** Location — shown with a flag emoji in some demos. */
+  country: string;
+  flag: string;
+  /** A neutral "amount" (licensed seats) — no money/PII anywhere in these demos. */
+  seats: number;
 };
 
 const MEMBERS: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
-  { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
-  { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
-  { id: 'm4', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', status: 'disabled', tasks: 12 },
-  { id: 'm5', name: 'Ava Nguyen', email: 'ava@acme.dev', role: 'Editor', team: 'Marketing', status: 'active', tasks: 54 },
-  { id: 'm6', name: 'Ivan Petrov', email: 'ivan@acme.dev', role: 'Admin', team: 'Engineering', status: 'active', tasks: 203 },
+  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128, country: 'Sweden', flag: '🇸🇪', seats: 24 },
+  { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0, country: 'Brazil', flag: '🇧🇷', seats: 8 },
+  { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86, country: 'Croatia', flag: '🇭🇷', seats: 16 },
+  { id: 'm4', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', status: 'disabled', tasks: 12, country: 'Germany', flag: '🇩🇪', seats: 4 },
+  { id: 'm5', name: 'Ava Nguyen', email: 'ava@acme.dev', role: 'Editor', team: 'Marketing', status: 'active', tasks: 54, country: 'Vietnam', flag: '🇻🇳', seats: 12 },
+  { id: 'm6', name: 'Ivan Petrov', email: 'ivan@acme.dev', role: 'Admin', team: 'Engineering', status: 'active', tasks: 203, country: 'Bulgaria', flag: '🇧🇬', seats: 40 },
 ];
 
 /** A larger, generated set for pagination / virtualization demos. */
@@ -122,6 +127,54 @@ function NameCell({ member }: { member: Member }) {
   );
 }
 
+// flag + country label
+function FlagCell({ member }: { member: Member }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="text-base leading-none">{member.flag}</span>
+      <span>{member.country}</span>
+    </span>
+  );
+}
+
+// a stacked AvatarGroup standing in for a member's collaborators
+const TEAMMATES = MEMBERS.map((m) => m.name);
+function TeamGroup({ member }: { member: Member }) {
+  const i = MEMBERS.findIndex((m) => m.id === member.id);
+  const names = [member.name, ...TEAMMATES.filter((_, j) => j !== i)].slice(0, 4);
+  return (
+    <AvatarGroup max={3} size="sm">
+      {names.map((n) => (
+        <Avatar key={n} name={n} />
+      ))}
+    </AvatarGroup>
+  );
+}
+
+// dogfooded icon-button row actions — edit, configure, delete
+function IconGlyph({ d }: { d: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" fill="none" aria-hidden>
+      <path d={d} stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function RowActions({ member }: { member: Member }) {
+  return (
+    <div className="flex items-center justify-end gap-0.5">
+      <Button variant="secondary" appearance="ghost" size="iconSm" aria-label={`Edit ${member.name}`}>
+        <IconGlyph d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" />
+      </Button>
+      <Button variant="secondary" appearance="ghost" size="iconSm" aria-label={`Configure ${member.name}`}>
+        <IconGlyph d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 2v1.5M8 12.5V14M3.5 3.5l1 1M11.5 11.5l1 1M2 8h1.5M12.5 8H14M3.5 12.5l1-1M11.5 4.5l1-1" />
+      </Button>
+      <Button variant="destructive" appearance="ghost" size="iconSm" aria-label={`Remove ${member.name}`}>
+        <IconGlyph d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
+      </Button>
+    </div>
+  );
+}
+
 // inline-edit cell — click to edit, Enter/blur commits, Esc cancels (dogfoods Input)
 function EditableCell({
   value,
@@ -162,14 +215,18 @@ function EditableCell({
   return (
     <button
       type="button"
+      title="Click to edit"
       onClick={() => {
         setDraft(String(value));
         setEditing(true);
       }}
-      className={`group/edit flex w-full cursor-text items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-fd-muted ${numeric ? 'justify-end tabular-nums' : ''}`}
+      className={`group/edit flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-fd-muted ${numeric ? 'justify-end tabular-nums' : ''}`}
     >
-      <span>{value}</span>
-      <svg viewBox="0 0 16 16" className="size-3 shrink-0 opacity-0 transition-opacity group-hover/edit:opacity-50" fill="none" aria-hidden>
+      {/* persistent dashed underline marks the cell as editable, even without hover */}
+      <span className="border-b border-dashed border-fd-muted-foreground/40 transition-colors group-hover/edit:border-fd-muted-foreground">
+        {value}
+      </span>
+      <svg viewBox="0 0 16 16" className="size-3 shrink-0 text-fd-muted-foreground opacity-0 transition-opacity group-hover/edit:opacity-70" fill="none" aria-hidden>
         <path d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
       </svg>
     </button>
@@ -256,6 +313,25 @@ export function DataTableEditableDemo() {
   return (
     <Box>
       <DataTable columns={editColumns} data={rows} rowKey={key} />
+    </Box>
+  );
+}
+
+// a production-grade mix: identity, an avatar group, a flag, a neutral amount,
+// a status badge and an icon-button action column
+const actionColumns: DataTableColumn<Member>[] = [
+  { id: 'member', header: 'Member', cell: (r) => <MemberCell member={r} /> },
+  { id: 'team', header: 'Collaborators', cell: (r) => <TeamGroup member={r} /> },
+  { id: 'location', header: 'Location', cell: (r) => <FlagCell member={r} /> },
+  { id: 'seats', header: 'Seats', numeric: true, accessor: (r) => r.seats },
+  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'actions', header: '', align: 'right', cell: (r) => <RowActions member={r} /> },
+];
+
+export function DataTableActionsDemo() {
+  return (
+    <Box>
+      <DataTable columns={actionColumns} data={MEMBERS} rowKey={key} />
     </Box>
   );
 }
