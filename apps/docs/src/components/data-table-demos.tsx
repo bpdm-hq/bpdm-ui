@@ -3,6 +3,7 @@
 import { type ReactNode, useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
+import { Avatar } from '@bpdm/ui/avatar';
 
 // ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
 type Member = {
@@ -83,25 +84,11 @@ function Box({ children }: { children: ReactNode }) {
   return <div className="w-full">{children}</div>;
 }
 
-// rich identity cell: small avatar + name + secondary line (email)
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
+// rich identity cell: dogfoods our own Avatar (auto initials + auto tint from name)
 function MemberCell({ member }: { member: Member }) {
-  const hue = (member.name.charCodeAt(0) * 13 + member.name.length * 29) % 360;
   return (
     <div className="flex items-center gap-3">
-      <span
-        className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-semibold"
-        style={{ backgroundColor: `hsl(${hue} 70% 90%)`, color: `hsl(${hue} 55% 32%)` }}
-      >
-        {initials(member.name)}
-      </span>
+      <Avatar name={member.name} size="sm" />
       <div className="min-w-0 leading-tight">
         <div className="truncate font-medium text-fd-foreground">{member.name}</div>
         <div className="truncate text-xs text-fd-muted-foreground">{member.email}</div>
