@@ -4,6 +4,7 @@ import { type ReactNode, useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
 import { Avatar } from '@bpdm/ui/avatar';
+import { Badge } from '@bpdm/ui/badge';
 import { Tabs } from '@bpdm/ui/tabs';
 
 // ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
@@ -32,17 +33,18 @@ const BIG: Member[] = Array.from({ length: 60 }, (_, i) => {
   return { ...base, id: `b${i}`, name: `${base.name.split(' ')[0]} ${i + 1}`, tasks: (i * 7) % 240 };
 });
 
-const STATUS_STYLE: Record<Member['status'], string> = {
-  active: 'bg-success/15 text-success',
-  invited: 'bg-warning/15 text-warning',
-  disabled: 'bg-muted text-muted-foreground',
-};
+// dogfood our Badge — soft tone + status dot, tinted to the variant
+const STATUS_VARIANT = {
+  active: 'success',
+  invited: 'warning',
+  disabled: 'neutral',
+} as const;
 
 function StatusBadge({ status }: { status: Member['status'] }) {
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLE[status]}`}>
+    <Badge variant={STATUS_VARIANT[status]} appearance="soft" dot className="capitalize">
       {status}
-    </span>
+    </Badge>
   );
 }
 
@@ -51,7 +53,7 @@ function StatusBadge({ status }: { status: Member['status'] }) {
  * documents (sorting, filtering, …) so every example shows just that one thing.
  */
 const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'name', header: 'Name', cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
   { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
   { id: 'role', header: 'Role', accessor: (r) => r.role },
   { id: 'team', header: 'Team', accessor: (r) => r.team },
@@ -61,7 +63,7 @@ const columns: DataTableColumn<Member>[] = [
 
 /** Base + `sortable` — used only by the Sorting / Multi-column sort demos. */
 const sortableColumns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
+  { id: 'name', header: 'Name', sortable: true, cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
   { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
   { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
   { id: 'team', header: 'Team', accessor: (r) => r.team },
@@ -71,7 +73,7 @@ const sortableColumns: DataTableColumn<Member>[] = [
 
 /** Base + `filterable` — used only by the Column filters demo. */
 const filterableColumns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+  { id: 'name', header: 'Name', filterable: true, cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
   { id: 'email', header: 'Email', accessor: (r) => r.email, className: 'font-mono text-xs' },
   { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
   { id: 'team', header: 'Team', filterable: true, filterType: 'select', accessor: (r) => r.team },
@@ -94,6 +96,16 @@ function MemberCell({ member }: { member: Member }) {
         <div className="truncate font-medium text-fd-foreground">{member.name}</div>
         <div className="truncate text-xs text-fd-muted-foreground">{member.email}</div>
       </div>
+    </div>
+  );
+}
+
+// compact identity cell for the shared columns — avatar + name on one line
+function NameCell({ member }: { member: Member }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <Avatar name={member.name} size="sm" />
+      <span className="font-medium text-fd-foreground">{member.name}</span>
     </div>
   );
 }
