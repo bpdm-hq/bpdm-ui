@@ -587,22 +587,38 @@ export function DataTableFooterDemo() {
   );
 }
 
-// Responsive demo — a rich, sortable + filterable table that stacks into cards on
-// narrow screens (avatar group, flag, a neutral amount, status, row actions)
+// Responsive demo — the kitchen sink: sortable + filterable, frozen edges (Name
+// left, Actions right), expandable rows, an avatar group, a flag, a neutral
+// amount and row actions — and it still stacks into cards on narrow screens.
 const responsiveColumns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', sortable: true, filterable: true, cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
-  { id: 'team', header: 'Collaborators', cell: (r) => <TeamGroup member={r} /> },
-  { id: 'location', header: 'Location', sortable: true, filterable: true, filterType: 'select', cell: (r) => <FlagCell member={r} />, sortAccessor: (r) => r.country },
-  { id: 'role', header: 'Role', sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
-  { id: 'seats', header: 'Seats', numeric: true, sortable: true, accessor: (r) => r.seats },
-  { id: 'status', header: 'Status', align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
-  { id: 'actions', header: 'Actions', align: 'right', hideable: false, cell: (r) => <RowActions member={r} /> },
+  { id: 'name', header: 'Name', pin: 'left', width: 210, sortable: true, filterable: true, cell: (r) => <NameCell member={r} />, sortAccessor: (r) => r.name },
+  { id: 'team', header: 'Collaborators', width: 170, cell: (r) => <TeamGroup member={r} /> },
+  { id: 'location', header: 'Location', width: 180, sortable: true, filterable: true, filterType: 'select', cell: (r) => <FlagCell member={r} />, sortAccessor: (r) => r.country },
+  { id: 'role', header: 'Role', width: 150, sortable: true, filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'seats', header: 'Seats', width: 120, numeric: true, sortable: true, accessor: (r) => r.seats },
+  { id: 'status', header: 'Status', width: 150, align: 'center', cell: (r) => <StatusBadge status={r.status} /> },
+  { id: 'actions', header: 'Actions', pin: 'right', width: 120, align: 'right', hideable: false, cell: (r) => <RowActions member={r} /> },
 ];
 
 export function DataTableResponsiveDemo() {
   return (
     <Box>
-      <DataTable columns={responsiveColumns} data={MEMBERS} rowKey={key} responsive />
+      <DataTable
+        columns={responsiveColumns}
+        data={MEMBERS}
+        rowKey={key}
+        responsive
+        pinnable
+        expandMode="single"
+        renderExpanded={(r) => (
+          <div className="flex flex-wrap items-center gap-4 px-2 py-1">
+            <span className="text-sm text-fd-muted-foreground">{r.email}</span>
+            <div className="ml-auto w-44">
+              <ProgressBar value={r.tasks} max={240} variant="primary" showValue label="Tasks" format={(v, m) => `${v}/${m}`} />
+            </div>
+          </div>
+        )}
+      />
     </Box>
   );
 }
