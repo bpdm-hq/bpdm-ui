@@ -150,8 +150,8 @@ export class MembersTable {
 ## Sizes
 
 Set the `size` prop for cell density — `sm`, `md` (default) or `lg`. The preview
-switches between them with our own [`Tabs`](/docs/panel/tabs) (`pill` variant) — a
-neat way to compare densities, and a small example of composing two components.
+switches between them with our own [`Tabs`](/docs/panel/tabs) — a neat way to
+compare densities, and a small example of composing two components.
 
 <Preview>
   <DataTableSizesDemo />
@@ -179,7 +179,6 @@ const columns: DataTableColumn<Member>[] = [
 export function SizedTables() {
   return (
     <Tabs
-      variant="pill"
       defaultValue="md"
       items={[
         { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" /> },
@@ -231,7 +230,7 @@ export class SizedTables {
 ```
 
 ```html title="sized-tables.html"
-<bpdm-tabs [items]="tabs()" variant="pill" defaultValue="md" />
+<bpdm-tabs [items]="tabs()" defaultValue="md" />
 
 <ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
 <ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
@@ -274,7 +273,6 @@ const columns: DataTableColumn<Member>[] = [
 export function BorderTables() {
   return (
     <Tabs
-      variant="pill"
       defaultValue="borderless"
       items={[
         { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} /> },
@@ -326,7 +324,7 @@ export class BorderTables {
 ```
 
 ```html title="border-tables.html"
-<bpdm-tabs [items]="tabs()" variant="pill" defaultValue="borderless" />
+<bpdm-tabs [items]="tabs()" defaultValue="borderless" />
 
 <ng-template #borderless><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" /></ng-template>
 <ng-template #striped><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped /></ng-template>

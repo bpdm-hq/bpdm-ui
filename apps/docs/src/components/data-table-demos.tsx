@@ -120,7 +120,7 @@ export function DataTableSizesDemo() {
   const data = MEMBERS.slice(0, 4);
   return (
     <Tabs
-      variant="pill"
+      className="w-full self-start"
       defaultValue="md"
       items={[
         { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={data} rowKey={key} size="sm" /> },
@@ -135,7 +135,7 @@ export function DataTableStripedDemo() {
   const data = MEMBERS.slice(0, 4);
   return (
     <Tabs
-      variant="pill"
+      className="w-full self-start"
       defaultValue="borderless"
       items={[
         { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={data} rowKey={key} /> },
