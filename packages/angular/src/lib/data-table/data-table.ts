@@ -1044,7 +1044,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
 
   // ---- class builders ----
   protected frameClass(): string {
-    return cn("w-full", this.frame() && "overflow-hidden rounded-xl border border-border bg-card", this.classInput());
+    return cn("w-full", this.frame() && "overflow-hidden rounded-xl border border-border bg-card shadow-sm", this.classInput());
   }
   protected tableClass(): string {
     return cn("w-full text-card-foreground", this.rowSpacing() ? "border-separate" : "border-collapse");
@@ -1077,8 +1077,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       ALIGN_CLASS[align],
-      // refined header: small, uppercase, tracked — a polished dashboard look
-      "whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+      // strong, readable header — confident dark sentence-case label
+      // (size inherited from density), distinct from the body weight
+      "whitespace-nowrap font-semibold text-foreground",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
       this.frame() || col.pin ? "bg-muted" : "bg-transparent",

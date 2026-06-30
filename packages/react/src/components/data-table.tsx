@@ -1673,7 +1673,7 @@ export function DataTable<T>({
       <div
         className={cn(
           "w-full",
-          frame && "overflow-hidden rounded-xl border border-border bg-card",
+          frame && "overflow-hidden rounded-xl border border-border bg-card shadow-sm",
           className,
         )}
       >
@@ -1804,9 +1804,9 @@ export function DataTable<T>({
                   className={cn(
                     cellPad({ size }),
                     alignClass[align],
-                    // refined header: small, uppercase, tracked — a polished
-                    // dashboard look that sets the header apart from the data
-                    "whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                    // strong, readable header — confident dark sentence-case label
+                    // (size inherited from density), distinct from the body weight
+                    "whitespace-nowrap font-semibold text-foreground",
                     reorderableColumns && "cursor-grab active:cursor-grabbing",
                     dragColId === col.id && "opacity-40",
                     // framed/pinned headers get the muted band; borderless headers
