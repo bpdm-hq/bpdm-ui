@@ -189,10 +189,11 @@ export class CompactTable {
   </Tab>
 </Tabs>
 
-## Striped, bordered & borderless
+## Borders & striping
 
-`striped` zebra-stripes rows, `bordered` adds column dividers, and `frame={false}`
-drops the outer border for a bare table.
+The table is **borderless by default** — just a clean header rule and soft row
+dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
+into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
 
 <Preview>
   <DataTableStripedDemo />
@@ -216,12 +217,16 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-export function StripedTables() {
+export function BorderTables() {
   return (
-    <>
-      <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped bordered />
-      <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame={false} />
-    </>
+    <div className="flex flex-col gap-6">
+      {/* default — borderless */}
+      <DataTable columns={columns} data={members} rowKey={(r) => r.id} />
+      {/* zebra rows */}
+      <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped />
+      {/* outlined card with column gridlines */}
+      <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered />
+    </div>
   );
 }
 ```
@@ -236,14 +241,17 @@ import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
-  selector: 'striped-tables',
+  selector: 'border-tables',
   imports: [BpdmDataTable],
   template: `
-    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped bordered />
-    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" [frame]="false" />
+    <div class="flex flex-col gap-6">
+      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />
+      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped />
+      <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered />
+    </div>
   `,
 })
-export class StripedTables {
+export class BorderTables {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
     { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
@@ -290,7 +298,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 export function ScrollingTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} stickyHeader maxHeight={260} />;
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame stickyHeader maxHeight={260} />;
 }
 ```
 
@@ -306,7 +314,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'scrolling-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" stickyHeader [maxHeight]="260" />`,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame stickyHeader [maxHeight]="260" />`,
 })
 export class ScrollingTable {
   readonly rowKey = (r: Member) => r.id;
@@ -842,7 +850,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 export function FrozenTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} pinnable maxHeight={300} />;
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame pinnable maxHeight={300} />;
 }
 ```
 
@@ -858,7 +866,7 @@ type Member = { id: string; name: string; email: string; role: string; tasks: nu
 @Component({
   selector: 'frozen-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" pinnable [maxHeight]="300" />`,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame pinnable [maxHeight]="300" />`,
 })
 export class FrozenTable {
   readonly rowKey = (r: Member) => r.id;
@@ -1317,7 +1325,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 export function HugeTable() {
-  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} virtualized maxHeight={320} />;
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame virtualized maxHeight={320} />;
 }
 ```
 
@@ -1333,7 +1341,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'huge-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" virtualized [maxHeight]="320" />`,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame virtualized [maxHeight]="320" />`,
 })
 export class HugeTable {
   readonly rowKey = (r: Member) => r.id;
@@ -1426,7 +1434,7 @@ export class EmptyTable {
 | `data` | `T[]` | — | **Required.** Row data. |
 | `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
 | `size` | `sm \| md \| lg` | `md` | Cell density. |
-| `striped` / `bordered` / `frame` / `divided` | `boolean` | — / — / `true` / `true` | Zebra rows / column dividers / outer frame / row dividers. |
+| `striped` / `bordered` / `frame` / `divided` | `boolean` | `false` / `false` / `false` / `true` | Zebra rows / column gridlines / outlined card / row dividers. Borderless by default. |
 | `hoverable` | `boolean` | `true` | Highlight the hovered row. |
 | `stickyHeader` + `maxHeight` | `boolean` + `number \| string` | — | Pin the header while the body scrolls. |
 | `onRowClick` | `(row, i) => void` | — | Make rows clickable. |

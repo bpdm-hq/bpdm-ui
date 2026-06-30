@@ -79,16 +79,27 @@ export function DataTableSizesDemo() {
 
 export function DataTableStripedDemo() {
   return (
-    <Box>
-      <DataTable columns={columns} data={MEMBERS} rowKey={key} striped bordered />
-    </Box>
+    <div className="flex w-full flex-col gap-6">
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-fd-muted-foreground">Default — borderless</p>
+        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} />
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-fd-muted-foreground">striped</p>
+        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} striped />
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-fd-muted-foreground">frame bordered — outlined</p>
+        <DataTable columns={columns} data={MEMBERS.slice(0, 4)} rowKey={key} frame bordered />
+      </div>
+    </div>
   );
 }
 
 export function DataTableStickyDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={BIG} rowKey={key} stickyHeader maxHeight={260} />
+      <DataTable columns={columns} data={BIG} rowKey={key} frame stickyHeader maxHeight={260} />
     </Box>
   );
 }
@@ -188,7 +199,7 @@ const pinnedColumns: DataTableColumn<Member>[] = [
 export function DataTableFrozenDemo() {
   return (
     <Box>
-      <DataTable columns={pinnedColumns} data={MEMBERS} rowKey={key} pinnable maxHeight={300} />
+      <DataTable columns={pinnedColumns} data={MEMBERS} rowKey={key} frame pinnable maxHeight={300} />
     </Box>
   );
 }
@@ -258,7 +269,7 @@ export function DataTableReorderDemo() {
 export function DataTableVirtualizedDemo() {
   return (
     <Box>
-      <DataTable columns={columns} data={BIG} rowKey={key} virtualized maxHeight={320} />
+      <DataTable columns={columns} data={BIG} rowKey={key} frame virtualized maxHeight={320} />
     </Box>
   );
 }

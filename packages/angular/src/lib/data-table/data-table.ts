@@ -229,7 +229,7 @@ interface RenderRow<T> {
                     [style.left.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
                     [style.right.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
                     [style.top.px]="stickyHeader() ? 0 : null"
-                    [class]="headCellClass(col, ci)"
+                    [class]="headCellClass(col)"
                   >
                     <div class="flex items-center gap-1">
                       @if (col.sortable) {
@@ -452,7 +452,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly size = input<"sm" | "md" | "lg">("md");
   readonly striped = input(false, { transform: booleanAttribute });
   readonly bordered = input(false, { transform: booleanAttribute });
-  readonly frame = input(true, { transform: booleanAttribute });
+  readonly frame = input(false, { transform: booleanAttribute });
   readonly divided = input(true, { transform: booleanAttribute });
   readonly cellClassName = input<string>("");
   readonly rowClassName = input<string | RowClassFn<T> | undefined>(undefined);
@@ -1066,13 +1066,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       "w-[1%]",
-      (this.frame() || (canPin && this.hasLeftPin())) ? "bg-muted" : "bg-transparent",
+      (this.frame() || (canPin && this.hasLeftPin())) ? "bg-muted" : this.stickyHeader() ? "bg-background" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
       canPin && this.bordered() && "border-r border-border",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
     );
   }
-  protected headCellClass(col: DataTableColumn<T>, ci: number): string {
+  protected headCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
     return cn(
       this.cellPad(),
@@ -1082,9 +1082,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "whitespace-nowrap font-semibold text-foreground",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
-      this.frame() || col.pin ? "bg-muted" : "bg-transparent",
+      // borderless headers stay transparent; a sticky header must be opaque
+      // or scrolling rows bleed through
+      this.frame() || col.pin ? "bg-muted" : this.stickyHeader() ? "bg-background" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
-      !this.frame() && !col.pin && ci > 0 && "border-l border-border/60",
       this.bordered() && "border-r border-border last:border-r-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
       col.id === this.lastLeftId() && "border-r border-border",

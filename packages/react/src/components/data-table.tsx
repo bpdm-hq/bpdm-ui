@@ -144,7 +144,7 @@ export interface DataTableProps<T> {
   striped?: boolean;
   /** Vertical dividers between columns. */
   bordered?: boolean;
-  /** Outer border + rounded container. Default true; set false for a bare table. */
+  /** Outer border + rounded container. Default false (borderless); set true for an outlined card. */
   frame?: boolean;
   /** Horizontal dividers between rows. Default true. */
   divided?: boolean;
@@ -987,7 +987,7 @@ export function DataTable<T>({
   size = "md",
   striped = false,
   bordered = false,
-  frame = true,
+  frame = false,
   divided = true,
   cellClassName,
   rowClassName,
@@ -1705,7 +1705,7 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame ? "bg-muted" : "bg-transparent",
+                  frame ? "bg-muted" : stickyHeader ? "bg-background" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   stickyHeader && "sticky top-0 z-10",
                 )}
@@ -1723,7 +1723,7 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
+                  frame || hasLeftPin ? "bg-muted" : stickyHeader ? "bg-background" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
@@ -1742,7 +1742,7 @@ export function DataTable<T>({
                   cellPad({ size }),
                   "w-[1%]",
                   "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
-                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
+                  frame || hasLeftPin ? "bg-muted" : stickyHeader ? "bg-background" : "bg-transparent",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                 )}
@@ -1759,7 +1759,7 @@ export function DataTable<T>({
                 )}
               </th>
             )}
-            {orderedColumns.map((col, ci) => {
+            {orderedColumns.map((col) => {
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
               const dir = entry?.dir ?? null;
@@ -1810,12 +1810,11 @@ export function DataTable<T>({
                     reorderableColumns && "cursor-grab active:cursor-grabbing",
                     dragColId === col.id && "opacity-40",
                     // framed/pinned headers get the muted band; borderless headers
-                    // stay transparent (page-coloured) for a lighter, elegant look
-                    frame || col.pin ? "bg-muted" : "bg-transparent",
+                    // stay transparent (page-coloured) for a lighter, elegant look —
+                    // but a sticky header must be opaque or scrolling rows bleed through
+                    frame || col.pin ? "bg-muted" : stickyHeader ? "bg-background" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
-                    // borderless: thin separators between header labels
-                    !frame && !col.pin && ci > 0 && "border-l border-border/60",
                     bordered && "border-r border-border last:border-r-0",
                     col.pin ? "z-20" : stickyHeader && "z-10",
                     col.id === lastLeftId && "border-r border-border",
