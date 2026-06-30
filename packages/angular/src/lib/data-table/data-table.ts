@@ -453,6 +453,8 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly striped = input(false, { transform: booleanAttribute });
   readonly bordered = input(false, { transform: booleanAttribute });
   readonly frame = input(false, { transform: booleanAttribute });
+  /** Soft drop shadow so the table gently floats. Default true; false = flat/flush. */
+  readonly elevated = input(true, { transform: booleanAttribute });
   readonly divided = input(true, { transform: booleanAttribute });
   readonly cellClassName = input<string>("");
   /** Extra classes on every header cell — e.g. to tint/colour the header row. */
@@ -1047,13 +1049,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   // ---- class builders ----
   protected frameClass(): string {
     return cn(
-      // every table rests on a soft, blended surface that whisper-floats off the
-      // page; `frame` adds a hairline border + a stronger lift (defined card),
-      // the borderless default just floats gently so it blends in
-      "w-full overflow-hidden bg-card",
+      "w-full",
+      // `frame` = a defined outlined card; the borderless default whisper-floats so
+      // it blends; `elevated`=false drops the float for a flat, flush table
       this.frame()
-        ? "rounded-xl border border-border/70 shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
-        : "rounded-lg shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
+        ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+        : this.elevated() &&
+            "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
       this.classInput(),
     );
   }

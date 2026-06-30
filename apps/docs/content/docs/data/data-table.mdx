@@ -1936,6 +1936,7 @@ export class EmptyTable {
 | `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
 | `size` | `sm \| md \| lg` | `md` | Cell density. |
 | `striped` / `bordered` / `frame` / `divided` | `boolean` | `false` / `false` / `false` / `true` | Zebra rows / column gridlines / outlined card / row dividers. Borderless by default. |
+| `elevated` | `boolean` | `true` | Soft drop shadow so the table gently floats. Set `false` for a flat, flush table (e.g. nested inside your own card). |
 | `hoverable` | `boolean` | `true` | Highlight the hovered row. |
 | `headerClassName` / `cellClassName` / `rowClassName` | `string` / `string` / `string \| (row, i) => string` | — | Custom styling: header cells / body cells / per-row (conditional). See [Custom styling](#custom-styling). |
 | `stickyHeader` + `maxHeight` | `boolean` + `number \| string` | — | Pin the header while the body scrolls. |

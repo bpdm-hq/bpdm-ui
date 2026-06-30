@@ -146,6 +146,11 @@ export interface DataTableProps<T> {
   bordered?: boolean;
   /** Outer border + rounded container. Default false (borderless); set true for an outlined card. */
   frame?: boolean;
+  /**
+   * Soft drop shadow so the table gently floats off the page. Default true; set
+   * false for a flat, flush table (e.g. when nesting inside your own card).
+   */
+  elevated?: boolean;
   /** Horizontal dividers between rows. Default true. */
   divided?: boolean;
   /** Extra classes on every body cell — e.g. "py-4" for taller rows. */
@@ -990,6 +995,7 @@ export function DataTable<T>({
   striped = false,
   bordered = false,
   frame = false,
+  elevated = true,
   divided = true,
   cellClassName,
   headerClassName,
@@ -1675,13 +1681,13 @@ export function DataTable<T>({
       ) : (
       <div
         className={cn(
-          // every table rests on a soft, blended surface that whisper-floats off
-          // the page; `frame` adds a hairline border + a stronger lift (defined
-          // card), the borderless default just floats gently so it blends in
-          "w-full overflow-hidden bg-card",
+          "w-full",
+          // `frame` = a defined outlined card; the borderless default whisper-floats
+          // so it blends; `elevated={false}` drops the float for a flat, flush table
           frame
-            ? "rounded-xl border border-border/70 shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
-            : "rounded-lg shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
+            ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+            : elevated &&
+                "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
           className,
         )}
       >
