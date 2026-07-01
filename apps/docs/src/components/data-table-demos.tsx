@@ -321,6 +321,7 @@ export function DataTableSizesDemo() {
   return (
     <Tabs
       className="w-full self-start"
+      listClassName="mb-2"
       defaultValue="md"
       items={[
         { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={data} rowKey={key} size="sm" /> },
@@ -336,6 +337,7 @@ export function DataTableStripedDemo() {
   return (
     <Tabs
       className="w-full self-start"
+      listClassName="mb-2"
       defaultValue="borderless"
       items={[
         { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={data} rowKey={key} /> },
@@ -436,6 +438,7 @@ export function DataTableSelectionDemo() {
   return (
     <Tabs
       className="w-full self-start"
+      listClassName="mb-2"
       defaultValue="multiple"
       items={[
         {
@@ -495,6 +498,7 @@ export function DataTablePaginationDemo() {
   return (
     <Tabs
       className="w-full self-start"
+      listClassName="mb-2"
       defaultValue="client"
       items={[
         {
