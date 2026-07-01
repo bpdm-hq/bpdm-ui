@@ -1,11 +1,270 @@
 ---
 title: Stepper
-description: Stepper — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A step-by-step flow — horizontal or vertical, optional linear gating, driven by a small hook; in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Stepper** component — available in React (`@bpdm/ui/stepper`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  StepperUsageDemo,
+  StepperVerticalDemo,
+  StepperLinearDemo,
+  StepperValidatedDemo,
+  StepperStepsOnlyDemo,
+} from '@/components/stepper-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Stepper** walks a user through a flow — onboarding, checkout, a wizard.
+Compose `StepList` (the markers) and `StepPanels` (the content); drive navigation
+with the `useStepper()` hook (React) or a `#s="bpdmStepper"` template ref (Angular).
+Horizontal or vertical, with optional **linear** gating.
+
+## Usage
+
+Put a `Step` per stage in `StepList`, a matching `StepPanel` in `StepPanels`, then
+wire **Back / Next / Finish** from the stepper's state.
+
+<Preview>
+  <StepperUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="onboarding.tsx"
+import { Stepper, StepList, Step, StepPanels, StepPanel, useStepper } from '@bpdm/ui/stepper';
+import { Button } from '@bpdm/ui/button';
+
+// navigation reads the stepper state from context — place it anywhere inside <Stepper>
+function Nav() {
+  const { isFirst, isLast, next, back, complete } = useStepper();
+  return (
+    <div className="mt-4 flex justify-between">
+      <Button variant="secondary" appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      {isLast ? <Button size="sm" onClick={complete}>Finish</Button> : <Button size="sm" onClick={next}>Next</Button>}
+    </div>
+  );
+}
+
+export function Onboarding() {
+  return (
+    <Stepper defaultValue="1">
+      <StepList>
+        <Step value="1">Account</Step>
+        <Step value="2">Workspace</Step>
+        <Step value="3">Review</Step>
+      </StepList>
+      <StepPanels>
+        <StepPanel value="1">Tell us who you are — name and email.</StepPanel>
+        <StepPanel value="2">Name your workspace and pick a URL.</StepPanel>
+        <StepPanel value="3">Everything looks good — review and finish.</StepPanel>
+      </StepPanels>
+      <Nav />
+    </Stepper>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Expose the stepper as `#s="bpdmStepper"` and call `s.next()` / `s.back()` / `s.complete()`.
+
+```ts title="onboarding.ts"
+import { Component } from '@angular/core';
+import { BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'onboarding',
+  imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, BpdmButton],
+  template: `
+    <bpdm-stepper #s="bpdmStepper" defaultValue="1">
+      <bpdm-step-list>
+        <bpdm-step value="1">Account</bpdm-step>
+        <bpdm-step value="2">Workspace</bpdm-step>
+        <bpdm-step value="3">Review</bpdm-step>
+      </bpdm-step-list>
+      <bpdm-step-panels>
+        <bpdm-step-panel value="1">Tell us who you are — name and email.</bpdm-step-panel>
+        <bpdm-step-panel value="2">Name your workspace and pick a URL.</bpdm-step-panel>
+        <bpdm-step-panel value="3">Everything looks good — review and finish.</bpdm-step-panel>
+      </bpdm-step-panels>
+
+      <div class="mt-4 flex justify-between">
+        <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="s.back()" [disabled]="s.isFirst()">Back</button>
+        @if (s.isLast()) {
+          <button bpdmButton size="sm" (click)="s.complete()">Finish</button>
+        } @else {
+          <button bpdmButton size="sm" (click)="s.next()">Next</button>
+        }
+      </div>
+    </bpdm-stepper>
+  `,
+})
+export class Onboarding {}
+```
+
+  </Tab>
+</Tabs>
+
+## Vertical
+
+Set `orientation="vertical"` for a stacked flow — good for a sidebar wizard.
+
+<Preview>
+  <StepperVerticalDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="vertical.tsx"
+<Stepper defaultValue="1" orientation="vertical">…</Stepper>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="vertical.html"
+<bpdm-stepper #s="bpdmStepper" defaultValue="1" orientation="vertical">…</bpdm-stepper>
+```
+
+  </Tab>
+</Tabs>
+
+## Linear gating
+
+`linear` stops users from jumping ahead — future steps aren't clickable until they're
+reached. Add `lockIndicator` to show a lock on unreachable steps.
+
+<Preview>
+  <StepperLinearDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="linear.tsx"
+<Stepper defaultValue="1" linear lockIndicator>…</Stepper>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="linear.html"
+<bpdm-stepper #s="bpdmStepper" defaultValue="1" linear lockIndicator>…</bpdm-stepper>
+```
+
+  </Tab>
+</Tabs>
+
+## Validated steps
+
+Gate **Next** on the current step's validity — just disable the button from your own
+state (here, a checkbox must be ticked).
+
+<Preview>
+  <StepperValidatedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="validated.tsx"
+function Nav({ canNext }: { canNext: boolean }) {
+  const { isFirst, isLast, next, back, complete } = useStepper();
+  return (
+    <div className="mt-4 flex justify-between">
+      <Button appearance="ghost" size="sm" onClick={back} disabled={isFirst}>Back</Button>
+      {isLast
+        ? <Button size="sm" onClick={complete}>Finish</Button>
+        : <Button size="sm" onClick={next} disabled={!canNext}>Next</Button>}
+    </div>
+  );
+}
+// …then <Nav canNext={agreed} /> inside a linear <Stepper>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="validated.html"
+<button bpdmButton size="sm" (click)="s.next()" [disabled]="!agreed()">Next</button>
+```
+
+  </Tab>
+</Tabs>
+
+## Steps only
+
+Drop the `StepPanels` to use the stepper purely as a **progress indicator** (e.g. a
+checkout header) — the markers show which step is active and which are done.
+
+<Preview>
+  <StepperStepsOnlyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="steps-only.tsx"
+<Stepper value={current}>
+  <StepList>
+    <Step value="1">Account</Step>
+    <Step value="2">Workspace</Step>
+    <Step value="3">Review</Step>
+  </StepList>
+</Stepper>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="steps-only.html"
+<bpdm-stepper [value]="current()">
+  <bpdm-step-list>
+    <bpdm-step value="1">Account</bpdm-step>
+    <bpdm-step value="2">Workspace</bpdm-step>
+    <bpdm-step value="3">Review</bpdm-step>
+  </bpdm-step-list>
+</bpdm-stepper>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Stepper` / `<bpdm-stepper>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` / `onValueChange` | `string \| number` | first step | Active step — controlled or uncontrolled. Angular: `[(value)]`. |
+| `orientation` | `horizontal \| vertical` | `horizontal` | Layout direction. |
+| `linear` | `boolean` | `false` | Require the current step before advancing (future steps aren't clickable). |
+| `lockIndicator` | `boolean` | `false` | Show a lock on steps not reachable yet (with `linear`). |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+### Parts
+
+| Part | React | Angular |
+| --- | --- | --- |
+| Marker row | `<StepList>` | `<bpdm-step-list>` |
+| Step | `<Step value icon disabled>` | `<bpdm-step value [disabled]>` |
+| Panels | `<StepPanels>` | `<bpdm-step-panels>` |
+| Panel | `<StepPanel value>` | `<bpdm-step-panel value>` |
+
+### Navigation
+
+React exposes **`useStepper()`** — `{ value, activeIndex, count, isFirst, isLast,
+next, back, activate, complete, finished }`. Angular exports the stepper as
+`#s="bpdmStepper"` with the same fields/methods (`s.next()`, `s.isLast()`, …).
+
+## Accessibility
+
+- Steps form a `tablist` — each is a focusable `<button role="tab">` with
+  `aria-selected` / `aria-current`, and completed steps show a **check** — state isn't
+  conveyed by colour alone.
+- With `linear`, steps that aren't reachable yet are **disabled** (and, with
+  `lockIndicator`, show a lock), so they're skipped by keyboard and screen readers.
+- Panels are associated with their step, and the active panel is the one shown —
+  drive `Next`/`Finish` from real buttons so the flow is fully keyboard-operable.
