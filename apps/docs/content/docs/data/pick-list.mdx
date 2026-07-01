@@ -1,11 +1,265 @@
 ---
 title: Pick List
-description: Pick List — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Move items between two lists — transfer with the middle controls, optionally reorder each side; filterable, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Pick List** component — available in React (`@bpdm/ui/pick-list`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  PickListUsageDemo,
+  PickListCustomDemo,
+  PickListFilterDemo,
+  PickListTransferDemo,
+} from '@/components/pick-list-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Pick List** moves items between two lists — a **source** and a **target**.
+Select items on either side and transfer them with the middle controls (move /
+move-all, each way); optionally reorder within each list (drag or the side controls).
+Controlled (`value` = `{ source, target }`) or uncontrolled, filterable, and
+responsive (the two lists stack on small screens). In Angular it's
+`<bpdm-pick-list>` with `[(value)]` and an `itemTemplate`.
+
+## Usage
+
+Give it `itemKey`, `renderItem`, and the two lists via `value`/`onChange`. The
+middle column transfers the current selection between the lists.
+
+<Preview>
+  <PickListUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-usage.tsx"
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+
+const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log'];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`[(value)]` two-way binds `{ source, target }`; the row is an `<ng-template>`
+passed as `itemTemplate`.
+
+```ts title="pick-list-usage.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList } from '@bpdm/ng';
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList],
+  template: `
+    <bpdm-pick-list [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row" sourceHeader="Available" targetHeader="Enabled">
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (s: string) => s;
+  readonly value = signal({
+    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log'],
+    target: [] as string[],
+  });
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Custom rows
+
+`renderItem` / the `itemTemplate` can render anything — a `Badge`, an avatar,
+secondary text.
+
+<Preview>
+  <PickListCustomDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-custom.tsx"
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+import { Badge } from '@bpdm/ui/badge';
+
+type Feature = { id: string; name: string; tag: string };
+const FEATURES: Feature[] = [
+  { id: 'f1', name: 'Analytics', tag: 'Core' },
+  { id: 'f2', name: 'Webhooks', tag: 'Add-on' },
+  { id: 'f3', name: 'Audit log', tag: 'Beta' },
+];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as Feature[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(f) => f.id}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      renderItem={(f) => (
+        <div className="flex flex-1 items-center justify-between gap-3">
+          <span className="font-medium">{f.name}</span>
+          <Badge variant="secondary" appearance="soft">{f.tag}</Badge>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list-custom.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList, BpdmBadge } from '@bpdm/ng';
+
+type Feature = { id: string; name: string; tag: string };
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList, BpdmBadge],
+  template: `
+    <bpdm-pick-list [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row" sourceHeader="Available" targetHeader="Enabled">
+      <ng-template #row let-f>
+        <div class="flex flex-1 items-center justify-between gap-3">
+          <span class="font-medium">{{ f.name }}</span>
+          <bpdm-badge variant="secondary" appearance="soft">{{ f.tag }}</bpdm-badge>
+        </div>
+      </ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (f: Feature) => f.id;
+  readonly value = signal<{ source: Feature[]; target: Feature[] }>({
+    source: [
+      { id: 'f1', name: 'Analytics', tag: 'Core' },
+      { id: 'f2', name: 'Webhooks', tag: 'Add-on' },
+      { id: 'f3', name: 'Audit log', tag: 'Beta' },
+    ],
+    target: [],
+  });
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Filtering
+
+Pass `filterBy` to show a filter box on **both** lists — handy for long option sets.
+
+<Preview>
+  <PickListFilterDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-filter.tsx"
+<PickList
+  value={value}
+  onChange={setValue}
+  itemKey={(f) => f.id}
+  renderItem={(f) => <FeatureRow feature={f} />}
+  sourceHeader="Available"
+  targetHeader="Enabled"
+  filterBy={(f) => f.name}
+  filterPlaceholder="Filter features…"
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="pick-list-filter.html"
+<bpdm-pick-list
+  [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row"
+  sourceHeader="Available" targetHeader="Enabled"
+  [filterBy]="filterBy" filterPlaceholder="Filter features…">
+  <ng-template #row let-f><!-- … --></ng-template>
+</bpdm-pick-list>
+```
+
+```ts
+readonly filterBy = (f: Feature) => f.name;
+```
+
+  </Tab>
+</Tabs>
+
+## Transfer only
+
+Set `reorder={false}` to hide the up/down reorder controls (and within-list drag) —
+leaving just the transfer between lists.
+
+<Preview>
+  <PickListTransferDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-transfer.tsx"
+<PickList value={value} onChange={setValue} itemKey={(s) => s} renderItem={(s) => s}
+  sourceHeader="Available" targetHeader="Enabled" reorder={false} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="pick-list-transfer.html"
+<bpdm-pick-list [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row"
+  sourceHeader="Available" targetHeader="Enabled" [reorder]="false">
+  <ng-template #row let-item>{{ item }}</ng-template>
+</bpdm-pick-list>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `PickList` / `<bpdm-pick-list>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` / `onChange` | `{ source: T[]; target: T[] }` | — | The two lists — controlled or uncontrolled. Angular: `[(value)]`. |
+| `itemKey` | `(item) => string \| number` | — | **Required.** Stable id per item. |
+| `renderItem` (Angular `itemTemplate`) | `(item) => ReactNode` / `TemplateRef` | — | **Required.** How each row renders. |
+| `sourceHeader` / `targetHeader` | `ReactNode` / `string` | — | Headers above each list. |
+| `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box on both lists. |
+| `reorder` | `boolean` | `true` | Show per-list reorder controls + within-list drag. |
+| `scrollHeight` | `string` | `18rem` | Max body height before a list scrolls. |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+## Accessibility
+
+- The transfer controls (**move / move-all, each direction**) are real `<button>`s
+  with accessible labels, and disable when there's nothing to move.
+- Items are keyboard-selectable and expose their selected state; the current
+  selection is what the controls transfer.
+- Drag is an enhancement — every transfer and reorder is reachable with the
+  buttons, so keyboard-only users can operate both lists fully.
+- Give each list a `sourceHeader` / `targetHeader` so its purpose is announced.
