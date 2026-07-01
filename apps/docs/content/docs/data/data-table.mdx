@@ -378,7 +378,11 @@ export class FilterableTable {
 
 ## Search
 
-`searchable` adds a global search box that filters rows across all columns.
+`searchable` adds a global search box that filters rows across all columns —
+**client-side** by default. For **server-side** search, control `searchValue` +
+`onSearchChange`: the box is shown but the table stops filtering itself and emits
+the query so you can re-fetch. The preview toggles **Client** and **Server** with
+our `Tabs`.
 
 <Preview>
   <DataTableSearchDemo />
@@ -388,6 +392,7 @@ export class FilterableTable {
   <Tab value="React">
 
 ```tsx title="data-table-search.tsx"
+import { useState } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -402,9 +407,27 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
+// Client-side (default) — the table searches `data` in memory
 export function SearchableTable() {
   return (
     <DataTable columns={columns} data={members} rowKey={(r) => r.id} searchable searchPlaceholder="Search members…" />
+  );
+}
+
+// Server-side — control `searchValue`; the box is shown but you fetch the results
+export function ServerSearchTable() {
+  const [q, setQ] = useState('');
+  const rows = useSearchedMembers(q); // your data hook — re-fetches on change (debounce it!)
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      rowKey={(r) => r.id}
+      searchable
+      searchPlaceholder="Search members…"
+      searchValue={q}
+      onSearchChange={setQ}
+    />
   );
 }
 ```
@@ -413,7 +436,7 @@ export function SearchableTable() {
   <Tab value="Angular">
 
 ```ts title="data-table-search.ts"
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -421,7 +444,15 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'searchable-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />`,
+  template: `
+    <!-- Client-side (default) -->
+    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />
+
+    <!-- Server-side — control [searchValue]; re-fetch on (searchChange), debounce it -->
+    <bpdm-data-table
+      [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
+      searchable [searchValue]="q()" (searchChange)="onSearch($event)" />
+  `,
 })
 export class SearchableTable {
   readonly rowKey = (r: Member) => r.id;
@@ -435,6 +466,14 @@ export class SearchableTable {
     { id: 'role', header: 'Role', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
+
+  // server-side: query + the rows your backend returns
+  readonly q = signal('');
+  readonly serverRows = signal<Member[]>([]);
+  onSearch(value: string) {
+    this.q.set(value);
+    // re-fetch (debounced): this.api.search(value).subscribe(rows => this.serverRows.set(rows));
+  }
 }
 ```
 

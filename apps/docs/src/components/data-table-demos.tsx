@@ -700,11 +700,50 @@ export function DataTableFiltersDemo() {
   );
 }
 
+// simulate a backend searching across fields (mirrors the table's global search)
+function searchServer(rows: Member[], q: string): Member[] {
+  const query = q.trim().toLowerCase();
+  if (!query) return rows;
+  return rows.filter((m) =>
+    [m.name, m.email, m.role, m.team, m.country].some((v) => String(v).toLowerCase().includes(query)),
+  );
+}
+
+function ServerSearchTable() {
+  // controlled search value — the parent (a real app: the server) owns filtering
+  const [q, setQ] = useState('');
+  return (
+    <DataTable
+      columns={flagColumns}
+      data={searchServer(MEMBERS, q)}
+      rowKey={key}
+      searchable
+      searchPlaceholder="Search members…"
+      searchValue={q}
+      onSearchChange={setQ}
+    />
+  );
+}
+
 export function DataTableSearchDemo() {
   return (
-    <Box>
-      <DataTable columns={flagColumns} data={MEMBERS} rowKey={key} searchable searchPlaceholder="Search members…" />
-    </Box>
+    <Tabs
+      className="w-full self-start"
+      listClassName="mb-2"
+      defaultValue="client"
+      items={[
+        {
+          value: 'client',
+          label: 'Client',
+          content: <DataTable columns={flagColumns} data={MEMBERS} rowKey={key} searchable searchPlaceholder="Search members…" />,
+        },
+        {
+          value: 'server',
+          label: 'Server',
+          content: <ServerSearchTable />,
+        },
+      ]}
+    />
   );
 }
 
