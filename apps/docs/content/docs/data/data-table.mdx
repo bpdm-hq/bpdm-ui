@@ -585,8 +585,10 @@ export class PagedTable {
 
 ## Selection
 
-`selectable` adds a checkbox column (or radios with `selectionMode="single"`).
-Drive it with `selectedKeys` + `onSelectionChange` to build a selection toolbar.
+`selectable` adds a selection column — **checkboxes with a select-all** by default,
+or **radios** with `selectionMode="single"`. The preview toggles the two modes with
+our `Tabs`. Drive it with `selectedKeys` + `onSelectionChange` to build a selection
+toolbar (bulk actions, a "clear" button, …).
 
 <Preview>
   <DataTableSelectionDemo />

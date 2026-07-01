@@ -431,19 +431,54 @@ export function DataTableMultiSortDemo() {
 }
 
 export function DataTableSelectionDemo() {
-  const [keys, setKeys] = useState<React.Key[]>([]);
+  const [multi, setMulti] = useState<React.Key[]>([]);
+  const [single, setSingle] = useState<React.Key[]>([]);
   return (
-    <div className="flex w-full flex-col gap-3">
-      {keys.length > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-fd-border bg-fd-card px-4 py-2 text-sm">
-          <span className="text-fd-foreground">{keys.length} selected</span>
-          <Button size="sm" variant="secondary" appearance="outline" onClick={() => setKeys([])}>
-            Clear
-          </Button>
-        </div>
-      )}
-      <DataTable columns={teamColumns} data={MEMBERS} rowKey={key} selectable selectedKeys={keys} onSelectionChange={setKeys} />
-    </div>
+    <Tabs
+      className="w-full self-start"
+      defaultValue="multiple"
+      items={[
+        {
+          value: 'multiple',
+          label: 'Multiple',
+          content: (
+            <div className="flex flex-col gap-3">
+              {multi.length > 0 && (
+                <div className="flex items-center justify-between rounded-lg border border-fd-border bg-fd-card px-4 py-2 text-sm">
+                  <span className="text-fd-foreground">{multi.length} selected</span>
+                  <Button size="sm" variant="secondary" appearance="outline" onClick={() => setMulti([])}>
+                    Clear
+                  </Button>
+                </div>
+              )}
+              <DataTable columns={teamColumns} data={MEMBERS} rowKey={key} selectable selectedKeys={multi} onSelectionChange={setMulti} />
+            </div>
+          ),
+        },
+        {
+          value: 'single',
+          label: 'Single',
+          content: (
+            <div className="flex flex-col gap-3">
+              {single.length > 0 && (
+                <div className="rounded-lg border border-fd-border bg-fd-card px-4 py-2 text-sm text-fd-foreground">
+                  Selected: <span className="font-medium">{MEMBERS.find((m) => m.id === single[0])?.name}</span>
+                </div>
+              )}
+              <DataTable
+                columns={teamColumns}
+                data={MEMBERS}
+                rowKey={key}
+                selectable
+                selectionMode="single"
+                selectedKeys={single}
+                onSelectionChange={setSingle}
+              />
+            </div>
+          ),
+        },
+      ]}
+    />
   );
 }
 
