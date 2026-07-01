@@ -1,11 +1,277 @@
 ---
 title: Card
-description: Card — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A composable surface — media, header/title/description, content and footer; three variants, hover-lift and fully-clickable modes, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Card** component — available in React (`@bpdm/ui/card`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  CardUsageDemo,
+  CardMediaDemo,
+  CardVariantsDemo,
+  CardInteractiveDemo,
+  CardHorizontalDemo,
+  CardGridDemo,
+} from '@/components/card-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Card** is a composable surface — compose `CardHeader` / `CardTitle` /
+`CardDescription` / `CardContent` / `CardFooter`, plus an optional edge-to-edge
+`CardMedia`. Three surface variants, an optional hover-lift, and a fully-clickable
+`interactive` mode. In Angular the parts are directives (`bpdmCardTitle`, …) on your
+own elements.
+
+## Usage
+
+Compose the header (title + description), content, and footer. `divider` adds a
+hairline above the footer.
+
+<Preview>
+  <CardUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="card-usage.tsx"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@bpdm/ui/card';
+import { Button } from '@bpdm/ui/button';
+
+export function ReportCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Weekly report</CardTitle>
+        <CardDescription>Your team's activity this week.</CardDescription>
+      </CardHeader>
+      <CardContent>Deploys, reviews, and open tasks at a glance.</CardContent>
+      <CardFooter divider>
+        <Button size="sm">View report</Button>
+        <Button size="sm" variant="secondary" appearance="ghost">Dismiss</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The parts are directives on your own elements; the card + header are components.
+
+```ts title="card-usage.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter,
+} from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'report-card',
+  imports: [BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter, BpdmButton],
+  template: `
+    <bpdm-card>
+      <bpdm-card-header>
+        <h3 bpdmCardTitle>Weekly report</h3>
+        <p bpdmCardDescription>Your team's activity this week.</p>
+      </bpdm-card-header>
+      <div bpdmCardContent>Deploys, reviews, and open tasks at a glance.</div>
+      <div bpdmCardFooter [divider]="true">
+        <button bpdmButton size="sm">View report</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost">Dismiss</button>
+      </div>
+    </bpdm-card>
+  `,
+})
+export class ReportCard {}
+```
+
+  </Tab>
+</Tabs>
+
+## Media & action
+
+`CardMedia` is an edge-to-edge band at the top (it zooms on card hover). The header
+takes a right-aligned `action` slot — a badge, an icon button, a menu.
+
+<Preview>
+  <CardMediaDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="card-media.tsx"
+<Card hoverable>
+  <CardMedia src="/cover.jpg" alt="Release cover" aspect="video" />
+  <CardHeader action={<Badge variant="success" appearance="soft" dot>Live</Badge>}>
+    <CardTitle>Release 2.4</CardTitle>
+    <CardDescription>Shipped 3 hours ago</CardDescription>
+  </CardHeader>
+  <CardContent>Dark mode, faster search, and a dozen fixes.</CardContent>
+  <CardFooter divider>
+    <Button size="sm" variant="secondary" appearance="outline">Changelog</Button>
+  </CardFooter>
+</Card>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The action is any element marked `bpdmCardAction` inside the header.
+
+```html title="card-media.html"
+<bpdm-card [hoverable]="true">
+  <bpdm-card-media src="/cover.jpg" alt="Release cover" aspect="video" />
+  <bpdm-card-header>
+    <h3 bpdmCardTitle>Release 2.4</h3>
+    <p bpdmCardDescription>Shipped 3 hours ago</p>
+    <bpdm-badge bpdmCardAction variant="success" appearance="soft" dot>Live</bpdm-badge>
+  </bpdm-card-header>
+  <div bpdmCardContent>Dark mode, faster search, and a dozen fixes.</div>
+  <div bpdmCardFooter [divider]="true">
+    <button bpdmButton size="sm" variant="secondary" appearance="outline">Changelog</button>
+  </div>
+</bpdm-card>
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+`variant` sets the surface: **elevated** (soft shadow, default), **outlined** (a
+hairline border), or **soft** (a muted fill). The preview toggles them with our `Tabs`.
+
+<Preview>
+  <CardVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="variants.tsx"
+<Card variant="outlined">…</Card>
+<Card variant="soft">…</Card>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="variants.html"
+<bpdm-card variant="outlined">…</bpdm-card>
+<bpdm-card variant="soft">…</bpdm-card>
+```
+
+  </Tab>
+</Tabs>
+
+## Interactive (clickable card)
+
+Add `hoverable` for a lift on hover, and `interactive` for a focusable, pressable
+card. With `asChild` (React), the whole card becomes a single `<a>` — one big link.
+
+<Preview>
+  <CardInteractiveDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="interactive.tsx"
+<Card hoverable interactive asChild>
+  <a href="/dashboard">
+    <CardHeader>
+      <CardTitle>Open the dashboard</CardTitle>
+      <CardDescription>The whole card is one link.</CardDescription>
+    </CardHeader>
+  </a>
+</Card>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Wrap the card in your own `<a>`, or set `interactive` and handle `(click)`.
+
+```html title="interactive.html"
+<a routerLink="/dashboard">
+  <bpdm-card [hoverable]="true" [interactive]="true">
+    <bpdm-card-header><h3 bpdmCardTitle>Open the dashboard</h3></bpdm-card-header>
+  </bpdm-card>
+</a>
+```
+
+  </Tab>
+</Tabs>
+
+## Horizontal
+
+Set the card to `flex-row` and put the media on the side for a list/row layout.
+
+<Preview>
+  <CardHorizontalDemo />
+</Preview>
+
+```tsx title="horizontal.tsx"
+<Card hoverable className="flex-row">
+  <CardMedia src="/thumb.jpg" alt="" className="w-28 shrink-0" />
+  <div className="min-w-0 flex-1">
+    <CardHeader>
+      <CardTitle>Design tokens</CardTitle>
+      <CardDescription>Guide · 6 min read</CardDescription>
+    </CardHeader>
+    <CardContent>How the theme is generated from one token set.</CardContent>
+  </div>
+</Card>
+```
+
+## Responsive grid
+
+Cards are plain blocks — drop them in a grid.
+
+<Preview>
+  <CardGridDemo />
+</Preview>
+
+```tsx title="grid.tsx"
+<div className="grid gap-4 sm:grid-cols-3">
+  {items.map((it) => (
+    <Card key={it.title} hoverable>
+      <CardHeader><CardTitle>{it.title}</CardTitle></CardHeader>
+      <CardContent>{it.body}</CardContent>
+    </Card>
+  ))}
+</div>
+```
+
+## API
+
+### `Card` / `<bpdm-card>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `elevated \| outlined \| soft` | `elevated` | Surface style. |
+| `hoverable` | `boolean` | `false` | Lift + deepen the shadow on hover. |
+| `interactive` | `boolean` | `false` | Focusable + pressable (for clickable cards). |
+| `asChild` (React) | `boolean` | `false` | Render as the child element, e.g. an `<a>`. |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+### Parts
+
+| Part | React | Angular | Notes |
+| --- | --- | --- | --- |
+| Media | `<CardMedia src alt aspect overlay />` | `<bpdm-card-media …>` | Edge-to-edge band; zooms on hover. |
+| Header | `<CardHeader action={…}>` | `<bpdm-card-header>` + `bpdmCardAction` | Title/description + a right-aligned action slot. |
+| Title | `<CardTitle>` | `[bpdmCardTitle]` | |
+| Description | `<CardDescription>` | `[bpdmCardDescription]` | |
+| Content | `<CardContent>` | `[bpdmCardContent]` | |
+| Footer | `<CardFooter divider>` | `[bpdmCardFooter] [divider]` | `divider` adds a hairline above. |
+
+## Accessibility
+
+- Card is a plain container — put a **heading** (`CardTitle` renders an `<h3>`) so
+  the section is announced; use the right level for your page.
+- For clickable cards, `interactive` adds a visible focus ring and pressed state,
+  and `asChild` on an `<a>`/`<button>` keeps it a real, keyboard-operable control
+  (rather than a click handler on a `<div>`).
+- `CardMedia` images take an `alt`; decorative bands can use `alt=""`.
