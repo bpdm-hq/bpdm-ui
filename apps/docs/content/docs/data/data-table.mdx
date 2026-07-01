@@ -152,10 +152,12 @@ export class MembersTable {
 
 Mark a column `sortable`; clicking its header cycles asc → desc → none, with a live
 arrow indicator. Add `multiSort` to sort by several columns at once — **Shift+click**
-a header to append it to the sort (each shows its order). The preview toggles the two
-modes with our `Tabs`; in **Multi sort** rows are grouped by **role**, then by **tasks**
-within each role. Leave `sort` unset to let the table sort internally, or control
-`sort` + `onSortChange` for server-side ordering.
+a header to append it (each shows its order); in **Multi sort** rows are grouped by
+**role**, then by **tasks**. By default sorting is **client-side** — leave `sort` unset
+and the table orders the data in memory. For **server-side** ordering, control `sort` +
+`onSortChange`: the table renders exactly the order you give and fires `onSortChange`
+so you can re-fetch the sorted page (it won't re-sort itself). The preview toggles all
+three with our `Tabs`.
 
 <Preview>
   <DataTableSortDemo />
@@ -165,6 +167,7 @@ within each role. Leave `sort` unset to let the table sort internally, or contro
   <Tab value="React">
 
 ```tsx title="data-table-sorting.tsx"
+import { useState } from 'react';
 import { DataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -208,13 +211,23 @@ export function MultiSortTable() {
     />
   );
 }
+
+// Server-side sort — control `sort`; the table renders your order and calls
+// onSortChange so you can re-fetch. It never re-sorts the data itself.
+export function ServerSortedTable() {
+  const [sort, setSort] = useState<DataTableSort[]>([{ id: 'name', dir: 'asc' }]);
+  const rows = useSortedMembers(sort); // your data hook — fetches rows in `sort` order
+  return (
+    <DataTable columns={columns} data={rows} rowKey={(r) => r.id} sort={sort} onSortChange={setSort} />
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
 ```ts title="data-table-sorting.ts"
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -223,22 +236,25 @@ type Member = { id: string; name: string; role: string; tasks: number };
   selector: 'sortable-table',
   imports: [BpdmDataTable],
   template: `
-    <!-- Single-column sort -->
+    <!-- Single-column sort (client-side; leave sort uncontrolled) -->
     <bpdm-data-table
       [columns]="columns" [data]="members" [rowKey]="rowKey"
-      [defaultSort]="[{ id: 'tasks', dir: 'desc' }]"
-      (sortChange)="onSort($event)" />
+      [defaultSort]="[{ id: 'tasks', dir: 'desc' }]" />
 
     <!-- Multi-column sort — Shift+click a header to append (grouped by role, then tasks) -->
     <bpdm-data-table
       [columns]="columns" [data]="members" [rowKey]="rowKey"
       multiSort
       [defaultSort]="[{ id: 'role', dir: 'asc' }, { id: 'tasks', dir: 'desc' }]" />
+
+    <!-- Server-side sort — control [sort]; re-fetch on (sortChange), table won't re-sort -->
+    <bpdm-data-table
+      [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
+      [sort]="sort()" (sortChange)="onSort($event)" />
   `,
 })
 export class SortableTable {
   readonly rowKey = (r: Member) => r.id;
-  onSort(sort: DataTableSort[]) { console.log(sort); }
   readonly members: Member[] = [
     { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
@@ -249,6 +265,14 @@ export class SortableTable {
     { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
   ];
+
+  // server-side: sort state + the rows your backend returns in that order
+  readonly sort = signal<DataTableSort[]>([{ id: 'name', dir: 'asc' }]);
+  readonly serverRows = signal<Member[]>([]);
+  onSort(next: DataTableSort[]) {
+    this.sort.set(next);
+    // re-fetch: this.api.members(next).subscribe(rows => this.serverRows.set(rows));
+  }
 }
 ```
 

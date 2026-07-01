@@ -1,7 +1,7 @@
 'use client';
 
 import { type ReactNode, useState } from 'react';
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { DataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
 import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
 import { Badge } from '@bpdm/ui/badge';
@@ -407,6 +407,25 @@ export function DataTableClickableDemo() {
   );
 }
 
+// simulate a backend returning rows already sorted in the requested order
+function sortServer(rows: Member[], sort: DataTableSort[]): Member[] {
+  if (!sort.length) return rows;
+  const { id, dir } = sort[0];
+  const get = (m: Member) => (id === 'tasks' ? m.tasks : String((m as Record<string, unknown>)[id] ?? ''));
+  return [...rows].sort((a, b) => {
+    const av = get(a);
+    const bv = get(b);
+    const c = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv));
+    return dir === 'asc' ? c : -c;
+  });
+}
+
+function ServerSortTable() {
+  // controlled sort — the parent (a real app: the server) owns the row order
+  const [sort, setSort] = useState<DataTableSort[]>([{ id: 'name', dir: 'asc' }]);
+  return <DataTable columns={sortableColumns} data={sortServer(MEMBERS, sort)} rowKey={key} sort={sort} onSortChange={setSort} />;
+}
+
 export function DataTableSortDemo() {
   return (
     <Tabs
@@ -434,6 +453,11 @@ export function DataTableSortDemo() {
               ]}
             />
           ),
+        },
+        {
+          value: 'server',
+          label: 'Server',
+          content: <ServerSortTable />,
         },
       ]}
     />
