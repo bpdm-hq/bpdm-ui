@@ -32,12 +32,12 @@ type Member = {
 };
 
 const MEMBERS: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128, country: 'Sweden', flag: '🇸🇪', seats: 24 },
-  { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0, country: 'Brazil', flag: '🇧🇷', seats: 8 },
-  { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86, country: 'Croatia', flag: '🇭🇷', seats: 16 },
-  { id: 'm4', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', status: 'disabled', tasks: 12, country: 'Germany', flag: '🇩🇪', seats: 4 },
-  { id: 'm5', name: 'Ava Nguyen', email: 'ava@acme.dev', role: 'Editor', team: 'Marketing', status: 'active', tasks: 54, country: 'Vietnam', flag: '🇻🇳', seats: 12 },
-  { id: 'm6', name: 'Ivan Petrov', email: 'ivan@acme.dev', role: 'Admin', team: 'Engineering', status: 'active', tasks: 203, country: 'Bulgaria', flag: '🇧🇬', seats: 40 },
+  { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128, country: 'Sweden', flag: '🇸🇪', seats: 24 },
+  { id: 'm2', name: 'Leo Martins', email: 'leo@bpdm.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0, country: 'Brazil', flag: '🇧🇷', seats: 8 },
+  { id: 'm3', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86, country: 'Croatia', flag: '🇭🇷', seats: 16 },
+  { id: 'm4', name: 'Noah Bauer', email: 'noah@bpdm.dev', role: 'Viewer', team: 'Support', status: 'disabled', tasks: 12, country: 'Germany', flag: '🇩🇪', seats: 4 },
+  { id: 'm5', name: 'Ava Nguyen', email: 'ava@bpdm.dev', role: 'Editor', team: 'Marketing', status: 'active', tasks: 54, country: 'Vietnam', flag: '🇻🇳', seats: 12 },
+  { id: 'm6', name: 'Ivan Petrov', email: 'ivan@bpdm.dev', role: 'Admin', team: 'Engineering', status: 'active', tasks: 203, country: 'Bulgaria', flag: '🇧🇬', seats: 40 },
 ];
 
 /** A larger, generated set for pagination / virtualization demos. */

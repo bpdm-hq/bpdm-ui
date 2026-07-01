@@ -62,9 +62,9 @@ type Member = {
 };
 
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
-  { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
-  { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
+  { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
+  { id: 'm2', name: 'Leo Martins', email: 'leo@bpdm.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
+  { id: 'm3', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
 ];
 
 // a rich identity cell — Avatar derives initials + colour from the name
@@ -114,9 +114,9 @@ export class MembersTable {
   readonly memberCell = viewChild.required<TemplateRef<{ $implicit: Member }>>('memberCell');
 
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
-    { id: 'm2', name: 'Leo Martins', email: 'leo@acme.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
-    { id: 'm3', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
+    { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', status: 'active', tasks: 128 },
+    { id: 'm2', name: 'Leo Martins', email: 'leo@bpdm.dev', role: 'Admin', team: 'Design', status: 'invited', tasks: 0 },
+    { id: 'm3', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
   ];
 
   readonly rowKey = (r: Member) => r.id;
@@ -172,7 +172,7 @@ import { DataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ui/da
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Editor', tasks: 12 },
 ];
@@ -256,7 +256,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class SortableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Editor', tasks: 12 },
   ];
@@ -303,7 +303,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -328,7 +328,7 @@ import { DataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ui/dat
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const ALL: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -400,7 +400,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class FilterableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -420,7 +420,7 @@ import { BpdmDataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ng
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const ALL: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -508,7 +508,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -534,7 +534,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const ALL: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -587,7 +587,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class SearchableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -607,7 +607,7 @@ import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const ALL: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -806,7 +806,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -862,7 +862,7 @@ export class SelectableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly keys = signal<(string | number)[]>([]);
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -893,7 +893,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -928,7 +928,7 @@ export class ClickableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly open = (row: Member) => console.log(row.name);
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -964,9 +964,9 @@ import { ProgressBar } from '@bpdm/ui/progress';
 
 type Member = { id: string; name: string; email: string; role: string; team: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', tasks: 12 },
+  { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', email: 'noah@bpdm.dev', role: 'Viewer', team: 'Support', tasks: 12 },
 ];
 const columns: DataTableColumn<Member>[] = [
   { id: 'name', header: 'Name', accessor: (r) => r.name },
@@ -1049,9 +1049,9 @@ type Member = { id: string; name: string; email: string; role: string; team: str
 export class ExpandableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', tasks: 12 },
+    { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', email: 'noah@bpdm.dev', role: 'Viewer', team: 'Support', tasks: 12 },
   ];
   readonly columns: DataTableColumn<Member>[] = [
     { id: 'name', header: 'Name', accessor: (r) => r.name },
@@ -1137,7 +1137,7 @@ function EditableCell({
 
 export function EditableTable() {
   const [rows, setRows] = useState<Member[]>([
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ]);
@@ -1181,7 +1181,7 @@ export class EditableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly editing = signal<string | null>(null); // `${id}:${field}`
   readonly rows = signal<Member[]>([
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ]);
@@ -1265,9 +1265,9 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; email: string; role: string; team: string; country: string; seats: number; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
+  { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', email: 'noah@bpdm.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
 ];
 // wide columns force horizontal scroll → the pinned edges (left + right) stay put
 const columns: DataTableColumn<Member>[] = [
@@ -1302,9 +1302,9 @@ type Member = { id: string; name: string; email: string; role: string; team: str
 export class FrozenTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', email: 'hugo@acme.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', email: 'sara@acme.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', email: 'noah@acme.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
+    { id: 'm1', name: 'Milo Lindberg', email: 'milo@bpdm.dev', role: 'Owner', team: 'Engineering', country: 'Sweden', seats: 24, tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', country: 'Croatia', seats: 16, tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', email: 'noah@bpdm.dev', role: 'Viewer', team: 'Support', country: 'Germany', seats: 4, tasks: 12 },
   ];
   // wide columns force horizontal scroll → the pinned edges (left + right) stay put
   readonly columns: DataTableColumn<Member>[] = [
@@ -1339,7 +1339,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   // …more rows than fit in 260px → the body scrolls
@@ -1372,7 +1372,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class ScrollingTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -1404,7 +1404,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -1436,7 +1436,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class ToggleableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -1469,7 +1469,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const initial: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -1520,7 +1520,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class ReorderableTable {
   readonly rowKey = (r: Member) => r.id;
   readonly rows = signal<Member[]>([
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ]);
@@ -1552,7 +1552,7 @@ import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -1587,7 +1587,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class SummaryTable {
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -1640,7 +1640,7 @@ import { Badge } from '@bpdm/ui/badge';
 
 type Member = { id: string; name: string; role: string; status: 'active' | 'disabled'; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
   { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
   { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
 ];
@@ -1710,7 +1710,7 @@ export class CustomStyledTable {
   readonly rowClass = (r: Member) => (r.status === 'disabled' ? 'bg-destructive/[0.06] text-muted-foreground' : '');
 
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', status: 'active', tasks: 128 },
     { id: 'm2', name: 'Noah Bauer', role: 'Viewer', status: 'disabled', tasks: 12 },
     { id: 'm3', name: 'Sara Kovac', role: 'Editor', status: 'active', tasks: 86 },
   ];
@@ -1771,7 +1771,7 @@ import { Tabs } from '@bpdm/ui/tabs';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -1816,7 +1816,7 @@ export class BorderTables {
 
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -1864,7 +1864,7 @@ import { Tabs } from '@bpdm/ui/tabs';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
   { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
   { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
 ];
@@ -1909,7 +1909,7 @@ export class SizedTables {
 
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
     { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
   ];
@@ -2030,7 +2030,7 @@ type Member = {
   role: string; seats: number; team: string[];
 };
 const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: ['Sara Kovac', 'Ivan Petrov'] },
+  { id: 'm1', name: 'Milo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: ['Sara Kovac', 'Ivan Petrov'] },
   { id: 'm2', name: 'Leo Martins', country: 'Brazil', flag: '🇧🇷', role: 'Admin', seats: 8, team: ['Noah Bauer'] },
 ];
 
@@ -2143,7 +2143,7 @@ export class ResponsiveTable {
 
   readonly rowKey = (r: Member) => r.id;
   readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: [{ name: 'Sara Kovac' }, { name: 'Ivan Petrov' }] },
+    { id: 'm1', name: 'Milo Lindberg', country: 'Sweden', flag: '🇸🇪', role: 'Owner', seats: 24, team: [{ name: 'Sara Kovac' }, { name: 'Ivan Petrov' }] },
     { id: 'm2', name: 'Leo Martins', country: 'Brazil', flag: '🇧🇷', role: 'Admin', seats: 8, team: [{ name: 'Noah Bauer' }] },
   ];
 
