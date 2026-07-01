@@ -9,6 +9,7 @@ import {
   StatCardDeltaDemo,
   StatCardAccentDemo,
   StatCardNoDeltaDemo,
+  StatCardLoadingDemo,
   StatCardDashboardDemo,
 } from '@/components/stat-card-demos';
 import { Preview } from '@/components/preview';
@@ -212,6 +213,47 @@ export class OpenTickets {}
   </Tab>
 </Tabs>
 
+## Loading
+
+Set `loading` while the data is in flight — the card shows a shimmering skeleton
+(and sets `aria-busy`) in place of the content, keeping the layout stable.
+
+<Preview>
+  <StatCardLoadingDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-loading.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+
+export function LiveUsers({ loading, count }: { loading: boolean; count?: number }) {
+  return <StatCard label="Active users" value={count?.toLocaleString() ?? '—'} loading={loading} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-loading.ts"
+import { Component, input } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'live-users',
+  imports: [BpdmStatCard],
+  template: `<bpdm-stat-card label="Active users" [value]="value()" [loading]="loading()" />`,
+})
+export class LiveUsers {
+  readonly loading = input(false);
+  readonly value = input('—');
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Dashboard grid
 
 Stat Cards are just tiles — drop them in a responsive grid for a KPI row.
@@ -221,12 +263,19 @@ Stat Cards are just tiles — drop them in a responsive grid for a KPI row.
 </Preview>
 
 ```tsx title="dashboard.tsx"
-<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-  <StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
-  <StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
-  <StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} deltaLabel="vs last month" icon={<TrendingDown />} />
-  <StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />
-</div>
+import { StatCard } from '@bpdm/ui/stat-card';
+import { Users, UserPlus, TrendingDown, Clock } from 'lucide-react';
+
+export function Dashboard() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
+      <StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
+      <StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} deltaLabel="vs last month" icon={<TrendingDown />} />
+      <StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />
+    </div>
+  );
+}
 ```
 
 ## API
@@ -242,6 +291,7 @@ Stat Cards are just tiles — drop them in a responsive grid for a KPI row.
 | `positiveIsGood` | `boolean` | `true` | When `false`, an increase is shown as bad (red) — for churn/bounce/errors. |
 | `icon` | `ReactNode` (Angular `bpdmStatCardIcon`) | — | Icon shown in the badge. |
 | `accent` | `string` | — | Any CSS colour — tints the card + icon badge. |
+| `loading` | `boolean` | `false` | Show a shimmering skeleton (sets `aria-busy`) while data loads. |
 | `className` | `string` (Angular `class`) | — | Extra classes on the card. |
 
 ## Accessibility

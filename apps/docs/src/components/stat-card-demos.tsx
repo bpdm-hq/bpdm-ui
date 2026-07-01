@@ -88,6 +88,15 @@ export function StatCardNoDeltaDemo() {
   );
 }
 
+export function StatCardLoadingDemo() {
+  return (
+    <div className="grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+      <StatCard label="Active users" value="—" loading />
+      <StatCard label="New signups" value="—" loading />
+    </div>
+  );
+}
+
 export function StatCardDashboardDemo() {
   return (
     <div className="grid w-full max-w-3xl gap-4 sm:grid-cols-2">

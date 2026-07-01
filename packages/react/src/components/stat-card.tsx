@@ -14,6 +14,8 @@ export interface StatCardProps {
   icon?: React.ReactNode;
   /** Any CSS color (hex / token) — tints the card background + icon badge. */
   accent?: string;
+  /** Show a shimmering skeleton in place of the content (data still loading). */
+  loading?: boolean;
   className?: string;
 }
 
@@ -45,8 +47,30 @@ export function StatCard({
   positiveIsGood = true,
   icon,
   accent,
+  loading = false,
   className,
 }: StatCardProps) {
+  if (loading) {
+    return (
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        aria-label={`${label} loading`}
+        className={cn(
+          "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm",
+          className,
+        )}
+      >
+        <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="h-3.5 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-7 w-28 animate-pulse rounded bg-muted" />
+          <div className="h-3.5 w-32 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="size-12 shrink-0 animate-pulse rounded-full bg-muted" />
+      </div>
+    );
+  }
+
   const hasDelta = delta !== undefined && !Number.isNaN(delta);
   const up = (delta ?? 0) > 0;
   const neutral = (delta ?? 0) === 0;

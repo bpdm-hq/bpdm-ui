@@ -51,4 +51,11 @@ describe("StatCard", () => {
     render(<StatCard label="Users" value="10" icon={<svg data-testid="ico" />} />);
     expect(screen.getByTestId("ico")).toBeTruthy();
   });
+
+  it("shows a skeleton (aria-busy) and hides the value while loading", () => {
+    const { container } = render(<StatCard label="Active users" value="8,420" loading />);
+    expect(container.firstElementChild).toHaveAttribute("aria-busy", "true");
+    expect(container.textContent).not.toContain("8,420");
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+  });
 });

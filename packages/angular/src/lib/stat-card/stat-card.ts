@@ -20,8 +20,17 @@ import { cn } from "@bpdm/variants";
   host: {
     "[class]": "cardClass()",
     "[style.background-color]": "cardBg()",
+    "[attr.aria-busy]": "loading() ? 'true' : null",
   },
   template: `
+    @if (loading()) {
+      <div class="min-w-0 flex-1 space-y-2.5">
+        <div class="h-3.5 w-24 animate-pulse rounded bg-muted"></div>
+        <div class="h-7 w-28 animate-pulse rounded bg-muted"></div>
+        <div class="h-3.5 w-32 animate-pulse rounded bg-muted"></div>
+      </div>
+      <div class="size-12 shrink-0 animate-pulse rounded-full bg-muted"></div>
+    } @else {
     <div class="min-w-0">
       <p class="truncate text-sm text-muted-foreground">{{ label() }}</p>
       <p class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
@@ -57,6 +66,7 @@ import { cn } from "@bpdm/variants";
     >
       <ng-content select="[bpdmStatCardIcon]" />
     </span>
+    }
   `,
 })
 export class BpdmStatCard {
@@ -71,6 +81,8 @@ export class BpdmStatCard {
   readonly positiveIsGood = input(true, { transform: booleanAttribute });
   /** Any CSS color — tints the card background + icon badge. */
   readonly accent = input<string>();
+  /** Show a shimmering skeleton in place of the content (data still loading). */
+  readonly loading = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly hasDelta = computed(() => {
@@ -89,12 +101,12 @@ export class BpdmStatCard {
   protected readonly cardClass = computed(() =>
     cn(
       "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
-      this.accent() ? "border-transparent" : "border-border bg-card",
+      this.accent() && !this.loading() ? "border-transparent" : "border-border bg-card",
       this.classInput(),
     ),
   );
   protected readonly cardBg = computed(() =>
-    this.accent() ? `color-mix(in srgb, ${this.accent()} 8%, var(--card))` : null,
+    this.accent() && !this.loading() ? `color-mix(in srgb, ${this.accent()} 8%, var(--card))` : null,
   );
   protected readonly badgeBg = computed(() =>
     this.accent() ? `color-mix(in srgb, ${this.accent()} 14%, transparent)` : null,
