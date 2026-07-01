@@ -286,7 +286,8 @@ Set `filterable` on a column for a header filter menu — `filterType` is `text`
 **client-side** by default (the table filters `data` in memory). For **server-side**
 filtering, control `filters` + `onFiltersChange` (and `searchValue` + `onSearchChange`
 for search): the same funnel UI is shown, but the table stops filtering itself and
-just emits the change so you can re-fetch — exactly like controlled sorting.
+just emits the change so you can re-fetch — exactly like controlled sorting. The
+preview toggles **Client** and **Server** with our `Tabs`.
 
 <Preview>
   <DataTableFiltersDemo />
@@ -296,7 +297,8 @@ just emits the change so you can re-fetch — exactly like controlled sorting.
   <Tab value="React">
 
 ```tsx title="data-table-filters.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { useState } from 'react';
+import { DataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
@@ -310,8 +312,19 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
+// Client-side (default) — the table filters `data` in memory
 export function FilterableTable() {
   return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
+}
+
+// Server-side — control `filters`; the same funnel UI shows, but you fetch the
+// filtered rows. `ColumnFilter` = { matchMode: 'all' | 'any', rules: [{ op, value }] }.
+export function ServerFilteredTable() {
+  const [filters, setFilters] = useState<Record<string, ColumnFilter>>({});
+  const rows = useFilteredMembers(filters); // your data hook — re-fetches on change
+  return (
+    <DataTable columns={columns} data={rows} rowKey={(r) => r.id} filters={filters} onFiltersChange={setFilters} />
+  );
 }
 ```
 
@@ -319,15 +332,23 @@ export function FilterableTable() {
   <Tab value="Angular">
 
 ```ts title="data-table-filters.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+import { Component, signal } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
   selector: 'filterable-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
+  template: `
+    <!-- Client-side (default) -->
+    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />
+
+    <!-- Server-side — control [filters]; re-fetch on (filtersChange) -->
+    <bpdm-data-table
+      [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
+      [filters]="filters()" (filtersChange)="onFilters($event)" />
+  `,
 })
 export class FilterableTable {
   readonly rowKey = (r: Member) => r.id;
@@ -341,6 +362,14 @@ export class FilterableTable {
     { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
   ];
+
+  // server-side: filter state + the rows your backend returns
+  readonly filters = signal<Record<string, ColumnFilter>>({});
+  readonly serverRows = signal<Member[]>([]);
+  onFilters(next: Record<string, ColumnFilter>) {
+    this.filters.set(next);
+    // re-fetch: this.api.members(next).subscribe(rows => this.serverRows.set(rows));
+  }
 }
 ```
 

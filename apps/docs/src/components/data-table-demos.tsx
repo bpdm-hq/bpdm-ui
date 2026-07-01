@@ -1,7 +1,13 @@
 'use client';
 
 import { type ReactNode, useState } from 'react';
-import { DataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ui/data-table';
+import {
+  DataTable,
+  type DataTableColumn,
+  type DataTableSort,
+  type ColumnFilter,
+  type FilterOperator,
+} from '@bpdm/ui/data-table';
 import { Button } from '@bpdm/ui/button';
 import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
 import { Badge } from '@bpdm/ui/badge';
@@ -611,11 +617,86 @@ export function DataTableFrozenDemo() {
   );
 }
 
+// simulate a backend applying the controlled filters (mirrors the table's own eval)
+const FILTER_FIELD: Record<string, (m: Member) => string | number> = {
+  name: (m) => m.name,
+  role: (m) => m.role,
+  team: (m) => m.team,
+  tasks: (m) => m.tasks,
+};
+function evalRule(cell: string | number, op: FilterOperator, val: string, numeric: boolean): boolean {
+  if (val === '') return true;
+  if (numeric) {
+    const a = Number(cell);
+    const b = Number(val);
+    if (Number.isNaN(a) || Number.isNaN(b)) return false;
+    switch (op) {
+      case 'equals': return a === b;
+      case 'notEquals': return a !== b;
+      case 'gt': return a > b;
+      case 'gte': return a >= b;
+      case 'lt': return a < b;
+      case 'lte': return a <= b;
+      default: return true;
+    }
+  }
+  const a = String(cell).toLowerCase();
+  const b = val.toLowerCase();
+  switch (op) {
+    case 'startsWith': return a.startsWith(b);
+    case 'endsWith': return a.endsWith(b);
+    case 'equals': return a === b;
+    case 'notEquals': return a !== b;
+    default: return a.includes(b);
+  }
+}
+function applyFiltersServer(rows: Member[], filters: Record<string, ColumnFilter>): Member[] {
+  const active = Object.entries(filters).filter(([, f]) => f.rules.some((r) => r.value !== ''));
+  if (!active.length) return rows;
+  return rows.filter((row) =>
+    active.every(([id, f]) => {
+      const get = FILTER_FIELD[id];
+      if (!get) return true;
+      const numeric = id === 'tasks';
+      const res = f.rules.filter((r) => r.value !== '').map((r) => evalRule(get(row), r.op, r.value, numeric));
+      return f.matchMode === 'all' ? res.every(Boolean) : res.some(Boolean);
+    }),
+  );
+}
+
+function ServerFilterTable() {
+  // controlled filters — the parent (a real app: the server) owns filtering
+  const [filters, setFilters] = useState<Record<string, ColumnFilter>>({});
+  return (
+    <DataTable
+      columns={filterableColumns}
+      data={applyFiltersServer(MEMBERS, filters)}
+      rowKey={key}
+      filters={filters}
+      onFiltersChange={setFilters}
+    />
+  );
+}
+
 export function DataTableFiltersDemo() {
   return (
-    <Box>
-      <DataTable columns={filterableColumns} data={MEMBERS} rowKey={key} />
-    </Box>
+    <Tabs
+      className="w-full self-start"
+      listClassName="mb-2"
+      defaultValue="client"
+      items={[
+        {
+          value: 'client',
+          label: 'Client',
+          content: <DataTable columns={filterableColumns} data={MEMBERS} rowKey={key} />,
+        },
+        {
+          value: 'server',
+          label: 'Server',
+          content: <ServerFilterTable />,
+        },
+      ]}
+    />
   );
 }
 
