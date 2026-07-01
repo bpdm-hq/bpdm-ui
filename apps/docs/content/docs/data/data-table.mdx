@@ -391,8 +391,9 @@ our `Tabs`.
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="data-table-search.tsx"
-import { useState } from 'react';
+**Client** — hand the table everything; it searches `data` in memory:
+
+```tsx title="search-client.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -407,17 +408,42 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-// Client-side (default) — the table searches `data` in memory
 export function SearchableTable() {
   return (
     <DataTable columns={columns} data={members} rowKey={(r) => r.id} searchable searchPlaceholder="Search members…" />
   );
 }
+```
 
-// Server-side — control `searchValue`; the box is shown but you fetch the results
+**Server** — control `searchValue`; the box is shown but *you* fetch the results
+(swap `searchMembers` for a debounced API call):
+
+```tsx title="search-server.tsx"
+import { useMemo, useState } from 'react';
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const ALL: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+// stand-in for your backend — replace with a (debounced) fetch
+function searchMembers(q: string): Member[] {
+  const query = q.trim().toLowerCase();
+  if (!query) return ALL;
+  return ALL.filter((m) => [m.name, m.role].some((v) => v.toLowerCase().includes(query)));
+}
+
 export function ServerSearchTable() {
   const [q, setQ] = useState('');
-  const rows = useSearchedMembers(q); // your data hook — re-fetches on change (debounce it!)
+  const rows = useMemo(() => searchMembers(q), [q]);
   return (
     <DataTable
       columns={columns}
@@ -435,8 +461,10 @@ export function ServerSearchTable() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="data-table-search.ts"
-import { Component, signal } from '@angular/core';
+**Client** — the table searches `data` in memory:
+
+```ts title="search-client.ts"
+import { Component } from '@angular/core';
 import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -444,15 +472,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'searchable-table',
   imports: [BpdmDataTable],
-  template: `
-    <!-- Client-side (default) -->
-    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />
-
-    <!-- Server-side — control [searchValue]; re-fetch on (searchChange), debounce it -->
-    <bpdm-data-table
-      [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
-      searchable [searchValue]="q()" (searchChange)="onSearch($event)" />
-  `,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" searchable searchPlaceholder="Search members…" />`,
 })
 export class SearchableTable {
   readonly rowKey = (r: Member) => r.id;
@@ -466,13 +486,49 @@ export class SearchableTable {
     { id: 'role', header: 'Role', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
   ];
+}
+```
 
-  // server-side: query + the rows your backend returns
+**Server** — control `[searchValue]`; re-fetch on `(searchChange)` (debounced):
+
+```ts title="search-server.ts"
+import { Component, signal, computed } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const ALL: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+
+@Component({
+  selector: 'server-search-table',
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns" [data]="rows()" [rowKey]="rowKey"
+      searchable searchPlaceholder="Search members…"
+      [searchValue]="q()" (searchChange)="onSearch($event)" />
+  `,
+})
+export class ServerSearchTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+
   readonly q = signal('');
-  readonly serverRows = signal<Member[]>([]);
+  // stand-in for your backend — replace with a (debounced) API call
+  readonly rows = computed(() => {
+    const query = this.q().trim().toLowerCase();
+    if (!query) return ALL;
+    return ALL.filter((m) => [m.name, m.role].some((v) => v.toLowerCase().includes(query)));
+  });
   onSearch(value: string) {
     this.q.set(value);
-    // re-fetch (debounced): this.api.search(value).subscribe(rows => this.serverRows.set(rows));
   }
 }
 ```
