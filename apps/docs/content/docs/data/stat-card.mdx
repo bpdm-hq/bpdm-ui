@@ -1,11 +1,253 @@
 ---
 title: Stat Card
-description: Stat Card — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A dashboard KPI card — label, big value, a good/bad percentage delta and an icon — in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Stat Card** component — available in React (`@bpdm/ui/stat-card`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  StatCardUsageDemo,
+  StatCardDeltaDemo,
+  StatCardAccentDemo,
+  StatCardNoDeltaDemo,
+  StatCardDashboardDemo,
+} from '@/components/stat-card-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Stat Card** is a dashboard KPI tile: a `label`, a big pre-formatted `value`,
+an optional percentage `delta` (coloured green/red by whether the change is *good*),
+and an optional `icon` badge. Tint the whole card with an `accent` colour. In Angular
+it's `<bpdm-stat-card>` with the same inputs; the icon is projected with
+`bpdmStatCardIcon`.
+
+## Usage
+
+Pass a `label` and a pre-formatted `value`. Add a `delta` (percent change) with an
+optional `deltaLabel`, and an `icon`.
+
+<Preview>
+  <StatCardUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-usage.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+import { Users } from 'lucide-react'; // any icon works
+
+export function ActiveUsers() {
+  return (
+    <StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The icon is any element marked `bpdmStatCardIcon` (projected into the badge).
+
+```ts title="stat-card-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'active-users',
+  imports: [BpdmStatCard],
+  template: `
+    <bpdm-stat-card label="Active users" value="8,420" [delta]="3.1" deltaLabel="vs last week">
+      <svg bpdmStatCardIcon viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+      </svg>
+    </bpdm-stat-card>
+  `,
+})
+export class ActiveUsers {}
+```
+
+  </Tab>
+</Tabs>
+
+## Delta & direction
+
+A positive `delta` is green and a negative one red — **by default up is good**. For
+metrics where an *increase* is bad (churn, bounce rate, error rate…), set
+`positiveIsGood={false}` so a rise turns red. A zero delta is neutral. The arrow and
+sign convey direction too, so it never relies on colour alone.
+
+<Preview>
+  <StatCardDeltaDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-delta.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+import { UserPlus, Clock, TrendingDown } from 'lucide-react';
+
+export function Deltas() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {/* up + good → green */}
+      <StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
+      {/* down + good → red */}
+      <StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />
+      {/* up but bad → red */}
+      <StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} deltaLabel="vs last month" icon={<TrendingDown />} />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-delta.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'deltas',
+  imports: [BpdmStatCard],
+  template: `
+    <div class="grid gap-4 sm:grid-cols-3">
+      <bpdm-stat-card label="New signups" value="1,294" [delta]="12.5" deltaLabel="vs last month" />
+      <bpdm-stat-card label="Avg. session" value="4m 12s" [delta]="-1.8" deltaLabel="vs last month" />
+      <!-- up is bad here → a rise turns red -->
+      <bpdm-stat-card label="Bounce rate" value="2.4%" [delta]="0.6" [positiveIsGood]="false" deltaLabel="vs last month" />
+    </div>
+  `,
+})
+export class Deltas {}
+```
+
+  </Tab>
+</Tabs>
+
+## Accent colour
+
+Pass `accent` — any CSS colour (hex or a token) — to tint the card background and
+the icon badge. Great for colour-coding a dashboard.
+
+<Preview>
+  <StatCardAccentDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-accent.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+import { Eye, Activity } from 'lucide-react';
+
+export function Accented() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <StatCard label="Page views" value="1.24M" accent="#2563eb" icon={<Eye />} />
+      <StatCard label="Sessions" value="84.3K" accent="#0d9488" icon={<Activity />} />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-accent.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'accented',
+  imports: [BpdmStatCard],
+  template: `
+    <div class="grid gap-4 sm:grid-cols-2">
+      <bpdm-stat-card label="Page views" value="1.24M" accent="#2563eb" />
+      <bpdm-stat-card label="Sessions" value="84.3K" accent="#0d9488" />
+    </div>
+  `,
+})
+export class Accented {}
+```
+
+  </Tab>
+</Tabs>
+
+## Without a delta
+
+Omit `delta` for a plain label + value tile.
+
+<Preview>
+  <StatCardNoDeltaDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-plain.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+
+export function OpenTickets() {
+  return <StatCard label="Open tickets" value="37" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-plain.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'open-tickets',
+  imports: [BpdmStatCard],
+  template: `<bpdm-stat-card label="Open tickets" value="37" />`,
+})
+export class OpenTickets {}
+```
+
+  </Tab>
+</Tabs>
+
+## Dashboard grid
+
+Stat Cards are just tiles — drop them in a responsive grid for a KPI row.
+
+<Preview>
+  <StatCardDashboardDemo />
+</Preview>
+
+```tsx title="dashboard.tsx"
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" icon={<Users />} />
+  <StatCard label="New signups" value="1,294" delta={12.5} deltaLabel="vs last month" icon={<UserPlus />} />
+  <StatCard label="Bounce rate" value="2.4%" delta={0.6} positiveIsGood={false} deltaLabel="vs last month" icon={<TrendingDown />} />
+  <StatCard label="Avg. session" value="4m 12s" delta={-1.8} deltaLabel="vs last month" icon={<Clock />} />
+</div>
+```
+
+## API
+
+### `StatCard` / `<bpdm-stat-card>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | — | **Required.** The metric name. |
+| `value` | `ReactNode` (Angular `string`) | — | **Required.** The pre-formatted value, e.g. `"8,420"`. |
+| `delta` | `number` | — | Percent change, e.g. `12.5` or `-1.8`. Omit for no delta. |
+| `deltaLabel` | `string` | — | Caption next to the delta, e.g. `"vs last month"`. |
+| `positiveIsGood` | `boolean` | `true` | When `false`, an increase is shown as bad (red) — for churn/bounce/errors. |
+| `icon` | `ReactNode` (Angular `bpdmStatCardIcon`) | — | Icon shown in the badge. |
+| `accent` | `string` | — | Any CSS colour — tints the card + icon badge. |
+| `className` | `string` (Angular `class`) | — | Extra classes on the card. |
+
+## Accessibility
+
+- The `label` and `value` are plain text, announced in reading order.
+- The delta never relies on colour alone — an **arrow + sign** convey direction and
+  `deltaLabel` gives it context, so it reads clearly without perceiving red/green.
+- The icon is decorative — the `label` carries the meaning.
+- `accent` only tints backgrounds; text keeps accessible contrast against the card.
