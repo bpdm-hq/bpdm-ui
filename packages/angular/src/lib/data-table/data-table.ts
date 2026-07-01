@@ -115,7 +115,7 @@ interface RenderRow<T> {
               <input
                 type="text"
                 [value]="query()"
-                (input)="query.set($any($event.target).value)"
+                (input)="setQuery($any($event.target).value)"
                 [attr.placeholder]="searchPlaceholder()"
                 aria-label="Search"
                 class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background pl-8 pr-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
@@ -496,8 +496,14 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly pinnable = input(false, { transform: booleanAttribute });
   readonly columnPinChange = output<{ id: string; pin: "left" | "right" | undefined }>();
   readonly columnToggle = input(false, { transform: booleanAttribute });
+  /** Controlled per-column filters — when set, the parent owns filtering (server-side). */
+  readonly filtersInput = input<Record<string, ColumnFilter> | undefined>(undefined, { alias: "filters" });
+  readonly filtersChange = output<Record<string, ColumnFilter>>();
   readonly searchable = input(false, { transform: booleanAttribute });
   readonly searchPlaceholder = input<string>("Search…");
+  /** Controlled search value — when set, the parent owns search (server-side). */
+  readonly searchValue = input<string | undefined>(undefined);
+  readonly searchChange = output<string>();
   readonly responsive = input(false, { transform: booleanAttribute });
   readonly virtualized = input(false, { transform: booleanAttribute });
   readonly reorderableColumns = input(false, { transform: booleanAttribute });
@@ -510,9 +516,26 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   private readonly headRow = viewChild<ElementRef<HTMLTableRowElement>>("headRow");
   private readonly injector = inject(Injector);
 
-  // --- mutable UI state ---
-  protected readonly query = signal("");
-  protected readonly filters = signal<Record<string, ColumnFilter>>({});
+  // --- mutable UI state (search + filters are controllable → server-side) ---
+  private readonly internalQuery = signal("");
+  private readonly internalFilters = signal<Record<string, ColumnFilter>>({});
+  protected readonly isQueryControlled = computed(() => this.searchValue() !== undefined);
+  protected readonly isFiltersControlled = computed(() => this.filtersInput() !== undefined);
+  protected readonly query = computed(() => this.searchValue() ?? this.internalQuery());
+  protected readonly filters = computed(() => this.filtersInput() ?? this.internalFilters());
+  protected setQuery(v: string) {
+    if (!this.isQueryControlled()) this.internalQuery.set(v);
+    this.searchChange.emit(v);
+  }
+  protected setFilters(
+    next:
+      | Record<string, ColumnFilter>
+      | ((prev: Record<string, ColumnFilter>) => Record<string, ColumnFilter>),
+  ) {
+    const resolved = typeof next === "function" ? next(this.filters()) : next;
+    if (!this.isFiltersControlled()) this.internalFilters.set(resolved);
+    this.filtersChange.emit(resolved);
+  }
   // null = "untouched" → fall back to the matching default* input (reactively, so
   // a binding that resolves after construction is still picked up)
   private readonly internalSort = signal<DataTableSort[] | null>(null);
@@ -753,18 +776,18 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     Object.values(this.filters()).some((f) => f.rules.some((r) => r.value !== "")),
   );
   protected applyFilter(id: string, f: ColumnFilter): void {
-    this.filters.update((s) => ({ ...s, [id]: f }));
+    this.setFilters((s) => ({ ...s, [id]: f }));
   }
   protected clearFilter(id: string): void {
-    this.filters.update((s) => {
+    this.setFilters((s) => {
       const next = { ...s };
       delete next[id];
       return next;
     });
   }
   protected clearAll(): void {
-    this.query.set("");
-    this.filters.set({});
+    this.setQuery("");
+    this.setFilters({});
   }
   protected filterOptionsFor(col: DataTableColumn<T>): { value: string; label: string }[] {
     if (col.filterType !== "select") return [];
@@ -781,17 +804,20 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
 
   private readonly filteredData = computed(() => {
-    const q = this.query().trim().toLowerCase();
+    // controlled dimensions are already applied by the parent (server-side)
+    const q = this.isQueryControlled() ? "" : this.query().trim().toLowerCase();
     const cols = this.effectiveColumns();
     const byId = this.colById();
-    const active = Object.entries(this.filters())
-      .map(([id, f]) => ({
-        col: byId.get(id),
-        type: (byId.get(id)?.filterType ?? (byId.get(id)?.numeric ? "number" : "text")) as "text" | "number",
-        matchMode: f.matchMode,
-        rules: f.rules.filter((r) => r.value !== ""),
-      }))
-      .filter((f) => f.col && f.rules.length > 0);
+    const active = this.isFiltersControlled()
+      ? []
+      : Object.entries(this.filters())
+          .map(([id, f]) => ({
+            col: byId.get(id),
+            type: (byId.get(id)?.filterType ?? (byId.get(id)?.numeric ? "number" : "text")) as "text" | "number",
+            matchMode: f.matchMode,
+            rules: f.rules.filter((r) => r.value !== ""),
+          }))
+          .filter((f) => f.col && f.rules.length > 0);
     const data = this.dataOrdered();
     if (!q && active.length === 0) return data;
     return data.filter((row) => {

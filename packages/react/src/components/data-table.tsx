@@ -213,9 +213,20 @@ export interface DataTableProps<T> {
   onColumnPinChange?: (id: string, pin: "left" | "right" | undefined) => void;
   /** Show a "Columns" control above the table to show/hide columns. */
   columnToggle?: boolean;
+  /**
+   * Controlled per-column filters — when set, the parent owns filtering (e.g.
+   * server-side): the table shows the funnel UI but does NOT filter `data` itself.
+   */
+  filters?: Record<string, ColumnFilter>;
+  /** Fired whenever a column filter changes (controlled and uncontrolled). */
+  onFiltersChange?: (filters: Record<string, ColumnFilter>) => void;
   /** Show a global search box that filters rows across all columns. */
   searchable?: boolean;
   searchPlaceholder?: string;
+  /** Controlled search value — when set, the parent owns search (e.g. server-side). */
+  searchValue?: string;
+  /** Fired whenever the search value changes (controlled and uncontrolled). */
+  onSearchChange?: (value: string) => void;
   /** On narrow screens, stack each row into a label/value card instead of scrolling. */
   responsive?: boolean;
   /**
@@ -1025,8 +1036,12 @@ export function DataTable<T>({
   pinnable = false,
   onColumnPinChange,
   columnToggle = false,
+  filters: controlledFilters,
+  onFiltersChange,
   searchable = false,
   searchPlaceholder = "Search…",
+  searchValue,
+  onSearchChange,
   responsive = false,
   virtualized = false,
   reorderableColumns = false,
@@ -1044,11 +1059,28 @@ export function DataTable<T>({
   );
   const sortState = isControlled ? sort! : internalSort;
 
-  // global search query
-  const [query, setQuery] = React.useState("");
+  // global search query — controllable (parent owns it → server-side search)
+  const isQueryControlled = searchValue !== undefined;
+  const [internalQuery, setInternalQuery] = React.useState("");
+  const query = isQueryControlled ? searchValue! : internalQuery;
+  const setQuery = (v: string) => {
+    if (!isQueryControlled) setInternalQuery(v);
+    onSearchChange?.(v);
+  };
 
-  // per-column filters (id → matchMode + rules)
-  const [filters, setFilters] = React.useState<Record<string, ColumnFilter>>({});
+  // per-column filters (id → matchMode + rules) — controllable (server-side)
+  const isFiltersControlled = controlledFilters !== undefined;
+  const [internalFilters, setInternalFilters] = React.useState<Record<string, ColumnFilter>>({});
+  const filters = isFiltersControlled ? controlledFilters! : internalFilters;
+  const setFilters = (
+    next:
+      | Record<string, ColumnFilter>
+      | ((prev: Record<string, ColumnFilter>) => Record<string, ColumnFilter>),
+  ) => {
+    const resolved = typeof next === "function" ? next(filters) : next;
+    if (!isFiltersControlled) setInternalFilters(resolved);
+    onFiltersChange?.(resolved);
+  };
 
   // interactive pinning: runtime pin state seeded from the columns' declared pin
   const [pinState, setPinState] = React.useState<
@@ -1158,17 +1190,21 @@ export function DataTable<T>({
   };
 
   const filteredData = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // when a dimension is controlled the parent already applied it (server-side),
+    // so the table must NOT re-apply it here
+    const q = isQueryControlled ? "" : query.trim().toLowerCase();
     // resolve active column filters once (skip empty-value rule sets)
-    const active = Object.entries(filters)
-      .map(([id, f]) => ({
-        col: colById.get(id),
-        type: (colById.get(id)?.filterType ??
-          (colById.get(id)?.numeric ? "number" : "text")) as "text" | "number",
-        matchMode: f.matchMode,
-        rules: f.rules.filter((r) => r.value !== ""),
-      }))
-      .filter((f) => f.col && f.rules.length > 0);
+    const active = isFiltersControlled
+      ? []
+      : Object.entries(filters)
+          .map(([id, f]) => ({
+            col: colById.get(id),
+            type: (colById.get(id)?.filterType ??
+              (colById.get(id)?.numeric ? "number" : "text")) as "text" | "number",
+            matchMode: f.matchMode,
+            rules: f.rules.filter((r) => r.value !== ""),
+          }))
+          .filter((f) => f.col && f.rules.length > 0);
 
     if (!q && active.length === 0) return dataOrdered;
 
@@ -1187,7 +1223,7 @@ export function DataTable<T>({
         return matchMode === "all" ? res.every(Boolean) : res.some(Boolean);
       });
     });
-  }, [dataOrdered, query, filters, effectiveColumns, colById]);
+  }, [dataOrdered, query, filters, effectiveColumns, colById, isQueryControlled, isFiltersControlled]);
 
   const sortedRows = React.useMemo(() => {
     if (isControlled || sortState.length === 0) return filteredData;

@@ -282,7 +282,11 @@ export class SortableTable {
 ## Column filters
 
 Set `filterable` on a column for a header filter menu — `filterType` is `text`,
-`number`, or `select` (pick from the column's distinct values).
+`number`, or `select` (pick from the column's distinct values). Filtering is
+**client-side** by default (the table filters `data` in memory). For **server-side**
+filtering, control `filters` + `onFiltersChange` (and `searchValue` + `onSearchChange`
+for search): the same funnel UI is shown, but the table stops filtering itself and
+just emits the change so you can re-fetch — exactly like controlled sorting.
 
 <Preview>
   <DataTableFiltersDemo />
@@ -2035,6 +2039,8 @@ export class EmptyTable {
 | `pagination` | `client \| server \| cursor` | — | Paging config. |
 | `renderExpanded` (Angular `expandedTemplate`) / `expandMode` / `expandedKeys` | — | — | Expandable detail rows. |
 | `pinnable` / `columnToggle` / `searchable` / `responsive` / `virtualized` | `boolean` | — | Opt-in features. |
+| `filters` / `onFiltersChange` | `Record<string, ColumnFilter>` / `(filters) => void` | — | Controlled column filters — set for **server-side** filtering (table stops filtering itself). Angular `[filters]` + `(filtersChange)`. |
+| `searchValue` / `onSearchChange` | `string` / `(value) => void` | — | Controlled global search — set for **server-side** search. Angular `[searchValue]` + `(searchChange)`. |
 | `reorderableColumns` / `reorderableRows` | `boolean` | — | Drag to reorder columns / rows. |
 | `emptyContent` | `ReactNode` (Angular `string`) | `No data` | Empty-state content. |
 
