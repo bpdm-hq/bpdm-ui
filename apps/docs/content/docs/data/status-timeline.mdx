@@ -1,11 +1,187 @@
 ---
 title: Status Timeline
-description: Status Timeline — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A vertical status timeline for lifecycles — complete / current / pending / failed steps with timestamps, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Status Timeline** component — available in React (`@bpdm/ui/status-timeline`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  StatusTimelineUsageDemo,
+  StatusTimelineStatusesDemo,
+  StatusTimelineFailureDemo,
+} from '@/components/status-timeline-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Status Timeline** shows a lifecycle top-to-bottom — a deployment, an approval,
+an onboarding flow. Each step carries a `status` (**complete** ✓, **current** —
+pulsing, **pending** — hollow, **failed** ✗), with an optional `timestamp` and
+`description`. It's data-driven: pass an `items` array.
+
+## Usage
+
+Pass `items` — each with a `title` and a `status`. Add a `timestamp` (shown on the
+right) and a `description` where useful.
+
+<Preview>
+  <StatusTimelineUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="deploy-timeline.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+  { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+  { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+  { title: 'Promote to production', status: 'pending' },
+];
+
+export function DeployTimeline() {
+  return <StatusTimeline items={steps} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="deploy-timeline.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'deploy-timeline',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class DeployTimeline {
+  readonly steps: TimelineItem[] = [
+    { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+    { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+    { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+    { title: 'Promote to production', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Statuses
+
+The four `status` values — **complete**, **current**, **pending**, **failed** —
+each get a distinct marker. The `current` marker pulses; `failed` is destructive-red.
+
+<Preview>
+  <StatusTimelineStatusesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="statuses.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const items: TimelineItem[] = [
+  { title: 'Complete', status: 'complete', timestamp: 'done', description: 'A finished step.' },
+  { title: 'Current', status: 'current', timestamp: 'now', description: 'In progress (the marker pulses).' },
+  { title: 'Pending', status: 'pending', description: 'Not started yet.' },
+  { title: 'Failed', status: 'failed', timestamp: 'error', description: 'Something went wrong.' },
+];
+
+export function Statuses() {
+  return <StatusTimeline items={items} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="statuses.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'statuses',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="items" />`,
+})
+export class Statuses {
+  readonly items: TimelineItem[] = [
+    { title: 'Complete', status: 'complete', timestamp: 'done', description: 'A finished step.' },
+    { title: 'Current', status: 'current', timestamp: 'now', description: 'In progress (the marker pulses).' },
+    { title: 'Pending', status: 'pending', description: 'Not started yet.' },
+    { title: 'Failed', status: 'failed', timestamp: 'error', description: 'Something went wrong.' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## With a failure
+
+A `failed` step turns red and carries its reason in `description` — the steps after
+it stay `pending`.
+
+<Preview>
+  <StatusTimelineFailureDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="failed-pipeline.tsx"
+const steps: TimelineItem[] = [
+  { title: 'Build', status: 'complete', timestamp: '11:02' },
+  { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
+  { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
+  { title: 'Deploy', status: 'pending' },
+];
+
+<StatusTimeline items={steps} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="failed-pipeline.ts"
+readonly steps: TimelineItem[] = [
+  { title: 'Build', status: 'complete', timestamp: '11:02' },
+  { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
+  { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
+  { title: 'Deploy', status: 'pending' },
+];
+// <bpdm-status-timeline [items]="steps" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `StatusTimeline` / `<bpdm-status-timeline>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
+| `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
+
+### `TimelineItem`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `title` | `string` | The step label. |
+| `status` | `complete \| current \| pending \| failed` | The step's state (drives the marker + colour). |
+| `timestamp` | `string` | Short meta shown on the right, e.g. `"09:47"`. |
+| `description` | `ReactNode` (Angular `string`) | Optional detail under the title. |
+
+## Accessibility
+
+- Renders an ordered list (`<ol>` / `<li>`) — steps are announced in sequence.
+- Status is **never colour-only**: each state has a distinct marker/icon
+  (✓ complete, a filled pulsing dot for current, a hollow ring for pending, ✗ failed)
+  and the `title` describes the step.
+- The `current` step's pulse respects reduced-motion preferences.
+- `timestamp` and `description` are plain text, read alongside the step title.

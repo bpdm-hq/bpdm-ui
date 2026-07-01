@@ -69,7 +69,7 @@ export function StatusTimeline({ items, className }: StatusTimelineProps) {
             >
               {status === "current" && (
                 <span
-                  className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite]"
+                  className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none"
                   aria-hidden
                 />
               )}

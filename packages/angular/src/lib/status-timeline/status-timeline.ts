@@ -57,7 +57,7 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
           }
           <span [class]="row.dotClass">
             @if (row.status === "current") {
-              <span class="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite]" aria-hidden="true"></span>
+              <span class="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none" aria-hidden="true"></span>
             }
             @if (row.status === "complete") {
               <svg viewBox="0 0 16 16" fill="none" class="size-3.5" aria-hidden="true">
