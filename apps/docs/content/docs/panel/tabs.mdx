@@ -1,11 +1,262 @@
 ---
 title: Tabs
-description: Tabs — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Accessible tabs (roving focus, arrow keys) — underline or pill, full-width, icons; data-driven or composed, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Tabs** component — available in React (`@bpdm/ui/tabs`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  TabsUsageDemo,
+  TabsPillDemo,
+  TabsFullWidthDemo,
+  TabsBaselineDemo,
+  TabsIconsDemo,
+  TabsDisabledDemo,
+} from '@/components/tabs-demos';
+import { Preview } from '@/components/preview';
+
+The **Tabs** switch between panels. Built for accessibility — roving focus and
+arrow-key navigation — with two looks (**underline** and **pill**), optional icons,
+full-width layout, and disabled tabs. Data-driven via `items`, controlled or
+uncontrolled. In Angular it's `<bpdm-tabs>` with the same inputs.
+
+## Usage
+
+Pass `items` — each with a `value`, `label`, and `content`. `defaultValue` sets the
+initial tab (or control it with `value` + `onValueChange`).
+
+<Preview>
+  <TabsUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tabs-usage.tsx"
+import { Tabs, type TabItem } from '@bpdm/ui/tabs';
+
+const items: TabItem[] = [
+  { value: 'overview', label: 'Overview', content: <p>Key metrics and recent activity.</p> },
+  { value: 'activity', label: 'Activity', content: <p>A feed of deploys, comments, and reviews.</p> },
+  { value: 'settings', label: 'Settings', content: <p>Manage members, roles, and integrations.</p> },
+];
+
+export function WorkspaceTabs() {
+  return <Tabs items={items} defaultValue="overview" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Each tab's `content` is a `<ng-template>` referenced from the `items` array.
+
+```ts title="tabs-usage.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmTabs, type TabItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'workspace-tabs',
+  imports: [BpdmTabs],
+  templateUrl: './workspace-tabs.html',
+})
+export class WorkspaceTabs {
+  readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+
+  readonly items = computed<TabItem[]>(() => [
+    { value: 'overview', label: 'Overview', content: this.overview() },
+    { value: 'activity', label: 'Activity', content: this.activity() },
+    { value: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}
+```
+
+```html title="workspace-tabs.html"
+<bpdm-tabs [items]="items()" defaultValue="overview" />
+
+<ng-template #overview><p>Key metrics and recent activity.</p></ng-template>
+<ng-template #activity><p>A feed of deploys, comments, and reviews.</p></ng-template>
+<ng-template #settings><p>Manage members, roles, and integrations.</p></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Pill variant
+
+`variant="pill"` swaps the underline indicator for a filled active tab — good for
+compact, segmented switches.
+
+<Preview>
+  <TabsPillDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pill.tsx"
+<Tabs items={items} defaultValue="overview" variant="pill" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="pill.html"
+<bpdm-tabs [items]="items()" defaultValue="overview" variant="pill" />
+```
+
+  </Tab>
+</Tabs>
+
+## Full width
+
+`fullWidth` stretches the tabs to fill the row equally.
+
+<Preview>
+  <TabsFullWidthDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="full-width.tsx"
+<Tabs items={items} defaultValue="overview" fullWidth />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="full-width.html"
+<bpdm-tabs [items]="items()" defaultValue="overview" fullWidth />
+```
+
+  </Tab>
+</Tabs>
+
+## Baseline
+
+For the underline variant, `baseline` controls how far the track runs — `full`
+(across the whole row, default) or `content` (only under the tabs).
+
+<Preview>
+  <TabsBaselineDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="baseline.tsx"
+<Tabs items={items} defaultValue="overview" baseline="content" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="baseline.html"
+<bpdm-tabs [items]="items()" defaultValue="overview" baseline="content" />
+```
+
+  </Tab>
+</Tabs>
+
+## With icons
+
+Give a tab an `icon` for a leading glyph.
+
+<Preview>
+  <TabsIconsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="icons.tsx"
+import { Gauge } from 'lucide-react';
+
+const items: TabItem[] = [
+  { value: 'overview', label: 'Overview', icon: <Gauge />, content: <p>…</p> },
+  // …
+];
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The `icon` is a `<ng-template>` too.
+
+```ts title="icons.ts"
+readonly gauge = viewChild.required<TemplateRef<unknown>>('gauge');
+
+readonly items = computed<TabItem[]>(() => [
+  { value: 'overview', label: 'Overview', icon: this.gauge(), content: this.overview() },
+]);
+```
+
+  </Tab>
+</Tabs>
+
+## Disabled tab
+
+Set `disabled` on an item to make it non-selectable (arrow-key navigation skips it).
+
+<Preview>
+  <TabsDisabledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="disabled.tsx"
+const items: TabItem[] = [
+  { value: 'settings', label: 'Settings', disabled: true, content: <p>…</p> },
+  // …
+];
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="disabled.ts"
+{ value: 'settings', label: 'Settings', disabled: true, content: this.settings() }
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Tabs` / `<bpdm-tabs>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `TabItem[]` | — | **Required.** The tabs. |
+| `value` / `defaultValue` / `onValueChange` | `string` | — | Active tab — controlled or uncontrolled. Angular: `[(value)]`. |
+| `variant` | `underline \| pill` | `underline` | Indicator style. |
+| `baseline` | `full \| content` | `full` | Underline track width (underline variant). |
+| `fullWidth` | `boolean` | `false` | Stretch tabs to fill the row. |
+| `className` / `listClassName` | `string` | — | Extra classes on the root / the tab list. |
+
+### `TabItem`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | Unique id for the tab. |
+| `label` | `ReactNode` (Angular `string`) | The tab's label. |
+| `content` | `ReactNode` (Angular `TemplateRef`) | The panel shown when active. |
+| `icon` | `ReactNode` (Angular `TemplateRef`) | Optional leading icon. |
+| `disabled` | `boolean` | Make the tab non-selectable. |
 
 <Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
+  Prefer composition? Import `TabsRoot` / `TabsList` / `TabsTrigger` / `TabsContent`
+  and build the tree yourself instead of passing `items`.
 </Callout>
+
+## Accessibility
+
+- Built on Radix Tabs — a proper **tablist** with **roving focus**: arrow keys move
+  between tabs, **Home/End** jump to first/last, and disabled tabs are skipped.
+- Each tab is a `role="tab"` linked to its `role="tabpanel"` via `aria-controls` /
+  `aria-labelledby`; the active tab carries `aria-selected`.
+- The active indicator is not colour-only — the selected tab is also bolder, and
+  (pill) filled.
