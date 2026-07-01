@@ -119,6 +119,52 @@ fixture.debugElement.query(By.css('[data-testid="status"]'));
   </Tab>
 </Tabs>
 
+### Data Table
+
+The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
+no test ids needed. Rows are `row`, headers are `columnheader`, cells are `cell`,
+sortable headers are `button`s (with `aria-sort` on the header), selection controls
+are `checkbox`/`radio`, and the pagination controls are labelled buttons. Pass
+`label` for an accessible table name (`getByRole('table', { name })`).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="members-table.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<MembersTable label="Members" />);
+
+// the table, its rows, and a specific cell — all by role/text
+screen.getByRole('table', { name: 'Members' });
+screen.getAllByRole('row');            // 1 header row + N body rows
+screen.getByRole('cell', { name: 'Sara Kovac' });
+
+// sort by clicking the header button; assert aria-sort on the header
+await userEvent.click(screen.getByRole('button', { name: 'Name' }));
+expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute('aria-sort', 'ascending');
+
+// selection controls are checkboxes ([0] is select-all)
+await userEvent.click(screen.getAllByRole('checkbox')[1]);
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="members-table.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// query by role/tag — no test ids needed on a semantic table
+el.querySelectorAll('tbody tr');                 // body rows
+el.querySelector('thead th button');             // a sortable header
+el.querySelectorAll('[role="checkbox"]');        // [0] = select-all
+el.querySelector('input[aria-label="Search"]');  // the search box
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and

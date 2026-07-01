@@ -2287,11 +2287,23 @@ export class EmptyTable {
 
 ## Accessibility
 
-- Renders a real semantic `<table>` (`thead` / `tbody` / `th` / `td`), so screen
-  readers and keyboard navigation work natively.
-- Sortable headers are buttons and expose **`aria-sort`**; the selection column's
-  checkboxes/radios are labelled, and "select all" toggles the page.
-- The sticky header and horizontal scroll keep headers associated with their
-  cells; pinned columns stay reachable.
-- Provide a meaningful `header` per column — it's the accessible name for every
-  cell in that column.
+- Renders a real semantic `<table>` (`thead` / `tbody` / `th scope` / `td`) — a
+  plain accessible table, so screen readers announce rows and columns natively.
+  Pass **`label`** for the table's accessible name (maps to `aria-label`).
+- Provide a meaningful **`header`** per column — it's the accessible name for that
+  column's cells.
+- Sortable headers are `<button>`s and the header exposes **`aria-sort`**
+  (`none` / `ascending` / `descending`). Clickable rows (`onRowClick`) are
+  focusable and activate on **Enter / Space**.
+- Selection checkboxes/radios are labelled; **select-all** is a labelled header
+  checkbox with an indeterminate state. Pagination controls are labelled buttons
+  and the current page carries **`aria-current`**. Decorative icons are `aria-hidden`.
+- Sticky header + horizontal scroll keep headers associated with their cells, and
+  pinned columns stay reachable. On narrow screens, `responsive` stacks each row
+  into a **labelled label/value card** (the `header` becomes each field's label).
+
+<Callout type="info">
+  This is a semantic **table**, not a custom ARIA **grid** — it does not implement
+  arrow-key cell-to-cell navigation (`role="grid"`). That fits the vast majority of
+  data tables; reach for a grid only if you need spreadsheet-style cell navigation.
+</Callout>
