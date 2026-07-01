@@ -12,8 +12,7 @@ import {
   DataTableEditableDemo,
   DataTableStickyDemo,
   DataTableClickableDemo,
-  DataTableSortingDemo,
-  DataTableMultiSortDemo,
+  DataTableSortDemo,
   DataTableSelectionDemo,
   DataTablePaginationDemo,
   DataTableExpandableDemo,
@@ -151,100 +150,22 @@ export class MembersTable {
 
 ## Sorting
 
-Mark a column `sortable`; clicking its header cycles asc → desc → none. For
-server-side ordering, control `sort` and handle `onSortChange`.
+Mark a column `sortable`; clicking its header cycles asc → desc → none, with a live
+arrow indicator. Add `multiSort` to sort by several columns at once — **Shift+click**
+a header to append it to the sort (each shows its order). The preview toggles the two
+modes with our `Tabs`; in **Multi sort** rows are grouped by **role**, then by **tasks**
+within each role. Leave `sort` unset to let the table sort internally, or control
+`sort` + `onSortChange` for server-side ordering.
 
 <Preview>
-  <DataTableSortingDemo />
+  <DataTableSortDemo />
 </Preview>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
 ```tsx title="data-table-sorting.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
-  { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
-];
-
-export function SortableTable() {
-  return (
-    <DataTable
-      columns={columns}
-      data={members}
-      rowKey={(r) => r.id}
-      defaultSort={[{ id: 'tasks', dir: 'desc' }]}
-      onSortChange={(sort) => console.log(sort)}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-sorting.ts"
-import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'sortable-table',
-  imports: [BpdmDataTable],
-  template: `
-    <bpdm-data-table
-      [columns]="columns"
-      [data]="members"
-      [rowKey]="rowKey"
-      [defaultSort]="[{ id: 'tasks', dir: 'desc' }]"
-      (sortChange)="onSort($event)"
-    />
-  `,
-})
-export class SortableTable {
-  readonly rowKey = (r: Member) => r.id;
-  onSort(sort: DataTableSort[]) { console.log(sort); }
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', sortable: true, accessor: (r) => r.name },
-    { id: 'role', header: 'Role', sortable: true, accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
-  ];
-}
-```
-
-  </Tab>
-</Tabs>
-
-## Multi-column sort
-
-Add `multiSort` to sort by several columns at once — **Shift+click** a header to
-append it to the sort (each shows its order). Here rows are grouped by **role**,
-then by **tasks** within each role.
-
-<Preview>
-  <DataTableMultiSortDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-multi-sort.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { DataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
@@ -258,6 +179,21 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
 ];
 
+// Single-column sort — clicking a header cycles asc → desc → none
+export function SortableTable() {
+  return (
+    <DataTable
+      columns={columns}
+      data={members}
+      rowKey={(r) => r.id}
+      defaultSort={[{ id: 'tasks', dir: 'desc' }]}
+      onSortChange={(sort: DataTableSort[]) => console.log(sort)}
+    />
+  );
+}
+
+// Multi-column sort — Shift+click a header to append it (each shows its order);
+// here rows are grouped by role, then by tasks within each role
 export function MultiSortTable() {
   return (
     <DataTable
@@ -277,27 +213,32 @@ export function MultiSortTable() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="data-table-multi-sort.ts"
+```ts title="data-table-sorting.ts"
 import { Component } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+import { BpdmDataTable, type DataTableColumn, type DataTableSort } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
-  selector: 'multi-sort-table',
+  selector: 'sortable-table',
   imports: [BpdmDataTable],
   template: `
+    <!-- Single-column sort -->
     <bpdm-data-table
-      [columns]="columns"
-      [data]="members"
-      [rowKey]="rowKey"
+      [columns]="columns" [data]="members" [rowKey]="rowKey"
+      [defaultSort]="[{ id: 'tasks', dir: 'desc' }]"
+      (sortChange)="onSort($event)" />
+
+    <!-- Multi-column sort — Shift+click a header to append (grouped by role, then tasks) -->
+    <bpdm-data-table
+      [columns]="columns" [data]="members" [rowKey]="rowKey"
       multiSort
-      [defaultSort]="[{ id: 'role', dir: 'asc' }, { id: 'tasks', dir: 'desc' }]"
-    />
+      [defaultSort]="[{ id: 'role', dir: 'asc' }, { id: 'tasks', dir: 'desc' }]" />
   `,
 })
-export class MultiSortTable {
+export class SortableTable {
   readonly rowKey = (r: Member) => r.id;
+  onSort(sort: DataTableSort[]) { console.log(sort); }
   readonly members: Member[] = [
     { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
     { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },

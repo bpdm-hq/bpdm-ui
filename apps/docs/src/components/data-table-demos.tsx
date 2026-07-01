@@ -407,28 +407,36 @@ export function DataTableClickableDemo() {
   );
 }
 
-export function DataTableSortingDemo() {
+export function DataTableSortDemo() {
   return (
-    <Box>
-      <DataTable columns={sortableColumns} data={MEMBERS} rowKey={key} defaultSort={[{ id: 'tasks', dir: 'desc' }]} />
-    </Box>
-  );
-}
-
-export function DataTableMultiSortDemo() {
-  return (
-    <Box>
-      <DataTable
-        columns={sortableColumns}
-        data={MEMBERS}
-        rowKey={key}
-        multiSort
-        defaultSort={[
-          { id: 'role', dir: 'asc' },
-          { id: 'tasks', dir: 'desc' },
-        ]}
-      />
-    </Box>
+    <Tabs
+      className="w-full self-start"
+      listClassName="mb-2"
+      defaultValue="single"
+      items={[
+        {
+          value: 'single',
+          label: 'Single sort',
+          content: <DataTable columns={sortableColumns} data={MEMBERS} rowKey={key} defaultSort={[{ id: 'tasks', dir: 'desc' }]} />,
+        },
+        {
+          value: 'multi',
+          label: 'Multi sort',
+          content: (
+            <DataTable
+              columns={sortableColumns}
+              data={MEMBERS}
+              rowKey={key}
+              multiSort
+              defaultSort={[
+                { id: 'role', dir: 'asc' },
+                { id: 'tasks', dir: 'desc' },
+              ]}
+            />
+          ),
+        },
+      ]}
+    />
   );
 }
 
