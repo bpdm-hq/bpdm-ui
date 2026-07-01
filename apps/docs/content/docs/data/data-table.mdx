@@ -296,9 +296,10 @@ preview toggles **Client** and **Server** with our `Tabs`.
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="data-table-filters.tsx"
-import { useState } from 'react';
-import { DataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ui/data-table';
+**Client** — mark columns `filterable`; the table filters `data` in memory:
+
+```tsx title="filters-client.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 const members: Member[] = [
@@ -312,16 +313,68 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
-// Client-side (default) — the table filters `data` in memory
 export function FilterableTable() {
   return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
 }
+```
 
-// Server-side — control `filters`; the same funnel UI shows, but you fetch the
-// filtered rows. `ColumnFilter` = { matchMode: 'all' | 'any', rules: [{ op, value }] }.
+**Server** — control `filters`; the same funnel UI shows, but *you* fetch the filtered
+rows (swap `filterMembers` for a real API call). A `ColumnFilter` is
+`{ matchMode: 'all' | 'any', rules: [{ op, value }] }`:
+
+```tsx title="filters-server.tsx"
+import { useMemo, useState } from 'react';
+import { DataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const ALL: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+  { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
+];
+const FIELD: Record<string, (m: Member) => string | number> = {
+  name: (m) => m.name,
+  role: (m) => m.role,
+  tasks: (m) => m.tasks,
+};
+
+// stand-in for your backend — apply the active filters (replace with a fetch)
+function filterMembers(filters: Record<string, ColumnFilter>): Member[] {
+  const active = Object.entries(filters).filter(([, f]) => f.rules.some((r) => r.value !== ''));
+  if (!active.length) return ALL;
+  return ALL.filter((m) =>
+    active.every(([id, f]) => {
+      const raw = FIELD[id]?.(m);
+      const res = f.rules
+        .filter((r) => r.value !== '')
+        .map((r) => {
+          const cell = String(raw ?? '').toLowerCase();
+          const v = r.value.toLowerCase();
+          switch (r.op) {
+            case 'equals': return cell === v;
+            case 'notEquals': return cell !== v;
+            case 'startsWith': return cell.startsWith(v);
+            case 'endsWith': return cell.endsWith(v);
+            case 'gt': return Number(raw) > Number(r.value);
+            case 'gte': return Number(raw) >= Number(r.value);
+            case 'lt': return Number(raw) < Number(r.value);
+            case 'lte': return Number(raw) <= Number(r.value);
+            default: return cell.includes(v);
+          }
+        });
+      return f.matchMode === 'all' ? res.every(Boolean) : res.some(Boolean);
+    }),
+  );
+}
+
 export function ServerFilteredTable() {
   const [filters, setFilters] = useState<Record<string, ColumnFilter>>({});
-  const rows = useFilteredMembers(filters); // your data hook — re-fetches on change
+  const rows = useMemo(() => filterMembers(filters), [filters]);
   return (
     <DataTable columns={columns} data={rows} rowKey={(r) => r.id} filters={filters} onFiltersChange={setFilters} />
   );
@@ -331,24 +384,18 @@ export function ServerFilteredTable() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="data-table-filters.ts"
-import { Component, signal } from '@angular/core';
-import { BpdmDataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ng';
+**Client** — mark columns `filterable`; the table filters in memory:
+
+```ts title="filters-client.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
 
 type Member = { id: string; name: string; role: string; tasks: number };
 
 @Component({
   selector: 'filterable-table',
   imports: [BpdmDataTable],
-  template: `
-    <!-- Client-side (default) -->
-    <bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />
-
-    <!-- Server-side — control [filters]; re-fetch on (filtersChange) -->
-    <bpdm-data-table
-      [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
-      [filters]="filters()" (filtersChange)="onFilters($event)" />
-  `,
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
 })
 export class FilterableTable {
   readonly rowKey = (r: Member) => r.id;
@@ -362,14 +409,77 @@ export class FilterableTable {
     { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
     { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
   ];
+}
+```
 
-  // server-side: filter state + the rows your backend returns
+**Server** — control `[filters]`; re-fetch on `(filtersChange)`:
+
+```ts title="filters-server.ts"
+import { Component, signal, computed } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn, type ColumnFilter } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const ALL: Member[] = [
+  { id: 'm1', name: 'Hugo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const FIELD: Record<string, (m: Member) => string | number> = {
+  name: (m) => m.name,
+  role: (m) => m.role,
+  tasks: (m) => m.tasks,
+};
+
+@Component({
+  selector: 'server-filtered-table',
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns" [data]="rows()" [rowKey]="rowKey"
+      [filters]="filters()" (filtersChange)="onFilters($event)" />
+  `,
+})
+export class ServerFilteredTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', filterable: true, accessor: (r) => r.name },
+    { id: 'role', header: 'Role', filterable: true, filterType: 'select', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, filterable: true, accessor: (r) => r.tasks },
+  ];
+
   readonly filters = signal<Record<string, ColumnFilter>>({});
-  readonly serverRows = signal<Member[]>([]);
   onFilters(next: Record<string, ColumnFilter>) {
     this.filters.set(next);
-    // re-fetch: this.api.members(next).subscribe(rows => this.serverRows.set(rows));
   }
+
+  // stand-in for your backend — apply the active filters (replace with a fetch)
+  readonly rows = computed(() => {
+    const active = Object.entries(this.filters()).filter(([, f]) => f.rules.some((r) => r.value !== ''));
+    if (!active.length) return ALL;
+    return ALL.filter((m) =>
+      active.every(([id, f]) => {
+        const raw = FIELD[id]?.(m);
+        const res = f.rules
+          .filter((r) => r.value !== '')
+          .map((r) => {
+            const cell = String(raw ?? '').toLowerCase();
+            const v = r.value.toLowerCase();
+            switch (r.op) {
+              case 'equals': return cell === v;
+              case 'notEquals': return cell !== v;
+              case 'startsWith': return cell.startsWith(v);
+              case 'endsWith': return cell.endsWith(v);
+              case 'gt': return Number(raw) > Number(r.value);
+              case 'gte': return Number(raw) >= Number(r.value);
+              case 'lt': return Number(raw) < Number(r.value);
+              case 'lte': return Number(raw) <= Number(r.value);
+              default: return cell.includes(v);
+            }
+          });
+        return f.matchMode === 'all' ? res.every(Boolean) : res.some(Boolean);
+      }),
+    );
+  });
 }
 ```
 
