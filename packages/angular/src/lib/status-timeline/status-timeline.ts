@@ -2,13 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, input } from "@angular/co
 import { cn } from "@bpdm/variants";
 
 export type TimelineStatus = "complete" | "current" | "pending" | "failed";
+export type TimelineAlign = "left" | "right" | "alternate";
 
 export interface TimelineItem {
   title: string;
   status?: TimelineStatus;
-  /** Short timestamp / meta shown on the right, e.g. "12:04". */
+  /** Short timestamp / meta shown inline on the right, e.g. "12:04". */
   timestamp?: string;
   description?: string;
+  /** Content shown on the opposite side of the line (e.g. a date). */
+  opposite?: string;
 }
 
 interface TimelineRow {
@@ -16,11 +19,15 @@ interface TimelineRow {
   status: TimelineStatus;
   timestamp?: string;
   description?: string;
+  opposite?: string;
   last: boolean;
-  muted: boolean;
-  dotClass: string;
+  liClass: string;
   lineClass: string;
+  dotClass: string;
+  contentClass: string;
+  titleRowClass: string;
   titleClass: string;
+  oppositeClass: string;
 }
 
 const DOT_BY_STATUS: Record<TimelineStatus, string> = {
@@ -34,15 +41,8 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
  * `<bpdm-status-timeline>` — vertical status timeline for lifecycles (deployment,
  * approval, onboarding, builds). Each step has a status — `complete` (✓),
  * `current` (pulsing), `pending` (hollow), `failed` (✗) — with an optional
- * timestamp and description.
- *
- * ```html
- * <bpdm-status-timeline [items]="[
- *   { title: 'Build queued', status: 'complete', timestamp: '09:41' },
- *   { title: 'Running tests', status: 'current', timestamp: '09:42' },
- *   { title: 'Deploy', status: 'pending' },
- * ]" />
- * ```
+ * timestamp, description, and `opposite` content. `align` places content left
+ * (default), right, or alternating; `opposite` content sits across the line.
  */
 @Component({
   selector: "bpdm-status-timeline",
@@ -51,7 +51,7 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
   template: `
     <ol [class]="rootClass()">
       @for (row of rows(); track $index) {
-        <li class="relative flex gap-3 pb-6 last:pb-0">
+        <li [class]="row.liClass">
           @if (!row.last) {
             <span [class]="row.lineClass" aria-hidden="true"></span>
           }
@@ -71,8 +71,8 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
             }
           </span>
 
-          <div class="-mt-0.5 flex-1">
-            <div class="flex items-center justify-between gap-2">
+          <div [class]="row.contentClass">
+            <div [class]="row.titleRowClass">
               <p [class]="row.titleClass">{{ row.title }}</p>
               @if (row.timestamp) {
                 <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</span>
@@ -82,6 +82,10 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
               <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
             }
           </div>
+
+          @if (hasOpposite()) {
+            <div [class]="row.oppositeClass">{{ row.opposite }}</div>
+          }
         </li>
       }
     </ol>
@@ -89,32 +93,61 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
 })
 export class BpdmStatusTimeline {
   readonly items = input<TimelineItem[]>([]);
+  readonly align = input<TimelineAlign>("left");
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly rootClass = computed(() => cn("relative", this.classInput()));
+  protected readonly hasOpposite = computed(() => this.items().some((it) => it.opposite != null));
 
   protected readonly rows = computed<TimelineRow[]>(() => {
     const items = this.items();
+    const align = this.align();
+    const alternate = align === "alternate";
+    const centered = alternate || this.hasOpposite();
+
     return items.map((item, i) => {
       const status = item.status ?? "pending";
       const last = i === items.length - 1;
       const muted = status === "pending";
+      const contentRight = alternate ? i % 2 === 0 : align !== "right";
+
       return {
         title: item.title,
         status,
         timestamp: item.timestamp,
         description: item.description,
+        opposite: item.opposite,
         last,
-        muted,
+        liClass: cn(
+          "relative pb-6 last:pb-0",
+          centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
+          !centered && align === "right" && "flex-row-reverse",
+        ),
+        lineClass: cn(
+          "absolute top-6 bottom-0 w-px",
+          centered
+            ? "left-1/2 -translate-x-1/2"
+            : align === "right"
+              ? "right-3 translate-x-1/2"
+              : "left-3 -translate-x-1/2",
+          status === "complete" ? "bg-success/40" : "bg-border",
+        ),
         dotClass: cn(
           "relative z-10 grid size-6 shrink-0 place-items-center rounded-full",
           DOT_BY_STATUS[status],
+          centered && "col-start-2",
         ),
-        lineClass: cn(
-          "absolute left-3 top-6 bottom-0 w-px -translate-x-1/2",
-          status === "complete" ? "bg-success/40" : "bg-border",
+        contentClass: cn(
+          "-mt-0.5 min-w-0",
+          centered ? (contentRight ? "col-start-3" : "col-start-1") : "flex-1",
+          !contentRight && "text-right",
         ),
+        titleRowClass: cn("flex items-center justify-between gap-2", !contentRight && "flex-row-reverse"),
         titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
+        oppositeClass: cn(
+          "-mt-0.5 min-w-0 text-sm text-muted-foreground",
+          contentRight ? "col-start-1 text-right" : "col-start-3 text-left",
+        ),
       };
     });
   });
