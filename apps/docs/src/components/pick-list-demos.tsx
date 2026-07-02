@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { PickList } from '@bpdm/ui/pick-list';
 import { Badge } from '@bpdm/ui/badge';
 
@@ -28,61 +28,75 @@ function FeatureRow({ f }: { f: Feature }) {
 }
 
 // ── demos ─────────────────────────────────────────────────────────────────────
+// PickList is fluid — it fills its container. In the docs stage we give it a
+// comfortable, centered width so the two panes read as a balanced pair.
+function Stage({ children }: { children: ReactNode }) {
+  return <div className="mx-auto w-full max-w-4xl">{children}</div>;
+}
+
 export function PickListUsageDemo() {
   const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
   return (
-    <PickList
-      value={value}
-      onChange={setValue}
-      itemKey={(s) => s}
-      renderItem={(s) => s}
-      sourceHeader="Available"
-      targetHeader="Enabled"
-    />
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+      />
+    </Stage>
   );
 }
 
 export function PickListCustomDemo() {
   const [value, setValue] = useState({ source: FEATURE_OBJS, target: [] as Feature[] });
   return (
-    <PickList
-      value={value}
-      onChange={setValue}
-      itemKey={(f) => f.id}
-      renderItem={(f) => <FeatureRow f={f} />}
-      sourceHeader="Available"
-      targetHeader="Enabled"
-    />
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(f) => f.id}
+        renderItem={(f) => <FeatureRow f={f} />}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+      />
+    </Stage>
   );
 }
 
 export function PickListFilterDemo() {
   const [value, setValue] = useState({ source: FEATURE_OBJS, target: [] as Feature[] });
   return (
-    <PickList
-      value={value}
-      onChange={setValue}
-      itemKey={(f) => f.id}
-      renderItem={(f) => <FeatureRow f={f} />}
-      sourceHeader="Available"
-      targetHeader="Enabled"
-      filterBy={(f) => f.name}
-      filterPlaceholder="Filter features…"
-    />
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(f) => f.id}
+        renderItem={(f) => <FeatureRow f={f} />}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+        filterBy={(f) => f.name}
+        filterPlaceholder="Filter features…"
+      />
+    </Stage>
   );
 }
 
 export function PickListTransferDemo() {
   const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
   return (
-    <PickList
-      value={value}
-      onChange={setValue}
-      itemKey={(s) => s}
-      renderItem={(s) => s}
-      sourceHeader="Available"
-      targetHeader="Enabled"
-      reorder={false}
-    />
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+        reorder={false}
+      />
+    </Stage>
   );
 }

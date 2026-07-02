@@ -59,7 +59,7 @@ const meta: Meta<typeof PickList<string>> = {
   // canvas so the two panes read as a compact, balanced pair.
   decorators: [
     (Story) => (
-      <div className="mx-auto w-full max-w-3xl">
+      <div className="mx-auto w-full max-w-4xl">
         <Story />
       </div>
     ),

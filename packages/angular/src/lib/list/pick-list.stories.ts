@@ -136,7 +136,7 @@ const meta: Meta = {
       const story = storyFn() as { template?: string; [k: string]: unknown };
       return {
         ...story,
-        template: `<div class="mx-auto w-full max-w-3xl">${story.template ?? ""}</div>`,
+        template: `<div class="mx-auto w-full max-w-4xl">${story.template ?? ""}</div>`,
       };
     },
   ],
