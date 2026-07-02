@@ -139,14 +139,19 @@ export class BpdmStatusTimeline {
         ),
         contentClass: cn(
           "-mt-0.5 min-w-0",
-          centered ? (contentRight ? "col-start-3" : "col-start-1") : "flex-1",
+          // hug the line so title + meta stay together beside the dot
+          centered
+            ? contentRight
+              ? "col-start-3 justify-self-start"
+              : "col-start-1 justify-self-end"
+            : "flex-1",
           !contentRight && "text-right",
         ),
         titleRowClass: cn("flex items-center justify-between gap-2", !contentRight && "flex-row-reverse"),
         titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
         oppositeClass: cn(
           "-mt-0.5 min-w-0 text-sm text-muted-foreground",
-          contentRight ? "col-start-1 text-right" : "col-start-3 text-left",
+          contentRight ? "col-start-1 justify-self-end text-right" : "col-start-3 justify-self-start text-left",
         ),
       };
     });

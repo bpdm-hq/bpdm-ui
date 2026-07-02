@@ -111,7 +111,12 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
             <div
               className={cn(
                 "-mt-0.5 min-w-0",
-                centered ? (contentRight ? "col-start-3" : "col-start-1") : "flex-1",
+                // hug the line so title + meta stay together beside the dot
+                centered
+                  ? contentRight
+                    ? "col-start-3 justify-self-start"
+                    : "col-start-1 justify-self-end"
+                  : "flex-1",
                 !contentRight && "text-right",
               )}
             >
@@ -130,7 +135,7 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
               <div
                 className={cn(
                   "-mt-0.5 min-w-0 text-sm text-muted-foreground",
-                  contentRight ? "col-start-1 text-right" : "col-start-3 text-left",
+                  contentRight ? "col-start-1 justify-self-end text-right" : "col-start-3 justify-self-start text-left",
                 )}
               >
                 {item.opposite}
