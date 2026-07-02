@@ -8,6 +8,8 @@ import {
   StatusTimelineUsageDemo,
   StatusTimelineStatusesDemo,
   StatusTimelineFailureDemo,
+  StatusTimelineAlignDemo,
+  StatusTimelineOppositeDemo,
 } from '@/components/status-timeline-demos';
 import { Preview } from '@/components/preview';
 
@@ -159,6 +161,111 @@ readonly steps: TimelineItem[] = [
   </Tab>
 </Tabs>
 
+## Alignment
+
+`align` sets which side the content sits on relative to the line — `left` (default),
+`right`, or `alternate` (zig-zag). The demo switches between them with our own
+[Tabs](/docs/panel/tabs).
+
+<Preview>
+  <StatusTimelineAlignDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alignment.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+  { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+  { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+  { title: 'Promote to production', status: 'pending' },
+];
+
+export function Alignment() {
+  return <StatusTimeline items={steps} align="alternate" />; // or "left" | "right"
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alignment.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'alignment',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" align="alternate" />`, // or "left" | "right"
+})
+export class Alignment {
+  readonly steps: TimelineItem[] = [
+    { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+    { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+    { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+    { title: 'Promote to production', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Opposite
+
+Add `opposite` to an item to show content on the **other side** of the line — a date,
+a duration, an actor. Any item having `opposite` centers the line so both sides read.
+
+<Preview>
+  <StatusTimelineOppositeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="opposite.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
+  { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+];
+
+export function Opposite() {
+  return <StatusTimeline items={steps} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="opposite.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'opposite',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class Opposite {
+  readonly steps: TimelineItem[] = [
+    { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
+    { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
+    { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
+    { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatusTimeline` / `<bpdm-status-timeline>`
@@ -166,6 +273,7 @@ readonly steps: TimelineItem[] = [
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
+| `align` | `left \| right \| alternate` | `left` | Which side the content sits on relative to the line. |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
 
 ### `TimelineItem`
@@ -176,6 +284,7 @@ readonly steps: TimelineItem[] = [
 | `status` | `complete \| current \| pending \| failed` | The step's state (drives the marker + colour). |
 | `timestamp` | `string` | Short meta shown on the right, e.g. `"09:47"`. |
 | `description` | `ReactNode` (Angular `string`) | Optional detail under the title. |
+| `opposite` | `ReactNode` (Angular `string`) | Content shown across the line (e.g. a date); centers the line when present. |
 
 ## Accessibility
 

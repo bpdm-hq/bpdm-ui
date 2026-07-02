@@ -1,9 +1,14 @@
 'use client';
 
 import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+import { Tabs, type TabItem } from '@bpdm/ui/tabs';
 
 function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-sm">{children}</div>;
+}
+
+function WideBox({ children }: { children: React.ReactNode }) {
+  return <div className="mx-auto w-full max-w-lg">{children}</div>;
 }
 
 // ── demos (neutral deploy / CI lifecycle) ─────────────────────────────────────
@@ -49,5 +54,36 @@ export function StatusTimelineFailureDemo() {
     <Box>
       <StatusTimeline items={FAILED} />
     </Box>
+  );
+}
+
+// Alignment — dogfood our own Tabs to switch between left / right / alternate
+const ALIGN_TABS: TabItem[] = [
+  { value: 'left', label: 'Left', content: <StatusTimeline items={DEPLOY} align="left" /> },
+  { value: 'right', label: 'Right', content: <StatusTimeline items={DEPLOY} align="right" /> },
+  { value: 'alternate', label: 'Alternate', content: <StatusTimeline items={DEPLOY} align="alternate" /> },
+];
+
+export function StatusTimelineAlignDemo() {
+  return (
+    <WideBox>
+      <Tabs items={ALIGN_TABS} defaultValue="alternate" variant="pill" listClassName="mb-3" />
+    </WideBox>
+  );
+}
+
+// Opposite — a date across the line from each step
+const DATED: TimelineItem[] = [
+  { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
+  { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+];
+
+export function StatusTimelineOppositeDemo() {
+  return (
+    <WideBox>
+      <StatusTimeline items={DATED} />
+    </WideBox>
   );
 }
