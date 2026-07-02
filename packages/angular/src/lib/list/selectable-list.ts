@@ -169,6 +169,8 @@ export class BpdmSelectableList<T = unknown> {
     const showAccent = isSel || (this.focused() && isActive) || this.isOver(key);
     return cn(
       "group relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-[0.99]",
+      // gentle settle-in when an item is added / transferred into this list
+      "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
       // primary inline-start accent bar is the single visual language — it marks the
       // selection, the keyboard-active option, AND the drag drop-target. RTL-safe.
       "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
