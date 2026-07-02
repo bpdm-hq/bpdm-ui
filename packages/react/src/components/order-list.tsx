@@ -77,6 +77,8 @@ export interface SelectableListProps<T> {
   multiselectable?: boolean;
   /** Accessible name for the listbox when there is no visible `header`. */
   ariaLabel?: string;
+  /** Predicate marking an item as disabled — not selectable, draggable, or keyboard-active. */
+  isItemDisabled?: (item: T) => boolean;
   className?: string;
 }
 
@@ -94,8 +96,10 @@ export function SelectableList<T>({
   emptyText = "No items",
   multiselectable = false,
   ariaLabel,
+  isItemDisabled,
   className,
 }: SelectableListProps<T>) {
+  const isDisabled = (item: T) => !!isItemDisabled?.(item);
   const [query, setQuery] = React.useState("");
   const [dragKey, setDragKey] = React.useState<ItemKey | null>(null);
   const [overKey, setOverKey] = React.useState<ItemKey | null>(null);
@@ -113,42 +117,51 @@ export function SelectableList<T>({
     : items;
   const canDrag = !!onReorder && !filtering;
 
-  // keep the active option within what's currently visible (e.g. after filtering)
-  React.useEffect(() => {
-    if (activeKey != null && !shown.some((i) => keyOf(i) === activeKey)) {
-      setActiveKey(shown.length ? keyOf(shown[0]) : null);
+  // first / next enabled option in a direction (keyboard nav skips disabled rows)
+  const findEnabled = (start: number, dir: 1 | -1) => {
+    for (let i = start; i >= 0 && i < shown.length; i += dir) {
+      if (!isDisabled(shown[i])) return i;
     }
+    return -1;
+  };
+
+  // keep the active option within what's currently visible + enabled (e.g. after filtering)
+  React.useEffect(() => {
+    const ok = activeKey != null && shown.some((i) => keyOf(i) === activeKey && !isDisabled(i));
+    if (!ok) {
+      const first = findEnabled(0, 1);
+      setActiveKey(first >= 0 ? keyOf(shown[first]) : null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shown, activeKey, keyOf]);
 
   const activeIndex = activeKey == null ? -1 : shown.findIndex((i) => keyOf(i) === activeKey);
 
-  const moveActive = (to: number) => {
-    if (!shown.length) return;
-    const clamped = Math.max(0, Math.min(shown.length - 1, to));
-    setActiveKey(keyOf(shown[clamped]));
+  const setActiveTo = (idx: number) => {
+    if (idx >= 0) setActiveKey(keyOf(shown[idx]));
   };
 
   const onListKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        moveActive(activeIndex < 0 ? 0 : activeIndex + 1);
+        setActiveTo(findEnabled(activeIndex < 0 ? 0 : activeIndex + 1, 1));
         break;
       case "ArrowUp":
         e.preventDefault();
-        moveActive(activeIndex < 0 ? 0 : activeIndex - 1);
+        setActiveTo(findEnabled(activeIndex < 0 ? shown.length - 1 : activeIndex - 1, -1));
         break;
       case "Home":
         e.preventDefault();
-        moveActive(0);
+        setActiveTo(findEnabled(0, 1));
         break;
       case "End":
         e.preventDefault();
-        moveActive(shown.length - 1);
+        setActiveTo(findEnabled(shown.length - 1, -1));
         break;
       case "Enter":
       case " ":
-        if (activeIndex >= 0) {
+        if (activeIndex >= 0 && !isDisabled(shown[activeIndex])) {
           e.preventDefault();
           const it = shown[activeIndex];
           onToggle(keyOf(it), it);
@@ -202,7 +215,7 @@ export function SelectableList<T>({
         aria-activedescendant={activeIndex >= 0 ? optionId(activeKey as ItemKey) : undefined}
         onFocus={() => {
           setFocused(true);
-          if (activeIndex < 0 && shown.length) setActiveKey(keyOf(shown[0]));
+          if (activeIndex < 0) setActiveTo(findEnabled(0, 1));
         }}
         onBlur={() => setFocused(false)}
         onKeyDown={onListKeyDown}
@@ -216,8 +229,10 @@ export function SelectableList<T>({
         ) : (
           shown.map((item) => {
             const key = keyOf(item);
+            const itemDisabled = isDisabled(item);
             const isSel = selected.has(key);
             const isActive = key === activeKey;
+            const draggable = canDrag && !itemDisabled;
             // only while a drag is actually in progress — never a stray top line
             const isOver = dragKey !== null && overKey === key && dragKey !== key;
             return (
@@ -226,12 +241,14 @@ export function SelectableList<T>({
                 id={optionId(key)}
                 role="option"
                 aria-selected={isSel}
-                draggable={canDrag}
+                aria-disabled={itemDisabled || undefined}
+                draggable={draggable}
                 onClick={() => {
+                  if (itemDisabled) return;
                   setActiveKey(key);
                   onToggle(key, item);
                 }}
-                onDragStart={() => canDrag && setDragKey(key)}
+                onDragStart={() => draggable && setDragKey(key)}
                 onDragOver={(e) => {
                   if (!canDrag) return;
                   e.preventDefault();
@@ -247,20 +264,25 @@ export function SelectableList<T>({
                   handleDrop(key);
                 }}
                 className={cn(
-                  "group relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-[0.99]",
+                  "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
                   // gentle settle-in when an item is added / transferred into this list
                   "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
-                  // on-brand: a primary inline-start accent bar marks both the selection
-                  // and the active (keyboard-focused) option — full-height, RTL-safe.
+                  // on-brand: a primary inline-start accent bar marks the selection, the
+                  // keyboard-active option, AND the drag drop-target — full-height, RTL-safe.
                   "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
-                  isSel ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground" : "text-foreground hover:bg-muted",
-                  // the inline-start accent bar is the single visual language — it marks
-                  // the selection, the keyboard-active option, AND the drag drop-target.
-                  isSel || (focused && isActive) || isOver ? "before:opacity-100" : "before:opacity-0",
+                  itemDisabled
+                    ? "cursor-not-allowed text-muted-foreground opacity-60 before:opacity-0"
+                    : cn(
+                        "cursor-pointer active:scale-[0.99]",
+                        isSel
+                          ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
+                          : "text-foreground hover:bg-muted",
+                        isSel || (focused && isActive) || isOver ? "before:opacity-100" : "before:opacity-0",
+                      ),
                   dragKey === key && "opacity-50",
                 )}
               >
-                {canDrag && (
+                {draggable && (
                   <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground" />
                 )}
                 <div className="min-w-0 flex-1">{renderItem(item)}</div>
@@ -394,6 +416,8 @@ export interface OrderListProps<T> {
   scrollHeight?: string;
   /** Accessible name for the list when there is no visible `header`. */
   ariaLabel?: string;
+  /** Predicate marking an item as disabled — not selectable, movable, or draggable. */
+  isItemDisabled?: (item: T) => boolean;
   className?: string;
 }
 
@@ -416,6 +440,7 @@ export function OrderList<T>({
   selectionMode = "single",
   scrollHeight,
   ariaLabel,
+  isItemDisabled,
   className,
 }: OrderListProps<T>) {
   const [items, setItems] = useControllable<T[]>(valueProp, defaultValue, onChange);
@@ -460,6 +485,7 @@ export function OrderList<T>({
         scrollHeight={scrollHeight}
         multiselectable={selectionMode === "multiple"}
         ariaLabel={ariaLabel}
+        isItemDisabled={isItemDisabled}
       />
 
       <div role="status" aria-live="polite" className="sr-only">

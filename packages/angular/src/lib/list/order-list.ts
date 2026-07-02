@@ -49,6 +49,7 @@ import { BpdmSelectableList } from "./selectable-list";
         [scrollHeight]="scrollHeight()"
         [multiselectable]="selectionMode() === 'multiple'"
         [ariaLabel]="ariaLabel()"
+        [isItemDisabled]="isItemDisabled()"
         (toggle)="onToggle($event.key)"
         (reorder)="setItems($event)"
       />
@@ -73,6 +74,8 @@ export class BpdmOrderList<T = unknown> {
   readonly scrollHeight = input<string>("18rem");
   /** Accessible name for the list when there is no visible `header`. */
   readonly ariaLabel = input<string>("");
+  /** Predicate marking an item as disabled — not selectable, movable, or draggable. */
+  readonly isItemDisabled = input<((item: T) => boolean) | undefined>(undefined);
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly selected = signal<Set<ItemKey>>(new Set());

@@ -77,16 +77,17 @@ import {
               [id]="optionId(key)"
               role="option"
               [attr.aria-selected]="selected().has(key)"
-              [attr.draggable]="canDrag() ? true : null"
-              (click)="activeKey.set(key); toggle.emit({ key, item })"
-              (dragstart)="canDrag() ? dragKey.set(key) : null"
+              [attr.aria-disabled]="isDisabled(item) ? true : null"
+              [attr.draggable]="canDrag() && !isDisabled(item) ? true : null"
+              (click)="onOptionClick(key, item)"
+              (dragstart)="canDrag() && !isDisabled(item) ? dragKey.set(key) : null"
               (dragover)="onDragOver($event, key)"
               (dragleave)="onDragLeave(key)"
               (dragend)="dragKey.set(null); overKey.set(null)"
               (drop)="onDrop($event, key)"
-              [class]="rowClass(key)"
+              [class]="rowClass(key, item)"
             >
-              @if (canDrag()) {
+              @if (canDrag() && !isDisabled(item)) {
                 <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground" aria-hidden="true">
                   <circle cx="9" cy="6" r="1" fill="currentColor" /><circle cx="9" cy="12" r="1" fill="currentColor" /><circle cx="9" cy="18" r="1" fill="currentColor" />
                   <circle cx="15" cy="6" r="1" fill="currentColor" /><circle cx="15" cy="12" r="1" fill="currentColor" /><circle cx="15" cy="18" r="1" fill="currentColor" />
@@ -118,6 +119,8 @@ export class BpdmSelectableList<T = unknown> {
   readonly multiselectable = input(false, { transform: booleanAttribute });
   /** Accessible name for the listbox when there is no visible `header`. */
   readonly ariaLabel = input<string>("");
+  /** Predicate marking an item as disabled — not selectable, draggable, or keyboard-active. */
+  readonly isItemDisabled = input<((item: T) => boolean) | undefined>(undefined);
 
   readonly toggle = output<{ key: ItemKey; item: T }>();
   readonly reorder = output<T[]>();
@@ -163,60 +166,85 @@ export class BpdmSelectableList<T = unknown> {
     return this.dragKey() !== null && this.overKey() === key && this.dragKey() !== key;
   }
 
-  protected rowClass(key: ItemKey): string {
+  protected isDisabled(item: T): boolean {
+    const fn = this.isItemDisabled();
+    return !!fn && fn(item);
+  }
+
+  // first / next enabled option in a direction (keyboard nav skips disabled rows)
+  private findEnabled(start: number, dir: 1 | -1): number {
+    const list = this.shown();
+    for (let i = start; i >= 0 && i < list.length; i += dir) {
+      if (!this.isDisabled(list[i])) return i;
+    }
+    return -1;
+  }
+  private setActiveTo(idx: number): void {
+    if (idx >= 0) this.activeKey.set(this.keyOf()(this.shown()[idx]));
+  }
+
+  protected rowClass(key: ItemKey, item: T): string {
+    const disabled = this.isDisabled(item);
     const isSel = this.selected().has(key);
     const isActive = this.activeKey() === key;
-    const showAccent = isSel || (this.focused() && isActive) || this.isOver(key);
+    const showAccent = !disabled && (isSel || (this.focused() && isActive) || this.isOver(key));
     return cn(
-      "group relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-[0.99]",
+      "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
       // gentle settle-in when an item is added / transferred into this list
       "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
       // primary inline-start accent bar is the single visual language — it marks the
       // selection, the keyboard-active option, AND the drag drop-target. RTL-safe.
       "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
-      isSel ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground" : "text-foreground hover:bg-muted",
+      disabled
+        ? "cursor-not-allowed text-muted-foreground opacity-60"
+        : cn(
+            "cursor-pointer active:scale-[0.99]",
+            isSel
+              ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
+              : "text-foreground hover:bg-muted",
+          ),
       showAccent ? "before:opacity-100" : "before:opacity-0",
       this.dragKey() === key && "opacity-50",
     );
   }
 
-  protected onFocus(): void {
-    this.focused.set(true);
-    const list = this.shown();
-    if (this.activeIndex() < 0 && list.length) this.activeKey.set(this.keyOf()(list[0]));
+  protected onOptionClick(key: ItemKey, item: T): void {
+    if (this.isDisabled(item)) return;
+    this.activeKey.set(key);
+    this.toggle.emit({ key, item });
   }
 
-  protected moveActive(to: number): void {
-    const list = this.shown();
-    if (!list.length) return;
-    const clamped = Math.max(0, Math.min(list.length - 1, to));
-    this.activeKey.set(this.keyOf()(list[clamped]));
+  protected onFocus(): void {
+    this.focused.set(true);
+    if (this.activeIndex() < 0) this.setActiveTo(this.findEnabled(0, 1));
   }
 
   protected onListKey(e: KeyboardEvent): void {
     const idx = this.activeIndex();
+    const len = this.shown().length;
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        this.moveActive(idx < 0 ? 0 : idx + 1);
+        this.setActiveTo(this.findEnabled(idx < 0 ? 0 : idx + 1, 1));
         break;
       case "ArrowUp":
         e.preventDefault();
-        this.moveActive(idx < 0 ? 0 : idx - 1);
+        this.setActiveTo(this.findEnabled(idx < 0 ? len - 1 : idx - 1, -1));
         break;
       case "Home":
         e.preventDefault();
-        this.moveActive(0);
+        this.setActiveTo(this.findEnabled(0, 1));
         break;
       case "End":
         e.preventDefault();
-        this.moveActive(this.shown().length - 1);
+        this.setActiveTo(this.findEnabled(len - 1, -1));
         break;
       case "Enter":
       case " ": {
         if (idx < 0) break;
-        e.preventDefault();
         const it = this.shown()[idx];
+        if (this.isDisabled(it)) break;
+        e.preventDefault();
         this.toggle.emit({ key: this.keyOf()(it), item: it });
         break;
       }
