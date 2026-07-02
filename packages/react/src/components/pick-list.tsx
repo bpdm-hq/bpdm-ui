@@ -124,6 +124,7 @@ export function PickList<T>({
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
         emptyText="No items"
+        multiselectable
       />
 
       {/* transfer controls — a row on mobile, a column on lg+ */}
@@ -155,6 +156,7 @@ export function PickList<T>({
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
         emptyText="Nothing here yet"
+        multiselectable
       />
 
       {reorder && (

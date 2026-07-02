@@ -5,6 +5,8 @@ import {
   type ItemKeyFn,
   type ItemTextFn,
   type ListItemContext,
+  MOVE_MESSAGE,
+  type MoveKind,
 } from "./list-internals";
 import { BpdmReorderControls } from "./reorder-controls";
 import { BpdmSelectableList } from "./selectable-list";
@@ -32,6 +34,7 @@ import { BpdmSelectableList } from "./selectable-list";
         [itemKey]="itemKey()"
         [selected]="selected()"
         (reorder)="setItems($event)"
+        (moved)="announce($event)"
       />
       <bpdm-selectable-list
         class="flex-1"
@@ -44,9 +47,13 @@ import { BpdmSelectableList } from "./selectable-list";
         [filterBy]="filterBy()"
         [filterPlaceholder]="filterPlaceholder()"
         [scrollHeight]="scrollHeight()"
+        [multiselectable]="selectionMode() === 'multiple'"
+        [ariaLabel]="ariaLabel()"
         (toggle)="onToggle($event.key)"
         (reorder)="setItems($event)"
       />
+
+      <div role="status" aria-live="polite" class="sr-only">{{ message() }}</div>
     </div>
   `,
 })
@@ -64,16 +71,27 @@ export class BpdmOrderList<T = unknown> {
   /** "single" (default) or "multiple" — move several together with the controls. */
   readonly selectionMode = input<"single" | "multiple">("single");
   readonly scrollHeight = input<string>("18rem");
+  /** Accessible name for the list when there is no visible `header`. */
+  readonly ariaLabel = input<string>("");
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly selected = signal<Set<ItemKey>>(new Set());
   protected readonly items = computed<T[]>(() => this.value() ?? this.defaultValue());
+  protected readonly message = signal("");
+  private flip = false;
   protected readonly rootClass = computed(() =>
-    cn("flex flex-col gap-2 sm:flex-row sm:items-start", this.classInput()),
+    cn("flex flex-col gap-2 sm:flex-row sm:items-center", this.classInput()),
   );
 
   protected setItems(next: T[]): void {
     this.value.set(next);
+  }
+
+  // Toggle a trailing space so repeating the same action still changes the text
+  // node and is re-announced by the polite live region.
+  protected announce(kind: MoveKind): void {
+    this.flip = !this.flip;
+    this.message.set(MOVE_MESSAGE[kind] + (this.flip ? "" : " "));
   }
 
   protected onToggle(key: ItemKey): void {
