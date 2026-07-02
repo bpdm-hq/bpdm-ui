@@ -35,7 +35,7 @@ middle column transfers the current selection between the lists.
 import { useState } from 'react';
 import { PickList } from '@bpdm/ui/pick-list';
 
-const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log'];
+const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'];
 
 export function Features() {
   const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
@@ -74,7 +74,7 @@ import { BpdmPickList } from '@bpdm/ng';
 export class Features {
   readonly itemKey = (s: string) => s;
   readonly value = signal({
-    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log'],
+    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'],
     target: [] as string[],
   });
 }
@@ -100,11 +100,14 @@ import { useState } from 'react';
 import { PickList } from '@bpdm/ui/pick-list';
 import { Badge } from '@bpdm/ui/badge';
 
-type Feature = { id: string; name: string; tag: string };
+type Feature = { id: string; name: string; tag: 'Core' | 'Add-on' | 'Beta' };
+
 const FEATURES: Feature[] = [
   { id: 'f1', name: 'Analytics', tag: 'Core' },
-  { id: 'f2', name: 'Webhooks', tag: 'Add-on' },
-  { id: 'f3', name: 'Audit log', tag: 'Beta' },
+  { id: 'f2', name: 'Billing', tag: 'Core' },
+  { id: 'f3', name: 'Webhooks', tag: 'Add-on' },
+  { id: 'f4', name: 'SSO', tag: 'Add-on' },
+  { id: 'f5', name: 'Audit log', tag: 'Beta' },
 ];
 
 export function Features() {
@@ -119,7 +122,9 @@ export function Features() {
       renderItem={(f) => (
         <div className="flex flex-1 items-center justify-between gap-3">
           <span className="font-medium">{f.name}</span>
-          <Badge variant="secondary" appearance="soft">{f.tag}</Badge>
+          <Badge variant="secondary" appearance="soft">
+            {f.tag}
+          </Badge>
         </div>
       )}
     />
@@ -134,7 +139,7 @@ export function Features() {
 import { Component, signal } from '@angular/core';
 import { BpdmPickList, BpdmBadge } from '@bpdm/ng';
 
-type Feature = { id: string; name: string; tag: string };
+type Feature = { id: string; name: string; tag: 'Core' | 'Add-on' | 'Beta' };
 
 @Component({
   selector: 'features',
@@ -155,8 +160,10 @@ export class Features {
   readonly value = signal<{ source: Feature[]; target: Feature[] }>({
     source: [
       { id: 'f1', name: 'Analytics', tag: 'Core' },
-      { id: 'f2', name: 'Webhooks', tag: 'Add-on' },
-      { id: 'f3', name: 'Audit log', tag: 'Beta' },
+      { id: 'f2', name: 'Billing', tag: 'Core' },
+      { id: 'f3', name: 'Webhooks', tag: 'Add-on' },
+      { id: 'f4', name: 'SSO', tag: 'Add-on' },
+      { id: 'f5', name: 'Audit log', tag: 'Beta' },
     ],
     target: [],
   });
@@ -178,32 +185,89 @@ Pass `filterBy` to show a filter box on **both** lists — handy for long option
   <Tab value="React">
 
 ```tsx title="pick-list-filter.tsx"
-<PickList
-  value={value}
-  onChange={setValue}
-  itemKey={(f) => f.id}
-  renderItem={(f) => <FeatureRow feature={f} />}
-  sourceHeader="Available"
-  targetHeader="Enabled"
-  filterBy={(f) => f.name}
-  filterPlaceholder="Filter features…"
-/>
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+import { Badge } from '@bpdm/ui/badge';
+
+type Feature = { id: string; name: string; tag: 'Core' | 'Add-on' | 'Beta' };
+
+const FEATURES: Feature[] = [
+  { id: 'f1', name: 'Analytics', tag: 'Core' },
+  { id: 'f2', name: 'Billing', tag: 'Core' },
+  { id: 'f3', name: 'Webhooks', tag: 'Add-on' },
+  { id: 'f4', name: 'SSO', tag: 'Add-on' },
+  { id: 'f5', name: 'Audit log', tag: 'Beta' },
+];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as Feature[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(f) => f.id}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      filterBy={(f) => f.name}
+      filterPlaceholder="Filter features…"
+      renderItem={(f) => (
+        <div className="flex flex-1 items-center justify-between gap-3">
+          <span className="font-medium">{f.name}</span>
+          <Badge variant="secondary" appearance="soft">
+            {f.tag}
+          </Badge>
+        </div>
+      )}
+    />
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="pick-list-filter.html"
-<bpdm-pick-list
-  [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row"
-  sourceHeader="Available" targetHeader="Enabled"
-  [filterBy]="filterBy" filterPlaceholder="Filter features…">
-  <ng-template #row let-f><!-- … --></ng-template>
-</bpdm-pick-list>
-```
+```ts title="pick-list-filter.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList, BpdmBadge } from '@bpdm/ng';
 
-```ts
-readonly filterBy = (f: Feature) => f.name;
+type Feature = { id: string; name: string; tag: 'Core' | 'Add-on' | 'Beta' };
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList, BpdmBadge],
+  template: `
+    <bpdm-pick-list
+      [(value)]="value"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      [filterBy]="filterBy"
+      filterPlaceholder="Filter features…"
+    >
+      <ng-template #row let-f>
+        <div class="flex flex-1 items-center justify-between gap-3">
+          <span class="font-medium">{{ f.name }}</span>
+          <bpdm-badge variant="secondary" appearance="soft">{{ f.tag }}</bpdm-badge>
+        </div>
+      </ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (f: Feature) => f.id;
+  readonly filterBy = (f: Feature) => f.name;
+  readonly value = signal<{ source: Feature[]; target: Feature[] }>({
+    source: [
+      { id: 'f1', name: 'Analytics', tag: 'Core' },
+      { id: 'f2', name: 'Billing', tag: 'Core' },
+      { id: 'f3', name: 'Webhooks', tag: 'Add-on' },
+      { id: 'f4', name: 'SSO', tag: 'Add-on' },
+      { id: 'f5', name: 'Audit log', tag: 'Beta' },
+    ],
+    target: [],
+  });
+}
 ```
 
   </Tab>
@@ -222,18 +286,57 @@ leaving just the transfer between lists.
   <Tab value="React">
 
 ```tsx title="pick-list-transfer.tsx"
-<PickList value={value} onChange={setValue} itemKey={(s) => s} renderItem={(s) => s}
-  sourceHeader="Available" targetHeader="Enabled" reorder={false} />
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+
+const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      reorder={false}
+    />
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="pick-list-transfer.html"
-<bpdm-pick-list [(value)]="value" [itemKey]="itemKey" [itemTemplate]="row"
-  sourceHeader="Available" targetHeader="Enabled" [reorder]="false">
-  <ng-template #row let-item>{{ item }}</ng-template>
-</bpdm-pick-list>
+```ts title="pick-list-transfer.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList } from '@bpdm/ng';
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList],
+  template: `
+    <bpdm-pick-list
+      [(value)]="value"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      [reorder]="false"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (s: string) => s;
+  readonly value = signal({
+    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'],
+    target: [] as string[],
+  });
+}
 ```
 
   </Tab>
