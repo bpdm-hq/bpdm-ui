@@ -37,7 +37,7 @@ export interface PickListValue<T> {
     <div [class]="rootClass()">
       @if (reorder()) {
         <bpdm-reorder-controls
-          class="self-center lg:self-start"
+          class="self-center"
           [items]="source()"
           [itemKey]="itemKey()"
           [selected]="sourceSel()"
@@ -96,7 +96,7 @@ export interface PickListValue<T> {
 
       @if (reorder()) {
         <bpdm-reorder-controls
-          class="self-center lg:self-start"
+          class="self-center"
           [items]="target()"
           [itemKey]="itemKey()"
           [selected]="targetSel()"
@@ -129,7 +129,7 @@ export class BpdmPickList<T = unknown> {
   protected readonly source = computed(() => this.lists().source);
   protected readonly target = computed(() => this.lists().target);
   protected readonly rootClass = computed(() =>
-    cn("flex flex-col items-stretch gap-2 lg:flex-row lg:items-start", this.classInput()),
+    cn("flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch", this.classInput()),
   );
 
   protected setLists(next: PickListValue<T>): void {

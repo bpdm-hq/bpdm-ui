@@ -208,7 +208,7 @@ export function SelectableList<T>({
         onKeyDown={onListKeyDown}
         // Focus lives on the container (aria-activedescendant), but the visible
         // focus indicator is the active option's ring — so no ring on the container.
-        className="overflow-y-auto p-1 outline-none"
+        className="min-h-0 flex-1 overflow-y-auto p-1 outline-none"
         style={{ maxHeight: scrollHeight }}
       >
         {shown.length === 0 ? (

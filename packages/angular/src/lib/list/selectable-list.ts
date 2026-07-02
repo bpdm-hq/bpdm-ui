@@ -65,7 +65,7 @@ import {
         (focus)="onFocus()"
         (blur)="focused.set(false)"
         (keydown)="onListKey($event)"
-        class="overflow-y-auto p-1 outline-none"
+        class="min-h-0 flex-1 overflow-y-auto p-1 outline-none"
         [style.max-height]="scrollHeight()"
       >
         @if (shown().length === 0) {

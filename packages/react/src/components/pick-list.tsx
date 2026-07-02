@@ -97,7 +97,7 @@ export function PickList<T>({
   return (
     <div
       className={cn(
-        "flex flex-col items-stretch gap-2 lg:flex-row lg:items-start",
+        "flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch",
         className,
       )}
     >
@@ -107,7 +107,7 @@ export function PickList<T>({
           itemKey={itemKey}
           selected={sourceSel}
           onChange={(next) => setLists({ source: next, target })}
-          className="self-center lg:self-start"
+          className="self-center"
         />
       )}
 
@@ -165,7 +165,7 @@ export function PickList<T>({
           itemKey={itemKey}
           selected={targetSel}
           onChange={(next) => setLists({ source, target: next })}
-          className="self-center lg:self-start"
+          className="self-center"
         />
       )}
     </div>
