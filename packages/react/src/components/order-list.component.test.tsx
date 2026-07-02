@@ -107,4 +107,13 @@ describe("OrderList (component)", () => {
     await userEvent.click(btn("Move down"));
     expect(screen.getByRole("status").textContent?.trim()).toBe("Moved down one position");
   });
+
+  it("never selects a disabled item, so the controls stay disabled", async () => {
+    setup({ isItemDisabled: (s) => s === "Lint" });
+    const lint = screen.getByText("Lint").closest('[role="option"]')!;
+    expect(lint).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(lint);
+    expect(lint).toHaveAttribute("aria-selected", "false");
+    expect(btn("Move down")).toBeDisabled(); // nothing selected
+  });
 });
