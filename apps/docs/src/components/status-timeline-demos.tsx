@@ -67,7 +67,7 @@ const ALIGN_TABS: TabItem[] = [
 export function StatusTimelineAlignDemo() {
   return (
     <WideBox>
-      <Tabs items={ALIGN_TABS} defaultValue="alternate" variant="pill" listClassName="mb-3" />
+      <Tabs items={ALIGN_TABS} defaultValue="alternate" className="w-full self-start" listClassName="mb-2" />
     </WideBox>
   );
 }
