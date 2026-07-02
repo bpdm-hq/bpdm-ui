@@ -5,7 +5,7 @@ import { BpdmOrderList } from "./order-list";
 @Component({
   imports: [BpdmOrderList],
   template: `
-    <bpdm-order-list [(value)]="items" [itemKey]="key" [itemTemplate]="tpl" [selectionMode]="mode" />
+    <bpdm-order-list [(value)]="items" [itemKey]="key" [itemTemplate]="tpl" [selectionMode]="mode" header="Stages" />
     <ng-template #tpl let-item>{{ item }}</ng-template>
   `,
 })
@@ -25,6 +25,8 @@ describe("BpdmOrderList", () => {
     Array.from(f.nativeElement.querySelectorAll('[role="option"]')) as HTMLElement[];
   const ctrl = (f: { nativeElement: HTMLElement }, label: string) =>
     f.nativeElement.querySelector(`button[aria-label="${label}"]`) as HTMLButtonElement;
+  const listbox = (f: { nativeElement: HTMLElement }) =>
+    f.nativeElement.querySelector('[role="listbox"]') as HTMLElement;
 
   it("renders one option per item", () => {
     const fixture = setup();
@@ -63,5 +65,50 @@ describe("BpdmOrderList", () => {
     const selected = options(fixture).filter((o) => o.getAttribute("aria-selected") === "true");
     expect(selected.length).toBe(1);
     expect(selected[0].textContent?.trim()).toBe("B");
+  });
+
+  it("names the listbox from the header via aria-labelledby", () => {
+    const fixture = setup();
+    const lb = listbox(fixture);
+    const labelId = lb.getAttribute("aria-labelledby");
+    expect(labelId).toBeTruthy();
+    expect(fixture.nativeElement.querySelector(`#${labelId}`)?.textContent?.trim()).toBe("Stages");
+  });
+
+  it("omits aria-multiselectable in single mode and sets it in multiple mode", () => {
+    const single = setup();
+    expect(listbox(single).hasAttribute("aria-multiselectable")).toBe(false);
+
+    const multi = TestBed.createComponent(Host);
+    multi.componentInstance.mode = "multiple"; // set before first change-detection
+    multi.detectChanges();
+    expect(listbox(multi).getAttribute("aria-multiselectable")).toBe("true");
+  });
+
+  it("follows the listbox keyboard pattern (focus + arrows + Enter)", () => {
+    const fixture = setup();
+    const lb = listbox(fixture);
+    lb.dispatchEvent(new Event("focus"));
+    fixture.detectChanges();
+    // focusing activates the first option
+    expect(lb.getAttribute("aria-activedescendant")).toBe(options(fixture)[0].id);
+
+    lb.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    fixture.detectChanges();
+    expect(lb.getAttribute("aria-activedescendant")).toBe(options(fixture)[1].id);
+
+    lb.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    fixture.detectChanges();
+    expect(options(fixture)[1].getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("announces a control-column move via a live region", () => {
+    const fixture = setup();
+    options(fixture)[0].click();
+    fixture.detectChanges();
+    ctrl(fixture, "Move down").click();
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status.textContent?.trim()).toBe("Moved down one position");
   });
 });
