@@ -1,12 +1,13 @@
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmStatusTimeline, type TimelineItem } from "./status-timeline";
+import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./status-timeline";
 
 @Component({
   imports: [BpdmStatusTimeline],
-  template: `<bpdm-status-timeline [items]="items" />`,
+  template: `<bpdm-status-timeline [items]="items" [align]="align" />`,
 })
 class Host {
+  align: TimelineAlign = "left";
   items: TimelineItem[] = [
     { title: "Build queued", status: "complete", timestamp: "09:41" },
     { title: "Running tests", status: "current", timestamp: "09:42", description: "412 of 980 passed" },
@@ -55,5 +56,23 @@ describe("BpdmStatusTimeline", () => {
     const fixture = create();
     const last = (fixture.nativeElement.querySelectorAll("li")[3]) as HTMLElement;
     expect(last.querySelector('[aria-hidden="true"].absolute.w-px')).toBeNull();
+  });
+
+  it("uses a centered grid for align='alternate'", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.align = "alternate"; // set before first change-detection
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll("li.grid").length).toBe(4);
+  });
+
+  it("renders opposite content across a centered line", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.items = [
+      { title: "Ordered", status: "complete", opposite: "15 Oct" },
+      { title: "Shipped", status: "current", opposite: "16 Oct" },
+    ];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain("15 Oct");
+    expect(fixture.nativeElement.querySelector("li.grid")).toBeTruthy();
   });
 });

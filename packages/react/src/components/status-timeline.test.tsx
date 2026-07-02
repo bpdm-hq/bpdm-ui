@@ -33,4 +33,26 @@ describe("StatusTimeline", () => {
     // the pulsing overlay opts out of animation when the user prefers reduced motion
     expect(container.querySelector(".motion-reduce\\:animate-none")).toBeTruthy();
   });
+
+  it("centers the line and renders opposite content across it", () => {
+    const items: TimelineItem[] = [
+      { title: "Ordered", status: "complete", opposite: "15 Oct" },
+      { title: "Shipped", status: "current", opposite: "16 Oct" },
+    ];
+    const { container } = render(<StatusTimeline items={items} />);
+    expect(screen.getByText("15 Oct")).toBeTruthy();
+    // opposite present → rows use the centered 3-column grid
+    expect(container.querySelector("li.grid")).toBeTruthy();
+  });
+
+  it("switches to a centered grid for align='alternate'", () => {
+    const { container } = render(<StatusTimeline items={ITEMS} align="alternate" />);
+    expect(container.querySelectorAll("li.grid").length).toBe(4);
+  });
+
+  it("keeps the simple flex layout for the default left align", () => {
+    const { container } = render(<StatusTimeline items={ITEMS} />);
+    expect(container.querySelector("li.grid")).toBeNull();
+    expect(container.querySelector("li.flex")).toBeTruthy();
+  });
 });
