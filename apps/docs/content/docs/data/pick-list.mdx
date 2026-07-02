@@ -9,6 +9,7 @@ import {
   PickListCustomDemo,
   PickListFilterDemo,
   PickListTransferDemo,
+  PickListLockedDemo,
 } from '@/components/pick-list-demos';
 import { Preview } from '@/components/preview';
 
@@ -342,6 +343,83 @@ export class Features {
   </Tab>
 </Tabs>
 
+## Locked items
+
+Pass `isItemDisabled` to mark items that can't be selected, transferred, or dragged
+— e.g. a plan feature that's always on. Locked items stay put even on **move-all**,
+and keyboard navigation skips over them.
+
+<Preview>
+  <PickListLockedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-locked.tsx"
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+
+export function Features() {
+  const [value, setValue] = useState({
+    source: ['Billing', 'Webhooks', 'SSO'],
+    target: ['Analytics'],
+  });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      isItemDisabled={(s) => s === 'Analytics'}
+      onTransfer={(moved, to) => console.log(`Moved ${moved.length} to ${to}`)}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list-locked.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList, type PickListValue } from '@bpdm/ng';
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList],
+  template: `
+    <bpdm-pick-list
+      [(value)]="value"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      [isItemDisabled]="isLocked"
+      (transfer)="onTransfer($event)"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (s: string) => s;
+  readonly isLocked = (s: string) => s === 'Analytics';
+  readonly value = signal<PickListValue<string>>({
+    source: ['Billing', 'Webhooks', 'SSO'],
+    target: ['Analytics'],
+  });
+  onTransfer(e: { moved: string[]; to: 'source' | 'target' }) {
+    console.log(`Moved ${e.moved.length} to ${e.to}`);
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `PickList` / `<bpdm-pick-list>`
@@ -355,6 +433,9 @@ export class Features {
 | `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box on both lists. |
 | `reorder` | `boolean` | `true` | Show per-list reorder controls + within-list drag. |
 | `scrollHeight` | `string` | `18rem` | Max body height before a list scrolls. |
+| `sourceEmptyText` / `targetEmptyText` | `string` | `No items` / `Nothing here yet` | Empty-state text per list. |
+| `isItemDisabled` | `(item) => boolean` | — | Lock items — not selectable, transferable, or draggable; kept in place on move-all. |
+| `onTransfer` (Angular `transfer`) | `(moved, to) => void` / `{ moved, to }` | — | Fires after a transfer with the moved items and destination (`"source"` \| `"target"`). |
 | `className` | `string` (Angular `class`) | — | Extra classes. |
 
 ## Accessibility
@@ -366,3 +447,9 @@ export class Features {
 - Drag is an enhancement — every transfer and reorder is reachable with the
   buttons, so keyboard-only users can operate both lists fully.
 - Give each list a `sourceHeader` / `targetHeader` so its purpose is announced.
+- Each list is a WAI-ARIA **`listbox`** (single tab stop, roving `aria-activedescendant`,
+  ↑/↓/Home/End + Enter/Space), named by its header.
+- Every transfer is announced through a polite live region (e.g. "2 items moved to
+  Enabled"), and focus is kept inside the transfer group if a button disables.
+- Locked items (`isItemDisabled`) expose `aria-disabled` and are skipped by keyboard
+  navigation, so they never trap focus or appear selectable.

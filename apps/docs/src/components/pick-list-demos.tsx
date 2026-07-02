@@ -100,3 +100,20 @@ export function PickListTransferDemo() {
     </Stage>
   );
 }
+
+export function PickListLockedDemo() {
+  const [value, setValue] = useState({ source: ['Billing', 'Webhooks', 'SSO'], target: ['Analytics'] });
+  return (
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+        isItemDisabled={(s) => s === 'Analytics'}
+      />
+    </Stage>
+  );
+}

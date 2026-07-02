@@ -165,6 +165,55 @@ el.querySelector('input[aria-label="Search"]');  // the search box
   </Tab>
 </Tabs>
 
+### Pick List & Order List
+
+Both are WAI-ARIA **`listbox`**es: each list is a `listbox` (named by its header),
+rows are `option`s exposing `aria-selected` (and `aria-disabled` when locked), and
+the move/transfer controls are labelled `button`s. Query by role — no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<Features />); // a PickList with "Available" / "Enabled" lists
+
+// each list is a named listbox; rows are options
+screen.getByRole('listbox', { name: 'Available' });
+const option = screen.getByText('Billing').closest('[role="option"]')!;
+
+// select a row, then transfer it with the labelled control
+await userEvent.click(option);
+await userEvent.click(screen.getByRole('button', { name: 'Move to target' }));
+expect(option).toHaveAttribute('aria-selected', 'true'); // in the new list
+
+// a locked item is never selectable
+// expect(lockedOption).toHaveAttribute('aria-disabled', 'true');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// each list is a listbox; rows are options
+const lists = el.querySelectorAll('[role="listbox"]');
+const options = lists[0].querySelectorAll('[role="option"]');
+
+// transfer via a labelled button, then assert state
+(options[1] as HTMLElement).click();
+fixture.detectChanges();
+el.querySelector<HTMLButtonElement>('button[aria-label="Move to target"]')!.click();
+fixture.detectChanges();
+// options carry aria-selected / aria-disabled for assertions
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and
