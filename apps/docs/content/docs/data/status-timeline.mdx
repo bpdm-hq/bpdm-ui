@@ -337,10 +337,11 @@ export class Roadmap {
 
 ## Custom markers & interactivity
 
-Give an item a custom `icon` and/or `color` to override the default status glyph,
-and pass `onItemClick` to make each step interactive (keyboard-accessible). In
-Angular, set `interactive` and listen to `(itemClick)`; render custom markers with
-a `markerTemplate`.
+The quickest way to customise — no render function needed. Give an item a custom
+`icon` (React) and/or `color` to override the default status glyph, and pass
+`onItemClick` to make each step interactive (keyboard-accessible; in Angular set
+`interactive` and listen to `(itemClick)`). For a fully custom marker or a rich
+content card, use the **Fully custom** slots below.
 
 <Preview>
   <StatusTimelineCustomDemo />
@@ -410,6 +411,8 @@ the line, layout, alignment, and interactivity stay handled. React uses render
 props (`renderMarker` / `renderContent` / `renderOpposite`); Angular uses
 `markerTemplate` / `contentTemplate` / `oppositeTemplate` (context: item + index +
 status). Provide only the slots you need — the rest fall back to the defaults.
+Reach for these only when you need a fully custom marker or card; for a simple
+per-item icon or colour, prefer `icon` / `color` above.
 
 <Preview>
   <StatusTimelineRichDemo />
