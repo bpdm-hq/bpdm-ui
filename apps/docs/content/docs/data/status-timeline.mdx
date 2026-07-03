@@ -561,7 +561,7 @@ export function Onboarding() {
           if (statusOf(id) === 'current')
             return (
               <button onClick={() => complete(id)} aria-label={`Complete step ${id}`}
-                className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+                className="grid size-7 cursor-pointer place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
                 {id}
               </button>
             );
@@ -602,7 +602,7 @@ interface Step { id: number; label: string; }
       <ng-template #marker let-item>
         @if (statusOf(item.id) === 'current') {
           <button (click)="complete(item.id)" [attr.aria-label]="'Complete step ' + item.id"
-            class="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+            class="grid size-7 cursor-pointer place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
             {{ item.id }}
           </button>
         } @else {

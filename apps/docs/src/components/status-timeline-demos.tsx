@@ -365,7 +365,7 @@ export function StatusTimelineInteractiveDemo() {
                 type="button"
                 onClick={() => complete(id)}
                 aria-label={`Complete step ${id}`}
-                className="grid size-7 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm ring-4 ring-primary/20 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="grid size-7 cursor-pointer place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm ring-4 ring-primary/20 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {id}
               </button>
