@@ -7,10 +7,14 @@ function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-sm">{children}</div>;
 }
 
+// Stable-width shell so the Tabs bar doesn't resize as the content changes.
 function WideBox({ children }: { children: React.ReactNode }) {
-  // shrink to the timeline's own width and centre it, so alternate/opposite
-  // layouts don't float with big empty gutters inside a full-width card.
-  return <div className="mx-auto w-fit max-w-full">{children}</div>;
+  return <div className="mx-auto w-full max-w-2xl">{children}</div>;
+}
+
+// Centres the timeline compactly (to its own width) inside a full-width panel.
+function Center({ children }: { children: React.ReactNode }) {
+  return <div className="mx-auto w-fit py-1">{children}</div>;
 }
 
 // ── demos (neutral deploy / CI lifecycle) ─────────────────────────────────────
@@ -61,9 +65,9 @@ export function StatusTimelineFailureDemo() {
 
 // Alignment — dogfood our own Tabs to switch between left / right / alternate
 const ALIGN_TABS: TabItem[] = [
-  { value: 'left', label: 'Left', content: <StatusTimeline items={DEPLOY} align="left" /> },
-  { value: 'right', label: 'Right', content: <StatusTimeline items={DEPLOY} align="right" /> },
-  { value: 'alternate', label: 'Alternate', content: <StatusTimeline items={DEPLOY} align="alternate" /> },
+  { value: 'left', label: 'Left', content: <Center><StatusTimeline items={DEPLOY} align="left" /></Center> },
+  { value: 'right', label: 'Right', content: <Center><StatusTimeline items={DEPLOY} align="right" /></Center> },
+  { value: 'alternate', label: 'Alternate', content: <Center><StatusTimeline items={DEPLOY} align="alternate" /></Center> },
 ];
 
 export function StatusTimelineAlignDemo() {
@@ -85,7 +89,9 @@ const DATED: TimelineItem[] = [
 export function StatusTimelineOppositeDemo() {
   return (
     <WideBox>
-      <StatusTimeline items={DATED} />
+      <Center>
+        <StatusTimeline items={DATED} />
+      </Center>
     </WideBox>
   );
 }
