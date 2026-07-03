@@ -12,6 +12,7 @@ import {
   StatusTimelineOppositeDemo,
   StatusTimelineCustomDemo,
   StatusTimelineHorizontalDemo,
+  StatusTimelineRichDemo,
 } from '@/components/status-timeline-demos';
 import { Preview } from '@/components/preview';
 
@@ -402,6 +403,99 @@ export class Releases {
   </Tab>
 </Tabs>
 
+## Fully custom (render slots)
+
+For total control, hand the component a **shell** and render each slot yourself —
+the line, layout, alignment, and interactivity stay handled. React uses render
+props (`renderMarker` / `renderContent` / `renderOpposite`); Angular uses
+`markerTemplate` / `contentTemplate` / `oppositeTemplate` (context: item + index +
+status). Provide only the slots you need — the rest fall back to the defaults.
+
+<Preview>
+  <StatusTimelineRichDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="activity.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+type Event = TimelineItem & { user: string; date: string; color: string };
+
+const events: Event[] = [
+  { id: 'repo', user: 'JD', title: 'Repository created', status: 'complete', date: 'Oct 15', color: '#3b82f6' },
+  { id: 'qa', user: 'MK', title: 'QA review', status: 'current', date: 'Oct 16', color: '#f97316' },
+  { id: 'ga', user: 'JD', title: 'Production release', status: 'pending', date: 'Oct 18', color: '#84cc16' },
+];
+
+export function Activity() {
+  return (
+    <StatusTimeline
+      items={events}
+      align="alternate"
+      renderOpposite={(e) => <span className="text-fd-muted-foreground">{(e as Event).date}</span>}
+      renderMarker={(e) => (
+        <span className="flex size-11 items-center justify-center rounded-full text-white shadow-lg"
+          style={{ backgroundColor: (e as Event).color }} />
+      )}
+      renderContent={(e) => (
+        <div className="rounded-xl border p-4 text-left shadow-sm">
+          <p className="font-semibold">{e.title}</p>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="activity.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+type Event = TimelineItem & { user: string; date: string; color: string };
+
+@Component({
+  selector: 'activity',
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline
+      [items]="events"
+      align="alternate"
+      [markerTemplate]="marker"
+      [contentTemplate]="content"
+      [oppositeTemplate]="opposite"
+    >
+      <ng-template #opposite let-e>
+        <span class="text-muted-foreground">{{ e.date }}</span>
+      </ng-template>
+      <ng-template #marker let-e>
+        <span class="flex size-11 items-center justify-center rounded-full text-white shadow-lg"
+          [style.background-color]="e.color"></span>
+      </ng-template>
+      <ng-template #content let-e>
+        <div class="rounded-xl border p-4 text-left shadow-sm">
+          <p class="font-semibold">{{ e.title }}</p>
+        </div>
+      </ng-template>
+    </bpdm-status-timeline>
+  `,
+})
+export class Activity {
+  readonly events: Event[] = [
+    { id: 'repo', user: 'JD', title: 'Repository created', status: 'complete', date: 'Oct 15', color: '#3b82f6' },
+    { id: 'qa', user: 'MK', title: 'QA review', status: 'current', date: 'Oct 16', color: '#f97316' },
+    { id: 'ga', user: 'JD', title: 'Production release', status: 'pending', date: 'Oct 18', color: '#84cc16' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatusTimeline` / `<bpdm-status-timeline>`
@@ -412,7 +506,9 @@ export class Releases {
 | `layout` | `vertical \| horizontal` | `vertical` | Orientation of the timeline. |
 | `align` | vertical: `left \| right \| alternate` · horizontal: `top \| bottom \| alternate` | `left` / `top` | Which side the content sits on. |
 | `onItemClick` (Angular `interactive` + `itemClick`) | `(item, index) => void` | — | Make steps interactive (keyboard-accessible). Angular: set `interactive` and listen to `(itemClick)`. |
-| `markerTemplate` *(Angular only)* | `TemplateRef` | — | Custom marker content for all items (context: item + status). React uses per-item `icon`. |
+| `renderMarker` (Angular `markerTemplate`) | `(item, status) => ReactNode` / `TemplateRef` | — | Render the whole marker yourself (any size/shape). |
+| `renderContent` (Angular `contentTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole content cell yourself (a rich card, etc.). |
+| `renderOpposite` (Angular `oppositeTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole opposite cell yourself (vertical layouts). |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
 
 ### `TimelineItem`
