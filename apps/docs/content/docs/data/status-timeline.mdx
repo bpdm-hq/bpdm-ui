@@ -136,6 +136,8 @@ it stay `pending`.
   <Tab value="React">
 
 ```tsx title="failed-pipeline.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
 const steps: TimelineItem[] = [
   { title: 'Build', status: 'complete', timestamp: '11:02' },
   { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
@@ -143,20 +145,31 @@ const steps: TimelineItem[] = [
   { title: 'Deploy', status: 'pending' },
 ];
 
-<StatusTimeline items={steps} />
+export function FailedPipeline() {
+  return <StatusTimeline items={steps} />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
 ```ts title="failed-pipeline.ts"
-readonly steps: TimelineItem[] = [
-  { title: 'Build', status: 'complete', timestamp: '11:02' },
-  { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
-  { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
-  { title: 'Deploy', status: 'pending' },
-];
-// <bpdm-status-timeline [items]="steps" />
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'failed-pipeline',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class FailedPipeline {
+  readonly steps: TimelineItem[] = [
+    { title: 'Build', status: 'complete', timestamp: '11:02' },
+    { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
+    { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
+    { title: 'Deploy', status: 'pending' },
+  ];
+}
 ```
 
   </Tab>
