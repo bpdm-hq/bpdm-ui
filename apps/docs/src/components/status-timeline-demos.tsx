@@ -106,15 +106,16 @@ function Rocket() {
     </svg>
   );
 }
-function Flag() {
+function Target() {
   return (
     <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path d="M4 21V4h11l-1.5 4L15 12H4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
 const RELEASES: TimelineItem[] = [
-  { id: 'plan', title: 'Planned', color: '#8b5cf6', icon: <Flag />, timestamp: 'Q1' },
+  { id: 'plan', title: 'Planned', color: '#8b5cf6', icon: <Target />, timestamp: 'Q1' },
   { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
   { id: 'beta', title: 'Beta launched', color: '#0ea5e9', icon: <Rocket />, timestamp: 'Q2' },
   { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
