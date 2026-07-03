@@ -231,7 +231,7 @@ export class Alignment {
   </Tab>
 </Tabs>
 
-## Opposite content
+## Dual-sided
 
 Add `opposite` to an item to show content on the **other side** of the line — a date,
 a duration, an actor. Any item having `opposite` centers the line so both sides read.
@@ -253,7 +253,7 @@ const steps: TimelineItem[] = [
   { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
 ];
 
-export function OppositeContent() {
+export function DualSided() {
   return <StatusTimeline items={steps} />;
 }
 ```
@@ -266,11 +266,11 @@ import { Component } from '@angular/core';
 import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
 
 @Component({
-  selector: 'opposite-content',
+  selector: 'dual-sided',
   imports: [BpdmStatusTimeline],
   template: `<bpdm-status-timeline [items]="steps" />`,
 })
-export class OppositeContent {
+export class DualSided {
   readonly steps: TimelineItem[] = [
     { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
     { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
@@ -342,7 +342,7 @@ The quickest way to customise — no render function needed. Give an item a cust
 `icon` (React) and/or `color` to override the default status glyph, and pass
 `onItemClick` to make each step interactive (keyboard-accessible; in Angular set
 `interactive` and listen to `(itemClick)`). For a fully custom marker or a rich
-content card, use the **Fully custom** slots below.
+content card, see **Total control** below.
 
 <Preview>
   <StatusTimelineCustomDemo />
@@ -405,9 +405,9 @@ export class Releases {
   </Tab>
 </Tabs>
 
-## Fully custom (render slots)
+## Total control
 
-For total control, hand the component a **shell** and render each slot yourself —
+Hand the component a **shell** and render each slot yourself —
 the line, layout, alignment, and interactivity stay handled. React uses render
 props (`renderMarker` / `renderContent` / `renderOpposite`); Angular uses
 `markerTemplate` / `contentTemplate` / `oppositeTemplate` (context: item + index +
@@ -500,7 +500,7 @@ export class Activity {
   </Tab>
 </Tabs>
 
-## Interactive workflow
+## Guided workflow
 
 Because every slot is yours, the timeline composes into full step-based workflows.
 Here an onboarding flow tracks state, completes the **current** step when its marker
