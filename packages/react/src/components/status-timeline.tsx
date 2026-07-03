@@ -92,7 +92,7 @@ function Marker({ item, status, className }: { item: TimelineItem; status: Timel
 }
 
 const interactiveClasses =
-  "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring";
+  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
  * Status timeline for lifecycles (deployment, approval, onboarding, …). Each step
@@ -213,7 +213,9 @@ export function StatusTimeline({
             key={item.id ?? i}
             {...clickProps(item, i)}
             className={cn(
-              "relative pb-8 last:pb-0",
+              // gap is a margin (not padding) so the interactive hover/ring hugs the
+              // step content instead of bleeding into the connector gap
+              "relative mb-8 last:mb-0",
               centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
               !centered && align === "right" && "flex-row-reverse",
               interactive && interactiveClasses,
@@ -222,7 +224,8 @@ export function StatusTimeline({
             {!last && (
               <span
                 className={cn(
-                  "absolute top-6 bottom-0 w-px",
+                  // extend past the box into the margin gap to reach the next dot
+                  "absolute top-6 -bottom-8 w-px",
                   centered
                     ? "left-1/2 -translate-x-1/2"
                     : align === "right"

@@ -69,7 +69,7 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
 const DOT_BASE = "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5";
 const MARKER_WRAP = "relative z-10 flex shrink-0 items-center justify-center";
 const INTERACTIVE =
-  "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring";
+  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
  * `<bpdm-status-timeline>` — status timeline for lifecycles (deployment, approval,
@@ -271,13 +271,16 @@ export class BpdmStatusTimeline {
       return {
         ...base,
         liClass: cn(
-          "relative pb-8 last:pb-0",
+          // gap is a margin (not padding) so the interactive hover/ring hugs the
+          // step content instead of bleeding into the connector gap
+          "relative mb-8 last:mb-0",
           centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
           !centered && align === "right" && "flex-row-reverse",
           interactive && INTERACTIVE,
         ),
         lineClass: cn(
-          "absolute top-6 bottom-0 w-px",
+          // extend past the box into the margin gap to reach the next dot
+          "absolute top-6 -bottom-8 w-px",
           centered
             ? "left-1/2 -translate-x-1/2"
             : align === "right"
