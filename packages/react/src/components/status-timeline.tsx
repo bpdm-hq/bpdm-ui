@@ -5,13 +5,19 @@ export type TimelineStatus = "complete" | "current" | "pending" | "failed";
 export type TimelineAlign = "left" | "right" | "alternate";
 
 export type TimelineItem = {
-  title: string;
+  /** Stable id — used as the React key / for change tracking. Falls back to index. */
+  id?: string | number;
+  title: React.ReactNode;
   status?: TimelineStatus;
   /** Short timestamp / meta shown inline on the right, e.g. "12:04". */
   timestamp?: string;
   description?: React.ReactNode;
   /** Content shown on the opposite side of the line (e.g. a date). */
   opposite?: React.ReactNode;
+  /** Custom marker content, overriding the default status glyph (✓/✗/dot). */
+  icon?: React.ReactNode;
+  /** Custom marker colour (any CSS colour / token), overriding the status colour. */
+  color?: string;
 };
 
 export interface StatusTimelineProps {
@@ -22,6 +28,8 @@ export interface StatusTimelineProps {
    * the line so both sides are visible.
    */
   align?: TimelineAlign;
+  /** Make each step interactive — fires with the item and its index. */
+  onItemClick?: (item: TimelineItem, index: number) => void;
   className?: string;
 }
 
@@ -53,10 +61,11 @@ const dotByStatus: Record<TimelineStatus, string> = {
  * with an optional timestamp, description, and `opposite` content. `align` places the
  * content left (default), right, or alternating; `opposite` content sits across the line.
  */
-export function StatusTimeline({ items, align = "left", className }: StatusTimelineProps) {
+export function StatusTimeline({ items, align = "left", onItemClick, className }: StatusTimelineProps) {
   const alternate = align === "alternate";
   const hasOpposite = items.some((it) => it.opposite != null);
   const centered = alternate || hasOpposite; // center the line so both sides are usable
+  const interactive = !!onItemClick;
 
   return (
     <ol className={cn("relative", className)}>
@@ -66,14 +75,30 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
         const muted = status === "pending";
         // which side the main content sits, relative to the line
         const contentRight = alternate ? i % 2 === 0 : align !== "right";
+        const clickProps = interactive
+          ? {
+              role: "button" as const,
+              tabIndex: 0,
+              onClick: () => onItemClick!(item, i),
+              onKeyDown: (e: React.KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onItemClick!(item, i);
+                }
+              },
+            }
+          : {};
 
         return (
           <li
-            key={i}
+            key={item.id ?? i}
+            {...clickProps}
             className={cn(
               "relative pb-8 last:pb-0",
               centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
               !centered && align === "right" && "flex-row-reverse",
+              interactive &&
+                "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring",
             )}
           >
             {!last && (
@@ -92,9 +117,11 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
             )}
 
             <span
+              style={item.color ? { backgroundColor: item.color } : undefined}
               className={cn(
-                "relative z-10 grid size-6 shrink-0 place-items-center rounded-full",
-                dotByStatus[status],
+                "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5",
+                // custom colour → filled marker with a light glyph; else the status palette
+                item.color ? "text-white" : dotByStatus[status],
                 centered && "col-start-2 row-start-1",
               )}
             >
@@ -104,15 +131,19 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
                   aria-hidden
                 />
               )}
-              {status === "complete" && <Check />}
-              {status === "failed" && <Cross />}
+              {item.icon ?? (
+                <>
+                  {status === "complete" && <Check />}
+                  {status === "failed" && <Cross />}
+                </>
+              )}
             </span>
 
             <div
               className={cn(
                 // consistent, airy step rhythm — even circle-to-circle gap whether
                 // or not an item has a description
-                "-mt-0.5 min-h-10 min-w-0",
+                "min-h-10 min-w-0",
                 // hug the line so title + meta stay together beside the dot
                 centered
                   ? contentRight
@@ -122,7 +153,13 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
                 !contentRight && "text-right",
               )}
             >
-              <div className={cn("flex items-center justify-between gap-2", !contentRight && "flex-row-reverse")}>
+              <div
+                className={cn(
+                  // match the dot's height + centre so the title lines up with the marker
+                  "flex min-h-6 items-center justify-between gap-2",
+                  !contentRight && "flex-row-reverse",
+                )}
+              >
                 <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
                   {item.title}
                 </p>
@@ -136,7 +173,7 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
             {hasOpposite && (
               <div
                 className={cn(
-                  "-mt-0.5 min-w-0 text-sm text-muted-foreground",
+                  "flex min-h-6 min-w-0 items-center text-sm text-muted-foreground",
                   contentRight
                     ? "col-start-1 row-start-1 justify-self-end text-right"
                     : "col-start-3 row-start-1 justify-self-start text-left",
