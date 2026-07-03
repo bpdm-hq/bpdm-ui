@@ -86,10 +86,10 @@ export function StatusTimelineAlignDemo() {
 
 // Opposite — a date across the line from each step
 const DATED: TimelineItem[] = [
-  { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
-  { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
-  { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
-  { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+  { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+  { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
 ];
 
 export function StatusTimelineOppositeDemo() {

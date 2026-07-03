@@ -231,7 +231,7 @@ export class Alignment {
   </Tab>
 </Tabs>
 
-## Opposite
+## Opposite content
 
 Add `opposite` to an item to show content on the **other side** of the line — a date,
 a duration, an actor. Any item having `opposite` centers the line so both sides read.
@@ -247,13 +247,13 @@ a duration, an actor. Any item having `opposite` centers the line so both sides 
 import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
 
 const steps: TimelineItem[] = [
-  { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
-  { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
-  { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
-  { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+  { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+  { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
 ];
 
-export function Opposite() {
+export function OppositeContent() {
   return <StatusTimeline items={steps} />;
 }
 ```
@@ -266,16 +266,16 @@ import { Component } from '@angular/core';
 import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
 
 @Component({
-  selector: 'opposite',
+  selector: 'opposite-content',
   imports: [BpdmStatusTimeline],
   template: `<bpdm-status-timeline [items]="steps" />`,
 })
-export class Opposite {
+export class OppositeContent {
   readonly steps: TimelineItem[] = [
-    { title: 'Ordered', status: 'complete', opposite: '15 Oct, 10:30' },
-    { title: 'Processing', status: 'complete', opposite: '15 Oct, 14:00' },
-    { title: 'Shipped', status: 'current', opposite: '15 Oct, 16:15' },
-    { title: 'Delivered', status: 'pending', opposite: '16 Oct, 10:00' },
+    { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+    { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+    { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+    { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
   ];
 }
 ```
@@ -500,7 +500,7 @@ export class Activity {
   </Tab>
 </Tabs>
 
-## Interactive
+## Interactive workflow
 
 Because every slot is yours, the timeline composes into full step-based workflows.
 Here an onboarding flow tracks state, completes the **current** step when its marker
