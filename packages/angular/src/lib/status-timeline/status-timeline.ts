@@ -119,7 +119,7 @@ export class BpdmStatusTimeline {
         opposite: item.opposite,
         last,
         liClass: cn(
-          "relative pb-6 last:pb-0",
+          "relative pb-8 last:pb-0",
           centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
           !centered && align === "right" && "flex-row-reverse",
         ),
@@ -138,7 +138,8 @@ export class BpdmStatusTimeline {
           centered && "col-start-2 row-start-1",
         ),
         contentClass: cn(
-          "-mt-0.5 min-w-0",
+          // consistent, airy step rhythm — even circle-to-circle gap with or without a description
+          "-mt-0.5 min-h-10 min-w-0",
           // hug the line so title + meta stay together beside the dot
           centered
             ? contentRight

@@ -71,7 +71,7 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
           <li
             key={i}
             className={cn(
-              "relative pb-6 last:pb-0",
+              "relative pb-8 last:pb-0",
               centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
               !centered && align === "right" && "flex-row-reverse",
             )}
@@ -110,7 +110,9 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
 
             <div
               className={cn(
-                "-mt-0.5 min-w-0",
+                // consistent, airy step rhythm — even circle-to-circle gap whether
+                // or not an item has a description
+                "-mt-0.5 min-h-10 min-w-0",
                 // hug the line so title + meta stay together beside the dot
                 centered
                   ? contentRight
