@@ -7,6 +7,7 @@ import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./sta
   template: `
     <bpdm-status-timeline
       [items]="items"
+      [layout]="layout"
       [align]="align"
       [interactive]="interactive"
       (itemClick)="lastClick = $event"
@@ -14,6 +15,7 @@ import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./sta
   `,
 })
 class Host {
+  layout: "vertical" | "horizontal" = "vertical";
   align: TimelineAlign = "left";
   interactive = false;
   lastClick: { item: TimelineItem; index: number } | null = null;
@@ -97,6 +99,15 @@ describe("BpdmStatusTimeline", () => {
     first.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
     fixture.detectChanges();
     expect(fixture.componentInstance.lastClick?.item.title).toBe("Build queued");
+  });
+
+  it("renders a horizontal layout as a flex row of steps", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.layout = "horizontal";
+    fixture.detectChanges();
+    const ol = fixture.nativeElement.querySelector("ol") as HTMLElement;
+    expect(ol.className).toContain("flex");
+    expect(fixture.nativeElement.querySelectorAll("li").length).toBe(4);
   });
 
   it("applies a custom marker colour", () => {

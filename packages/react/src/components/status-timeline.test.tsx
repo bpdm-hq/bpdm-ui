@@ -73,6 +73,14 @@ describe("StatusTimeline", () => {
     expect(dot.style.backgroundColor).toBe("rgb(1, 2, 3)");
   });
 
+  it("renders a horizontal layout as a flex row of steps", () => {
+    const { container } = render(<StatusTimeline layout="horizontal" items={ITEMS} />);
+    expect(container.querySelector("ol")!.className).toContain("flex");
+    expect(container.querySelectorAll("li").length).toBe(ITEMS.length);
+    // horizontal connector is a full-width hairline
+    expect(container.querySelector("span.h-px.w-full")).toBeTruthy();
+  });
+
   it("makes steps interactive with onItemClick (click + keyboard)", async () => {
     const onItemClick = vi.fn();
     render(<StatusTimeline items={ITEMS} onItemClick={onItemClick} />);
