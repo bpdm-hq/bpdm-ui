@@ -85,10 +85,11 @@ const INTERACTIVE =
   host: { class: "block" },
   imports: [NgTemplateOutlet],
   template: `
-    <ol [class]="rootClass()">
+    <ol [class]="rootClass()" [attr.aria-label]="label() || null">
       @for (row of rows(); track row.key) {
         <li
           [class]="row.liClass"
+          [attr.aria-current]="row.status === 'current' ? 'step' : null"
           [attr.role]="interactive() ? 'button' : null"
           [attr.tabindex]="interactive() ? 0 : null"
           (click)="interactive() && itemClick.emit({ item: row.item, index: row.index })"
@@ -168,6 +169,8 @@ export class BpdmStatusTimeline {
   readonly items = input<TimelineItem[]>([]);
   readonly layout = input<TimelineLayout>("vertical");
   readonly align = input<TimelineAlign | undefined>(undefined);
+  /** Accessible name for the timeline (sets `aria-label` on the list). */
+  readonly label = input<string>("");
   /** Render the whole marker yourself (context: item + index + status). */
   readonly markerTemplate = input<TemplateRef<TimelineSlotContext> | undefined>(undefined);
   /** Render the whole content cell yourself (a rich card, etc.). */

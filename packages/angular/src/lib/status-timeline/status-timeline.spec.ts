@@ -115,6 +115,17 @@ describe("BpdmStatusTimeline", () => {
     expect(fixture.componentInstance.lastClick?.item.title).toBe("Build queued");
   });
 
+  it("names the list and marks the current step with aria-current", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.items = [
+      { title: "A", status: "complete" },
+      { title: "B", status: "current" },
+    ];
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelectorAll('[aria-current="step"]').length).toBe(1);
+  });
+
   it("renders a horizontal layout as a flex row of steps", () => {
     const fixture = TestBed.createComponent(Host);
     fixture.componentInstance.layout = "horizontal";

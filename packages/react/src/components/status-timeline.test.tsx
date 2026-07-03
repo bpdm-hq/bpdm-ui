@@ -104,6 +104,13 @@ describe("StatusTimeline", () => {
     expect(screen.getByTestId("opp").textContent).toBe("X");
   });
 
+  it("names the timeline and marks the current step with aria-current", () => {
+    render(<StatusTimeline label="Deploy pipeline" items={ITEMS} />);
+    expect(screen.getByRole("list", { name: "Deploy pipeline" })).toBeTruthy();
+    const current = screen.getByText("Tests").closest("li")!; // ITEMS[1] is 'current'
+    expect(current).toHaveAttribute("aria-current", "step");
+  });
+
   it("renders a horizontal layout as a flex row of steps", () => {
     const { container } = render(<StatusTimeline layout="horizontal" items={ITEMS} />);
     expect(container.querySelector("ol")!.className).toContain("flex");

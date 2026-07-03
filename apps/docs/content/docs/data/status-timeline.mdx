@@ -657,6 +657,7 @@ export class Onboarding {
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
+| `label` | `string` | — | Accessible name for the timeline (sets `aria-label` on the list). |
 | `layout` | `vertical \| horizontal` | `vertical` | Orientation of the timeline. |
 | `align` | vertical: `left \| right \| alternate` · horizontal: `top \| bottom \| alternate` | `left` / `top` | Which side the content sits on. |
 | `onItemClick` (Angular `interactive` + `itemClick`) | `(item, index) => void` | — | Make steps interactive (keyboard-accessible). Angular: set `interactive` and listen to `(itemClick)`. |
@@ -681,6 +682,7 @@ export class Onboarding {
 ## Accessibility
 
 - Renders an ordered list (`<ol>` / `<li>`) — steps are announced in sequence.
+  Pass `label` to name the list, and the **current** step carries `aria-current="step"`.
 - Status is **never colour-only**: each state has a distinct marker/icon
   (✓ complete, a filled pulsing dot for current, a hollow ring for pending, ✗ failed)
   and the `title` describes the step.

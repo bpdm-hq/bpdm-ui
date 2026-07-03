@@ -31,6 +31,8 @@ export interface StatusTimelineProps {
    * "alternate". Horizontal: "top" (default) / "bottom" / "alternate".
    */
   align?: TimelineAlign;
+  /** Accessible name for the timeline (sets `aria-label` on the list). */
+  label?: string;
   /** Make each step interactive — fires with the item and its index. */
   onItemClick?: (item: TimelineItem, index: number) => void;
   /** Render the whole marker yourself (any size/shape); overrides icon/colour/glyph. */
@@ -107,6 +109,7 @@ export function StatusTimeline({
   items,
   layout = "vertical",
   align: alignProp,
+  label,
   onItemClick,
   renderMarker,
   renderContent,
@@ -145,7 +148,7 @@ export function StatusTimeline({
   // ── Horizontal ──────────────────────────────────────────────────────────────
   if (horizontal) {
     return (
-      <ol className={cn("flex overflow-x-auto", className)}>
+      <ol aria-label={label} className={cn("flex overflow-x-auto", className)}>
         {items.map((item, i) => {
           const status = item.status ?? "pending";
           const last = i === items.length - 1;
@@ -155,6 +158,7 @@ export function StatusTimeline({
           return (
             <li
               key={item.id ?? i}
+              aria-current={status === "current" ? "step" : undefined}
               {...clickProps(item, i)}
               className={cn(
                 "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
@@ -200,7 +204,7 @@ export function StatusTimeline({
   const centered = alternate || showOpposite; // center the line so both sides are usable
 
   return (
-    <ol className={cn("relative", className)}>
+    <ol aria-label={label} className={cn("relative", className)}>
       {items.map((item, i) => {
         const status = item.status ?? "pending";
         const last = i === items.length - 1;
@@ -211,6 +215,7 @@ export function StatusTimeline({
         return (
           <li
             key={item.id ?? i}
+            aria-current={status === "current" ? "step" : undefined}
             {...clickProps(item, i)}
             className={cn(
               // gap is a margin (not padding) so the interactive hover/ring hugs the
