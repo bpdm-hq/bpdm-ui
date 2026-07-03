@@ -95,7 +95,7 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
               className={cn(
                 "relative z-10 grid size-6 shrink-0 place-items-center rounded-full",
                 dotByStatus[status],
-                centered && "col-start-2",
+                centered && "col-start-2 row-start-1",
               )}
             >
               {status === "current" && (
@@ -114,8 +114,8 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
                 // hug the line so title + meta stay together beside the dot
                 centered
                   ? contentRight
-                    ? "col-start-3 justify-self-start"
-                    : "col-start-1 justify-self-end"
+                    ? "col-start-3 row-start-1 justify-self-start"
+                    : "col-start-1 row-start-1 justify-self-end"
                   : "flex-1",
                 !contentRight && "text-right",
               )}
@@ -135,7 +135,9 @@ export function StatusTimeline({ items, align = "left", className }: StatusTimel
               <div
                 className={cn(
                   "-mt-0.5 min-w-0 text-sm text-muted-foreground",
-                  contentRight ? "col-start-1 justify-self-end text-right" : "col-start-3 justify-self-start text-left",
+                  contentRight
+                    ? "col-start-1 row-start-1 justify-self-end text-right"
+                    : "col-start-3 row-start-1 justify-self-start text-left",
                 )}
               >
                 {item.opposite}

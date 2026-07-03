@@ -135,15 +135,15 @@ export class BpdmStatusTimeline {
         dotClass: cn(
           "relative z-10 grid size-6 shrink-0 place-items-center rounded-full",
           DOT_BY_STATUS[status],
-          centered && "col-start-2",
+          centered && "col-start-2 row-start-1",
         ),
         contentClass: cn(
           "-mt-0.5 min-w-0",
           // hug the line so title + meta stay together beside the dot
           centered
             ? contentRight
-              ? "col-start-3 justify-self-start"
-              : "col-start-1 justify-self-end"
+              ? "col-start-3 row-start-1 justify-self-start"
+              : "col-start-1 row-start-1 justify-self-end"
             : "flex-1",
           !contentRight && "text-right",
         ),
@@ -151,7 +151,9 @@ export class BpdmStatusTimeline {
         titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
         oppositeClass: cn(
           "-mt-0.5 min-w-0 text-sm text-muted-foreground",
-          contentRight ? "col-start-1 justify-self-end text-right" : "col-start-3 justify-self-start text-left",
+          contentRight
+            ? "col-start-1 row-start-1 justify-self-end text-right"
+            : "col-start-3 row-start-1 justify-self-start text-left",
         ),
       };
     });
