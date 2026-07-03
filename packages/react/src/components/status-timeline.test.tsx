@@ -73,6 +73,37 @@ describe("StatusTimeline", () => {
     expect(dot.style.backgroundColor).toBe("rgb(1, 2, 3)");
   });
 
+  it("lets renderContent take over the whole content cell", () => {
+    render(
+      <StatusTimeline
+        items={[{ title: "X", status: "complete" }]}
+        renderContent={(item) => <div data-testid="card">Card for {item.title as string}</div>}
+      />,
+    );
+    expect(screen.getByTestId("card").textContent).toBe("Card for X");
+  });
+
+  it("lets renderMarker replace the marker glyph", () => {
+    const { container } = render(
+      <StatusTimeline
+        items={[{ title: "X", status: "complete" }]}
+        renderMarker={() => <span data-testid="m">M</span>}
+      />,
+    );
+    expect(screen.getByTestId("m")).toBeTruthy();
+    expect(container.querySelector('path[d="M3.5 8.5l3 3 6-7"]')).toBeNull(); // default glyph gone
+  });
+
+  it("lets renderOpposite fill the opposite cell", () => {
+    render(
+      <StatusTimeline
+        items={[{ title: "X" }]}
+        renderOpposite={(item) => <div data-testid="opp">{item.title as string}</div>}
+      />,
+    );
+    expect(screen.getByTestId("opp").textContent).toBe("X");
+  });
+
   it("renders a horizontal layout as a flex row of steps", () => {
     const { container } = render(<StatusTimeline layout="horizontal" items={ITEMS} />);
     expect(container.querySelector("ol")!.className).toContain("flex");

@@ -27,6 +27,20 @@ class Host {
   ];
 }
 
+@Component({
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline [items]="items" [contentTemplate]="c" [oppositeTemplate]="o" [markerTemplate]="m">
+      <ng-template #c let-item><span class="custom-content">{{ item.title }}</span></ng-template>
+      <ng-template #o let-item><span class="custom-opp">{{ item.timestamp }}</span></ng-template>
+      <ng-template #m let-item let-status="status"><span class="custom-marker">{{ status }}</span></ng-template>
+    </bpdm-status-timeline>
+  `,
+})
+class TemplateHost {
+  items: TimelineItem[] = [{ title: "Alpha", status: "complete", timestamp: "now" }];
+}
+
 describe("BpdmStatusTimeline", () => {
   const create = () => {
     const fixture = TestBed.createComponent(Host);
@@ -116,5 +130,16 @@ describe("BpdmStatusTimeline", () => {
     fixture.detectChanges();
     const dot = fixture.nativeElement.querySelector('span[style*="background"]') as HTMLElement;
     expect(dot.style.backgroundColor).toBe("rgb(1, 2, 3)");
+  });
+
+  it("renders custom marker / content / opposite templates", () => {
+    const fixture = TestBed.createComponent(TemplateHost);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector(".custom-content")?.textContent).toContain("Alpha");
+    expect(el.querySelector(".custom-opp")?.textContent).toContain("now");
+    expect(el.querySelector(".custom-marker")?.textContent).toContain("complete");
+    // default glyph is bypassed by the marker template
+    expect(el.querySelector('path[d="M3.5 8.5l3 3 6-7"]')).toBeNull();
   });
 });
