@@ -214,6 +214,49 @@ fixture.detectChanges();
   </Tab>
 </Tabs>
 
+### Status Timeline
+
+The timeline renders a semantic **`list`** (named by `label`), each step is a
+`listitem`, the **current** step carries `aria-current="step"`, and interactive
+steps / custom markers are labelled `button`s — so query by role, no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="status-timeline.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<DeployTimeline label="Deploy pipeline" />);
+
+// the list (by its label) and its steps
+screen.getByRole('list', { name: 'Deploy pipeline' });
+screen.getAllByRole('listitem');                       // one per step
+
+// the current step is discoverable via aria-current
+const current = screen.getByText('Deploying').closest('li');
+expect(current).toHaveAttribute('aria-current', 'step');
+
+// interactive steps / custom markers are labelled buttons
+await userEvent.click(screen.getByRole('button', { name: /complete step 2/i }));
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="status-timeline.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+el.querySelector('[aria-label="Deploy pipeline"]');       // the list
+el.querySelectorAll('li');                                // steps
+el.querySelector('[aria-current="step"]');                // the current step
+el.querySelector<HTMLButtonElement>('button[aria-label="Complete step 2"]')?.click();
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and
