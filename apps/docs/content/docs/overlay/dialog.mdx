@@ -238,7 +238,7 @@ export function Terms() {
       {/* a tall block of content — it scrolls; the header/footer stay pinned */}
       <div className="space-y-3">
         {sections.map((s) => (
-          <p key={s}>{s}: lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <p key={s}>{s}: the full text of this clause goes here, and the panel scrolls when it overflows.</p>
         ))}
       </div>
     </Dialog>
@@ -269,7 +269,7 @@ export class Terms {
   <ng-template bpdmDialogBody>
     <div class="space-y-3">
       @for (s of sections; track s) {
-        <p>{{ s }}: lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p>{{ s }}: the full text of this clause goes here, and the panel scrolls when it overflows.</p>
       }
     </div>
   </ng-template>

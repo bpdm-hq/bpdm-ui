@@ -109,8 +109,7 @@ export function DialogScrollableDemo() {
         {Array.from({ length: 12 }, (_, i) => (
           <p key={i}>
             {i + 1}. Long-form content scrolls inside the panel while the header and footer stay
-            pinned. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            pinned — handy for terms, changelogs, or a settings panel that outgrows the viewport.
           </p>
         ))}
       </div>
