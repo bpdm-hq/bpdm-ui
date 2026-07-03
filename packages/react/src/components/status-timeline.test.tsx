@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { StatusTimeline, type TimelineItem } from "./status-timeline";
 
 const ITEMS: TimelineItem[] = [
@@ -13,7 +14,7 @@ describe("StatusTimeline", () => {
   it("renders one list item per step with its title", () => {
     const { container } = render(<StatusTimeline items={ITEMS} />);
     expect(container.querySelectorAll("ol > li").length).toBe(4);
-    ITEMS.forEach((i) => expect(screen.getByText(i.title)).toBeTruthy());
+    ITEMS.forEach((i) => expect(screen.getByText(i.title as string)).toBeTruthy());
   });
 
   it("renders timestamps and descriptions", () => {
@@ -54,5 +55,33 @@ describe("StatusTimeline", () => {
     const { container } = render(<StatusTimeline items={ITEMS} />);
     expect(container.querySelector("li.grid")).toBeNull();
     expect(container.querySelector("li.flex")).toBeTruthy();
+  });
+
+  it("renders a custom marker icon instead of the default status glyph", () => {
+    const { container } = render(
+      <StatusTimeline items={[{ title: "Step", status: "complete", icon: <span data-testid="star">★</span> }]} />,
+    );
+    expect(screen.getByTestId("star")).toBeTruthy();
+    expect(container.querySelector('path[d="M3.5 8.5l3 3 6-7"]')).toBeNull(); // no default check
+  });
+
+  it("applies a custom marker colour", () => {
+    const { container } = render(
+      <StatusTimeline items={[{ title: "Step", status: "complete", color: "rgb(1, 2, 3)" }]} />,
+    );
+    const dot = container.querySelector('[style*="background"]') as HTMLElement;
+    expect(dot.style.backgroundColor).toBe("rgb(1, 2, 3)");
+  });
+
+  it("makes steps interactive with onItemClick (click + keyboard)", async () => {
+    const onItemClick = vi.fn();
+    render(<StatusTimeline items={ITEMS} onItemClick={onItemClick} />);
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBe(ITEMS.length);
+    await userEvent.click(buttons[1]);
+    expect(onItemClick).toHaveBeenLastCalledWith(ITEMS[1], 1);
+    buttons[2].focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onItemClick).toHaveBeenLastCalledWith(ITEMS[2], 2);
   });
 });

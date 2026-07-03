@@ -4,10 +4,19 @@ import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./sta
 
 @Component({
   imports: [BpdmStatusTimeline],
-  template: `<bpdm-status-timeline [items]="items" [align]="align" />`,
+  template: `
+    <bpdm-status-timeline
+      [items]="items"
+      [align]="align"
+      [interactive]="interactive"
+      (itemClick)="lastClick = $event"
+    />
+  `,
 })
 class Host {
   align: TimelineAlign = "left";
+  interactive = false;
+  lastClick: { item: TimelineItem; index: number } | null = null;
   items: TimelineItem[] = [
     { title: "Build queued", status: "complete", timestamp: "09:41" },
     { title: "Running tests", status: "current", timestamp: "09:42", description: "412 of 980 passed" },
@@ -74,5 +83,27 @@ describe("BpdmStatusTimeline", () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain("15 Oct");
     expect(fixture.nativeElement.querySelector("li.grid")).toBeTruthy();
+  });
+
+  it("emits (itemClick) when interactive, via click and keyboard", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.interactive = true;
+    fixture.detectChanges();
+    const first = fixture.nativeElement.querySelector("li") as HTMLElement;
+    expect(first.getAttribute("role")).toBe("button");
+    first.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.lastClick?.index).toBe(0);
+    first.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.lastClick?.item.title).toBe("Build queued");
+  });
+
+  it("applies a custom marker colour", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.items = [{ title: "Step", status: "complete", color: "rgb(1, 2, 3)" }];
+    fixture.detectChanges();
+    const dot = fixture.nativeElement.querySelector('span[style*="background"]') as HTMLElement;
+    expect(dot.style.backgroundColor).toBe("rgb(1, 2, 3)");
   });
 });
