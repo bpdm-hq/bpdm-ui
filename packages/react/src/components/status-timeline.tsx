@@ -9,7 +9,7 @@ export type TimelineAlign = "left" | "right" | "top" | "bottom" | "alternate";
 export type TimelineItem = {
   /** Stable id — used as the React key / for change tracking. Falls back to index. */
   id?: string | number;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   status?: TimelineStatus;
   /** Short timestamp / meta shown inline on the right, e.g. "12:04". */
   timestamp?: string;
@@ -27,13 +27,18 @@ export interface StatusTimelineProps {
   /** Orientation — "vertical" (default) or "horizontal". */
   layout?: TimelineLayout;
   /**
-   * Which side the content sits on relative to the line. Vertical: "left"
-   * (default) / "right" / "alternate". Horizontal: "top" (default) / "bottom" /
-   * "alternate". In vertical layouts, `opposite` on any item centers the line.
+   * Which side the content sits on. Vertical: "left" (default) / "right" /
+   * "alternate". Horizontal: "top" (default) / "bottom" / "alternate".
    */
   align?: TimelineAlign;
   /** Make each step interactive — fires with the item and its index. */
   onItemClick?: (item: TimelineItem, index: number) => void;
+  /** Render the whole marker yourself (any size/shape); overrides icon/colour/glyph. */
+  renderMarker?: (item: TimelineItem, status: TimelineStatus) => React.ReactNode;
+  /** Render the whole content cell yourself (a rich card, etc.). */
+  renderContent?: (item: TimelineItem, index: number) => React.ReactNode;
+  /** Render the whole opposite cell yourself (vertical layouts). */
+  renderOpposite?: (item: TimelineItem, index: number) => React.ReactNode;
   className?: string;
 }
 
@@ -59,7 +64,7 @@ const dotByStatus: Record<TimelineStatus, string> = {
   failed: "bg-destructive text-destructive-foreground",
 };
 
-/** The status marker: custom colour/icon, else the status glyph; pulses when current. */
+/** The default status marker: custom colour/icon, else the status glyph; pulses when current. */
 function Marker({ item, status, className }: { item: TimelineItem; status: TimelineStatus; className?: string }) {
   return (
     <span
@@ -92,15 +97,20 @@ const interactiveClasses =
 /**
  * Status timeline for lifecycles (deployment, approval, onboarding, …). Each step
  * has a status — complete (✓), current (pulsing), pending (hollow), failed (✗) —
- * with an optional timestamp, description, custom marker, and colour. `layout`
- * sets the orientation (vertical / horizontal) and `align` which side the content
- * sits on. Set `onItemClick` for keyboard-accessible, interactive steps.
+ * with an optional timestamp, description, custom marker, and colour. `layout` sets
+ * the orientation (vertical / horizontal) and `align` which side the content sits
+ * on. It doubles as a fully templatable shell: `renderMarker` / `renderContent` /
+ * `renderOpposite` take over any slot while the line, layout, and interactivity are
+ * handled for you. `onItemClick` makes steps keyboard-accessible and interactive.
  */
 export function StatusTimeline({
   items,
   layout = "vertical",
   align: alignProp,
   onItemClick,
+  renderMarker,
+  renderContent,
+  renderOpposite,
   className,
 }: StatusTimelineProps) {
   const horizontal = layout === "horizontal";
@@ -123,6 +133,15 @@ export function StatusTimeline({
         }
       : {};
 
+  const marker = (item: TimelineItem, status: TimelineStatus, placement: string) =>
+    renderMarker ? (
+      <span className={cn("relative z-10 flex shrink-0 items-center justify-center", placement)}>
+        {renderMarker(item, status)}
+      </span>
+    ) : (
+      <Marker item={item} status={status} className={placement} />
+    );
+
   // ── Horizontal ──────────────────────────────────────────────────────────────
   if (horizontal) {
     return (
@@ -131,7 +150,6 @@ export function StatusTimeline({
           const status = item.status ?? "pending";
           const last = i === items.length - 1;
           const muted = status === "pending";
-          // top → content above the line, bottom → below, alternate → zig-zag
           const contentTop = alternate ? i % 2 === 0 : align !== "bottom";
 
           return (
@@ -153,21 +171,22 @@ export function StatusTimeline({
                 />
               )}
 
-              <Marker item={item} status={status} className="row-start-2" />
+              {marker(item, status, "row-start-2")}
 
-              <div
-                className={cn(
-                  "min-w-0 text-center",
-                  contentTop ? "row-start-1 self-end" : "row-start-3 self-start",
+              <div className={cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", !renderContent && "text-center")}>
+                {renderContent ? (
+                  renderContent(item, i)
+                ) : (
+                  <>
+                    <div className="flex min-h-6 items-center justify-center">
+                      <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
+                        {item.title}
+                      </p>
+                    </div>
+                    {item.timestamp && <p className="text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
+                    {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+                  </>
                 )}
-              >
-                <div className="flex min-h-6 items-center justify-center">
-                  <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
-                    {item.title}
-                  </p>
-                </div>
-                {item.timestamp && <p className="text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
-                {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
               </div>
             </li>
           );
@@ -177,8 +196,8 @@ export function StatusTimeline({
   }
 
   // ── Vertical ────────────────────────────────────────────────────────────────
-  const hasOpposite = items.some((it) => it.opposite != null);
-  const centered = alternate || hasOpposite; // center the line so both sides are usable
+  const showOpposite = !!renderOpposite || items.some((it) => it.opposite != null);
+  const centered = alternate || showOpposite; // center the line so both sides are usable
 
   return (
     <ol className={cn("relative", className)}>
@@ -215,49 +234,55 @@ export function StatusTimeline({
               />
             )}
 
-            <Marker item={item} status={status} className={cn(centered && "col-start-2 row-start-1")} />
+            {marker(item, status, cn(centered && "col-start-2 row-start-1"))}
 
             <div
               className={cn(
-                // consistent, airy step rhythm — even circle-to-circle gap whether
-                // or not an item has a description
-                "min-h-10 min-w-0",
-                // hug the line so title + meta stay together beside the dot
+                "min-w-0",
                 centered
                   ? contentRight
                     ? "col-start-3 row-start-1 justify-self-start"
                     : "col-start-1 row-start-1 justify-self-end"
                   : "flex-1",
-                !contentRight && "text-right",
+                // default-structure spacing/alignment (skipped for custom content)
+                !renderContent && "min-h-10",
+                !renderContent && !contentRight && "text-right",
               )}
             >
-              <div
-                className={cn(
-                  // match the dot's height + centre so the title lines up with the marker
-                  "flex min-h-6 items-center justify-between gap-2",
-                  !contentRight && "flex-row-reverse",
-                )}
-              >
-                <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
-                  {item.title}
-                </p>
-                {item.timestamp && (
-                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{item.timestamp}</span>
-                )}
-              </div>
-              {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+              {renderContent ? (
+                renderContent(item, i)
+              ) : (
+                <>
+                  <div
+                    className={cn(
+                      "flex min-h-6 items-center justify-between gap-2",
+                      !contentRight && "flex-row-reverse",
+                    )}
+                  >
+                    <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
+                      {item.title}
+                    </p>
+                    {item.timestamp && (
+                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{item.timestamp}</span>
+                    )}
+                  </div>
+                  {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+                </>
+              )}
             </div>
 
-            {hasOpposite && (
+            {showOpposite && (
               <div
                 className={cn(
-                  "flex min-h-6 min-w-0 items-center text-sm text-muted-foreground",
+                  "min-w-0",
                   contentRight
-                    ? "col-start-1 row-start-1 justify-self-end text-right"
-                    : "col-start-3 row-start-1 justify-self-start text-left",
+                    ? "col-start-1 row-start-1 justify-self-end"
+                    : "col-start-3 row-start-1 justify-self-start",
+                  !renderOpposite && "flex min-h-6 items-center text-sm text-muted-foreground",
+                  !renderOpposite && (contentRight ? "text-right" : "text-left"),
                 )}
               >
-                {item.opposite}
+                {renderOpposite ? renderOpposite(item, i) : item.opposite}
               </div>
             )}
           </li>
