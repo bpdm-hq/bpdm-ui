@@ -13,6 +13,7 @@ import {
   StatusTimelineCustomDemo,
   StatusTimelineHorizontalDemo,
   StatusTimelineRichDemo,
+  StatusTimelineInteractiveDemo,
 } from '@/components/status-timeline-demos';
 import { Preview } from '@/components/preview';
 
@@ -493,6 +494,156 @@ export class Activity {
     { id: 'qa', user: 'MK', title: 'QA review', status: 'current', date: 'Oct 16', color: '#f97316' },
     { id: 'ga', user: 'JD', title: 'Production release', status: 'pending', date: 'Oct 18', color: '#84cc16' },
   ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Interactive
+
+Because every slot is yours, the timeline composes into full step-based workflows.
+Here an onboarding flow tracks state, completes the **current** step when its marker
+is clicked, and shows progress with our own [Progress Bar](/docs/form/progress) —
+all in your own component; the timeline just draws the line and lays it out.
+
+<Preview>
+  <StatusTimelineInteractiveDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="onboarding.tsx"
+import { useState } from 'react';
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+import { ProgressBar } from '@bpdm/ui/progress';
+import { Button } from '@bpdm/ui/button';
+
+const STEPS = [
+  { id: 1, label: 'Account created' },
+  { id: 2, label: 'Email verified' },
+  { id: 3, label: 'Profile completed' },
+  { id: 4, label: 'Team invited' },
+  { id: 5, label: 'First project created' },
+];
+
+export function Onboarding() {
+  const [completed, setCompleted] = useState<number[]>([1]);
+  const [current, setCurrent] = useState(2);
+  const total = STEPS.length;
+  const statusOf = (id: number) =>
+    completed.includes(id) ? 'completed' : id === current ? 'current' : 'pending';
+  const complete = (id: number) => {
+    if (id !== current) return;
+    setCompleted((c) => [...c, id]);
+    setCurrent((c) => c + 1);
+  };
+
+  const items: TimelineItem[] = STEPS.map((s) => ({
+    id: s.id,
+    status: statusOf(s.id) === 'completed' ? 'complete' : statusOf(s.id) === 'current' ? 'current' : 'pending',
+  }));
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{completed.length} of {total} completed</p>
+        <Button variant="secondary" appearance="outline" size="sm"
+          onClick={() => { setCompleted([1]); setCurrent(2); }}>Reset</Button>
+      </div>
+      <ProgressBar className="my-4" value={completed.length} max={total} variant="success" />
+
+      <StatusTimeline
+        items={items}
+        renderMarker={(item) => {
+          const id = item.id as number;
+          if (statusOf(id) === 'current')
+            return (
+              <button onClick={() => complete(id)} aria-label={`Complete step ${id}`}
+                className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+                {id}
+              </button>
+            );
+          return <span className="grid size-7 place-items-center rounded-full bg-muted text-muted-foreground">{id}</span>;
+        }}
+        renderContent={(item) => {
+          const step = STEPS.find((s) => s.id === item.id)!;
+          return <p className="px-3 py-2 text-sm font-medium">{step.label}</p>;
+        }}
+      />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="onboarding.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+import { BpdmProgressBar } from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+interface Step { id: number; label: string; }
+
+@Component({
+  selector: 'onboarding',
+  imports: [BpdmStatusTimeline, BpdmProgressBar, BpdmButton],
+  template: `
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-muted-foreground">{{ completed.length }} of {{ steps.length }} completed</p>
+      <bpdm-button variant="secondary" appearance="outline" size="sm" (click)="reset()">Reset</bpdm-button>
+    </div>
+    <bpdm-progress-bar class="my-4 block" [value]="completed.length" [max]="steps.length" variant="success" />
+
+    <bpdm-status-timeline [items]="items()" [markerTemplate]="marker" [contentTemplate]="content">
+      <ng-template #marker let-item>
+        @if (statusOf(item.id) === 'current') {
+          <button (click)="complete(item.id)" [attr.aria-label]="'Complete step ' + item.id"
+            class="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+            {{ item.id }}
+          </button>
+        } @else {
+          <span class="grid size-7 place-items-center rounded-full bg-muted text-muted-foreground">{{ item.id }}</span>
+        }
+      </ng-template>
+      <ng-template #content let-item>
+        <p class="px-3 py-2 text-sm font-medium">{{ label(item.id) }}</p>
+      </ng-template>
+    </bpdm-status-timeline>
+  `,
+})
+export class Onboarding {
+  readonly steps: Step[] = [
+    { id: 1, label: 'Account created' },
+    { id: 2, label: 'Email verified' },
+    { id: 3, label: 'Profile completed' },
+    { id: 4, label: 'Team invited' },
+    { id: 5, label: 'First project created' },
+  ];
+  completed = [1];
+  current = 2;
+
+  statusOf = (id: number) =>
+    this.completed.includes(id) ? 'completed' : id === this.current ? 'current' : 'pending';
+  label = (id: number) => this.steps.find((s) => s.id === id)!.label;
+  items = () =>
+    this.steps.map((s): TimelineItem => ({
+      id: s.id,
+      status: this.statusOf(s.id) === 'completed' ? 'complete' : this.statusOf(s.id) === 'current' ? 'current' : 'pending',
+    }));
+
+  complete(id: number) {
+    if (id !== this.current) return;
+    this.completed = [...this.completed, id];
+    this.current++;
+  }
+  reset() {
+    this.completed = [1];
+    this.current = 2;
+  }
 }
 ```
 

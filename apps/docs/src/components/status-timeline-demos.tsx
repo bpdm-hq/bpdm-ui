@@ -1,9 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
 import { Tabs, type TabItem } from '@bpdm/ui/tabs';
 import { Badge } from '@bpdm/ui/badge';
 import { Button } from '@bpdm/ui/button';
+import { ProgressBar } from '@bpdm/ui/progress';
+
+const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(' ');
 
 function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-sm">{children}</div>;
@@ -267,6 +271,149 @@ export function StatusTimelineRichDemo() {
           );
         }}
       />
+    </div>
+  );
+}
+
+// Interactive — step-based onboarding with progress + state (dogfoods our ProgressBar)
+function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function CheckCircleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-6 text-success" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function TickIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={2.4}>
+      <path d="M3.5 8.5l3 3 6-7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const ONBOARDING = [
+  { id: 1, label: 'Account created' },
+  { id: 2, label: 'Email verified' },
+  { id: 3, label: 'Profile completed' },
+  { id: 4, label: 'Team invited' },
+  { id: 5, label: 'First project created' },
+];
+
+export function StatusTimelineInteractiveDemo() {
+  const [completed, setCompleted] = useState<number[]>([1]);
+  const [current, setCurrent] = useState(2);
+  const total = ONBOARDING.length;
+  const done = completed.length === total;
+
+  const statusOf = (id: number) =>
+    completed.includes(id) ? 'completed' : id === current ? 'current' : 'pending';
+  const complete = (id: number) => {
+    if (id !== current) return;
+    setCompleted((c) => [...c, id]);
+    setCurrent((c) => c + 1);
+  };
+  const reset = () => {
+    setCompleted([1]);
+    setCurrent(2);
+  };
+
+  const items: TimelineItem[] = ONBOARDING.map((s) => ({
+    id: s.id,
+    status: statusOf(s.id) === 'completed' ? 'complete' : statusOf(s.id) === 'current' ? 'current' : 'pending',
+  }));
+
+  return (
+    <div className="mx-auto w-full max-w-xl">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h3 className="text-base font-semibold text-fd-foreground">Onboarding progress</h3>
+          <p className="text-sm text-fd-muted-foreground">
+            {completed.length} of {total} steps completed
+          </p>
+        </div>
+        <Button variant="secondary" appearance="outline" size="sm" onClick={reset}>
+          <RefreshIcon />
+          Reset
+        </Button>
+      </div>
+
+      <div className="my-4">
+        <ProgressBar value={completed.length} max={total} variant="success" />
+      </div>
+
+      <StatusTimeline
+        items={items}
+        renderMarker={(item) => {
+          const id = item.id as number;
+          const st = statusOf(id);
+          if (st === 'completed')
+            return (
+              <span className="grid size-7 place-items-center rounded-full bg-success text-success-foreground [&_svg]:size-3.5">
+                <TickIcon />
+              </span>
+            );
+          if (st === 'current')
+            return (
+              <button
+                type="button"
+                onClick={() => complete(id)}
+                aria-label={`Complete step ${id}`}
+                className="grid size-7 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm ring-4 ring-primary/20 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {id}
+              </button>
+            );
+          return (
+            <span className="grid size-7 place-items-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
+              {id}
+            </span>
+          );
+        }}
+        renderContent={(item) => {
+          const id = item.id as number;
+          const st = statusOf(id);
+          const step = ONBOARDING.find((s) => s.id === id)!;
+          return (
+            <div
+              className={cx(
+                'rounded-lg px-3 py-2 transition-colors',
+                st === 'completed' && 'bg-success/10',
+                st === 'current' && 'bg-primary/10',
+                st === 'pending' && 'opacity-60',
+              )}
+            >
+              <p
+                className={cx(
+                  'text-sm font-medium',
+                  st === 'completed' && 'text-success line-through',
+                  st === 'current' && 'text-fd-foreground',
+                  st === 'pending' && 'text-fd-muted-foreground',
+                )}
+              >
+                {step.label}
+              </p>
+              {st === 'current' && (
+                <p className="mt-0.5 text-xs text-fd-muted-foreground">Click the marker to complete</p>
+              )}
+            </div>
+          );
+        }}
+      />
+
+      {done && (
+        <div className="mt-4 flex flex-col items-center gap-1 rounded-lg border border-success/30 bg-success/10 p-4 text-center">
+          <CheckCircleIcon />
+          <p className="font-semibold text-success">Onboarding complete!</p>
+          <p className="text-sm text-fd-muted-foreground">You&apos;ve finished every step.</p>
+        </div>
+      )}
     </div>
   );
 }
