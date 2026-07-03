@@ -10,6 +10,7 @@ import {
   StatusTimelineFailureDemo,
   StatusTimelineAlignDemo,
   StatusTimelineOppositeDemo,
+  StatusTimelineCustomDemo,
 } from '@/components/status-timeline-demos';
 import { Preview } from '@/components/preview';
 
@@ -266,6 +267,74 @@ export class Opposite {
   </Tab>
 </Tabs>
 
+## Custom markers & interactivity
+
+Give an item a custom `icon` and/or `color` to override the default status glyph,
+and pass `onItemClick` to make each step interactive (keyboard-accessible). In
+Angular, set `interactive` and listen to `(itemClick)`; render custom markers with
+a `markerTemplate`.
+
+<Preview>
+  <StatusTimelineCustomDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="releases.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+import { Flag, Rocket } from 'lucide-react';
+
+const releases: TimelineItem[] = [
+  { id: 'plan', title: 'Planned', color: '#8b5cf6', icon: <Flag className="size-3.5" />, timestamp: 'Q1' },
+  { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
+  { id: 'beta', title: 'Beta launched', color: '#0ea5e9', icon: <Rocket className="size-3.5" />, timestamp: 'Q2' },
+  { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
+];
+
+export function Releases() {
+  return <StatusTimeline items={releases} onItemClick={(item) => console.log(item.id)} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="releases.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'releases',
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline
+      [items]="releases"
+      [markerTemplate]="marker"
+      interactive
+      (itemClick)="onClick($event)"
+    />
+    <ng-template #marker let-item let-status="status">
+      <!-- render a custom glyph per item / status -->
+    </ng-template>
+  `,
+})
+export class Releases {
+  readonly releases: TimelineItem[] = [
+    { id: 'plan', title: 'Planned', color: '#8b5cf6', timestamp: 'Q1' },
+    { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
+    { id: 'beta', title: 'Beta launched', color: '#0ea5e9', timestamp: 'Q2' },
+    { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
+  ];
+  onClick(e: { item: TimelineItem; index: number }) {
+    console.log(e.item.id);
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatusTimeline` / `<bpdm-status-timeline>`
@@ -274,17 +343,22 @@ export class Opposite {
 | --- | --- | --- | --- |
 | `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
 | `align` | `left \| right \| alternate` | `left` | Which side the content sits on relative to the line. |
+| `onItemClick` (Angular `interactive` + `itemClick`) | `(item, index) => void` | — | Make steps interactive (keyboard-accessible). Angular: set `interactive` and listen to `(itemClick)`. |
+| `markerTemplate` *(Angular only)* | `TemplateRef` | — | Custom marker content for all items (context: item + status). React uses per-item `icon`. |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
 
 ### `TimelineItem`
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `title` | `string` | The step label. |
+| `id` | `string \| number` | Stable key for change tracking (falls back to index). |
+| `title` | `ReactNode` (Angular `string`) | The step label. |
 | `status` | `complete \| current \| pending \| failed` | The step's state (drives the marker + colour). |
 | `timestamp` | `string` | Short meta shown on the right, e.g. `"09:47"`. |
 | `description` | `ReactNode` (Angular `string`) | Optional detail under the title. |
 | `opposite` | `ReactNode` (Angular `string`) | Content shown across the line (e.g. a date); centers the line when present. |
+| `icon` *(React)* | `ReactNode` | Custom marker glyph, overriding the default ✓/✗/dot. |
+| `color` | `string` | Custom marker colour (any CSS colour / token), overriding the status colour. |
 
 ## Accessibility
 
@@ -294,3 +368,5 @@ export class Opposite {
   and the `title` describes the step.
 - The `current` step's pulse respects reduced-motion preferences.
 - `timestamp` and `description` are plain text, read alongside the step title.
+- Interactive steps (`onItemClick` / `interactive`) expose `role="button"`, are
+  focusable, and respond to **Enter / Space** — fully keyboard-operable.

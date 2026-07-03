@@ -95,3 +95,33 @@ export function StatusTimelineOppositeDemo() {
     </WideBox>
   );
 }
+
+// Custom markers (icon + colour) + clickable steps
+function Rocket() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M4.5 16.5 3 21l4.5-1.5M9 15l6-6M14 4c3 0 6 3 6 6-3 4-8 6-8 6l-4-4s2-5 6-8Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function Flag() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M4 21V4h11l-1.5 4L15 12H4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+const RELEASES: TimelineItem[] = [
+  { id: 'plan', title: 'Planned', color: '#8b5cf6', icon: <Flag />, timestamp: 'Q1' },
+  { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
+  { id: 'beta', title: 'Beta launched', color: '#0ea5e9', icon: <Rocket />, timestamp: 'Q2' },
+  { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
+];
+
+export function StatusTimelineCustomDemo() {
+  return (
+    <Box>
+      <StatusTimeline items={RELEASES} onItemClick={(item) => console.log('clicked', item.id)} />
+    </Box>
+  );
+}
