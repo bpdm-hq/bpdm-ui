@@ -8,7 +8,9 @@ function Box({ children }: { children: React.ReactNode }) {
 }
 
 function WideBox({ children }: { children: React.ReactNode }) {
-  return <div className="mx-auto w-full max-w-lg">{children}</div>;
+  // shrink to the timeline's own width and centre it, so alternate/opposite
+  // layouts don't float with big empty gutters inside a full-width card.
+  return <div className="mx-auto w-fit max-w-full">{children}</div>;
 }
 
 // ── demos (neutral deploy / CI lifecycle) ─────────────────────────────────────
