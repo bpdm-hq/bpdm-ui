@@ -125,3 +125,25 @@ export function StatusTimelineCustomDemo() {
     </Box>
   );
 }
+
+// Horizontal orientation (align top / bottom / alternate) via our own Tabs
+const ROADMAP: TimelineItem[] = [
+  { id: 'discovery', title: 'Discovery', status: 'complete', timestamp: 'Q1' },
+  { id: 'design', title: 'Design', status: 'complete', timestamp: 'Q2' },
+  { id: 'build', title: 'Build', status: 'current', timestamp: 'Q3' },
+  { id: 'launch', title: 'Launch', status: 'pending', timestamp: 'Q4' },
+];
+
+const HORIZONTAL_TABS: TabItem[] = [
+  { value: 'top', label: 'Top', content: <StatusTimeline layout="horizontal" align="top" items={ROADMAP} /> },
+  { value: 'bottom', label: 'Bottom', content: <StatusTimeline layout="horizontal" align="bottom" items={ROADMAP} /> },
+  { value: 'alternate', label: 'Alternate', content: <StatusTimeline layout="horizontal" align="alternate" items={ROADMAP} /> },
+];
+
+export function StatusTimelineHorizontalDemo() {
+  return (
+    <div className="w-full">
+      <Tabs items={HORIZONTAL_TABS} defaultValue="top" className="w-full self-start" listClassName="mb-3" />
+    </div>
+  );
+}

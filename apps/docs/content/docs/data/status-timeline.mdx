@@ -11,13 +11,14 @@ import {
   StatusTimelineAlignDemo,
   StatusTimelineOppositeDemo,
   StatusTimelineCustomDemo,
+  StatusTimelineHorizontalDemo,
 } from '@/components/status-timeline-demos';
 import { Preview } from '@/components/preview';
 
-The **Status Timeline** shows a lifecycle top-to-bottom — a deployment, an approval,
-an onboarding flow. Each step carries a `status` (**complete** ✓, **current** —
-pulsing, **pending** — hollow, **failed** ✗), with an optional `timestamp` and
-`description`. It's data-driven: pass an `items` array.
+The **Status Timeline** shows a lifecycle — a deployment, an approval, an onboarding
+flow — **vertically** (default) or **horizontally**. Each step carries a `status`
+(**complete** ✓, **current** — pulsing, **pending** — hollow, **failed** ✗), with an
+optional `timestamp` and `description`. It's data-driven: pass an `items` array.
 
 ## Usage
 
@@ -280,6 +281,59 @@ export class Opposite {
   </Tab>
 </Tabs>
 
+## Horizontal
+
+Set `layout="horizontal"` to run the timeline left-to-right. In this orientation
+`align` is `top` (default), `bottom`, or `alternate`. The row scrolls horizontally
+when it overflows.
+
+<Preview>
+  <StatusTimelineHorizontalDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="roadmap.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const roadmap: TimelineItem[] = [
+  { id: 'discovery', title: 'Discovery', status: 'complete', timestamp: 'Q1' },
+  { id: 'design', title: 'Design', status: 'complete', timestamp: 'Q2' },
+  { id: 'build', title: 'Build', status: 'current', timestamp: 'Q3' },
+  { id: 'launch', title: 'Launch', status: 'pending', timestamp: 'Q4' },
+];
+
+export function Roadmap() {
+  return <StatusTimeline layout="horizontal" align="top" items={roadmap} />; // or "bottom" | "alternate"
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="roadmap.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'roadmap',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline layout="horizontal" align="top" [items]="roadmap" />`, // or "bottom" | "alternate"
+})
+export class Roadmap {
+  readonly roadmap: TimelineItem[] = [
+    { id: 'discovery', title: 'Discovery', status: 'complete', timestamp: 'Q1' },
+    { id: 'design', title: 'Design', status: 'complete', timestamp: 'Q2' },
+    { id: 'build', title: 'Build', status: 'current', timestamp: 'Q3' },
+    { id: 'launch', title: 'Launch', status: 'pending', timestamp: 'Q4' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Custom markers & interactivity
 
 Give an item a custom `icon` and/or `color` to override the default status glyph,
@@ -355,7 +409,8 @@ export class Releases {
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
-| `align` | `left \| right \| alternate` | `left` | Which side the content sits on relative to the line. |
+| `layout` | `vertical \| horizontal` | `vertical` | Orientation of the timeline. |
+| `align` | vertical: `left \| right \| alternate` · horizontal: `top \| bottom \| alternate` | `left` / `top` | Which side the content sits on. |
 | `onItemClick` (Angular `interactive` + `itemClick`) | `(item, index) => void` | — | Make steps interactive (keyboard-accessible). Angular: set `interactive` and listen to `(itemClick)`. |
 | `markerTemplate` *(Angular only)* | `TemplateRef` | — | Custom marker content for all items (context: item + status). React uses per-item `icon`. |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
