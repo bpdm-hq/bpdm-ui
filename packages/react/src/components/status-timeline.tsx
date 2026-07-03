@@ -2,7 +2,9 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export type TimelineStatus = "complete" | "current" | "pending" | "failed";
-export type TimelineAlign = "left" | "right" | "alternate";
+export type TimelineLayout = "vertical" | "horizontal";
+/** Vertical: left | right | alternate. Horizontal: top | bottom | alternate. */
+export type TimelineAlign = "left" | "right" | "top" | "bottom" | "alternate";
 
 export type TimelineItem = {
   /** Stable id — used as the React key / for change tracking. Falls back to index. */
@@ -12,7 +14,7 @@ export type TimelineItem = {
   /** Short timestamp / meta shown inline on the right, e.g. "12:04". */
   timestamp?: string;
   description?: React.ReactNode;
-  /** Content shown on the opposite side of the line (e.g. a date). */
+  /** Content shown on the opposite side of the line (vertical layouts). */
   opposite?: React.ReactNode;
   /** Custom marker content, overriding the default status glyph (✓/✗/dot). */
   icon?: React.ReactNode;
@@ -22,10 +24,12 @@ export type TimelineItem = {
 
 export interface StatusTimelineProps {
   items: TimelineItem[];
+  /** Orientation — "vertical" (default) or "horizontal". */
+  layout?: TimelineLayout;
   /**
-   * Which side the content sits on relative to the line: "left" (default),
-   * "right", or "alternate" (zig-zag). Providing `opposite` on any item centers
-   * the line so both sides are visible.
+   * Which side the content sits on relative to the line. Vertical: "left"
+   * (default) / "right" / "alternate". Horizontal: "top" (default) / "bottom" /
+   * "alternate". In vertical layouts, `opposite` on any item centers the line.
    */
   align?: TimelineAlign;
   /** Make each step interactive — fires with the item and its index. */
@@ -55,17 +59,126 @@ const dotByStatus: Record<TimelineStatus, string> = {
   failed: "bg-destructive text-destructive-foreground",
 };
 
+/** The status marker: custom colour/icon, else the status glyph; pulses when current. */
+function Marker({ item, status, className }: { item: TimelineItem; status: TimelineStatus; className?: string }) {
+  return (
+    <span
+      style={item.color ? { backgroundColor: item.color } : undefined}
+      className={cn(
+        "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5",
+        item.color ? "text-white" : dotByStatus[status],
+        className,
+      )}
+    >
+      {status === "current" && (
+        <span
+          className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none"
+          aria-hidden
+        />
+      )}
+      {item.icon ?? (
+        <>
+          {status === "complete" && <Check />}
+          {status === "failed" && <Cross />}
+        </>
+      )}
+    </span>
+  );
+}
+
+const interactiveClasses =
+  "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring";
+
 /**
- * Vertical status timeline for lifecycles (deployment, approval, onboarding, …). Each step
+ * Status timeline for lifecycles (deployment, approval, onboarding, …). Each step
  * has a status — complete (✓), current (pulsing), pending (hollow), failed (✗) —
- * with an optional timestamp, description, and `opposite` content. `align` places the
- * content left (default), right, or alternating; `opposite` content sits across the line.
+ * with an optional timestamp, description, custom marker, and colour. `layout`
+ * sets the orientation (vertical / horizontal) and `align` which side the content
+ * sits on. Set `onItemClick` for keyboard-accessible, interactive steps.
  */
-export function StatusTimeline({ items, align = "left", onItemClick, className }: StatusTimelineProps) {
+export function StatusTimeline({
+  items,
+  layout = "vertical",
+  align: alignProp,
+  onItemClick,
+  className,
+}: StatusTimelineProps) {
+  const horizontal = layout === "horizontal";
+  const align = alignProp ?? (horizontal ? "top" : "left");
   const alternate = align === "alternate";
+  const interactive = !!onItemClick;
+
+  const clickProps = (item: TimelineItem, i: number) =>
+    interactive
+      ? {
+          role: "button" as const,
+          tabIndex: 0,
+          onClick: () => onItemClick!(item, i),
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onItemClick!(item, i);
+            }
+          },
+        }
+      : {};
+
+  // ── Horizontal ──────────────────────────────────────────────────────────────
+  if (horizontal) {
+    return (
+      <ol className={cn("flex overflow-x-auto", className)}>
+        {items.map((item, i) => {
+          const status = item.status ?? "pending";
+          const last = i === items.length - 1;
+          const muted = status === "pending";
+          // top → content above the line, bottom → below, alternate → zig-zag
+          const contentTop = alternate ? i % 2 === 0 : align !== "bottom";
+
+          return (
+            <li
+              key={item.id ?? i}
+              {...clickProps(item, i)}
+              className={cn(
+                "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
+                interactive && interactiveClasses,
+              )}
+            >
+              {!last && (
+                <span
+                  className={cn(
+                    "absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2",
+                    status === "complete" ? "bg-success/40" : "bg-border",
+                  )}
+                  aria-hidden
+                />
+              )}
+
+              <Marker item={item} status={status} className="row-start-2" />
+
+              <div
+                className={cn(
+                  "min-w-0 text-center",
+                  contentTop ? "row-start-1 self-end" : "row-start-3 self-start",
+                )}
+              >
+                <div className="flex min-h-6 items-center justify-center">
+                  <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
+                    {item.title}
+                  </p>
+                </div>
+                {item.timestamp && <p className="text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
+                {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    );
+  }
+
+  // ── Vertical ────────────────────────────────────────────────────────────────
   const hasOpposite = items.some((it) => it.opposite != null);
   const centered = alternate || hasOpposite; // center the line so both sides are usable
-  const interactive = !!onItemClick;
 
   return (
     <ol className={cn("relative", className)}>
@@ -75,30 +188,16 @@ export function StatusTimeline({ items, align = "left", onItemClick, className }
         const muted = status === "pending";
         // which side the main content sits, relative to the line
         const contentRight = alternate ? i % 2 === 0 : align !== "right";
-        const clickProps = interactive
-          ? {
-              role: "button" as const,
-              tabIndex: 0,
-              onClick: () => onItemClick!(item, i),
-              onKeyDown: (e: React.KeyboardEvent) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onItemClick!(item, i);
-                }
-              },
-            }
-          : {};
 
         return (
           <li
             key={item.id ?? i}
-            {...clickProps}
+            {...clickProps(item, i)}
             className={cn(
               "relative pb-8 last:pb-0",
               centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
               !centered && align === "right" && "flex-row-reverse",
-              interactive &&
-                "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring",
+              interactive && interactiveClasses,
             )}
           >
             {!last && (
@@ -116,28 +215,7 @@ export function StatusTimeline({ items, align = "left", onItemClick, className }
               />
             )}
 
-            <span
-              style={item.color ? { backgroundColor: item.color } : undefined}
-              className={cn(
-                "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5",
-                // custom colour → filled marker with a light glyph; else the status palette
-                item.color ? "text-white" : dotByStatus[status],
-                centered && "col-start-2 row-start-1",
-              )}
-            >
-              {status === "current" && (
-                <span
-                  className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none"
-                  aria-hidden
-                />
-              )}
-              {item.icon ?? (
-                <>
-                  {status === "complete" && <Check />}
-                  {status === "failed" && <Cross />}
-                </>
-              )}
-            </span>
+            <Marker item={item} status={status} className={cn(centered && "col-start-2 row-start-1")} />
 
             <div
               className={cn(

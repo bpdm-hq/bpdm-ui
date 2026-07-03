@@ -11,7 +11,9 @@ import {
 import { cn } from "@bpdm/variants";
 
 export type TimelineStatus = "complete" | "current" | "pending" | "failed";
-export type TimelineAlign = "left" | "right" | "alternate";
+export type TimelineLayout = "vertical" | "horizontal";
+/** Vertical: left | right | alternate. Horizontal: top | bottom | alternate. */
+export type TimelineAlign = "left" | "right" | "top" | "bottom" | "alternate";
 
 export interface TimelineItem {
   /** Stable id — used for change tracking. Falls back to index. */
@@ -21,7 +23,7 @@ export interface TimelineItem {
   /** Short timestamp / meta shown inline on the right, e.g. "12:04". */
   timestamp?: string;
   description?: string;
-  /** Content shown on the opposite side of the line (e.g. a date). */
+  /** Content shown on the opposite side of the line (vertical layouts). */
   opposite?: string;
   /** Custom marker colour (any CSS colour / token), overriding the status colour. */
   color?: string;
@@ -60,13 +62,17 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
   failed: "bg-destructive text-destructive-foreground",
 };
 
+const DOT_BASE = "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5";
+const INTERACTIVE =
+  "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring";
+
 /**
- * `<bpdm-status-timeline>` — vertical status timeline for lifecycles (deployment,
- * approval, onboarding, builds). Each step has a status — `complete` (✓),
- * `current` (pulsing), `pending` (hollow), `failed` (✗) — with an optional
- * timestamp, description, `opposite` content, custom `color`, and a custom
- * `markerTemplate`. `align` places content left (default), right, or alternating.
- * Set `interactive` + listen to `(itemClick)` for clickable steps.
+ * `<bpdm-status-timeline>` — status timeline for lifecycles (deployment, approval,
+ * onboarding, builds). Each step has a status — `complete` (✓), `current` (pulsing),
+ * `pending` (hollow), `failed` (✗) — with optional timestamp, description, colour,
+ * and a custom `markerTemplate`. `layout` sets the orientation (vertical /
+ * horizontal) and `align` which side the content sits on. Set `interactive` +
+ * `(itemClick)` for clickable steps.
  */
 @Component({
   selector: "bpdm-status-timeline",
@@ -86,6 +92,7 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
           @if (!row.last) {
             <span [class]="row.lineClass" aria-hidden="true"></span>
           }
+
           <span [style.background-color]="row.color || null" [class]="row.dotClass">
             @if (row.status === "current") {
               <span class="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none" aria-hidden="true"></span>
@@ -106,20 +113,33 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
             }
           </span>
 
-          <div [class]="row.contentClass">
-            <div [class]="row.titleRowClass">
-              <p [class]="row.titleClass">{{ row.title }}</p>
+          @if (horizontal()) {
+            <div [class]="row.contentClass">
+              <div class="flex min-h-6 items-center justify-center">
+                <p [class]="row.titleClass">{{ row.title }}</p>
+              </div>
               @if (row.timestamp) {
-                <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</span>
+                <p class="text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</p>
+              }
+              @if (row.description) {
+                <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
               }
             </div>
-            @if (row.description) {
-              <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
+          } @else {
+            <div [class]="row.contentClass">
+              <div [class]="row.titleRowClass">
+                <p [class]="row.titleClass">{{ row.title }}</p>
+                @if (row.timestamp) {
+                  <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</span>
+                }
+              </div>
+              @if (row.description) {
+                <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
+              }
+            </div>
+            @if (hasOpposite()) {
+              <div [class]="row.oppositeClass">{{ row.opposite }}</div>
             }
-          </div>
-
-          @if (hasOpposite()) {
-            <div [class]="row.oppositeClass">{{ row.opposite }}</div>
           }
         </li>
       }
@@ -128,7 +148,8 @@ const DOT_BY_STATUS: Record<TimelineStatus, string> = {
 })
 export class BpdmStatusTimeline {
   readonly items = input<TimelineItem[]>([]);
-  readonly align = input<TimelineAlign>("left");
+  readonly layout = input<TimelineLayout>("vertical");
+  readonly align = input<TimelineAlign | undefined>(undefined);
   /** Custom marker template (context: `$implicit` item + `status`), overriding the glyph. */
   readonly markerTemplate = input<TemplateRef<TimelineMarkerContext> | undefined>(undefined);
   /** Make each step interactive (role/tabindex + `(itemClick)`). */
@@ -137,8 +158,14 @@ export class BpdmStatusTimeline {
 
   readonly itemClick = output<{ item: TimelineItem; index: number }>();
 
-  protected readonly rootClass = computed(() => cn("relative", this.classInput()));
+  protected readonly horizontal = computed(() => this.layout() === "horizontal");
+  private readonly resolvedAlign = computed<TimelineAlign>(
+    () => this.align() ?? (this.horizontal() ? "top" : "left"),
+  );
   protected readonly hasOpposite = computed(() => this.items().some((it) => it.opposite != null));
+  protected readonly rootClass = computed(() =>
+    cn(this.horizontal() ? "flex overflow-x-auto" : "relative", this.classInput()),
+  );
 
   protected onKey(e: KeyboardEvent, row: TimelineRow): void {
     if (!this.interactive()) return;
@@ -150,18 +177,17 @@ export class BpdmStatusTimeline {
 
   protected readonly rows = computed<TimelineRow[]>(() => {
     const items = this.items();
-    const align = this.align();
+    const horizontal = this.horizontal();
+    const align = this.resolvedAlign();
     const alternate = align === "alternate";
-    const centered = alternate || this.hasOpposite();
     const interactive = this.interactive();
+    const centered = alternate || this.hasOpposite();
 
     return items.map((item, i) => {
       const status = item.status ?? "pending";
       const last = i === items.length - 1;
       const muted = status === "pending";
-      const contentRight = alternate ? i % 2 === 0 : align !== "right";
-
-      return {
+      const base = {
         item,
         index: i,
         key: item.id ?? i,
@@ -172,12 +198,37 @@ export class BpdmStatusTimeline {
         opposite: item.opposite,
         color: item.color,
         last,
+        titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
+      };
+
+      if (horizontal) {
+        const contentTop = alternate ? i % 2 === 0 : align !== "bottom";
+        return {
+          ...base,
+          liClass: cn(
+            "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
+            interactive && INTERACTIVE,
+          ),
+          lineClass: cn(
+            "absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2",
+            status === "complete" ? "bg-success/40" : "bg-border",
+          ),
+          dotClass: cn(DOT_BASE, item.color ? "text-white" : DOT_BY_STATUS[status], "row-start-2"),
+          contentClass: cn("min-w-0 text-center", contentTop ? "row-start-1 self-end" : "row-start-3 self-start"),
+          titleRowClass: "",
+          oppositeClass: "",
+        };
+      }
+
+      // vertical
+      const contentRight = alternate ? i % 2 === 0 : align !== "right";
+      return {
+        ...base,
         liClass: cn(
           "relative pb-8 last:pb-0",
           centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
           !centered && align === "right" && "flex-row-reverse",
-          interactive &&
-            "cursor-pointer rounded-md outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring",
+          interactive && INTERACTIVE,
         ),
         lineClass: cn(
           "absolute top-6 bottom-0 w-px",
@@ -188,14 +239,8 @@ export class BpdmStatusTimeline {
               : "left-3 -translate-x-1/2",
           status === "complete" ? "bg-success/40" : "bg-border",
         ),
-        dotClass: cn(
-          "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5",
-          // custom colour → filled marker with a light glyph; else the status palette
-          item.color ? "text-white" : DOT_BY_STATUS[status],
-          centered && "col-start-2 row-start-1",
-        ),
+        dotClass: cn(DOT_BASE, item.color ? "text-white" : DOT_BY_STATUS[status], centered && "col-start-2 row-start-1"),
         contentClass: cn(
-          // consistent, airy step rhythm — even circle-to-circle gap with or without a description
           "min-h-10 min-w-0",
           centered
             ? contentRight
@@ -205,11 +250,9 @@ export class BpdmStatusTimeline {
           !contentRight && "text-right",
         ),
         titleRowClass: cn(
-          // match the dot's height + centre so the title lines up with the marker
           "flex min-h-6 items-center justify-between gap-2",
           !contentRight && "flex-row-reverse",
         ),
-        titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
         oppositeClass: cn(
           "flex min-h-6 min-w-0 items-center text-sm text-muted-foreground",
           contentRight
