@@ -13,7 +13,7 @@ export function CardUsageDemo() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Weekly report</CardTitle>
-        <CardDescription>Your team's activity this week.</CardDescription>
+        <CardDescription>Your team’s activity this week.</CardDescription>
       </CardHeader>
       <CardContent>Deploys, reviews, and open tasks at a glance.</CardContent>
       <CardFooter divider>

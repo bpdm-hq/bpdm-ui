@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+
+/** No-op subscribe — lets useSyncExternalStore act as a client-mount flag (true on client, false on server). */
+const emptySubscribe = () => () => {};
 
 /**
  * Single-icon theme toggle: shows the Sun in light mode and the Moon in dark
@@ -11,8 +14,8 @@ import { useTheme } from 'next-themes';
  */
 export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // Client-only mount flag without setState-in-effect — avoids the icon's hydration mismatch.
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isDark = mounted && resolvedTheme === 'dark';
 
