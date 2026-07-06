@@ -65,7 +65,8 @@ describe("DataTable", () => {
     expect(onSelectionChange).toHaveBeenLastCalledWith(["a"], expect.arrayContaining([expect.objectContaining({ id: "a" })]));
 
     await userEvent.click(checkboxes[0]);
-    expect(onSelectionChange.mock.calls.at(-1)![0].slice().sort()).toEqual(["a", "b", "c"]);
+    const lastCall = onSelectionChange.mock.calls[onSelectionChange.mock.calls.length - 1]!;
+    expect(lastCall[0].slice().sort()).toEqual(["a", "b", "c"]);
   });
 
   it("global search filters rows across columns", async () => {
