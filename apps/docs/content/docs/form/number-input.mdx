@@ -1,11 +1,374 @@
 ---
 title: Number Input
-description: Number Input — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Precision-safe number field with stepper buttons — sizes, layouts, range, affixes, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Number Input** component — available in React (`@bpdm/ui/number-input`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  NumberInputUsageDemo,
+  NumberInputSizesDemo,
+  NumberInputLayoutDemo,
+  NumberInputRangeDemo,
+  NumberInputAffixDemo,
+  NumberInputPrecisionDemo,
+  NumberInputStatesDemo,
+} from '@/components/number-input-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Number Input** is a number field with stepper buttons. It is **precision-safe**: values are
+strings and all arithmetic runs through `bignumber.js`, so very large counts and high-decimal
+measurements never lose precision the way a JavaScript `number` would. It works controlled or
+uncontrolled and clamps to `min`/`max`. In React it's `<NumberInput>`; in Angular it's
+`<bpdm-number-input>`.
+
+## Usage
+
+Drop it in with a starting value. Type freely, or use the steppers.
+
+<Preview>
+  <NumberInputUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="quantity.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Quantity() {
+  return <NumberInput defaultValue="8" min="0" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="quantity.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'quantity',
+  imports: [BpdmNumberInput],
+  template: `<bpdm-number-input defaultValue="8" min="0" />`,
+})
+export class Quantity {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+`size` sets the height and text scale — `sm`, `md` (default), or `lg`.
+
+<Preview>
+  <NumberInputSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Sizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput size="sm" defaultValue="8" />
+      <NumberInput size="md" defaultValue="8" />
+      <NumberInput size="lg" defaultValue="8" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'sizes',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input size="sm" defaultValue="8" />
+      <bpdm-number-input size="md" defaultValue="8" />
+      <bpdm-number-input size="lg" defaultValue="8" />
+    </div>
+  `,
+})
+export class Sizes {}
+```
+
+  </Tab>
+</Tabs>
+
+## Button layout
+
+`buttonLayout` chooses the steppers — `stacked` (up/down chevrons on the right, default) or
+`horizontal` (−/+ on each side).
+
+<Preview>
+  <NumberInputLayoutDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="layout.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Layout() {
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput buttonLayout="stacked" defaultValue="8" />
+      <NumberInput buttonLayout="horizontal" defaultValue="8" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="layout.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'layout',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input buttonLayout="stacked" defaultValue="8" />
+      <bpdm-number-input buttonLayout="horizontal" defaultValue="8" />
+    </div>
+  `,
+})
+export class Layout {}
+```
+
+  </Tab>
+</Tabs>
+
+## Range & step
+
+`min` and `max` clamp the value (the relevant stepper disables at the bound); `step` sets how much
+each press adds or removes.
+
+<Preview>
+  <NumberInputRangeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="range.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Range() {
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput min="0" max="10" defaultValue="5" />
+      <NumberInput step="5" defaultValue="25" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="range.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'range',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input min="0" max="10" defaultValue="5" />
+      <bpdm-number-input step="5" defaultValue="25" />
+    </div>
+  `,
+})
+export class Range {}
+```
+
+  </Tab>
+</Tabs>
+
+## Prefix & suffix
+
+Add static text before (`prefix`) or after (`suffix`) the value — units like `GB`, `kg`, `seats`,
+or a `×` multiplier.
+
+<Preview>
+  <NumberInputAffixDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="affix.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Affix() {
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput defaultValue="50" suffix="GB" min="0" />
+      <NumberInput defaultValue="5" suffix="seats" min="1" />
+      <NumberInput defaultValue="2" prefix="×" min="1" buttonLayout="horizontal" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="affix.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'affix',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input defaultValue="50" suffix="GB" min="0" />
+      <bpdm-number-input defaultValue="5" suffix="seats" min="1" />
+      <bpdm-number-input defaultValue="2" prefix="×" min="1" buttonLayout="horizontal" />
+    </div>
+  `,
+})
+export class Affix {}
+```
+
+  </Tab>
+</Tabs>
+
+## Precision
+
+The value is a **string** and every step/clamp runs through `bignumber.js`, so high-decimal steps
+and integers beyond `Number.MAX_SAFE_INTEGER` stay exact — no float drift, no exponential
+notation. Read the value as a string via `onValueChange` (React) or `[(value)]` (Angular).
+
+<Preview>
+  <NumberInputPrecisionDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="precision.tsx"
+import { useState } from 'react';
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Precision() {
+  const [value, setValue] = useState('1.2500');
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput value={value} onValueChange={setValue} step="0.0001" suffix="kg" />
+      <NumberInput defaultValue="9007199254740993" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="precision.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'precision',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input [(value)]="value" step="0.0001" suffix="kg" />
+      <bpdm-number-input defaultValue="9007199254740993" />
+    </div>
+  `,
+})
+export class Precision {
+  readonly value = signal('1.2500');
+}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Disabled dims the field and blocks both typing and the steppers.
+
+<Preview>
+  <NumberInputStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function States() {
+  return <NumberInput disabled defaultValue="8" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'states',
+  imports: [BpdmNumberInput],
+  template: `<bpdm-number-input disabled defaultValue="8" />`,
+})
+export class States {}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `NumberInput` / `bpdm-number-input`
+
+Values accept a `string` or `number`; strings are recommended to preserve precision.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string \| number` | — | Controlled value. React: pair with `onValueChange`. Angular: two-way `[(value)]`. |
+| `defaultValue` | `string \| number` | `"0"` | Uncontrolled initial value. |
+| `min` | `string \| number` | — | Lower bound; the decrease stepper disables at it. |
+| `max` | `string \| number` | — | Upper bound; the increase stepper disables at it. |
+| `step` | `string \| number` | `1` | Amount each stepper press adds or removes. |
+| `size` | `sm \| md \| lg` | `md` | Height + text scale. |
+| `buttonLayout` | `stacked \| horizontal` | `stacked` | Stepper placement. |
+| `prefix` | `string` | — | Static text before the value. |
+| `suffix` | `string` | — | Static text after the value. |
+| `onValueChange` *(React)* | `(value: string) => void` | — | Called with the string value on every change. |
+| `disabled` | `boolean` | `false` | Disable the field and steppers. |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+
+## Accessibility
+
+- The wrapper is a `role="group"`, and each stepper is a real `<button>` with an `aria-label`
+  (`Increase` / `Decrease`) — usable and announced without sight of the glyph.
+- The field uses `inputmode="decimal"`, so mobile shows a numeric keypad.
+- At `min`/`max` the relevant stepper is `disabled` (removed from the tab order), so the value
+  can't leave its range.
+- Give the field a name — associate a `<label>` (via `htmlFor`/`id`) or add `aria-label`.
