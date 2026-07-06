@@ -1,11 +1,308 @@
 ---
 title: Textarea
-description: Textarea — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Multi-line text input — sizes, resize control, auto-grow, and a character counter, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Textarea** component — available in React (`@bpdm/ui/textarea`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  TextareaUsageDemo,
+  TextareaSizesDemo,
+  TextareaResizeDemo,
+  TextareaAutoResizeDemo,
+  TextareaCountDemo,
+  TextareaStatesDemo,
+} from '@/components/textarea-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Textarea** is a multi-line text field on the same tokens as [Input](/docs/form/input) —
+three `size`s, a `resize` control, optional `autoResize` (grows with content), and a
+`showCount` character counter. In React it's `<Textarea>`; in Angular it's the
+`bpdmTextarea` directive on a native `<textarea>`.
+
+## Usage
+
+Drop it in like a native `<textarea>` — it's full-width, themed, and accessible by default.
+
+<Preview>
+  <TextareaUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="comment.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function Comment() {
+  return <Textarea placeholder="Write a comment…" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="comment.ts"
+import { Component } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+@Component({
+  selector: 'comment',
+  imports: [BpdmTextarea],
+  template: `<textarea bpdmTextarea placeholder="Write a comment…"></textarea>`,
+})
+export class Comment {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+`size` sets the padding and text scale — `sm`, `md` (default), or `lg`.
+
+<Preview>
+  <TextareaSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Textarea size="sm" placeholder="Small" />
+      <Textarea size="md" placeholder="Medium (default)" />
+      <Textarea size="lg" placeholder="Large" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+@Component({
+  selector: 'sizes',
+  imports: [BpdmTextarea],
+  template: `
+    <div class="flex flex-col gap-3">
+      <textarea bpdmTextarea size="sm" placeholder="Small"></textarea>
+      <textarea bpdmTextarea size="md" placeholder="Medium (default)"></textarea>
+      <textarea bpdmTextarea size="lg" placeholder="Large"></textarea>
+    </div>
+  `,
+})
+export class Sizes {}
+```
+
+  </Tab>
+</Tabs>
+
+## Resize
+
+`resize` controls the drag handle — `vertical` (default), `none`, or `both`.
+
+<Preview>
+  <TextareaResizeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="resize.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function Resize() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Textarea resize="none" placeholder="This one can't be resized." />
+      <Textarea resize="both" placeholder="Drag the corner to resize." />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="resize.ts"
+import { Component } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+@Component({
+  selector: 'resize',
+  imports: [BpdmTextarea],
+  template: `
+    <div class="flex flex-col gap-3">
+      <textarea bpdmTextarea resize="none" placeholder="This one can't be resized."></textarea>
+      <textarea bpdmTextarea resize="both" placeholder="Drag the corner to resize."></textarea>
+    </div>
+  `,
+})
+export class Resize {}
+```
+
+  </Tab>
+</Tabs>
+
+## Auto-resize
+
+Set `autoResize` and the field grows to fit its content — no scrollbar, and manual
+resize is turned off.
+
+<Preview>
+  <TextareaAutoResizeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="auto-resize.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function AutoResize() {
+  return <Textarea autoResize placeholder="Type — I grow to fit." />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="auto-resize.ts"
+import { Component } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+@Component({
+  selector: 'auto-resize',
+  imports: [BpdmTextarea],
+  template: `<textarea bpdmTextarea autoResize placeholder="Type — I grow to fit."></textarea>`,
+})
+export class AutoResize {}
+```
+
+  </Tab>
+</Tabs>
+
+## Character count
+
+Pass `showCount` (React) to show a live counter, paired with `maxLength` for an
+`n / max` readout.
+
+<Preview>
+  <TextareaCountDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="count.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function Count() {
+  return <Textarea showCount maxLength={120} placeholder="Up to 120 characters…" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="count.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+// Angular exposes the field; render your own counter from the bound value.
+@Component({
+  selector: 'count',
+  imports: [BpdmTextarea],
+  template: `
+    <textarea bpdmTextarea maxlength="120" [value]="text()"
+      (input)="text.set($any($event.target).value)" placeholder="Up to 120 characters…"></textarea>
+    <p class="mt-1 text-right text-xs tabular-nums text-muted-foreground">{{ text().length }} / 120</p>
+  `,
+})
+export class Count {
+  readonly text = signal('');
+}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Disabled dims and blocks input; `aria-invalid` turns the border destructive-red.
+
+<Preview>
+  <TextareaStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { Textarea } from '@bpdm/ui/textarea';
+
+export function States() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Textarea disabled defaultValue="You can't edit this field." />
+      <Textarea aria-invalid defaultValue="This value needs attention." />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.ts"
+import { Component } from '@angular/core';
+import { BpdmTextarea } from '@bpdm/ng';
+
+@Component({
+  selector: 'states',
+  imports: [BpdmTextarea],
+  template: `
+    <div class="flex flex-col gap-3">
+      <textarea bpdmTextarea disabled value="You can't edit this field."></textarea>
+      <textarea bpdmTextarea aria-invalid="true" value="This value needs attention."></textarea>
+    </div>
+  `,
+})
+export class States {}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Textarea` / `textarea[bpdmTextarea]`
+
+Extends the native `<textarea>` — `placeholder`, `value`, `defaultValue`, `rows`,
+`maxLength`, `disabled`, `onChange`, etc. all work as usual.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `size` | `sm \| md \| lg` | `md` | Padding + text scale. |
+| `resize` | `none \| vertical \| both` | `vertical` | Drag-handle behaviour. |
+| `autoResize` | `boolean` | `false` | Grow to fit content (disables manual resize). |
+| `showCount` *(React)* | `boolean` | `false` | Show a character counter (pairs with `maxLength`). |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+## Accessibility
+
+- Renders a native `<textarea>`, so it's focusable and labelable out of the box —
+  associate a `<label>` (via `htmlFor`/`id`) or `aria-label`.
+- Invalid state is set with `aria-invalid` — it colours the border **and** is
+  announced by assistive tech (never colour-only).
+- Disabled uses the native `disabled` attribute (removed from the tab order).
+- `showCount` is a visual aid; where the limit matters, pair the field with your own
+  `aria-describedby` hint for a spoken cue.
