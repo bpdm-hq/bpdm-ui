@@ -55,6 +55,15 @@ const meta: Meta<typeof PickList<string>> = {
   title: "Data Display/PickList",
   component: PickList,
   tags: ["autodocs"],
+  // PickList is fluid (fills its container); constrain + centre it in the story
+  // canvas so the two panes read as a compact, balanced pair.
+  decorators: [
+    (Story) => (
+      <div className="mx-auto w-full max-w-4xl">
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     docs: {
       description: { component: usage },

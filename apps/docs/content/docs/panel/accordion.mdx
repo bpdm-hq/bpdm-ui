@@ -1,0 +1,240 @@
+---
+title: Accordion
+description: A Radix-based accordion — single or multiple open, three looks, icons, smooth height animation, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  AccordionUsageDemo,
+  AccordionVariantsDemo,
+  AccordionIconsDemo,
+  AccordionMultipleDemo,
+  AccordionDisabledDemo,
+} from '@/components/accordion-demos';
+import { Preview } from '@/components/preview';
+
+The **Accordion** collapses content into expandable sections — an FAQ, settings
+groups, filters. Built on Radix: accessible (keyboard + ARIA), smooth height
+animation, a rotating chevron. It's data-driven via `items`; open **one** at a time
+(`single`) or **several** (`multiple`), in three looks. In Angular it's
+`<bpdm-accordion>` with the same inputs; each item's content is an `<ng-template>`.
+
+## Usage
+
+Pass `items` — each with a `value`, `title`, and `content`. `type="single"`
+(default) opens one at a time; `collapsible` (default) lets you close it.
+
+<Preview>
+  <AccordionUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="faq.tsx"
+import { Accordion, type AccordionItemData } from '@bpdm/ui/accordion';
+
+const items: AccordionItemData[] = [
+  { value: 'deploys', title: 'How are deploys triggered?', content: 'Every push to main runs CI; a green build promotes to staging automatically.' },
+  { value: 'rollback', title: 'Can I roll back a release?', content: 'Yes — pick any previous build in the deploys panel and click Promote.' },
+  { value: 'logs', title: 'Where are build logs stored?', content: 'Logs are kept for 30 days and are downloadable from each run.' },
+];
+
+export function Faq() {
+  return <Accordion type="single" collapsible defaultValue="deploys" items={items} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Each item's `content` is a `<ng-template>` referenced from the `items` array.
+
+```ts title="faq.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmAccordion, type AccordionItemData } from '@bpdm/ng';
+
+@Component({
+  selector: 'faq',
+  imports: [BpdmAccordion],
+  templateUrl: './faq.html',
+})
+export class Faq {
+  readonly deploys = viewChild.required<TemplateRef<unknown>>('deploys');
+  readonly rollback = viewChild.required<TemplateRef<unknown>>('rollback');
+  readonly logs = viewChild.required<TemplateRef<unknown>>('logs');
+
+  readonly items = computed<AccordionItemData[]>(() => [
+    { value: 'deploys', title: 'How are deploys triggered?', content: this.deploys() },
+    { value: 'rollback', title: 'Can I roll back a release?', content: this.rollback() },
+    { value: 'logs', title: 'Where are build logs stored?', content: this.logs() },
+  ]);
+}
+```
+
+```html title="faq.html"
+<bpdm-accordion [items]="items()" type="single" [collapsible]="true" defaultValue="deploys" />
+
+<ng-template #deploys>Every push to main runs CI; a green build promotes to staging automatically.</ng-template>
+<ng-template #rollback>Yes — pick any previous build in the deploys panel and click Promote.</ng-template>
+<ng-template #logs>Logs are kept for 30 days and are downloadable from each run.</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+`variant` gives three looks: **default** (a bordered list), **separated** (each item
+a card), and **borderless** (dividers only). The preview toggles them with our `Tabs`.
+
+<Preview>
+  <AccordionVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="variants.tsx"
+<Accordion type="single" collapsible items={items} variant="separated" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="variants.html"
+<bpdm-accordion [items]="items()" type="single" variant="separated" />
+```
+
+  </Tab>
+</Tabs>
+
+## With icons
+
+Give an item an `icon` for a leading glyph.
+
+<Preview>
+  <AccordionIconsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="icons.tsx"
+import { Rocket } from 'lucide-react';
+
+const items: AccordionItemData[] = [
+  { value: 'deploys', title: 'How are deploys triggered?', content: '…', icon: <Rocket /> },
+  // …
+];
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular the `icon` is a `<ng-template>` too.
+
+```ts title="icons.ts"
+readonly rocket = viewChild.required<TemplateRef<unknown>>('rocket');
+
+readonly items = computed<AccordionItemData[]>(() => [
+  { value: 'deploys', title: 'How are deploys triggered?', content: this.deploys(), icon: this.rocket() },
+]);
+```
+
+```html title="icons.html"
+<ng-template #rocket><!-- your icon svg --></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Multiple open
+
+`type="multiple"` lets several sections stay open at once (`defaultValue` is an array).
+
+<Preview>
+  <AccordionMultipleDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multiple.tsx"
+<Accordion type="multiple" defaultValue={['deploys', 'logs']} items={items} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multiple.html"
+<bpdm-accordion [items]="items()" type="multiple" [defaultValue]="['deploys', 'logs']" />
+```
+
+  </Tab>
+</Tabs>
+
+## Disabled item
+
+Set `disabled` on an item to make it non-interactive.
+
+<Preview>
+  <AccordionDisabledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="disabled.tsx"
+const items: AccordionItemData[] = [
+  { value: 'logs', title: 'Where are build logs stored?', content: '…', disabled: true },
+  // …
+];
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="disabled.ts"
+{ value: 'logs', title: 'Where are build logs stored?', content: this.logs(), disabled: true }
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Accordion` / `<bpdm-accordion>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `AccordionItemData[]` | — | **Required.** The sections. |
+| `type` | `single \| multiple` | `single` | Open one at a time, or several. |
+| `collapsible` | `boolean` | `true` | In `single` mode, allow closing the open item. |
+| `variant` | `default \| separated \| borderless` | `default` | The look. |
+| `defaultValue` / `value` / `onValueChange` | `string` (or `string[]` for `multiple`) | — | Open section(s) — uncontrolled or controlled. |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+### `AccordionItemData`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | Unique id for the section. |
+| `title` | `ReactNode` (Angular `string`) | The trigger label. |
+| `content` | `ReactNode` (Angular `TemplateRef`) | The collapsible body. |
+| `icon` | `ReactNode` (Angular `TemplateRef`) | Optional leading icon. |
+| `disabled` | `boolean` | Make the section non-interactive. |
+
+<Callout type="info">
+  Prefer composition? Import `AccordionRoot` / `AccordionItem` / `AccordionTrigger`
+  / `AccordionContent` and build the tree yourself instead of passing `items`.
+</Callout>
+
+## Accessibility
+
+- Built on Radix Accordion — full **keyboard** support (arrow keys move between
+  triggers, Enter/Space toggles) and correct ARIA (`aria-expanded`, the trigger
+  controls its region).
+- Triggers are real `<button>`s; disabled items are properly inert.
+- The open/close **height animation** is CSS-driven and respects the content's
+  natural height; a rotating chevron signals state (not colour).

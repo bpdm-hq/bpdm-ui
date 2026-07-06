@@ -1,0 +1,207 @@
+---
+title: Confirm Dialog
+description: An imperative confirmation prompt — await a boolean, no JSX wiring, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { ConfirmUsageDemo, ConfirmDestructiveDemo } from '@/components/confirm-dialog-demos';
+import { Preview } from '@/components/preview';
+
+The **Confirm Dialog** asks a yes/no question imperatively — no JSX to wire up per
+call. Mount the provider once, then `await confirm({ … })` anywhere and branch on
+the boolean it resolves to (`true` on confirm; `false` on cancel, outside-click,
+or `Esc`). It's built on the [Dialog](/docs/overlay/dialog). In Angular it's the
+injectable `BpdmConfirm` service.
+
+<Callout type="info">
+  **Setup** — mount `ConfirmProvider` once near your app root (React). In Angular
+  there's nothing to mount: `BpdmConfirm` is `providedIn: 'root'`, so just inject it.
+</Callout>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="app.tsx"
+import { ConfirmProvider } from '@bpdm/ui/confirm-dialog';
+
+export function App() {
+  return (
+    <ConfirmProvider>
+      <YourApp />
+    </ConfirmProvider>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Nothing to register — `BpdmConfirm` is `providedIn: 'root'`. Just inject it
+wherever you need it:
+
+```ts title="confirm-setup.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm } from '@bpdm/ng';
+
+@Component({ selector: 'example', template: '' })
+export class Example {
+  private readonly confirm = inject(BpdmConfirm);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Usage
+
+Call it and await the result. Pass `confirmText` / `cancelText` to relabel the
+buttons.
+
+<Preview>
+  <ConfirmUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="publish-button.tsx"
+import { useConfirm } from '@bpdm/ui/confirm-dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function PublishButton() {
+  const confirm = useConfirm();
+
+  async function onPublish() {
+    const ok = await confirm({
+      title: 'Publish changes?',
+      description: 'This will make your edits live for everyone in the workspace.',
+    });
+    if (ok) {
+      // …publish…
+    }
+  }
+
+  return <Button onClick={onPublish}>Publish changes</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="publish-button.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm } from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'publish-button',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="onPublish()">Publish changes</button>`,
+})
+export class PublishButton {
+  private readonly confirm = inject(BpdmConfirm);
+
+  async onPublish() {
+    const ok = await this.confirm.confirm({
+      title: 'Publish changes?',
+      description: 'This will make your edits live for everyone in the workspace.',
+    });
+    if (ok) {
+      // …publish…
+    }
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Destructive
+
+Set `destructive: true` to colour the confirm button red — for deletes and other
+irreversible actions. Pair it with a clear `confirmText`.
+
+<Preview>
+  <ConfirmDestructiveDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="delete-button.tsx"
+import { useConfirm } from '@bpdm/ui/confirm-dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function DeleteButton() {
+  const confirm = useConfirm();
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Delete project?',
+      description: 'This permanently deletes the project and all its data. This cannot be undone.',
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) {
+      // …delete…
+    }
+  }
+
+  return <Button variant="destructive" onClick={onDelete}>Delete project</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="delete-button.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm } from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'delete-button',
+  imports: [BpdmButton],
+  template: `<button bpdmButton variant="destructive" (click)="onDelete()">Delete project</button>`,
+})
+export class DeleteButton {
+  private readonly confirm = inject(BpdmConfirm);
+
+  async onDelete() {
+    const ok = await this.confirm.confirm({
+      title: 'Delete project?',
+      description: 'This permanently deletes the project and all its data. This cannot be undone.',
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) {
+      // …delete…
+    }
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+`confirm(options)` (React `useConfirm()` / Angular `BpdmConfirm.confirm()`) returns
+`Promise<boolean>`.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` / `string` | `Are you sure?` | Heading. |
+| `description` | `ReactNode` / `string` | — | Supporting text. |
+| `confirmText` | `string` | `Confirm` | Confirm button label. |
+| `cancelText` | `string` | `Cancel` | Cancel button label. |
+| `destructive` | `boolean` | `false` | Style the confirm button as destructive (red). |
+
+## Accessibility
+
+- Inherits everything from the [Dialog](/docs/overlay/dialog) — focus trap,
+  scroll lock, `role="dialog"` + `aria-modal`, and labelling via the title /
+  description.
+- Cancel, outside-click, and `Esc` all resolve the promise to `false`, so a
+  dismissed prompt is never treated as a confirmation.
+- Focus moves to the dialog on open and returns to the trigger on close.

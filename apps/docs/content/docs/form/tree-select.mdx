@@ -1,0 +1,193 @@
+---
+title: Tree Select
+description: Select from a hierarchy with parent/child checkboxes — leaf-based, searchable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  TreeSelectBasicDemo,
+  TreeSelectSearchableDemo,
+  TreeSelectCountDemo,
+  TreeSelectStatesDemo,
+} from '@/components/tree-select-demos';
+import { Preview } from '@/components/preview';
+
+The **Tree Select** picks options from a hierarchy. Toggling a parent selects
+all its children; selection is **leaf-based** — `value` is the array of selected
+leaf values. Nodes are data-driven via `options` (each node can have `children`).
+
+## Usage
+
+<Preview>
+  <TreeSelectBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tree-select-usage.tsx"
+import { TreeSelect } from '@bpdm/ui/tree-select';
+
+const TREE = [
+  {
+    value: 'frontend',
+    label: 'Frontend',
+    children: [
+      { value: 'react', label: 'React' },
+      { value: 'angular', label: 'Angular' },
+      { value: 'vue', label: 'Vue' },
+    ],
+  },
+  {
+    value: 'backend',
+    label: 'Backend',
+    children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+      { value: 'rust', label: 'Rust' },
+    ],
+  },
+];
+
+export function TreeSelectUsage() {
+  return <TreeSelect options={TREE} defaultValue={['react', 'vue']} placeholder="Select technologies" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="tree-select-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmTreeSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'tree-select-usage',
+  imports: [BpdmTreeSelect],
+  templateUrl: './tree-select-usage.html',
+})
+export class TreeSelectUsage {
+  readonly tree = [
+    { value: 'frontend', label: 'Frontend', children: [
+      { value: 'react', label: 'React' },
+      { value: 'angular', label: 'Angular' },
+      { value: 'vue', label: 'Vue' },
+    ] },
+    { value: 'backend', label: 'Backend', children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+      { value: 'rust', label: 'Rust' },
+    ] },
+  ];
+}
+```
+
+```html title="tree-select-usage.html"
+<bpdm-tree-select [options]="tree" [defaultValue]="['react', 'vue']" placeholder="Select technologies" />
+```
+
+  </Tab>
+</Tabs>
+
+## Searchable
+
+Set `searchable` to filter the tree — matches stay visible with their ancestors
+expanded.
+
+<Preview>
+  <TreeSelectSearchableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tree-select-searchable.tsx"
+<TreeSelect options={tree} searchable placeholder="Search technologies" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="tree-select-searchable.html"
+<bpdm-tree-select [options]="tree" searchable placeholder="Search technologies" />
+```
+
+  </Tab>
+</Tabs>
+
+## Count display
+
+Like Multi-select, set `maxDisplay={0}` to show a compact **"N selected"** count
+instead of chips.
+
+<Preview>
+  <TreeSelectCountDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tree-select-count.tsx"
+<TreeSelect options={tree} maxDisplay={0} defaultValue={['react', 'angular', 'vue', 'node']} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="tree-select-count.html"
+<bpdm-tree-select [options]="tree" [maxDisplay]="0" [defaultValue]="['react', 'angular', 'vue', 'node']" />
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+<Preview>
+  <TreeSelectStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tree-select-states.tsx"
+<TreeSelect options={tree} placeholder="Default" />
+<TreeSelect options={tree} aria-invalid placeholder="Invalid" />
+<TreeSelect options={tree} disabled placeholder="Disabled" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="tree-select-states.html"
+<bpdm-tree-select [options]="tree" placeholder="Default" />
+<bpdm-tree-select [options]="tree" aria-invalid="true" placeholder="Invalid" />
+<bpdm-tree-select [options]="tree" disabled placeholder="Disabled" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `TreeNode[]` (`{ value, label, disabled?, children? }`) | — | **Required.** The hierarchy. |
+| `value` / `defaultValue` | `string[]` | — | Selected **leaf** values (controlled / uncontrolled). |
+| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]`. |
+| `placeholder` | `string` | `Select…` | Text when nothing is selected. |
+| `maxDisplay` | `number` | `3` | Chips before "+N"; `0` → "N selected". |
+| `selectAll` | `boolean` | `true` | Show a "Select all" row. |
+| `searchable` | `boolean` | `false` | Filter the tree. |
+| `searchPlaceholder` | `string` | `Search…` | Filter placeholder. |
+| `emptyText` | `string` | `No results.` | Shown when nothing matches. |
+| `size` | `sm \| md \| lg` | `md` | Trigger height / text size. |
+| `disabled` | `boolean` | `false` | Disable the control. |
+| `aria-invalid` | `boolean` | — | Error state. |
+
+## Accessibility
+
+- Parent/child checkboxes use proper roles and **tristate** (a parent is
+  indeterminate when only some children are selected).
+- Full keyboard support (expand/collapse, toggle, type-ahead); pair with a
+  `<label>` or `aria-label`, and set `aria-invalid` on error.

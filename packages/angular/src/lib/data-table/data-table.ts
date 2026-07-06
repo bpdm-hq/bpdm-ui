@@ -44,9 +44,9 @@ import {
 type Key = string | number;
 
 const CELL_PAD: Record<"sm" | "md" | "lg", string> = {
-  sm: "px-3 py-2 text-sm",
-  md: "px-4 py-2.5 text-sm",
-  lg: "px-5 py-3.5 text-base",
+  sm: "px-3 py-2.5 text-sm",
+  md: "px-4 py-3 text-sm",
+  lg: "px-6 py-4 text-base",
 };
 const ALIGN_CLASS = { left: "text-left", center: "text-center", right: "text-right" } as const;
 const JUSTIFY_CLASS = { left: "justify-start", center: "justify-center", right: "justify-end" } as const;
@@ -115,7 +115,7 @@ interface RenderRow<T> {
               <input
                 type="text"
                 [value]="query()"
-                (input)="query.set($any($event.target).value)"
+                (input)="setQuery($any($event.target).value)"
                 [attr.placeholder]="searchPlaceholder()"
                 aria-label="Search"
                 class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background pl-8 pr-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
@@ -161,7 +161,7 @@ interface RenderRow<T> {
               <dl class="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
                 @for (col of cols; track col.id) {
                   <dt class="truncate text-muted-foreground">{{ col.header ?? col.id }}</dt>
-                  <dd [class]="'min-w-0 text-right ' + (col.numeric ? 'tabular-nums' : '')">
+                  <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-right ' + (col.numeric ? 'tabular-nums' : '')">
                     @if (col.cell) {
                       <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="cellCtx(rr)" />
                     } @else {
@@ -171,8 +171,12 @@ interface RenderRow<T> {
                 }
               </dl>
               @if (expandedSet().has(rr.key) && expandedTemplate()) {
-                <div class="mt-3 border-t border-border pt-3">
-                  <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                  <div class="overflow-hidden">
+                    <div class="mt-3 border-t border-border pt-3">
+                      <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                    </div>
+                  </div>
                 </div>
               }
             </div>
@@ -229,7 +233,7 @@ interface RenderRow<T> {
                     [style.left.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
                     [style.right.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
                     [style.top.px]="stickyHeader() ? 0 : null"
-                    [class]="headCellClass(col, ci)"
+                    [class]="headCellClass(col)"
                   >
                     <div class="flex items-center gap-1">
                       @if (col.sortable) {
@@ -239,7 +243,7 @@ interface RenderRow<T> {
                           @if (dir === null) {
                             <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 opacity-40" fill="none" aria-hidden="true"><path d="M5 6.5 8 3.5l3 3M5 9.5 8 12.5l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           } @else {
-                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-foreground" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-primary" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           }
                           @if (sortOrder(col.id) > 0) {
                             <span class="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">{{ sortOrder(col.id) }}</span>
@@ -273,7 +277,7 @@ interface RenderRow<T> {
                 @if (virtualized() && padTop() > 0) {
                   <tr [style.height.px]="padTop()"><td [attr.colspan]="colCount()"></td></tr>
                 }
-                @for (rr of rows; track rr.key) {
+                @for (rr of rows; track rr.key; let last = $last) {
                   <tr
                     [attr.data-selected]="selectedSet().has(rr.key) ? '' : null"
                     [attr.data-expanded]="expandedSet().has(rr.key) ? '' : null"
@@ -282,7 +286,7 @@ interface RenderRow<T> {
                     (click)="clickable() ? onRowClick()!(rr.row, rr.index) : null"
                     [attr.tabindex]="clickable() ? 0 : null"
                     (keydown)="onRowKey($event, rr)"
-                    [class]="rowClass(rr)"
+                    [class]="rowClass(rr, last)"
                   >
                     @if (reorderableRows()) {
                       <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-r border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
@@ -336,8 +340,15 @@ interface RenderRow<T> {
                   </tr>
                   @if (expandedSet().has(rr.key) && expandedTemplate()) {
                     <tr [class]="'bg-muted/30 ' + (divided() ? 'border-t border-border' : '')">
-                      <td [attr.colspan]="colCount()" [class]="cellPad()">
-                        <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                      <td [attr.colspan]="colCount()" class="p-0">
+                        <!-- grid 0fr→1fr animates the reveal to natural height smoothly -->
+                        <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                          <div class="overflow-hidden">
+                            <div [class]="cellPad()">
+                              <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                            </div>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   }
@@ -452,9 +463,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly size = input<"sm" | "md" | "lg">("md");
   readonly striped = input(false, { transform: booleanAttribute });
   readonly bordered = input(false, { transform: booleanAttribute });
-  readonly frame = input(true, { transform: booleanAttribute });
+  readonly frame = input(false, { transform: booleanAttribute });
+  /** Soft drop shadow so the table gently floats. Default true; false = flat/flush. */
+  readonly elevated = input(true, { transform: booleanAttribute });
   readonly divided = input(true, { transform: booleanAttribute });
   readonly cellClassName = input<string>("");
+  /** Extra classes on every header cell — e.g. to tint/colour the header row. */
+  readonly headerClassName = input<string>("");
   readonly rowClassName = input<string | RowClassFn<T> | undefined>(undefined);
   readonly rowSpacing = input<number | undefined>(undefined);
   readonly hoverable = input(true, { transform: booleanAttribute });
@@ -481,8 +496,14 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly pinnable = input(false, { transform: booleanAttribute });
   readonly columnPinChange = output<{ id: string; pin: "left" | "right" | undefined }>();
   readonly columnToggle = input(false, { transform: booleanAttribute });
+  /** Controlled per-column filters — when set, the parent owns filtering (server-side). */
+  readonly filtersInput = input<Record<string, ColumnFilter> | undefined>(undefined, { alias: "filters" });
+  readonly filtersChange = output<Record<string, ColumnFilter>>();
   readonly searchable = input(false, { transform: booleanAttribute });
   readonly searchPlaceholder = input<string>("Search…");
+  /** Controlled search value — when set, the parent owns search (server-side). */
+  readonly searchValue = input<string | undefined>(undefined);
+  readonly searchChange = output<string>();
   readonly responsive = input(false, { transform: booleanAttribute });
   readonly virtualized = input(false, { transform: booleanAttribute });
   readonly reorderableColumns = input(false, { transform: booleanAttribute });
@@ -495,9 +516,26 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   private readonly headRow = viewChild<ElementRef<HTMLTableRowElement>>("headRow");
   private readonly injector = inject(Injector);
 
-  // --- mutable UI state ---
-  protected readonly query = signal("");
-  protected readonly filters = signal<Record<string, ColumnFilter>>({});
+  // --- mutable UI state (search + filters are controllable → server-side) ---
+  private readonly internalQuery = signal("");
+  private readonly internalFilters = signal<Record<string, ColumnFilter>>({});
+  protected readonly isQueryControlled = computed(() => this.searchValue() !== undefined);
+  protected readonly isFiltersControlled = computed(() => this.filtersInput() !== undefined);
+  protected readonly query = computed(() => this.searchValue() ?? this.internalQuery());
+  protected readonly filters = computed(() => this.filtersInput() ?? this.internalFilters());
+  protected setQuery(v: string) {
+    if (!this.isQueryControlled()) this.internalQuery.set(v);
+    this.searchChange.emit(v);
+  }
+  protected setFilters(
+    next:
+      | Record<string, ColumnFilter>
+      | ((prev: Record<string, ColumnFilter>) => Record<string, ColumnFilter>),
+  ) {
+    const resolved = typeof next === "function" ? next(this.filters()) : next;
+    if (!this.isFiltersControlled()) this.internalFilters.set(resolved);
+    this.filtersChange.emit(resolved);
+  }
   // null = "untouched" → fall back to the matching default* input (reactively, so
   // a binding that resolves after construction is still picked up)
   private readonly internalSort = signal<DataTableSort[] | null>(null);
@@ -738,18 +776,18 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     Object.values(this.filters()).some((f) => f.rules.some((r) => r.value !== "")),
   );
   protected applyFilter(id: string, f: ColumnFilter): void {
-    this.filters.update((s) => ({ ...s, [id]: f }));
+    this.setFilters((s) => ({ ...s, [id]: f }));
   }
   protected clearFilter(id: string): void {
-    this.filters.update((s) => {
+    this.setFilters((s) => {
       const next = { ...s };
       delete next[id];
       return next;
     });
   }
   protected clearAll(): void {
-    this.query.set("");
-    this.filters.set({});
+    this.setQuery("");
+    this.setFilters({});
   }
   protected filterOptionsFor(col: DataTableColumn<T>): { value: string; label: string }[] {
     if (col.filterType !== "select") return [];
@@ -766,17 +804,20 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
 
   private readonly filteredData = computed(() => {
-    const q = this.query().trim().toLowerCase();
+    // controlled dimensions are already applied by the parent (server-side)
+    const q = this.isQueryControlled() ? "" : this.query().trim().toLowerCase();
     const cols = this.effectiveColumns();
     const byId = this.colById();
-    const active = Object.entries(this.filters())
-      .map(([id, f]) => ({
-        col: byId.get(id),
-        type: (byId.get(id)?.filterType ?? (byId.get(id)?.numeric ? "number" : "text")) as "text" | "number",
-        matchMode: f.matchMode,
-        rules: f.rules.filter((r) => r.value !== ""),
-      }))
-      .filter((f) => f.col && f.rules.length > 0);
+    const active = this.isFiltersControlled()
+      ? []
+      : Object.entries(this.filters())
+          .map(([id, f]) => ({
+            col: byId.get(id),
+            type: (byId.get(id)?.filterType ?? (byId.get(id)?.numeric ? "number" : "text")) as "text" | "number",
+            matchMode: f.matchMode,
+            rules: f.rules.filter((r) => r.value !== ""),
+          }))
+          .filter((f) => f.col && f.rules.length > 0);
     const data = this.dataOrdered();
     if (!q && active.length === 0) return data;
     return data.filter((row) => {
@@ -1044,7 +1085,16 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
 
   // ---- class builders ----
   protected frameClass(): string {
-    return cn("w-full", this.frame() && "overflow-hidden rounded-xl border border-border bg-card", this.classInput());
+    return cn(
+      "w-full",
+      // `frame` = a defined outlined card; the borderless default whisper-floats so
+      // it blends; `elevated`=false drops the float for a flat, flush table
+      this.frame()
+        ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+        : this.elevated() &&
+            "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
+      this.classInput(),
+    );
   }
   protected tableClass(): string {
     return cn("w-full text-card-foreground", this.rowSpacing() ? "border-separate" : "border-collapse");
@@ -1066,27 +1116,33 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       "w-[1%]",
-      (this.frame() || (canPin && this.hasLeftPin())) ? "bg-muted" : "bg-transparent",
+      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
       canPin && this.bordered() && "border-r border-border",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
+      this.headerClassName(),
     );
   }
-  protected headCellClass(col: DataTableColumn<T>, ci: number): string {
+  protected headCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
     return cn(
       this.cellPad(),
       ALIGN_CLASS[align],
-      "font-medium whitespace-nowrap text-muted-foreground",
+      // strong, readable header — confident dark sentence-case label
+      // (size inherited from density), distinct from the body weight
+      "whitespace-nowrap font-semibold text-foreground",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
-      this.frame() || col.pin ? "bg-muted" : "bg-transparent",
+      // framed/pinned/sticky headers sit on the card surface (clean header +
+      // divider, not a heavy grey band) and stay opaque so scrolling rows never
+      // bleed through; otherwise transparent
+      this.frame() || col.pin || this.stickyHeader() ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
-      !this.frame() && !col.pin && ci > 0 && "border-l border-border/60",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
+      this.headerClassName(),
       col.className,
     );
   }
@@ -1095,13 +1151,15 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
       JUSTIFY_CLASS[align],
+      // keep the active-sort LABEL dark/strong (enterprise-restrained);
+      // the small amber arrow + order badge signal the sort
       this.dirOf(col.id) && "text-foreground",
     );
   }
   private readonly pinnedBg = computed(() =>
     cn(
       "bg-card",
-      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))]",
+      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
       "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
     ),
   );
@@ -1114,7 +1172,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.cellPad(),
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin && `z-10 ${this.pinnedBg()}`,
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
@@ -1132,7 +1190,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
       "sticky bottom-0 bg-muted font-medium text-foreground shadow-[inset_0_1px_0_var(--border)]",
-      this.bordered() && "border-r border-border last:border-r-0",
+      this.bordered() && "border-r border-border/55 last:border-r-0",
       col.pin ? "z-20" : "z-10",
       col.id === this.lastLeftId() && "border-r border-border",
       col.id === this.firstRightId() && "border-l border-border",
@@ -1144,7 +1202,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     if (typeof f === "function") return (f as (rows: T[]) => string)(this.processedRows());
     return (f as string) ?? "";
   }
-  protected rowClass(rr: RenderRow<T>): string {
+  protected rowClass(rr: RenderRow<T>, isLast = false): string {
     const rc = this.rowClassName();
     const extra = typeof rc === "function" ? rc(rr.row, rr.index) : rc;
     const t = this.dropTarget();
@@ -1152,10 +1210,16 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "transition-colors",
       this.hasPinned() && "group",
       this.divided() && !this.rowSpacing() && "border-t border-border",
+      // borderless tables get a closing rule under the last row
+      // (framed tables are closed by the container border)
+      this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-border",
       this.rowSpacing() && "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
       this.striped() && "even:bg-muted/40",
-      this.hoverable() && "hover:bg-muted/60",
-      this.selectedSet().has(rr.key) && "bg-primary/10",
+      // bpdm signature: a warm amber focus language — soft amber hover, and
+      // selected rows get an amber tint + a left accent bar
+      this.hoverable() && "hover:bg-primary/[0.04]",
+      this.selectedSet().has(rr.key) && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+      this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-primary/[0.14]",
       t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--primary)]",
       t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--primary)]",
       this.clickable() && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",

@@ -1,0 +1,21 @@
+{
+  "title": "Form",
+  "icon": "TextCursorInput",
+  "pages": [
+    "input",
+    "textarea",
+    "number-input",
+    "money-input",
+    "password-input",
+    "input-otp",
+    "secure-field",
+    "float-label",
+    "checkbox",
+    "radio-group",
+    "switch",
+    "select",
+    "multi-select",
+    "tree-select",
+    "calendar"
+  ]
+}

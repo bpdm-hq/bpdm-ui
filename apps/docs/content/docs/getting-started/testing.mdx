@@ -1,0 +1,265 @@
+---
+title: Testing
+description: Target any bpdm/ui component in your tests — test ids, forwarded attributes, and roles.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+This applies to **every bpdm/ui component**. How you target one in a test depends
+on the kind of component:
+
+- **Simple components** (Button, Input, Badge, Switch, …) wrap a single native
+  element and forward extra attributes — so a `data-testid` lands directly on it.
+- **Composed components** (Select, Multi-select, Tree Select, Dialog, …) render a
+  small tree and don't yet forward arbitrary attributes onto their root — target
+  them by **role**, **text**, or a **wrapper** you control.
+
+## Simple components — `data-testid`
+
+These forward `data-testid` (and `id`, `aria-*`, any `data-*`) straight to the
+element.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="form.tsx"
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+<Input data-testid="email" placeholder="you@company.com" />
+<Button data-testid="save">Save</Button>
+```
+
+```tsx title="form.test.tsx"
+import { render, screen } from '@testing-library/react';
+
+screen.getByTestId('email');
+screen.getByTestId('save');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`bpdmButton` / `bpdmInput` are directives on native elements, so put the
+attribute straight on the element.
+
+```html title="form.html"
+<input bpdmInput data-testid="email" placeholder="you@company.com" />
+<button bpdmButton data-testid="save">Save</button>
+```
+
+```ts title="form.spec.ts"
+import { By } from '@angular/platform-browser';
+
+fixture.debugElement.query(By.css('[data-testid="email"]'));
+fixture.debugElement.query(By.css('[data-testid="save"]'));
+```
+
+  </Tab>
+</Tabs>
+
+## Composed components — role, text, or a wrapper
+
+Components like Select don't forward arbitrary attributes onto their root yet.
+Prefer **accessible queries** (role/text), or wrap the component in an element
+you own.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="status-select.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const STATUSES = [
+  { value: 'todo', label: 'Todo' },
+  { value: 'done', label: 'Done' },
+];
+
+export function StatusSelect() {
+  return (
+    // aria-label gives the trigger an accessible name for getByRole;
+    // the wrapper test id is an optional fallback
+    <div data-testid="status">
+      <Select options={STATUSES} aria-label="Status" placeholder="Set status" />
+    </div>
+  );
+}
+```
+
+```tsx title="status-select.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { StatusSelect } from './status-select';
+
+render(<StatusSelect />);
+
+// 1) Accessible query (recommended) — the trigger is a combobox
+screen.getByRole('combobox', { name: /status/i });
+
+// 2) Or the wrapper you control
+screen.getByTestId('status');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="status-select.html"
+<div data-testid="status">
+  <bpdm-select [options]="statuses" aria-label="Status" placeholder="Set status" />
+</div>
+```
+
+```ts title="status-select.spec.ts"
+import { By } from '@angular/platform-browser';
+
+// query the host element by tag, or the wrapper you control
+fixture.debugElement.query(By.css('bpdm-select'));
+fixture.debugElement.query(By.css('[data-testid="status"]'));
+```
+
+  </Tab>
+</Tabs>
+
+### Data Table
+
+The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
+no test ids needed. Rows are `row`, headers are `columnheader`, cells are `cell`,
+sortable headers are `button`s (with `aria-sort` on the header), selection controls
+are `checkbox`/`radio`, and the pagination controls are labelled buttons. Pass
+`label` for an accessible table name (`getByRole('table', { name })`).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="members-table.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<MembersTable label="Members" />);
+
+// the table, its rows, and a specific cell — all by role/text
+screen.getByRole('table', { name: 'Members' });
+screen.getAllByRole('row');            // 1 header row + N body rows
+screen.getByRole('cell', { name: 'Sara Kovac' });
+
+// sort by clicking the header button; assert aria-sort on the header
+await userEvent.click(screen.getByRole('button', { name: 'Name' }));
+expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute('aria-sort', 'ascending');
+
+// selection controls are checkboxes ([0] is select-all)
+await userEvent.click(screen.getAllByRole('checkbox')[1]);
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="members-table.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// query by role/tag — no test ids needed on a semantic table
+el.querySelectorAll('tbody tr');                 // body rows
+el.querySelector('thead th button');             // a sortable header
+el.querySelectorAll('[role="checkbox"]');        // [0] = select-all
+el.querySelector('input[aria-label="Search"]');  // the search box
+```
+
+  </Tab>
+</Tabs>
+
+### Pick List & Order List
+
+Both are WAI-ARIA **`listbox`**es: each list is a `listbox` (named by its header),
+rows are `option`s exposing `aria-selected` (and `aria-disabled` when locked), and
+the move/transfer controls are labelled `button`s. Query by role — no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<Features />); // a PickList with "Available" / "Enabled" lists
+
+// each list is a named listbox; rows are options
+screen.getByRole('listbox', { name: 'Available' });
+const option = screen.getByText('Billing').closest('[role="option"]')!;
+
+// select a row, then transfer it with the labelled control
+await userEvent.click(option);
+await userEvent.click(screen.getByRole('button', { name: 'Move to target' }));
+expect(option).toHaveAttribute('aria-selected', 'true'); // in the new list
+
+// a locked item is never selectable
+// expect(lockedOption).toHaveAttribute('aria-disabled', 'true');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// each list is a listbox; rows are options
+const lists = el.querySelectorAll('[role="listbox"]');
+const options = lists[0].querySelectorAll('[role="option"]');
+
+// transfer via a labelled button, then assert state
+(options[1] as HTMLElement).click();
+fixture.detectChanges();
+el.querySelector<HTMLButtonElement>('button[aria-label="Move to target"]')!.click();
+fixture.detectChanges();
+// options carry aria-selected / aria-disabled for assertions
+```
+
+  </Tab>
+</Tabs>
+
+### Status Timeline
+
+The timeline renders a semantic **`list`** (named by `label`), each step is a
+`listitem`, the **current** step carries `aria-current="step"`, and interactive
+steps / custom markers are labelled `button`s — so query by role, no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="status-timeline.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<DeployTimeline label="Deploy pipeline" />);
+
+// the list (by its label) and its steps
+screen.getByRole('list', { name: 'Deploy pipeline' });
+screen.getAllByRole('listitem');                       // one per step
+
+// the current step is discoverable via aria-current
+const current = screen.getByText('Deploying').closest('li');
+expect(current).toHaveAttribute('aria-current', 'step');
+
+// interactive steps / custom markers are labelled buttons
+await userEvent.click(screen.getByRole('button', { name: /complete step 2/i }));
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="status-timeline.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+el.querySelector('[aria-label="Deploy pipeline"]');       // the list
+el.querySelectorAll('li');                                // steps
+el.querySelector('[aria-current="step"]');                // the current step
+el.querySelector<HTMLButtonElement>('button[aria-label="Complete step 2"]')?.click();
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  Querying by **role** and **text** (Testing Library's recommendation) is the most
+  robust approach — it works across every component (simple or composed) and
+  doubles as an accessibility check. The same forwarding shown above also works
+  for `id`, `aria-*`, and any `data-*` on simple components.
+</Callout>

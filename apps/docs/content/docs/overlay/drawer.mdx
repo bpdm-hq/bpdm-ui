@@ -1,0 +1,335 @@
+---
+title: Drawer
+description: A slide-in panel (sheet) from any edge — focus-trapped, scroll-locked, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  DrawerBasicDemo,
+  DrawerSidesDemo,
+  DrawerSizesDemo,
+  DrawerFormDemo,
+  DrawerControlledDemo,
+} from '@/components/drawer-demos';
+import { Preview } from '@/components/preview';
+
+The **Drawer** is a slide-in panel ("sheet") built on Radix Dialog — focus trap,
+scroll lock, `Esc` and outside-click to close, full ARIA. It slides in from any
+edge. Use the low-config `Drawer` (pass a `trigger`, `side`, `title`, body and
+`footer`), or compose `DrawerRoot` / `DrawerContent`. In Angular it's
+`<bpdm-drawer>` with `[bpdmDrawerTrigger]` / `[bpdmDrawerBody]` / `[bpdmDrawerFooter]`.
+
+## Usage
+
+<Preview>
+  <DrawerBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-usage.tsx"
+import { Drawer, DrawerClose } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+export function Notifications() {
+  return (
+    <Drawer
+      trigger={<Button>Open drawer</Button>}
+      title="Notifications"
+      description="Your latest activity."
+      footer={
+        <DrawerClose asChild>
+          <Button>Mark all read</Button>
+        </DrawerClose>
+      }
+    >
+      <p>A slide-in panel from the right edge.</p>
+    </Drawer>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="notifications.ts"
+import { Component } from '@angular/core';
+import { BpdmDrawer, BpdmDrawerTrigger, BpdmDrawerBody, BpdmDrawerFooter, BpdmDrawerClose, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'notifications',
+  imports: [BpdmDrawer, BpdmDrawerTrigger, BpdmDrawerBody, BpdmDrawerFooter, BpdmDrawerClose, BpdmButton],
+  templateUrl: './notifications.html',
+})
+export class Notifications {}
+```
+
+```html title="notifications.html"
+<bpdm-drawer title="Notifications" description="Your latest activity.">
+  <button bpdmButton bpdmDrawerTrigger>Open drawer</button>
+  <ng-template bpdmDrawerBody>
+    <p>A slide-in panel from the right edge.</p>
+  </ng-template>
+  <ng-template bpdmDrawerFooter>
+    <button bpdmButton bpdmDrawerClose>Mark all read</button>
+  </ng-template>
+</bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
+## Sides
+
+The `side` prop chooses the edge: `right` (default), `left`, `top`, or `bottom`.
+
+<Preview>
+  <DrawerSidesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-sides.tsx"
+import { Drawer } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+export function Sides() {
+  return (
+    <>
+      <Drawer side="left" trigger={<Button>Left</Button>} title="Left drawer" />
+      <Drawer side="right" trigger={<Button>Right</Button>} title="Right drawer" />
+      <Drawer side="top" trigger={<Button>Top</Button>} title="Top drawer" />
+      <Drawer side="bottom" trigger={<Button>Bottom</Button>} title="Bottom drawer" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="drawer-sides.ts"
+import { Component } from '@angular/core';
+import { BpdmDrawer, BpdmDrawerTrigger, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'drawer-sides',
+  imports: [BpdmDrawer, BpdmDrawerTrigger, BpdmButton],
+  templateUrl: './drawer-sides.html',
+})
+export class DrawerSides {}
+```
+
+```html title="drawer-sides.html"
+<bpdm-drawer side="left" title="Left drawer"><button bpdmButton bpdmDrawerTrigger>Left</button></bpdm-drawer>
+<bpdm-drawer side="right" title="Right drawer"><button bpdmButton bpdmDrawerTrigger>Right</button></bpdm-drawer>
+<bpdm-drawer side="top" title="Top drawer"><button bpdmButton bpdmDrawerTrigger>Top</button></bpdm-drawer>
+<bpdm-drawer side="bottom" title="Bottom drawer"><button bpdmButton bpdmDrawerTrigger>Bottom</button></bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop sets the panel's width (left/right) or height (top/bottom):
+`sm`, `md` (default), `lg`, `xl`, `full`.
+
+<Preview>
+  <DrawerSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-sizes.tsx"
+<Drawer size="sm" trigger={<Button>SM</Button>} title="SM drawer" />
+<Drawer size="md" trigger={<Button>MD</Button>} title="MD drawer" />
+<Drawer size="lg" trigger={<Button>LG</Button>} title="LG drawer" />
+<Drawer size="xl" trigger={<Button>XL</Button>} title="XL drawer" />
+<Drawer size="full" trigger={<Button>Full</Button>} title="Full drawer" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="drawer-sizes.html"
+<bpdm-drawer size="sm" title="SM drawer"><button bpdmButton bpdmDrawerTrigger>SM</button></bpdm-drawer>
+<bpdm-drawer size="md" title="MD drawer"><button bpdmButton bpdmDrawerTrigger>MD</button></bpdm-drawer>
+<bpdm-drawer size="lg" title="LG drawer"><button bpdmButton bpdmDrawerTrigger>LG</button></bpdm-drawer>
+<bpdm-drawer size="xl" title="XL drawer"><button bpdmButton bpdmDrawerTrigger>XL</button></bpdm-drawer>
+<bpdm-drawer size="full" title="Full drawer"><button bpdmButton bpdmDrawerTrigger>Full</button></bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
+## With a form
+
+A common use — an edit panel with fields and a Save footer.
+
+<Preview>
+  <DrawerFormDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-form.tsx"
+import { Drawer, DrawerClose } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+export function EditProfile() {
+  return (
+    <Drawer
+      trigger={<Button>Edit profile</Button>}
+      title="Edit profile"
+      description="Update your details, then save."
+      footer={
+        <>
+          <DrawerClose asChild>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
+          </DrawerClose>
+          <DrawerClose asChild>
+            <Button>Save</Button>
+          </DrawerClose>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        <Input placeholder="Display name" aria-label="Display name" />
+        <Input type="email" placeholder="Email" aria-label="Email" />
+      </div>
+    </Drawer>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="edit-profile.ts"
+import { Component } from '@angular/core';
+import { BpdmDrawer, BpdmDrawerTrigger, BpdmDrawerBody, BpdmDrawerFooter, BpdmDrawerClose, BpdmButton, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'edit-profile',
+  imports: [BpdmDrawer, BpdmDrawerTrigger, BpdmDrawerBody, BpdmDrawerFooter, BpdmDrawerClose, BpdmButton, BpdmInput],
+  templateUrl: './edit-profile.html',
+})
+export class EditProfile {}
+```
+
+```html title="edit-profile.html"
+<bpdm-drawer title="Edit profile" description="Update your details, then save.">
+  <button bpdmButton bpdmDrawerTrigger>Edit profile</button>
+  <ng-template bpdmDrawerBody>
+    <div class="flex flex-col gap-3">
+      <input bpdmInput placeholder="Display name" aria-label="Display name" />
+      <input bpdmInput type="email" placeholder="Email" aria-label="Email" />
+    </div>
+  </ng-template>
+  <ng-template bpdmDrawerFooter>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDrawerClose>Cancel</button>
+    <button bpdmButton bpdmDrawerClose>Save</button>
+  </ng-template>
+</bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled
+
+Drive the open state with `open` + `onOpenChange` (React) or two-way `[(open)]`
+(Angular).
+
+<Preview>
+  <DrawerControlledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-controlled.tsx"
+import { useState } from 'react';
+import { Drawer } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+export function Controlled() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open from outside</Button>
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        title="Controlled drawer"
+        description="Driven by your own state."
+        footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <p>Open it from anywhere.</p>
+      </Drawer>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="controlled.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmDrawer, BpdmDrawerFooter, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'controlled',
+  imports: [BpdmDrawer, BpdmDrawerFooter, BpdmButton],
+  templateUrl: './controlled.html',
+})
+export class Controlled {
+  readonly open = signal(false);
+}
+```
+
+```html title="controlled.html"
+<button bpdmButton (click)="open.set(true)">Open from outside</button>
+<bpdm-drawer [(open)]="open" title="Controlled drawer" description="Driven by your own state.">
+  <ng-template bpdmDrawerFooter>
+    <button bpdmButton (click)="open.set(false)">Close</button>
+  </ng-template>
+</bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `side` | `left \| right \| top \| bottom` | `right` | Edge to slide in from. |
+| `size` | `sm \| md \| lg \| xl \| full` | `md` | Width (left/right) or height (top/bottom). |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(open)]`. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. |
+| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: `[bpdmDrawerTrigger]`. |
+| `title` / `description` | `ReactNode` | — | Heading + sub-heading (a hidden title is supplied if omitted). |
+| `footer` | `ReactNode` | — | Footer area (React). Angular: `[bpdmDrawerFooter]` template. |
+| `showClose` | `boolean` | `true` | Show the top-right close button. |
+
+**Primitives (React):** `DrawerRoot`, `DrawerTrigger`, `DrawerClose`,
+`DrawerContent` (`side`, `size`, `showClose`), `DrawerHeader`, `DrawerFooter`,
+`DrawerTitle`, `DrawerDescription`.
+
+## Accessibility
+
+- Built on Radix Dialog — focus trap (focus moves in on open, returns to the
+  trigger on close), scroll-locked background, and `Esc` / outside-click to close.
+- Renders `role="dialog"` + `aria-modal`, wired to the title / description via
+  `aria-labelledby` / `aria-describedby`. Always provide a `title` (a
+  visually-hidden one is added if you don't).
+- The close button has an `aria-label`; the trigger keeps its own role and
+  keyboard behaviour.

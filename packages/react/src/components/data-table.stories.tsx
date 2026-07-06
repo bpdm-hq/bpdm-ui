@@ -76,7 +76,7 @@ type Member = {
 };
 
 const MEMBERS: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", status: "active", joined: "2025-02-14", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", status: "active", joined: "2025-02-14", tasks: 128 },
   { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", joined: "2025-03-02", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", joined: "2025-03-19", tasks: 86 },
   { id: "m_04", name: "Noah Bauer", email: "noah@example.com", role: "Viewer", team: "Support", status: "disabled", joined: "2025-04-08", tasks: 12 },
@@ -253,7 +253,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -299,7 +299,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -330,7 +330,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -365,7 +365,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -406,7 +406,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -454,7 +454,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", status: "active", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", status: "active", tasks: 128 },
   { id: "m_02", name: "Leo Martins", status: "invited", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", status: "active", tasks: 86 },
 ];
@@ -545,7 +545,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -584,7 +584,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -683,7 +683,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -852,7 +852,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", email: "hugo@example.com", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", email: "milo@example.com", tasks: 128 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", email: "sara@example.com", tasks: 86 },
 ];
 
@@ -901,7 +901,7 @@ const columns: DataTableColumn<Member>[] = [
 
 export function Example() {
   const [rows] = useState<Member[]>([
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ]);
@@ -1011,7 +1011,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", joined: "2025-02-14", status: "active", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", joined: "2025-02-14", status: "active", tasks: 128 },
   { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", joined: "2025-03-02", status: "invited", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", joined: "2025-03-19", status: "active", tasks: 86 },
 ];
@@ -1072,7 +1072,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -1140,7 +1140,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", status: "active", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", status: "active", tasks: 128 },
   { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", tasks: 86 },
 ];
@@ -1183,7 +1183,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -1225,7 +1225,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -1271,7 +1271,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", team: "Engineering", status: "active", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", team: "Engineering", status: "active", tasks: 128 },
   { id: "m_02", name: "Leo Martins", team: "Design", status: "invited", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", team: "Engineering", status: "active", tasks: 86 },
 ];
@@ -1330,7 +1330,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -1370,7 +1370,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 const data: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
   { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
 ];
@@ -1412,7 +1412,7 @@ const columns: DataTableColumn<Member>[] = [
 
 export function Example() {
   const [data, setData] = useState<Member[]>([
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ]);

@@ -1,0 +1,322 @@
+---
+title: Input
+description: A text field — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  InputBasicDemo,
+  InputVariantsDemo,
+  InputSizesDemo,
+  InputStatesDemo,
+  InputIconsDemo,
+  InputTypesDemo,
+  InputFormFieldDemo,
+} from '@/components/input-demos';
+import { Preview } from '@/components/preview';
+
+The **Input** is a text field built on the native `<input>`, so every native
+type, attribute and form behaviour works. In React it's the `Input` component;
+in Angular it's the `bpdmInput` attribute directive on a real `<input>`.
+
+## Usage
+
+<Preview>
+  <InputBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-usage.tsx"
+import { Input } from '@bpdm/ui/input';
+
+export function InputUsage() {
+  return <Input placeholder="you@company.com" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="input-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'input-usage',
+  imports: [BpdmInput],
+  templateUrl: './input-usage.html',
+})
+export class InputUsage {}
+```
+
+```html title="input-usage.html"
+<input bpdmInput placeholder="you@company.com" />
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+The `variant` prop offers `outline` (default, bordered box) and `underline` (a
+single bottom border).
+
+<Preview>
+  <InputVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-variants.tsx"
+import { Input } from '@bpdm/ui/input';
+
+export function InputVariants() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Input variant="outline" placeholder="Outline (default)" />
+      <Input variant="underline" placeholder="Underline" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="input-variants.html"
+<input bpdmInput variant="outline" placeholder="Outline (default)" />
+<input bpdmInput variant="underline" placeholder="Underline" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <InputSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-sizes.tsx"
+import { Input } from '@bpdm/ui/input';
+
+export function InputSizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Input size="sm" placeholder="Small" />
+      <Input size="md" placeholder="Medium" />
+      <Input size="lg" placeholder="Large" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="input-sizes.html"
+<input bpdmInput size="sm" placeholder="Small" />
+<input bpdmInput size="md" placeholder="Medium" />
+<input bpdmInput size="lg" placeholder="Large" />
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Use the native attributes — `disabled`, a value, and `aria-invalid` for the
+error state (the field turns destructive-coloured automatically).
+
+<Preview>
+  <InputStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-states.tsx"
+import { Input } from '@bpdm/ui/input';
+
+export function InputStates() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Input placeholder="Default" />
+      <Input defaultValue="With a value" />
+      <Input aria-invalid defaultValue="Invalid value" />
+      <Input disabled placeholder="Disabled" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="input-states.html"
+<input bpdmInput placeholder="Default" />
+<input bpdmInput value="With a value" />
+<input bpdmInput aria-invalid="true" value="Invalid value" />
+<input bpdmInput disabled placeholder="Disabled" />
+```
+
+  </Tab>
+</Tabs>
+
+## With icons
+
+In React, add a leading or trailing icon with `startIcon` / `endIcon` and the
+field pads itself to clear them.
+
+<Preview>
+  <InputIconsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-icons.tsx"
+import { Search, Calendar, Mail, Lock } from 'lucide-react';
+import { Input } from '@bpdm/ui/input';
+
+export function InputIcons() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Input placeholder="Search" startIcon={<Search />} />
+      <Input placeholder="Pick a date" endIcon={<Calendar />} />
+      <Input type="email" placeholder="Email" startIcon={<Mail />} />
+      <Input type="password" placeholder="Password" startIcon={<Lock />} />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`startIcon` / `endIcon` are a React convenience. In Angular, wrap the input and
+position the icon, padding the field to clear it:
+
+```html title="input-icons.html"
+<div class="relative flex items-center">
+  <svg class="pointer-events-none absolute left-3 size-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+  <input bpdmInput class="pl-9" placeholder="Search" />
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Input types
+
+Any native `type` works — `email`, `password`, `number`, `file`, and the rest.
+
+<Preview>
+  <InputTypesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-types.tsx"
+import { Input } from '@bpdm/ui/input';
+
+export function InputTypes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Input type="email" placeholder="email@company.com" />
+      <Input type="password" placeholder="••••••••" />
+      <Input type="number" placeholder="0" />
+      <Input type="file" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="input-types.html"
+<input bpdmInput type="email" placeholder="email@company.com" />
+<input bpdmInput type="password" placeholder="••••••••" />
+<input bpdmInput type="number" placeholder="0" />
+<input bpdmInput type="file" />
+```
+
+  </Tab>
+</Tabs>
+
+## Form field
+
+Pair the input with a `<label>` (linked via `htmlFor`/`for`) and an optional
+helper line. This is the accessible, recommended pattern.
+
+<Preview>
+  <InputFormFieldDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-field.tsx"
+import { Mail } from 'lucide-react';
+import { Input } from '@bpdm/ui/input';
+
+export function InputField() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor="email" className="text-sm font-medium">
+        Email
+      </label>
+      <Input id="email" type="email" placeholder="you@company.com" startIcon={<Mail />} />
+      <p className="text-xs text-muted-foreground">We'll never share your email.</p>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="input-field.html"
+<div class="flex flex-col gap-1.5">
+  <label for="email" class="text-sm font-medium">Email</label>
+  <input bpdmInput id="email" type="email" placeholder="you@company.com" />
+  <p class="text-xs text-muted-foreground">We'll never share your email.</p>
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `outline \| underline` | `outline` | Bordered box, or a single bottom border. |
+| `size` | `sm \| md \| lg` | `md` | Field height and text size. |
+| `startIcon` | `ReactNode` | — | **React only** — icon rendered at the leading edge. |
+| `endIcon` | `ReactNode` | — | **React only** — icon rendered at the trailing edge. |
+
+All native `<input>` attributes (`type`, `placeholder`, `value`, `disabled`,
+`readOnly`, `aria-invalid`, …) are supported. In Angular, `variant` and `size`
+are `@Input`s on the `input[bpdmInput]` directive.
+
+## Accessibility
+
+- Always pair the input with a `<label>` linked by `htmlFor` (React) / `for`
+  (Angular), or give it an `aria-label`.
+- Set **`aria-invalid`** when a field fails validation — bpdm styles it with the
+  destructive colour, and screen readers announce the error state.
+- It's a native `<input>`, so keyboard and assistive-tech behaviour are built in.

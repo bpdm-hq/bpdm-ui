@@ -126,6 +126,10 @@ export interface DialogProps {
   children?: React.ReactNode;
   /** Classes on the dialog panel. */
   className?: string;
+  /** Forwarded to the content — e.g. `e.preventDefault()` to stop outside-click close. */
+  onInteractOutside?: DialogContentProps["onInteractOutside"];
+  /** Forwarded to the content — e.g. `e.preventDefault()` to stop Esc close. */
+  onEscapeKeyDown?: DialogContentProps["onEscapeKeyDown"];
 }
 
 /**
@@ -146,11 +150,19 @@ export function Dialog({
   showClose = true,
   children,
   className,
+  onInteractOutside,
+  onEscapeKeyDown,
 }: DialogProps) {
   return (
     <DialogRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent size={size} showClose={showClose} className={className}>
+      <DialogContent
+        size={size}
+        showClose={showClose}
+        className={className}
+        onInteractOutside={onInteractOutside}
+        onEscapeKeyDown={onEscapeKeyDown}
+      >
         <DialogHeader>
           {title ? (
             <DialogTitle>{title}</DialogTitle>

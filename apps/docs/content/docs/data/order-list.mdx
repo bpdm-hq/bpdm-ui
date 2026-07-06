@@ -1,0 +1,431 @@
+---
+title: Order List
+description: Reorder a collection — select items and move them with the control column or drag-and-drop; filterable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  OrderListUsageDemo,
+  OrderListCustomDemo,
+  OrderListFilterDemo,
+  OrderListMultipleDemo,
+  OrderListControlsDemo,
+} from '@/components/order-list-demos';
+import { Preview } from '@/components/preview';
+
+The **Order List** lets users reorder a collection: select an item, then move it
+**up / to top / down / to bottom** with the control column, or **drag** it. It's
+controlled (`value` + `onChange`) or uncontrolled (`defaultValue`), filterable, and
+responsive (controls sit beside the list, stacking above on small screens). In
+Angular it's `<bpdm-order-list>` with `[(value)]` and an `itemTemplate`.
+
+<Callout type="info">
+  Order List renders every row (no virtualization), which suits small-to-medium
+  collections — reorder queues, feature toggles, pipeline steps. For large,
+  paged datasets reach for the [Data Table](/docs/data/data-table) instead.
+</Callout>
+
+## Usage
+
+Give it `itemKey` (a stable id) and `renderItem`. Provide `onChange` (or bind
+`value`) to receive the reordered array. Drag-and-drop is on by default.
+
+<Preview>
+  <OrderListUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-usage.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+
+const STAGES = ['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy'];
+
+export function Pipeline() {
+  const [items, setItems] = useState(STAGES);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      header="Pipeline stages"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+The row is an `<ng-template>` passed as `itemTemplate`; `[(value)]` two-way binds
+the ordered array.
+
+```ts title="order-list-usage.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList } from '@bpdm/ng';
+
+@Component({
+  selector: 'pipeline',
+  imports: [BpdmOrderList],
+  template: `
+    <bpdm-order-list [(value)]="items" [itemKey]="itemKey" [itemTemplate]="row" header="Pipeline stages">
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class Pipeline {
+  readonly itemKey = (s: string) => s;
+  readonly items = signal(['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy']);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Custom rows
+
+`renderItem` (React) / the `itemTemplate` (Angular) can render anything — an
+avatar, a `Badge`, secondary text.
+
+<Preview>
+  <OrderListCustomDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-custom.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+import { Badge } from '@bpdm/ui/badge';
+
+type Task = { id: string; name: string; tag: 'Backend' | 'Design' | 'Docs' | 'Frontend' };
+
+const TASKS: Task[] = [
+  { id: 't1', name: 'Auth refactor', tag: 'Backend' },
+  { id: 't2', name: 'Dark mode', tag: 'Design' },
+  { id: 't3', name: 'API reference', tag: 'Docs' },
+  { id: 't4', name: 'Onboarding flow', tag: 'Frontend' },
+  { id: 't5', name: 'Rate limiting', tag: 'Backend' },
+];
+
+export function Backlog() {
+  const [items, setItems] = useState(TASKS);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(t) => t.id}
+      header="Backlog"
+      renderItem={(t) => (
+        <div className="flex flex-1 items-center justify-between gap-3">
+          <span className="font-medium">{t.name}</span>
+          <Badge variant="secondary" appearance="soft">
+            {t.tag}
+          </Badge>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list-custom.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList, BpdmBadge } from '@bpdm/ng';
+
+type Task = { id: string; name: string; tag: 'Backend' | 'Design' | 'Docs' | 'Frontend' };
+
+@Component({
+  selector: 'backlog',
+  imports: [BpdmOrderList, BpdmBadge],
+  template: `
+    <bpdm-order-list [(value)]="items" [itemKey]="itemKey" [itemTemplate]="row" header="Backlog">
+      <ng-template #row let-t>
+        <div class="flex flex-1 items-center justify-between gap-3">
+          <span class="font-medium">{{ t.name }}</span>
+          <bpdm-badge variant="secondary" appearance="soft">{{ t.tag }}</bpdm-badge>
+        </div>
+      </ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class Backlog {
+  readonly itemKey = (t: Task) => t.id;
+  readonly items = signal<Task[]>([
+    { id: 't1', name: 'Auth refactor', tag: 'Backend' },
+    { id: 't2', name: 'Dark mode', tag: 'Design' },
+    { id: 't3', name: 'API reference', tag: 'Docs' },
+    { id: 't4', name: 'Onboarding flow', tag: 'Frontend' },
+    { id: 't5', name: 'Rate limiting', tag: 'Backend' },
+  ]);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Filtering
+
+Pass `filterBy` (an accessor returning each item's searchable text) to show a
+filter box. Drag is disabled while a filter is active (order would be ambiguous);
+the control column still moves the visible selection.
+
+<Preview>
+  <OrderListFilterDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-filter.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+import { Badge } from '@bpdm/ui/badge';
+
+type Task = { id: string; name: string; tag: 'Backend' | 'Design' | 'Docs' | 'Frontend' };
+
+const TASKS: Task[] = [
+  { id: 't1', name: 'Auth refactor', tag: 'Backend' },
+  { id: 't2', name: 'Dark mode', tag: 'Design' },
+  { id: 't3', name: 'API reference', tag: 'Docs' },
+  { id: 't4', name: 'Onboarding flow', tag: 'Frontend' },
+  { id: 't5', name: 'Rate limiting', tag: 'Backend' },
+];
+
+export function FilterableBacklog() {
+  const [items, setItems] = useState(TASKS);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(t) => t.id}
+      filterBy={(t) => t.name}
+      filterPlaceholder="Filter tasks…"
+      renderItem={(t) => (
+        <div className="flex flex-1 items-center justify-between gap-3">
+          <span className="font-medium">{t.name}</span>
+          <Badge variant="secondary" appearance="soft">
+            {t.tag}
+          </Badge>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list-filter.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList, BpdmBadge } from '@bpdm/ng';
+
+type Task = { id: string; name: string; tag: 'Backend' | 'Design' | 'Docs' | 'Frontend' };
+
+@Component({
+  selector: 'filterable-backlog',
+  imports: [BpdmOrderList, BpdmBadge],
+  template: `
+    <bpdm-order-list
+      [(value)]="items"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      [filterBy]="filterBy"
+      filterPlaceholder="Filter tasks…"
+    >
+      <ng-template #row let-t>
+        <div class="flex flex-1 items-center justify-between gap-3">
+          <span class="font-medium">{{ t.name }}</span>
+          <bpdm-badge variant="secondary" appearance="soft">{{ t.tag }}</bpdm-badge>
+        </div>
+      </ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class FilterableBacklog {
+  readonly itemKey = (t: Task) => t.id;
+  readonly filterBy = (t: Task) => t.name;
+  readonly items = signal<Task[]>([
+    { id: 't1', name: 'Auth refactor', tag: 'Backend' },
+    { id: 't2', name: 'Dark mode', tag: 'Design' },
+    { id: 't3', name: 'API reference', tag: 'Docs' },
+    { id: 't4', name: 'Onboarding flow', tag: 'Frontend' },
+    { id: 't5', name: 'Rate limiting', tag: 'Backend' },
+  ]);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Multiple selection
+
+`selectionMode="multiple"` lets users select several items and move them together
+with the control column. (A drag still moves a single item.)
+
+<Preview>
+  <OrderListMultipleDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-multiple.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+
+const STAGES = ['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy'];
+
+export function MultiMove() {
+  const [items, setItems] = useState(STAGES);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      selectionMode="multiple"
+      header="Select several, move together"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list-multiple.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList } from '@bpdm/ng';
+
+@Component({
+  selector: 'multi-move',
+  imports: [BpdmOrderList],
+  template: `
+    <bpdm-order-list
+      [(value)]="items"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      selectionMode="multiple"
+      header="Select several, move together"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class MultiMove {
+  readonly itemKey = (s: string) => s;
+  readonly items = signal(['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy']);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Controls only
+
+Set `dragdrop={false}` to reorder purely with the control column — handy on
+touch, or when drag would conflict with other gestures.
+
+<Preview>
+  <OrderListControlsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-controls.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+
+const STAGES = ['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy'];
+
+export function ControlsOnly() {
+  const [items, setItems] = useState(STAGES);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      dragdrop={false}
+      header="Controls only (no drag)"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list-controls.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList } from '@bpdm/ng';
+
+@Component({
+  selector: 'controls-only',
+  imports: [BpdmOrderList],
+  template: `
+    <bpdm-order-list
+      [(value)]="items"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      [dragdrop]="false"
+      header="Controls only (no drag)"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class ControlsOnly {
+  readonly itemKey = (s: string) => s;
+  readonly items = signal(['Lint', 'Type-check', 'Unit tests', 'Build', 'Deploy']);
+}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `OrderList` / `<bpdm-order-list>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` / `onChange` | `T[]` / `T[]` / `(next) => void` | — | The ordered array — controlled or uncontrolled. Angular: `[(value)]`. |
+| `itemKey` | `(item) => string \| number` | — | **Required.** Stable id per item. |
+| `renderItem` (Angular `itemTemplate`) | `(item) => ReactNode` / `TemplateRef` | — | **Required.** How each row renders. |
+| `header` | `ReactNode` / `string` | — | Optional list header. |
+| `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box matching this text. |
+| `dragdrop` | `boolean` | `true` | Enable drag-to-reorder. |
+| `selectionMode` | `single \| multiple` | `single` | Move one, or several together via the controls. |
+| `scrollHeight` | `string` | `18rem` | Max body height before the list scrolls. |
+| `ariaLabel` | `string` | `Orderable list` | Accessible name for the listbox when there's no visible `header`. |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+## Accessibility
+
+- The list is a WAI-ARIA **`listbox`**: it's a single tab stop and a roving
+  `aria-activedescendant` tracks the active option. **↑ / ↓** move it, **Home / End**
+  jump to the ends, and **Enter / Space** toggle selection.
+- Each row is a `role="option"` exposing `aria-selected`; in
+  `selectionMode="multiple"` the listbox sets `aria-multiselectable`.
+- The listbox is **named** by its `header` (wired via `aria-labelledby`). With no
+  header, pass `ariaLabel` — it falls back to "Orderable list".
+- The control buttons (**Move up / to top / down / to bottom**) are real
+  `<button>`s with labels, grouped under a `role="group"`, and disabled at the
+  list's edges. If the pressed button disables after a move, focus is kept within
+  the group.
+- Each move is announced through a polite live region, so screen-reader users hear
+  the result. Drag-and-drop is a purely visual enhancement — every reorder is also
+  reachable from the keyboard via the controls.
+- Layout uses logical properties, so the selection accent and control column
+  mirror correctly in RTL.

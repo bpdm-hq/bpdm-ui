@@ -51,7 +51,13 @@ let uid = 0;
     }
     @if (!hideArrow()) {
       <span [class]="arrowClass()" aria-hidden="true">
-        <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-popover">
+        <svg
+          width="12"
+          height="6"
+          viewBox="0 0 12 6"
+          class="block fill-popover"
+          style="filter: drop-shadow(0 0 1.5px rgb(0 0 0 / 0.22))"
+        >
           <path d="M0 0L6 6L12 0Z" />
         </svg>
       </span>

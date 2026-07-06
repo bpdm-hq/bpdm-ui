@@ -22,7 +22,7 @@ describe("BpdmAlert", () => {
     const box = host.querySelector('[role="alert"]') as HTMLElement;
 
     expect(box).toBeTruthy();
-    expect(box.className).toContain("before:bg-destructive"); // error accent
+    expect(box.className).toContain("var(--destructive)"); // error accent (destructive color-mix bg/border)
     expect(host.textContent).toContain("Oops"); // title
     expect(host.textContent).toContain("Something failed"); // body
   });

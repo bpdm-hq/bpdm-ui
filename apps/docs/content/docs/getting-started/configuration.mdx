@@ -1,0 +1,111 @@
+---
+title: Configuration
+description: Themes, dark mode, and customising the design tokens.
+---
+
+Everything visual in bpdm/ui is driven by the CSS variables in `@bpdm/tokens`,
+so theming is just setting (or overriding) those tokens — no config files, same
+for React and Angular.
+
+## Themes
+
+bpdm ships **four built-in themes**, selected with a `data-theme` attribute on
+`<html>` (or any ancestor):
+
+| Theme | Mode | Feel |
+| --- | --- | --- |
+| `paper` | Light | Warm, default |
+| `mist` | Light | Cool, neutral |
+| `charcoal` | Dark | Warm dark |
+| `slate` | Dark | Cool, enterprise dark |
+
+```html
+<html data-theme="paper">  <!-- default light -->
+<html data-theme="slate">  <!-- cool dark -->
+```
+
+If you don't set `data-theme`, the default (`paper`) applies.
+
+## Dark mode
+
+Switch between a light and a dark theme by toggling `data-theme` — for example
+with a small theme switcher that flips `paper` ⇄ `slate` and persists the choice:
+
+```ts
+const setTheme = (theme: 'paper' | 'slate') => {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem('theme', theme);
+};
+```
+
+Use any light theme (`paper`/`mist`) against any dark theme (`charcoal`/`slate`).
+
+## Overriding tokens
+
+Re-theme by overriding any token — globally on `:root`, or scoped to a subtree.
+The brand colour (`--primary`) is amber in every theme; change it once and every
+component follows:
+
+```css
+:root {
+  --primary: #6366f1;        /* make the brand indigo */
+  --radius: 0.5rem;          /* tighter corners everywhere */
+}
+```
+
+## Design tokens
+
+These are every token you can override. **Colours** are defined per theme;
+**radius** and **motion** are shared across all themes. Override any of them on
+`:root` (globally) or on any element (scoped).
+
+### Surfaces & text
+
+| Token | Used for |
+| --- | --- |
+| `--background` / `--foreground` | Page background and default text |
+| `--card` / `--card-foreground` | Raised surfaces — cards, panels |
+| `--popover` / `--popover-foreground` | Floating surfaces — menus, popovers |
+| `--muted` / `--muted-foreground` | Subtle backgrounds and secondary text |
+
+### Semantic colours
+
+Each colour has a matching `-foreground` token for text/icons placed on it.
+
+| Token | Used for |
+| --- | --- |
+| `--primary` / `--primary-foreground` | Brand / primary actions (amber) |
+| `--secondary` / `--secondary-foreground` | Neutral, secondary actions |
+| `--accent` / `--accent-foreground` | Accent highlights |
+| `--success` / `--success-foreground` | Success states |
+| `--info` / `--info-foreground` | Informational states |
+| `--warning` / `--warning-foreground` | Warning states |
+| `--help` / `--help-foreground` | Help / tips |
+| `--destructive` / `--destructive-foreground` | Destructive / dangerous actions |
+
+### Borders & focus
+
+| Token | Used for |
+| --- | --- |
+| `--border` | Default border colour |
+| `--input` | Form-control borders |
+| `--ring` | Focus-ring colour |
+
+### Radius & motion (shared across all themes)
+
+| Token | Default | Used for |
+| --- | --- | --- |
+| `--radius` | `0.625rem` | Corner radius for every component |
+| `--bpdm-ease-out` | `cubic-bezier(0.32, 0.72, 0, 1)` | Confident decelerate |
+| `--bpdm-ease-overshoot` | `cubic-bezier(0.21, 1.02, 0.73, 1)` | Springy "pop" |
+| `--bpdm-duration-fast` | `120ms` | Quick transitions |
+| `--bpdm-duration-base` | `180ms` | Default transitions |
+| `--bpdm-duration-slow` | `240ms` | Slower transitions |
+
+Reference these motion tokens in your own CSS (e.g. `transition-duration: var(--bpdm-duration-base)`) instead of hard-coding values, so custom UI matches the system.
+
+## Next
+
+<Cards>
+  <Card title="Components" href="/docs/button/button" description="Browse all 38 components" />
+</Cards>

@@ -87,7 +87,7 @@ type Member = {
 };
 
 const MEMBERS: Member[] = [
-  { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", status: "active", joined: "2025-02-14", tasks: 128 },
+  { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", status: "active", joined: "2025-02-14", tasks: 128 },
   { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", joined: "2025-03-02", tasks: 0 },
   { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", joined: "2025-03-19", tasks: 86 },
   { id: "m_04", name: "Noah Bauer", email: "noah@example.com", role: "Viewer", team: "Support", status: "disabled", joined: "2025-04-08", tasks: 12 },
@@ -768,7 +768,7 @@ export class TableSizesComponent {
   readonly sizes = ["sm", "md", "lg"] as const;
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -802,7 +802,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableStripedComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -840,7 +840,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableStickyComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -879,7 +879,7 @@ export class TableClickableComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly open = (row: Member) => console.log("Opened", row.id);
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -918,7 +918,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableSortingComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -975,7 +975,7 @@ export class TableMultiSortComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly defaultSort: DataTableSort[] = [{ id: "status", dir: "asc" }, { id: "tasks", dir: "desc" }];
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", status: "active", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", status: "active", tasks: 128 },
     { id: "m_02", name: "Leo Martins", status: "invited", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", status: "active", tasks: 86 },
   ];
@@ -1064,7 +1064,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableSingleSelectComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1120,7 +1120,7 @@ export class TableToolbarComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly selected = signal<(string | number)[]>([]);
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1164,7 +1164,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableClientPagingComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1306,7 +1306,7 @@ type Member = { id: string; name: string; role: string; email: string; tasks: nu
 export class TableExpandableComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", email: "hugo@example.com", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", email: "milo@example.com", tasks: 128 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", email: "sara@example.com", tasks: 86 },
   ];
   readonly columns = computed<DataTableColumn<Member>[]>(() => [
@@ -1351,7 +1351,7 @@ export class TableBorderlessComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly size = signal(10);
   readonly rows = signal<Member[]>([
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ]);
@@ -1409,7 +1409,7 @@ export class TableFrozenComponent {
   readonly actionsTpl = viewChild<TemplateRef<CellContext<Member>>>("actions");
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", joined: "2025-02-14", status: "active", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", joined: "2025-02-14", status: "active", tasks: 128 },
     { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", joined: "2025-03-02", status: "invited", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", joined: "2025-03-19", status: "active", tasks: 86 },
   ];
@@ -1453,7 +1453,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TablePinnableComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1496,7 +1496,7 @@ export class TableFiltersComponent {
   readonly statusTpl = viewChild<TemplateRef<CellContext<Member>>>("status");
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", email: "hugo@example.com", role: "Owner", team: "Engineering", status: "active", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", email: "milo@example.com", role: "Owner", team: "Engineering", status: "active", tasks: 128 },
     { id: "m_02", name: "Leo Martins", email: "leo@example.com", role: "Admin", team: "Design", status: "invited", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", email: "sara@example.com", role: "Editor", team: "Engineering", status: "active", tasks: 86 },
   ];
@@ -1543,7 +1543,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableSearchComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1578,7 +1578,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableToggleComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1621,7 +1621,7 @@ export class TableFooterComponent {
   readonly statusTpl = viewChild<TemplateRef<CellContext<Member>>>("status");
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", team: "Engineering", status: "active", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", team: "Engineering", status: "active", tasks: 128 },
     { id: "m_02", name: "Leo Martins", team: "Design", status: "invited", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", team: "Engineering", status: "active", tasks: 86 },
   ];
@@ -1668,7 +1668,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableResponsiveComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1710,7 +1710,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableColReorderComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data: Member[] = [
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ];
@@ -1756,7 +1756,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 export class TableRowReorderComponent {
   readonly rowKey = (r: Member) => r.id;
   readonly data = signal<Member[]>([
-    { id: "m_01", name: "Hugo Lindberg", role: "Owner", tasks: 128 },
+    { id: "m_01", name: "Milo Lindberg", role: "Owner", tasks: 128 },
     { id: "m_02", name: "Leo Martins", role: "Admin", tasks: 0 },
     { id: "m_03", name: "Sara Kovač", role: "Editor", tasks: 86 },
   ]);

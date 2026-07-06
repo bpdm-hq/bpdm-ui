@@ -255,18 +255,23 @@ function ToastItem({
   const dismissible = record.dismissible ?? !record.loading;
   const dur = record.duration ?? fallbackDuration;
 
+  // a title-only toast centres the icon with the text; once there's a
+  // description (or action) the content is multi-line, so the icon top-aligns
+  // to the first line instead.
+  const compact = record.description == null && !record.action;
+  const iconBox = cn(
+    "flex size-8 shrink-0 items-center justify-center rounded-lg",
+    !compact && "mt-0.5",
+  );
+
   const leading = record.loading ? (
-    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+    <span className={cn(iconBox, "bg-muted")}>
       <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
     </span>
   ) : record.icon !== undefined ? (
-    record.icon && (
-      <span className={cn("mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg", v.tint)}>
-        {record.icon}
-      </span>
-    )
+    record.icon && <span className={cn(iconBox, v.tint)}>{record.icon}</span>
   ) : v.Icon ? (
-    <span className={cn("mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg", v.tint)}>
+    <span className={cn(iconBox, v.tint)}>
       <v.Icon className={cn("size-4", v.fg)} />
     </span>
   ) : null;
@@ -285,7 +290,8 @@ function ToastItem({
         { "--bpdm-toast-in": cfg.in, "--bpdm-toast-out": cfg.out } as React.CSSProperties
       }
       className={cn(
-        "group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
+        "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
+        compact ? "items-center" : "items-start",
         "before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
         v.accent,
         !sticky && "before:opacity-40",

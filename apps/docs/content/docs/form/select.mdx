@@ -1,0 +1,372 @@
+---
+title: Select
+description: A single-select dropdown — data-driven, searchable, accessible, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  SelectBasicDemo,
+  SelectSearchableDemo,
+  SelectWithIconsDemo,
+  SelectGroupsDemo,
+  SelectBigDemo,
+  SelectSizesDemo,
+  SelectStatesDemo,
+} from '@/components/select-demos';
+import { Preview } from '@/components/preview';
+
+The **Select** is a single-choice dropdown. It's **data-driven** — you pass an
+`options` array (flat or grouped) rather than markup — with optional search,
+controlled or uncontrolled value, and long lists virtualized for performance.
+
+## Usage
+
+<Preview>
+  <SelectBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-usage.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+];
+
+export function SelectUsage() {
+  return <Select options={FRAMEWORKS} placeholder="Select a framework" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="select-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'select-usage',
+  imports: [BpdmSelect],
+  templateUrl: './select-usage.html',
+})
+export class SelectUsage {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'angular', label: 'Angular' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'svelte', label: 'Svelte' },
+  ];
+}
+```
+
+```html title="select-usage.html"
+<bpdm-select [options]="frameworks" placeholder="Select a framework" />
+```
+
+  </Tab>
+</Tabs>
+
+## Searchable
+
+Set `searchable` to add a filter box — handy for long lists. Customise the empty
+state with `emptyText` and the field with `searchPlaceholder`.
+
+<Preview>
+  <SelectSearchableDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-searchable.tsx"
+import { Select } from '@bpdm/ui/select';
+
+export function SelectSearchable({ frameworks }) {
+  return <Select searchable options={frameworks} placeholder="Search frameworks" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="select-searchable.html"
+<bpdm-select [options]="frameworks" searchable placeholder="Search frameworks" />
+```
+
+  </Tab>
+</Tabs>
+
+## With icons
+
+Each option (and group) accepts an `icon` — rendered before the label in both
+the trigger and the dropdown.
+
+<Preview>
+  <SelectWithIconsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-icons.tsx"
+import { Circle, CircleDashed, CircleCheck, CircleX } from 'lucide-react';
+import { Select } from '@bpdm/ui/select';
+
+const STATUSES = [
+  { value: 'todo', label: 'Todo', icon: <Circle className="size-4 text-muted-foreground" /> },
+  { value: 'in-progress', label: 'In progress', icon: <CircleDashed className="size-4 text-primary" /> },
+  { value: 'done', label: 'Done', icon: <CircleCheck className="size-4 text-primary" /> },
+  { value: 'canceled', label: 'Canceled', icon: <CircleX className="size-4 text-destructive" /> },
+];
+
+export function SelectWithIcons() {
+  return <Select options={STATUSES} placeholder="Set status" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular, `icon` takes a string template (or any renderable the component
+supports); pass your status options with an icon per entry:
+
+```ts title="select-icons.ts"
+readonly statuses = [
+  { value: 'todo', label: 'Todo', icon: '○' },
+  { value: 'in-progress', label: 'In progress', icon: '◐' },
+  { value: 'done', label: 'Done', icon: '✓' },
+  { value: 'canceled', label: 'Canceled', icon: '✕' },
+];
+```
+
+```html title="select-icons.html"
+<bpdm-select [options]="statuses" placeholder="Set status" />
+```
+
+  </Tab>
+</Tabs>
+
+## Grouped options
+
+Pass groups (`{ label, options }`) instead of flat options to show labelled
+sections. The group `label` can include an emoji or icon.
+
+<Preview>
+  <SelectGroupsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-groups.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const CITIES = [
+  {
+    label: '🇩🇪 Germany',
+    options: [
+      { value: 'berlin', label: 'Berlin' },
+      { value: 'frankfurt', label: 'Frankfurt' },
+      { value: 'hamburg', label: 'Hamburg' },
+      { value: 'munich', label: 'Munich' },
+    ],
+  },
+  {
+    label: '🇺🇸 USA',
+    options: [
+      { value: 'nyc', label: 'New York' },
+      { value: 'la', label: 'Los Angeles' },
+      { value: 'chicago', label: 'Chicago' },
+    ],
+  },
+];
+
+export function SelectGroups() {
+  return <Select options={CITIES} placeholder="Select a city" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="select-groups.ts"
+readonly cities = [
+  { label: '🇩🇪 Germany', options: [
+    { value: 'berlin', label: 'Berlin' },
+    { value: 'frankfurt', label: 'Frankfurt' },
+    { value: 'hamburg', label: 'Hamburg' },
+    { value: 'munich', label: 'Munich' },
+  ] },
+  { label: '🇺🇸 USA', options: [
+    { value: 'nyc', label: 'New York' },
+    { value: 'la', label: 'Los Angeles' },
+    { value: 'chicago', label: 'Chicago' },
+  ] },
+];
+```
+
+```html title="select-groups.html"
+<bpdm-select [options]="cities" placeholder="Select a city" />
+```
+
+  </Tab>
+</Tabs>
+
+## Large datasets
+
+The dropdown is **virtualized** — only the visible rows render — so it stays
+smooth even with thousands of options. Open it and scroll through 10,000 rows.
+
+<Preview>
+  <SelectBigDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-large.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+
+export function SelectLarge() {
+  return <Select options={options} placeholder="Scroll 10,000 records" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="select-large.ts"
+readonly options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+```
+
+```html title="select-large.html"
+<bpdm-select [options]="options" placeholder="Scroll 10,000 records" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <SelectSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-sizes.tsx"
+<Select size="sm" options={frameworks} placeholder="Small" />
+<Select size="md" options={frameworks} placeholder="Medium" />
+<Select size="lg" options={frameworks} placeholder="Large" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="select-sizes.html"
+<bpdm-select size="sm" [options]="frameworks" placeholder="Small" />
+<bpdm-select size="md" [options]="frameworks" placeholder="Medium" />
+<bpdm-select size="lg" [options]="frameworks" placeholder="Large" />
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Set a `defaultValue`, mark the field with `aria-invalid` for errors, or
+`disabled` to turn it off.
+
+<Preview>
+  <SelectStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-states.tsx"
+<Select options={frameworks} placeholder="Default" />
+<Select options={frameworks} defaultValue="react" />
+<Select options={frameworks} aria-invalid placeholder="Invalid" />
+<Select options={frameworks} disabled placeholder="Disabled" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="select-states.html"
+<bpdm-select [options]="frameworks" placeholder="Default" />
+<bpdm-select [options]="frameworks" defaultValue="react" />
+<bpdm-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
+<bpdm-select [options]="frameworks" disabled placeholder="Disabled" />
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled value
+
+Drive the selection yourself with `value` + `onValueChange` (React) or two-way
+`[(value)]` (Angular).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-controlled.tsx"
+import { useState } from 'react';
+import { Select } from '@bpdm/ui/select';
+
+export function SelectControlled({ frameworks }) {
+  const [value, setValue] = useState('react');
+  return <Select options={frameworks} value={value} onValueChange={setValue} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="select-controlled.html"
+<bpdm-select [options]="frameworks" [(value)]="selected" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `SelectItems` (flat `{ value, label, icon?, disabled? }[]` or grouped `{ label, icon?, options }[]`) | — | **Required.** Data-driven options; each option/group may carry an `icon`. |
+| `value` / `defaultValue` | `string` | — | Controlled / uncontrolled selection. |
+| `onValueChange` | `(value: string) => void` | — | **React** — fires on selection. Angular uses two-way `[(value)]`. |
+| `placeholder` | `string` | `Select…` | Text when nothing is selected. |
+| `searchable` | `boolean` | `false` | Show a filter box. |
+| `searchPlaceholder` | `string` | `Search…` | Placeholder for the filter box. |
+| `emptyText` | `string` | `No results.` | Shown when the filter matches nothing. |
+| `size` | `sm \| md \| lg` | `md` | Trigger height and text size. |
+| `disabled` | `boolean` | `false` | Disable the control. |
+| `aria-invalid` | `boolean` | — | Error state (destructive border). |
+
+## Accessibility
+
+- The trigger and listbox follow the combobox/listbox pattern — full **keyboard
+  support** (arrows to move, Enter to select, Esc to close, type-ahead).
+- Pair it with a `<label>` (linked via `id`) or an `aria-label`.
+- Set `aria-invalid` when selection fails validation.

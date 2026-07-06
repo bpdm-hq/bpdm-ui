@@ -5,7 +5,14 @@ import { BpdmPickList, type PickListValue } from "./pick-list";
 @Component({
   imports: [BpdmPickList],
   template: `
-    <bpdm-pick-list [(value)]="lists" [itemKey]="key" [itemTemplate]="tpl" [reorder]="reorder" />
+    <bpdm-pick-list
+      [(value)]="lists"
+      [itemKey]="key"
+      [itemTemplate]="tpl"
+      [reorder]="reorder"
+      [isItemDisabled]="isDisabled"
+      (transfer)="lastTransfer = $event"
+    />
     <ng-template #tpl let-item>{{ item }}</ng-template>
   `,
 })
@@ -13,6 +20,8 @@ class Host {
   readonly lists = signal<PickListValue<string>>({ source: ["A", "B", "C"], target: ["Z"] });
   readonly key = (w: string) => w;
   reorder = true;
+  isDisabled: (w: string) => boolean = () => false;
+  lastTransfer: { moved: string[]; to: "source" | "target" } | null = null;
 }
 
 describe("BpdmPickList", () => {
@@ -65,5 +74,29 @@ describe("BpdmPickList", () => {
     const fixture = setup(false);
     expect(ctrl(fixture, "Move up")).toBeNull();
     expect(ctrl(fixture, "Move to target")).toBeTruthy(); // transfer controls remain
+  });
+
+  it("emits (transfer) with the moved items and destination", () => {
+    const fixture = setup();
+    optionsIn(lists(fixture)[0])[1].click(); // select "B"
+    fixture.detectChanges();
+    ctrl(fixture, "Move to target").click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.lastTransfer).toEqual({ moved: ["B"], to: "target" });
+  });
+
+  it("locks a disabled item — not selectable, and left behind on move-all", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.isDisabled = (w) => w === "B";
+    fixture.detectChanges();
+    const source = lists(fixture)[0];
+    const b = optionsIn(source)[1];
+    expect(b.getAttribute("aria-disabled")).toBe("true");
+    b.click(); // ignored
+    fixture.detectChanges();
+    expect(b.getAttribute("aria-selected")).toBe("false");
+    ctrl(fixture, "Move all to target").click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.lists()).toEqual({ source: ["B"], target: ["Z", "A", "C"] });
   });
 });

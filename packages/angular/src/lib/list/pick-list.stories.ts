@@ -130,6 +130,15 @@ const meta: Meta = {
   component: BpdmPickList,
   decorators: [
     moduleMetadata({ imports: [PlStringHost, PlFilterHost, PlTemplateHost] }),
+    // PickList is fluid; constrain + centre it in the story canvas so the two
+    // panes read as a compact, balanced pair.
+    (storyFn) => {
+      const story = storyFn() as { template?: string; [k: string]: unknown };
+      return {
+        ...story,
+        template: `<div class="mx-auto w-full max-w-4xl">${story.template ?? ""}</div>`,
+      };
+    },
   ],
   tags: ["autodocs"],
 };

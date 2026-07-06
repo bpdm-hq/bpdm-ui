@@ -1,0 +1,11 @@
+{
+  "title": "Data",
+  "icon": "Table",
+  "pages": [
+    "data-table",
+    "stat-card",
+    "order-list",
+    "pick-list",
+    "status-timeline"
+  ]
+}

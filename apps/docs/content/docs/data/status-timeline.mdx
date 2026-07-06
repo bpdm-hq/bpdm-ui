@@ -1,0 +1,692 @@
+---
+title: Status Timeline
+description: A vertical status timeline for lifecycles — complete / current / pending / failed steps with timestamps, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  StatusTimelineUsageDemo,
+  StatusTimelineStatusesDemo,
+  StatusTimelineFailureDemo,
+  StatusTimelineAlignDemo,
+  StatusTimelineOppositeDemo,
+  StatusTimelineCustomDemo,
+  StatusTimelineHorizontalDemo,
+  StatusTimelineRichDemo,
+  StatusTimelineInteractiveDemo,
+} from '@/components/status-timeline-demos';
+import { Preview } from '@/components/preview';
+
+The **Status Timeline** shows a lifecycle — a deployment, an approval, an onboarding
+flow — **vertically** (default) or **horizontally**. Each step carries a `status`
+(**complete** ✓, **current** — pulsing, **pending** — hollow, **failed** ✗), with an
+optional `timestamp` and `description`. It's data-driven: pass an `items` array.
+
+## Usage
+
+Pass `items` — each with a `title` and a `status`. Add a `timestamp` (shown on the
+right) and a `description` where useful.
+
+<Preview>
+  <StatusTimelineUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="deploy-timeline.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+  { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+  { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+  { title: 'Promote to production', status: 'pending' },
+];
+
+export function DeployTimeline() {
+  return <StatusTimeline items={steps} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="deploy-timeline.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'deploy-timeline',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class DeployTimeline {
+  readonly steps: TimelineItem[] = [
+    { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+    { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+    { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+    { title: 'Promote to production', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Statuses
+
+The four `status` values — **complete**, **current**, **pending**, **failed** —
+each get a distinct marker. The `current` marker pulses; `failed` is destructive-red.
+
+<Preview>
+  <StatusTimelineStatusesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="statuses.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const items: TimelineItem[] = [
+  { title: 'Complete', status: 'complete', timestamp: 'done', description: 'A finished step.' },
+  { title: 'Current', status: 'current', timestamp: 'now', description: 'In progress (the marker pulses).' },
+  { title: 'Pending', status: 'pending', description: 'Not started yet.' },
+  { title: 'Failed', status: 'failed', timestamp: 'error', description: 'Something went wrong.' },
+];
+
+export function Statuses() {
+  return <StatusTimeline items={items} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="statuses.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'statuses',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="items" />`,
+})
+export class Statuses {
+  readonly items: TimelineItem[] = [
+    { title: 'Complete', status: 'complete', timestamp: 'done', description: 'A finished step.' },
+    { title: 'Current', status: 'current', timestamp: 'now', description: 'In progress (the marker pulses).' },
+    { title: 'Pending', status: 'pending', description: 'Not started yet.' },
+    { title: 'Failed', status: 'failed', timestamp: 'error', description: 'Something went wrong.' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## With a failure
+
+A `failed` step turns red and carries its reason in `description` — the steps after
+it stay `pending`.
+
+<Preview>
+  <StatusTimelineFailureDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="failed-pipeline.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Build', status: 'complete', timestamp: '11:02' },
+  { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
+  { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
+  { title: 'Deploy', status: 'pending' },
+];
+
+export function FailedPipeline() {
+  return <StatusTimeline items={steps} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="failed-pipeline.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'failed-pipeline',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class FailedPipeline {
+  readonly steps: TimelineItem[] = [
+    { title: 'Build', status: 'complete', timestamp: '11:02' },
+    { title: 'Unit tests', status: 'complete', timestamp: '11:05' },
+    { title: 'E2E tests', status: 'failed', timestamp: '11:09', description: '2 specs failed — pipeline stopped.' },
+    { title: 'Deploy', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Alignment
+
+`align` sets which side the content sits on relative to the line — `left` (default),
+`right`, or `alternate` (zig-zag). The demo switches between them with our own
+[Tabs](/docs/panel/tabs).
+
+<Preview>
+  <StatusTimelineAlignDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alignment.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+  { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+  { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+  { title: 'Promote to production', status: 'pending' },
+];
+
+export function Alignment() {
+  return <StatusTimeline items={steps} align="alternate" />; // or "left" | "right"
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alignment.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'alignment',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" align="alternate" />`, // or "left" | "right"
+})
+export class Alignment {
+  readonly steps: TimelineItem[] = [
+    { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
+    { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },
+    { title: 'Deploying to staging', status: 'current', timestamp: '09:47' },
+    { title: 'Promote to production', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Dual-sided
+
+Add `opposite` to an item to show content on the **other side** of the line — a date,
+a duration, an actor. Any item having `opposite` centers the line so both sides read.
+
+<Preview>
+  <StatusTimelineOppositeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="opposite.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+  { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
+];
+
+export function DualSided() {
+  return <StatusTimeline items={steps} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="opposite.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'dual-sided',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" />`,
+})
+export class DualSided {
+  readonly steps: TimelineItem[] = [
+    { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+    { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+    { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+    { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Horizontal
+
+Set `layout="horizontal"` to run the timeline left-to-right. In this orientation
+`align` is `top` (default), `bottom`, or `alternate`. The row scrolls horizontally
+when it overflows.
+
+<Preview>
+  <StatusTimelineHorizontalDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="roadmap.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const roadmap: TimelineItem[] = [
+  { id: 'discovery', title: 'Discovery', status: 'complete', timestamp: 'Q1' },
+  { id: 'design', title: 'Design', status: 'complete', timestamp: 'Q2' },
+  { id: 'build', title: 'Build', status: 'current', timestamp: 'Q3' },
+  { id: 'launch', title: 'Launch', status: 'pending', timestamp: 'Q4' },
+];
+
+export function Roadmap() {
+  return <StatusTimeline layout="horizontal" align="top" items={roadmap} />; // or "bottom" | "alternate"
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="roadmap.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'roadmap',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline layout="horizontal" align="top" [items]="roadmap" />`, // or "bottom" | "alternate"
+})
+export class Roadmap {
+  readonly roadmap: TimelineItem[] = [
+    { id: 'discovery', title: 'Discovery', status: 'complete', timestamp: 'Q1' },
+    { id: 'design', title: 'Design', status: 'complete', timestamp: 'Q2' },
+    { id: 'build', title: 'Build', status: 'current', timestamp: 'Q3' },
+    { id: 'launch', title: 'Launch', status: 'pending', timestamp: 'Q4' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Icons, colours & interactivity
+
+The quickest way to customise — no render function needed. Give an item a custom
+`icon` (React) and/or `color` to override the default status glyph, and pass
+`onItemClick` to make each step interactive (keyboard-accessible; in Angular set
+`interactive` and listen to `(itemClick)`). For a fully custom marker or a rich
+content card, see **Total control** below.
+
+<Preview>
+  <StatusTimelineCustomDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="releases.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+import { Flag, Rocket } from 'lucide-react';
+
+const releases: TimelineItem[] = [
+  { id: 'plan', title: 'Planned', color: '#8b5cf6', icon: <Flag className="size-3.5" />, timestamp: 'Q1' },
+  { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
+  { id: 'beta', title: 'Beta launched', color: '#0ea5e9', icon: <Rocket className="size-3.5" />, timestamp: 'Q2' },
+  { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
+];
+
+export function Releases() {
+  return <StatusTimeline items={releases} onItemClick={(item) => console.log(item.id)} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="releases.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'releases',
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline
+      [items]="releases"
+      [markerTemplate]="marker"
+      interactive
+      (itemClick)="onClick($event)"
+    />
+    <ng-template #marker let-item let-status="status">
+      <!-- render a custom glyph per item / status -->
+    </ng-template>
+  `,
+})
+export class Releases {
+  readonly releases: TimelineItem[] = [
+    { id: 'plan', title: 'Planned', color: '#8b5cf6', timestamp: 'Q1' },
+    { id: 'build', title: 'In development', status: 'current', timestamp: 'now' },
+    { id: 'beta', title: 'Beta launched', color: '#0ea5e9', timestamp: 'Q2' },
+    { id: 'ga', title: 'General availability', status: 'pending', timestamp: 'soon' },
+  ];
+  onClick(e: { item: TimelineItem; index: number }) {
+    console.log(e.item.id);
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Total control
+
+Hand the component a **shell** and render each slot yourself —
+the line, layout, alignment, and interactivity stay handled. React uses render
+props (`renderMarker` / `renderContent` / `renderOpposite`); Angular uses
+`markerTemplate` / `contentTemplate` / `oppositeTemplate` (context: item + index +
+status). Provide only the slots you need — the rest fall back to the defaults.
+Reach for these only when you need a fully custom marker or card; for a simple
+per-item icon or colour, prefer `icon` / `color` above.
+
+<Preview>
+  <StatusTimelineRichDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="activity.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+type Event = TimelineItem & { user: string; date: string; color: string };
+
+const events: Event[] = [
+  { id: 'repo', user: 'JD', title: 'Repository created', status: 'complete', date: 'Oct 15', color: '#3b82f6' },
+  { id: 'qa', user: 'MK', title: 'QA review', status: 'current', date: 'Oct 16', color: '#f97316' },
+  { id: 'ga', user: 'JD', title: 'Production release', status: 'pending', date: 'Oct 18', color: '#84cc16' },
+];
+
+export function Activity() {
+  return (
+    <StatusTimeline
+      items={events}
+      align="alternate"
+      renderOpposite={(e) => <span className="text-fd-muted-foreground">{(e as Event).date}</span>}
+      renderMarker={(e) => (
+        <span className="flex size-11 items-center justify-center rounded-full text-white shadow-lg"
+          style={{ backgroundColor: (e as Event).color }} />
+      )}
+      renderContent={(e) => (
+        <div className="rounded-xl border p-4 text-left shadow-sm">
+          <p className="font-semibold">{e.title}</p>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="activity.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+
+type Event = TimelineItem & { user: string; date: string; color: string };
+
+@Component({
+  selector: 'activity',
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline
+      [items]="events"
+      align="alternate"
+      [markerTemplate]="marker"
+      [contentTemplate]="content"
+      [oppositeTemplate]="opposite"
+    >
+      <ng-template #opposite let-e>
+        <span class="text-muted-foreground">{{ e.date }}</span>
+      </ng-template>
+      <ng-template #marker let-e>
+        <span class="flex size-11 items-center justify-center rounded-full text-white shadow-lg"
+          [style.background-color]="e.color"></span>
+      </ng-template>
+      <ng-template #content let-e>
+        <div class="rounded-xl border p-4 text-left shadow-sm">
+          <p class="font-semibold">{{ e.title }}</p>
+        </div>
+      </ng-template>
+    </bpdm-status-timeline>
+  `,
+})
+export class Activity {
+  readonly events: Event[] = [
+    { id: 'repo', user: 'JD', title: 'Repository created', status: 'complete', date: 'Oct 15', color: '#3b82f6' },
+    { id: 'qa', user: 'MK', title: 'QA review', status: 'current', date: 'Oct 16', color: '#f97316' },
+    { id: 'ga', user: 'JD', title: 'Production release', status: 'pending', date: 'Oct 18', color: '#84cc16' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Guided workflow
+
+Because every slot is yours, the timeline composes into full step-based workflows.
+Here an onboarding flow tracks state, completes the **current** step when its marker
+is clicked, and shows progress with our own [Progress Bar](/docs/form/progress) —
+all in your own component; the timeline just draws the line and lays it out.
+
+<Preview>
+  <StatusTimelineInteractiveDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="onboarding.tsx"
+import { useState } from 'react';
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+import { ProgressBar } from '@bpdm/ui/progress';
+import { Button } from '@bpdm/ui/button';
+
+const STEPS = [
+  { id: 1, label: 'Account created' },
+  { id: 2, label: 'Email verified' },
+  { id: 3, label: 'Profile completed' },
+  { id: 4, label: 'Team invited' },
+  { id: 5, label: 'First project created' },
+];
+
+export function Onboarding() {
+  const [completed, setCompleted] = useState<number[]>([1]);
+  const [current, setCurrent] = useState(2);
+  const total = STEPS.length;
+  const statusOf = (id: number) =>
+    completed.includes(id) ? 'completed' : id === current ? 'current' : 'pending';
+  const complete = (id: number) => {
+    if (id !== current) return;
+    setCompleted((c) => [...c, id]);
+    setCurrent((c) => c + 1);
+  };
+
+  const items: TimelineItem[] = STEPS.map((s) => ({
+    id: s.id,
+    status: statusOf(s.id) === 'completed' ? 'complete' : statusOf(s.id) === 'current' ? 'current' : 'pending',
+  }));
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{completed.length} of {total} completed</p>
+        <Button variant="secondary" appearance="outline" size="sm"
+          onClick={() => { setCompleted([1]); setCurrent(2); }}>Reset</Button>
+      </div>
+      <ProgressBar className="my-4" value={completed.length} max={total} variant="success" />
+
+      <StatusTimeline
+        items={items}
+        renderMarker={(item) => {
+          const id = item.id as number;
+          if (statusOf(id) === 'current')
+            return (
+              <button onClick={() => complete(id)} aria-label={`Complete step ${id}`}
+                className="grid size-7 cursor-pointer place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+                {id}
+              </button>
+            );
+          return <span className="grid size-7 place-items-center rounded-full bg-muted text-muted-foreground">{id}</span>;
+        }}
+        renderContent={(item) => {
+          const step = STEPS.find((s) => s.id === item.id)!;
+          return <p className="px-3 py-2 text-sm font-medium">{step.label}</p>;
+        }}
+      />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="onboarding.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type TimelineItem } from '@bpdm/ng';
+import { BpdmProgressBar } from '@bpdm/ng';
+import { BpdmButton } from '@bpdm/ng';
+
+interface Step { id: number; label: string; }
+
+@Component({
+  selector: 'onboarding',
+  imports: [BpdmStatusTimeline, BpdmProgressBar, BpdmButton],
+  template: `
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-muted-foreground">{{ completed.length }} of {{ steps.length }} completed</p>
+      <bpdm-button variant="secondary" appearance="outline" size="sm" (click)="reset()">Reset</bpdm-button>
+    </div>
+    <bpdm-progress-bar class="my-4 block" [value]="completed.length" [max]="steps.length" variant="success" />
+
+    <bpdm-status-timeline [items]="items()" [markerTemplate]="marker" [contentTemplate]="content">
+      <ng-template #marker let-item>
+        @if (statusOf(item.id) === 'current') {
+          <button (click)="complete(item.id)" [attr.aria-label]="'Complete step ' + item.id"
+            class="grid size-7 cursor-pointer place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-primary/20 transition-transform hover:scale-110">
+            {{ item.id }}
+          </button>
+        } @else {
+          <span class="grid size-7 place-items-center rounded-full bg-muted text-muted-foreground">{{ item.id }}</span>
+        }
+      </ng-template>
+      <ng-template #content let-item>
+        <p class="px-3 py-2 text-sm font-medium">{{ label(item.id) }}</p>
+      </ng-template>
+    </bpdm-status-timeline>
+  `,
+})
+export class Onboarding {
+  readonly steps: Step[] = [
+    { id: 1, label: 'Account created' },
+    { id: 2, label: 'Email verified' },
+    { id: 3, label: 'Profile completed' },
+    { id: 4, label: 'Team invited' },
+    { id: 5, label: 'First project created' },
+  ];
+  completed = [1];
+  current = 2;
+
+  statusOf = (id: number) =>
+    this.completed.includes(id) ? 'completed' : id === this.current ? 'current' : 'pending';
+  label = (id: number) => this.steps.find((s) => s.id === id)!.label;
+  items = () =>
+    this.steps.map((s): TimelineItem => ({
+      id: s.id,
+      status: this.statusOf(s.id) === 'completed' ? 'complete' : this.statusOf(s.id) === 'current' ? 'current' : 'pending',
+    }));
+
+  complete(id: number) {
+    if (id !== this.current) return;
+    this.completed = [...this.completed, id];
+    this.current++;
+  }
+  reset() {
+    this.completed = [1];
+    this.current = 2;
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `StatusTimeline` / `<bpdm-status-timeline>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `TimelineItem[]` | — | **Required.** The ordered steps. |
+| `label` | `string` | — | Accessible name for the timeline (sets `aria-label` on the list). |
+| `layout` | `vertical \| horizontal` | `vertical` | Orientation of the timeline. |
+| `align` | vertical: `left \| right \| alternate` · horizontal: `top \| bottom \| alternate` | `left` / `top` | Which side the content sits on. |
+| `onItemClick` (Angular `interactive` + `itemClick`) | `(item, index) => void` | — | Make steps interactive (keyboard-accessible). Angular: set `interactive` and listen to `(itemClick)`. |
+| `renderMarker` (Angular `markerTemplate`) | `(item, status) => ReactNode` / `TemplateRef` | — | Render the whole marker yourself (any size/shape). |
+| `renderContent` (Angular `contentTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole content cell yourself (a rich card, etc.). |
+| `renderOpposite` (Angular `oppositeTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole opposite cell yourself (vertical layouts). |
+| `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
+
+### `TimelineItem`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string \| number` | Stable key for change tracking (falls back to index). |
+| `title` | `ReactNode` (Angular `string`) | The step label. |
+| `status` | `complete \| current \| pending \| failed` | The step's state (drives the marker + colour). |
+| `timestamp` | `string` | Short meta shown on the right, e.g. `"09:47"`. |
+| `description` | `ReactNode` (Angular `string`) | Optional detail under the title. |
+| `opposite` | `ReactNode` (Angular `string`) | Content shown across the line (e.g. a date); centers the line when present. |
+| `icon` *(React)* | `ReactNode` | Custom marker glyph, overriding the default ✓/✗/dot. |
+| `color` | `string` | Custom marker colour (any CSS colour / token), overriding the status colour. |
+
+## Accessibility
+
+- Renders an ordered list (`<ol>` / `<li>`) — steps are announced in sequence.
+  Pass `label` to name the list, and the **current** step carries `aria-current="step"`.
+- Status is **never colour-only**: each state has a distinct marker/icon
+  (✓ complete, a filled pulsing dot for current, a hollow ring for pending, ✗ failed)
+  and the `title` describes the step.
+- The `current` step's pulse respects reduced-motion preferences.
+- `timestamp` and `description` are plain text, read alongside the step title.
+- Interactive steps (`onItemClick` / `interactive`) expose `role="button"`, are
+  focusable, and respond to **Enter / Space** — fully keyboard-operable.

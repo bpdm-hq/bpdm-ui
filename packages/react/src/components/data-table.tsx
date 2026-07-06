@@ -144,12 +144,19 @@ export interface DataTableProps<T> {
   striped?: boolean;
   /** Vertical dividers between columns. */
   bordered?: boolean;
-  /** Outer border + rounded container. Default true; set false for a bare table. */
+  /** Outer border + rounded container. Default false (borderless); set true for an outlined card. */
   frame?: boolean;
+  /**
+   * Soft drop shadow so the table gently floats off the page. Default true; set
+   * false for a flat, flush table (e.g. when nesting inside your own card).
+   */
+  elevated?: boolean;
   /** Horizontal dividers between rows. Default true. */
   divided?: boolean;
   /** Extra classes on every body cell — e.g. "py-4" for taller rows. */
   cellClassName?: string;
+  /** Extra classes on every header cell — e.g. to tint/colour the header row. */
+  headerClassName?: string;
   /** Extra classes per body row — a string, or a fn for conditional styling. */
   rowClassName?: string | ((row: T, index: number) => string);
   /**
@@ -206,9 +213,20 @@ export interface DataTableProps<T> {
   onColumnPinChange?: (id: string, pin: "left" | "right" | undefined) => void;
   /** Show a "Columns" control above the table to show/hide columns. */
   columnToggle?: boolean;
+  /**
+   * Controlled per-column filters — when set, the parent owns filtering (e.g.
+   * server-side): the table shows the funnel UI but does NOT filter `data` itself.
+   */
+  filters?: Record<string, ColumnFilter>;
+  /** Fired whenever a column filter changes (controlled and uncontrolled). */
+  onFiltersChange?: (filters: Record<string, ColumnFilter>) => void;
   /** Show a global search box that filters rows across all columns. */
   searchable?: boolean;
   searchPlaceholder?: string;
+  /** Controlled search value — when set, the parent owns search (e.g. server-side). */
+  searchValue?: string;
+  /** Fired whenever the search value changes (controlled and uncontrolled). */
+  onSearchChange?: (value: string) => void;
   /** On narrow screens, stack each row into a label/value card instead of scrolling. */
   responsive?: boolean;
   /**
@@ -235,9 +253,9 @@ export interface DataTableProps<T> {
 const cellPad = cva("", {
   variants: {
     size: {
-      sm: "px-3 py-2 text-sm",
-      md: "px-4 py-2.5 text-sm",
-      lg: "px-5 py-3.5 text-base",
+      sm: "px-3 py-2.5 text-sm",
+      md: "px-4 py-3 text-sm",
+      lg: "px-6 py-4 text-base",
     },
   },
   defaultVariants: { size: "md" },
@@ -298,7 +316,7 @@ function SortIcon({ dir }: { dir: SortDirection | null }) {
     );
   }
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-foreground" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-primary" fill="none" aria-hidden>
       <path d={dir === "asc" ? "M4 10l4-4 4 4" : "M4 6l4 4 4-4"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -987,9 +1005,11 @@ export function DataTable<T>({
   size = "md",
   striped = false,
   bordered = false,
-  frame = true,
+  frame = false,
+  elevated = true,
   divided = true,
   cellClassName,
+  headerClassName,
   rowClassName,
   rowSpacing,
   hoverable = true,
@@ -1016,8 +1036,12 @@ export function DataTable<T>({
   pinnable = false,
   onColumnPinChange,
   columnToggle = false,
+  filters: controlledFilters,
+  onFiltersChange,
   searchable = false,
   searchPlaceholder = "Search…",
+  searchValue,
+  onSearchChange,
   responsive = false,
   virtualized = false,
   reorderableColumns = false,
@@ -1035,11 +1059,28 @@ export function DataTable<T>({
   );
   const sortState = isControlled ? sort! : internalSort;
 
-  // global search query
-  const [query, setQuery] = React.useState("");
+  // global search query — controllable (parent owns it → server-side search)
+  const isQueryControlled = searchValue !== undefined;
+  const [internalQuery, setInternalQuery] = React.useState("");
+  const query = isQueryControlled ? searchValue! : internalQuery;
+  const setQuery = (v: string) => {
+    if (!isQueryControlled) setInternalQuery(v);
+    onSearchChange?.(v);
+  };
 
-  // per-column filters (id → matchMode + rules)
-  const [filters, setFilters] = React.useState<Record<string, ColumnFilter>>({});
+  // per-column filters (id → matchMode + rules) — controllable (server-side)
+  const isFiltersControlled = controlledFilters !== undefined;
+  const [internalFilters, setInternalFilters] = React.useState<Record<string, ColumnFilter>>({});
+  const filters = isFiltersControlled ? controlledFilters! : internalFilters;
+  const setFilters = (
+    next:
+      | Record<string, ColumnFilter>
+      | ((prev: Record<string, ColumnFilter>) => Record<string, ColumnFilter>),
+  ) => {
+    const resolved = typeof next === "function" ? next(filters) : next;
+    if (!isFiltersControlled) setInternalFilters(resolved);
+    onFiltersChange?.(resolved);
+  };
 
   // interactive pinning: runtime pin state seeded from the columns' declared pin
   const [pinState, setPinState] = React.useState<
@@ -1149,17 +1190,21 @@ export function DataTable<T>({
   };
 
   const filteredData = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // when a dimension is controlled the parent already applied it (server-side),
+    // so the table must NOT re-apply it here
+    const q = isQueryControlled ? "" : query.trim().toLowerCase();
     // resolve active column filters once (skip empty-value rule sets)
-    const active = Object.entries(filters)
-      .map(([id, f]) => ({
-        col: colById.get(id),
-        type: (colById.get(id)?.filterType ??
-          (colById.get(id)?.numeric ? "number" : "text")) as "text" | "number",
-        matchMode: f.matchMode,
-        rules: f.rules.filter((r) => r.value !== ""),
-      }))
-      .filter((f) => f.col && f.rules.length > 0);
+    const active = isFiltersControlled
+      ? []
+      : Object.entries(filters)
+          .map(([id, f]) => ({
+            col: colById.get(id),
+            type: (colById.get(id)?.filterType ??
+              (colById.get(id)?.numeric ? "number" : "text")) as "text" | "number",
+            matchMode: f.matchMode,
+            rules: f.rules.filter((r) => r.value !== ""),
+          }))
+          .filter((f) => f.col && f.rules.length > 0);
 
     if (!q && active.length === 0) return dataOrdered;
 
@@ -1178,7 +1223,7 @@ export function DataTable<T>({
         return matchMode === "all" ? res.every(Boolean) : res.some(Boolean);
       });
     });
-  }, [dataOrdered, query, filters, effectiveColumns, colById]);
+  }, [dataOrdered, query, filters, effectiveColumns, colById, isQueryControlled, isFiltersControlled]);
 
   const sortedRows = React.useMemo(() => {
     if (isControlled || sortState.length === 0) return filteredData;
@@ -1472,7 +1517,7 @@ export function DataTable<T>({
   // so they resolve under @theme inline.
   const pinnedBg = cn(
     "bg-card",
-    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))]",
+    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
     "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
   );
 
@@ -1652,15 +1697,19 @@ export function DataTable<T>({
                         <dt className="truncate text-muted-foreground">
                           {col.header ?? col.id}
                         </dt>
-                        <dd className={cn("min-w-0 text-right", col.numeric && "tabular-nums")}>
+                        <dd className={cn("flex min-w-0 items-center justify-end gap-2 text-right", col.numeric && "tabular-nums")}>
                           {renderCell(col, row, rowIndex)}
                         </dd>
                       </React.Fragment>
                     ))}
                   </dl>
                   {expanded && (
-                    <div className="mt-3 border-t border-border pt-3">
-                      {renderExpanded!(row, rowIndex)}
+                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                      <div className="overflow-hidden">
+                        <div className="mt-3 border-t border-border pt-3">
+                          {renderExpanded!(row, rowIndex)}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1673,7 +1722,12 @@ export function DataTable<T>({
       <div
         className={cn(
           "w-full",
-          frame && "overflow-hidden rounded-xl border border-border bg-card",
+          // `frame` = a defined outlined card; the borderless default whisper-floats
+          // so it blends; `elevated={false}` drops the float for a flat, flush table
+          frame
+            ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+            : elevated &&
+                "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
           className,
         )}
       >
@@ -1705,9 +1759,10 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame ? "bg-muted" : "bg-transparent",
+                  frame || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   stickyHeader && "sticky top-0 z-10",
+                  headerClassName,
                 )}
               />
             )}
@@ -1723,10 +1778,11 @@ export function DataTable<T>({
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
-                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
+                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
+                  headerClassName,
                 )}
               />
             )}
@@ -1742,9 +1798,10 @@ export function DataTable<T>({
                   cellPad({ size }),
                   "w-[1%]",
                   "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
-                  frame || hasLeftPin ? "bg-muted" : "bg-transparent",
+                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   bordered && "border-r border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
+                  headerClassName,
                 )}
               >
                 {selectionMode === "multiple" && (
@@ -1759,7 +1816,7 @@ export function DataTable<T>({
                 )}
               </th>
             )}
-            {orderedColumns.map((col, ci) => {
+            {orderedColumns.map((col) => {
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
               const dir = entry?.dir ?? null;
@@ -1804,20 +1861,22 @@ export function DataTable<T>({
                   className={cn(
                     cellPad({ size }),
                     alignClass[align],
-                    "font-medium whitespace-nowrap text-muted-foreground",
+                    // strong, readable header — confident dark sentence-case label
+                    // (size inherited from density), distinct from the body weight
+                    "whitespace-nowrap font-semibold text-foreground",
                     reorderableColumns && "cursor-grab active:cursor-grabbing",
                     dragColId === col.id && "opacity-40",
-                    // framed/pinned headers get the muted band; borderless headers
-                    // stay transparent (page-coloured) for a lighter, elegant look
-                    frame || col.pin ? "bg-muted" : "bg-transparent",
+                    // framed/pinned/sticky headers sit on the card surface (clean
+                    // header + divider, not a heavy grey band) and stay opaque so
+                    // scrolling rows never bleed through; otherwise transparent
+                    frame || col.pin || stickyHeader ? "bg-card" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
-                    // borderless: thin separators between header labels
-                    !frame && !col.pin && ci > 0 && "border-l border-border/60",
-                    bordered && "border-r border-border last:border-r-0",
+                    bordered && "border-r border-border/55 last:border-r-0",
                     col.pin ? "z-20" : stickyHeader && "z-10",
                     col.id === lastLeftId && "border-r border-border",
                     col.id === firstRightId && "border-l border-border",
+                    headerClassName,
                     col.className,
                   )}
                 >
@@ -1829,6 +1888,8 @@ export function DataTable<T>({
                         className={cn(
                           "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
                           justifyClass[align],
+                          // keep the active-sort LABEL dark/strong (enterprise-restrained);
+                          // the small amber arrow + order badge signal the sort
                           dir && "text-foreground",
                         )}
                       >
@@ -1900,6 +1961,7 @@ export function DataTable<T>({
             ).map((rowIndex) => {
               const row = rows[rowIndex];
               const key = keyOf(row, rowIndex);
+              const isLast = rowIndex === rows.length - 1;
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
               const canExpand = expandable && (!rowExpandable || rowExpandable(row));
@@ -1945,11 +2007,17 @@ export function DataTable<T>({
                   // `group` lets pinned cells mirror the row's hover/selected state
                   hasPinned && "group",
                   divided && !rowSpacing && "border-t border-border",
+                  // borderless tables get a closing rule under the last row
+                  // (framed tables are closed by the container border)
+                  divided && !rowSpacing && !frame && isLast && "border-b border-border",
                   rowSpacing &&
                     "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
                   striped && "even:bg-muted/40",
-                  hoverable && "hover:bg-muted/60",
-                  selected && "bg-primary/10",
+                  // bpdm signature: a warm amber focus language — soft amber hover,
+                  // and selected rows get an amber tint + a left accent bar
+                  hoverable && "hover:bg-primary/[0.04]",
+                  selected && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+                  hoverable && selected && "hover:bg-primary/[0.14]",
                   // insertion line while reordering rows
                   dropTarget?.key === key &&
                     dropTarget.pos === "before" &&
@@ -2066,7 +2134,7 @@ export function DataTable<T>({
                         cellPad({ size }),
                         alignClass[align],
                         col.numeric && "tabular-nums",
-                        bordered && "border-r border-border last:border-r-0",
+                        bordered && "border-r border-border/55 last:border-r-0",
                         col.pin && `z-10 ${pinnedBg}`,
                         col.id === lastLeftId && "border-r border-border",
                         col.id === firstRightId && "border-l border-border",
@@ -2085,8 +2153,13 @@ export function DataTable<T>({
               </tr>
               {expanded && (
                 <tr className={cn("bg-muted/30", divided && "border-t border-border")}>
-                  <td colSpan={colCount} className={cellPad({ size })}>
-                    {renderExpanded!(row, rowIndex)}
+                  <td colSpan={colCount} className="p-0">
+                    {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
+                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                      <div className="overflow-hidden">
+                        <div className={cellPad({ size })}>{renderExpanded!(row, rowIndex)}</div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -2153,7 +2226,7 @@ export function DataTable<T>({
                       col.numeric && "tabular-nums",
                       "sticky bottom-0 bg-muted font-medium text-foreground",
                       "shadow-[inset_0_1px_0_var(--border)]",
-                      bordered && "border-r border-border last:border-r-0",
+                      bordered && "border-r border-border/55 last:border-r-0",
                       col.pin ? "z-20" : "z-10",
                       col.id === lastLeftId && "border-r border-border",
                       col.id === firstRightId && "border-l border-border",

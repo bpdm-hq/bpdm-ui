@@ -73,6 +73,12 @@ export interface SelectableListProps<T> {
   /** Max body height before scrolling, e.g. "18rem". */
   scrollHeight?: string;
   emptyText?: string;
+  /** Whether more than one option can be selected (drives `aria-multiselectable`). */
+  multiselectable?: boolean;
+  /** Accessible name for the listbox when there is no visible `header`. */
+  ariaLabel?: string;
+  /** Predicate marking an item as disabled — not selectable, draggable, or keyboard-active. */
+  isItemDisabled?: (item: T) => boolean;
   className?: string;
 }
 
@@ -88,17 +94,81 @@ export function SelectableList<T>({
   filterPlaceholder = "Filter",
   scrollHeight = "18rem",
   emptyText = "No items",
+  multiselectable = false,
+  ariaLabel,
+  isItemDisabled,
   className,
 }: SelectableListProps<T>) {
+  const isDisabled = (item: T) => !!isItemDisabled?.(item);
   const [query, setQuery] = React.useState("");
   const [dragKey, setDragKey] = React.useState<ItemKey | null>(null);
   const [overKey, setOverKey] = React.useState<ItemKey | null>(null);
+  // roving "active" option for the WAI-ARIA listbox keyboard pattern
+  const [activeKey, setActiveKey] = React.useState<ItemKey | null>(null);
+  const [focused, setFocused] = React.useState(false);
+
+  const baseId = React.useId();
+  const headerId = header ? `${baseId}-label` : undefined;
+  const optionId = (k: ItemKey) => `${baseId}-opt-${String(k)}`;
 
   const filtering = !!filterBy && query.trim() !== "";
   const shown = filtering
     ? items.filter((i) => filterBy!(i).toLowerCase().includes(query.trim().toLowerCase()))
     : items;
   const canDrag = !!onReorder && !filtering;
+
+  // first / next enabled option in a direction (keyboard nav skips disabled rows)
+  const findEnabled = (start: number, dir: 1 | -1) => {
+    for (let i = start; i >= 0 && i < shown.length; i += dir) {
+      if (!isDisabled(shown[i])) return i;
+    }
+    return -1;
+  };
+
+  // keep the active option within what's currently visible + enabled (e.g. after filtering)
+  React.useEffect(() => {
+    const ok = activeKey != null && shown.some((i) => keyOf(i) === activeKey && !isDisabled(i));
+    if (!ok) {
+      const first = findEnabled(0, 1);
+      setActiveKey(first >= 0 ? keyOf(shown[first]) : null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown, activeKey, keyOf]);
+
+  const activeIndex = activeKey == null ? -1 : shown.findIndex((i) => keyOf(i) === activeKey);
+
+  const setActiveTo = (idx: number) => {
+    if (idx >= 0) setActiveKey(keyOf(shown[idx]));
+  };
+
+  const onListKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveTo(findEnabled(activeIndex < 0 ? 0 : activeIndex + 1, 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveTo(findEnabled(activeIndex < 0 ? shown.length - 1 : activeIndex - 1, -1));
+        break;
+      case "Home":
+        e.preventDefault();
+        setActiveTo(findEnabled(0, 1));
+        break;
+      case "End":
+        e.preventDefault();
+        setActiveTo(findEnabled(shown.length - 1, -1));
+        break;
+      case "Enter":
+      case " ":
+        if (activeIndex >= 0 && !isDisabled(shown[activeIndex])) {
+          e.preventDefault();
+          const it = shown[activeIndex];
+          onToggle(keyOf(it), it);
+        }
+        break;
+    }
+  };
 
   const handleDrop = (targetKey: ItemKey) => {
     if (dragKey != null && dragKey !== targetKey && onReorder) {
@@ -117,7 +187,11 @@ export function SelectableList<T>({
         className,
       )}
     >
-      {header && <div className="border-b border-border px-3 py-2 text-sm font-semibold">{header}</div>}
+      {header && (
+        <div id={headerId} className="border-b border-border px-3 py-2 text-sm font-semibold">
+          {header}
+        </div>
+      )}
 
       {filterBy && (
         <div className="flex items-center gap-2 border-b border-border px-3">
@@ -132,30 +206,49 @@ export function SelectableList<T>({
         </div>
       )}
 
-      <div role="listbox" aria-multiselectable className="overflow-y-auto p-1" style={{ maxHeight: scrollHeight }}>
+      <div
+        role="listbox"
+        aria-multiselectable={multiselectable || undefined}
+        aria-labelledby={headerId}
+        aria-label={headerId ? undefined : (ariaLabel ?? "Orderable list")}
+        tabIndex={0}
+        aria-activedescendant={activeIndex >= 0 ? optionId(activeKey as ItemKey) : undefined}
+        onFocus={() => {
+          setFocused(true);
+          if (activeIndex < 0) setActiveTo(findEnabled(0, 1));
+        }}
+        onBlur={() => setFocused(false)}
+        onKeyDown={onListKeyDown}
+        // Focus lives on the container (aria-activedescendant), but the visible
+        // focus indicator is the active option's ring — so no ring on the container.
+        className="min-h-0 flex-1 overflow-y-auto p-1 outline-none"
+        style={{ maxHeight: scrollHeight }}
+      >
         {shown.length === 0 ? (
           <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
         ) : (
           shown.map((item) => {
             const key = keyOf(item);
+            const itemDisabled = isDisabled(item);
             const isSel = selected.has(key);
+            const isActive = key === activeKey;
+            const draggable = canDrag && !itemDisabled;
             // only while a drag is actually in progress — never a stray top line
             const isOver = dragKey !== null && overKey === key && dragKey !== key;
             return (
               <div
                 key={key}
+                id={optionId(key)}
                 role="option"
                 aria-selected={isSel}
-                tabIndex={0}
-                draggable={canDrag}
-                onClick={() => onToggle(key, item)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onToggle(key, item);
-                  }
+                aria-disabled={itemDisabled || undefined}
+                draggable={draggable}
+                onClick={() => {
+                  if (itemDisabled) return;
+                  setActiveKey(key);
+                  onToggle(key, item);
                 }}
-                onDragStart={() => canDrag && setDragKey(key)}
+                onDragStart={() => draggable && setDragKey(key)}
                 onDragOver={(e) => {
                   if (!canDrag) return;
                   e.preventDefault();
@@ -171,19 +264,25 @@ export function SelectableList<T>({
                   handleDrop(key);
                 }}
                 className={cn(
-                  "group relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm outline-none transition-[background-color,transform] duration-[var(--bpdm-duration-fast)] active:scale-[0.99]",
-                  "focus-visible:ring-2 focus-visible:ring-ring",
-                  // on-brand: a primary left accent + tint marks the selection.
-                  // full-height, with the left corners curved to match the row.
-                  "before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
-                  isSel
-                    ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground before:opacity-100"
-                    : "text-foreground hover:bg-muted before:opacity-0",
+                  "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
+                  // gentle settle-in when an item is added / transferred into this list
+                  "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
+                  // on-brand: a primary inline-start accent bar marks the selection, the
+                  // keyboard-active option, AND the drag drop-target — full-height, RTL-safe.
+                  "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
+                  itemDisabled
+                    ? "cursor-not-allowed text-muted-foreground opacity-60 before:opacity-0"
+                    : cn(
+                        "cursor-pointer active:scale-[0.99]",
+                        isSel
+                          ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
+                          : "text-foreground hover:bg-muted",
+                        isSel || (focused && isActive) || isOver ? "before:opacity-100" : "before:opacity-0",
+                      ),
                   dragKey === key && "opacity-50",
                 )}
-                style={isOver ? { boxShadow: "inset 0 2px 0 0 var(--primary)" } : undefined}
               >
-                {canDrag && (
+                {draggable && (
                   <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground" />
                 )}
                 <div className="min-w-0 flex-1">{renderItem(item)}</div>
@@ -215,7 +314,7 @@ export function ControlButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border bg-card text-muted-foreground transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 [&_svg]:size-4"
+      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border/60 bg-card text-muted-foreground shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4"
     >
       {children}
     </button>
@@ -226,44 +325,73 @@ function sameOrder<T>(a: T[], b: T[], keyOf: (i: T) => ItemKey) {
   return a.length === b.length && a.every((x, i) => keyOf(x) === keyOf(b[i]));
 }
 
+export type MoveKind = "up" | "top" | "down" | "bottom";
+
 // ── ReorderControls — the up/top/down/bottom column (used by OrderList + PickList)
 export function ReorderControls<T>({
   items,
   itemKey,
   selected,
   onChange,
+  onMoved,
   className,
 }: {
   items: T[];
   itemKey: (item: T) => ItemKey;
   selected: Set<ItemKey>;
   onChange: (next: T[]) => void;
+  /** Called after a move actually changes the order (drives live-region announcements). */
+  onMoved?: (kind: MoveKind) => void;
   className?: string;
 }) {
-  const move = (fn: (a: T[], k: (i: T) => ItemKey, s: Set<ItemKey>) => T[]) => {
+  const groupRef = React.useRef<HTMLDivElement>(null);
+
+  const move = (
+    kind: MoveKind,
+    fn: (a: T[], k: (i: T) => ItemKey, s: Set<ItemKey>) => T[],
+  ) => {
     const next = fn(items, itemKey, selected);
-    if (!sameOrder(next, items, itemKey)) onChange(next);
+    if (sameOrder(next, items, itemKey)) return;
+    onChange(next);
+    onMoved?.(kind);
+    // If the button we just pressed becomes disabled (e.g. "Move to top" once at
+    // the top), the browser drops focus to <body>. Keep focus inside the group.
+    if (typeof requestAnimationFrame !== "function") return;
+    requestAnimationFrame(() => {
+      const grp = groupRef.current;
+      if (!grp) return;
+      const active = document.activeElement as HTMLElement | null;
+      const lost = !active || active === document.body || (active as HTMLButtonElement).disabled;
+      if (lost) grp.querySelector<HTMLButtonElement>("button:not([disabled])")?.focus();
+    });
   };
   const can = (fn: (a: T[], k: (i: T) => ItemKey, s: Set<ItemKey>) => T[]) =>
     selected.size > 0 && !sameOrder(fn(items, itemKey, selected), items, itemKey);
 
   return (
-    <div className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
-      <ControlButton label="Move up" disabled={!can(moveSelectedUp)} onClick={() => move(moveSelectedUp)}>
+    <div ref={groupRef} role="group" aria-label="Reorder" className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
+      <ControlButton label="Move up" disabled={!can(moveSelectedUp)} onClick={() => move("up", moveSelectedUp)}>
         <ChevronUp />
       </ControlButton>
-      <ControlButton label="Move to top" disabled={!can(moveSelectedTop)} onClick={() => move(moveSelectedTop)}>
+      <ControlButton label="Move to top" disabled={!can(moveSelectedTop)} onClick={() => move("top", moveSelectedTop)}>
         <ChevronsUp />
       </ControlButton>
-      <ControlButton label="Move down" disabled={!can(moveSelectedDown)} onClick={() => move(moveSelectedDown)}>
+      <ControlButton label="Move down" disabled={!can(moveSelectedDown)} onClick={() => move("down", moveSelectedDown)}>
         <ChevronDown />
       </ControlButton>
-      <ControlButton label="Move to bottom" disabled={!can(moveSelectedBottom)} onClick={() => move(moveSelectedBottom)}>
+      <ControlButton label="Move to bottom" disabled={!can(moveSelectedBottom)} onClick={() => move("bottom", moveSelectedBottom)}>
         <ChevronsDown />
       </ControlButton>
     </div>
   );
 }
+
+const MOVE_MESSAGE: Record<MoveKind, string> = {
+  up: "Moved up one position",
+  top: "Moved to top",
+  down: "Moved down one position",
+  bottom: "Moved to bottom",
+};
 
 // ── OrderList — SelectableList + a reorder control column ─────────────────────
 export interface OrderListProps<T> {
@@ -286,6 +414,10 @@ export interface OrderListProps<T> {
    */
   selectionMode?: "single" | "multiple";
   scrollHeight?: string;
+  /** Accessible name for the list when there is no visible `header`. */
+  ariaLabel?: string;
+  /** Predicate marking an item as disabled — not selectable, movable, or draggable. */
+  isItemDisabled?: (item: T) => boolean;
   className?: string;
 }
 
@@ -307,10 +439,21 @@ export function OrderList<T>({
   dragdrop = true,
   selectionMode = "single",
   scrollHeight,
+  ariaLabel,
+  isItemDisabled,
   className,
 }: OrderListProps<T>) {
   const [items, setItems] = useControllable<T[]>(valueProp, defaultValue, onChange);
   const [selected, setSelected] = React.useState<Set<ItemKey>>(new Set());
+  const [message, setMessage] = React.useState("");
+  const flip = React.useRef(false);
+
+  // Toggle a trailing space so an identical action (e.g. two "Move to top"s in a
+  // row) still changes the text node and is re-announced by the live region.
+  const announce = (kind: MoveKind) => {
+    flip.current = !flip.current;
+    setMessage(MOVE_MESSAGE[kind] + (flip.current ? "" : " "));
+  };
 
   const toggle = (key: ItemKey) =>
     setSelected((prev) => {
@@ -325,8 +468,8 @@ export function OrderList<T>({
     });
 
   return (
-    <div className={cn("flex flex-col gap-2 sm:flex-row sm:items-start", className)}>
-      <ReorderControls items={items} itemKey={itemKey} selected={selected} onChange={setItems} />
+    <div className={cn("flex flex-col gap-2 sm:flex-row sm:items-center", className)}>
+      <ReorderControls items={items} itemKey={itemKey} selected={selected} onChange={setItems} onMoved={announce} />
 
       <SelectableList
         className="flex-1"
@@ -340,7 +483,14 @@ export function OrderList<T>({
         filterBy={filterBy}
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
+        multiselectable={selectionMode === "multiple"}
+        ariaLabel={ariaLabel}
+        isItemDisabled={isItemDisabled}
       />
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {message}
+      </div>
     </div>
   );
 }

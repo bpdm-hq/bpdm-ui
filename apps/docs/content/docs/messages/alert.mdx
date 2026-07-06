@@ -1,0 +1,406 @@
+---
+title: Alert
+description: An inline, persistent message — severity palette, three appearances, actions and dismiss, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  AlertUsageDemo,
+  AlertVariantsDemo,
+  AlertAppearancesDemo,
+  AlertActionsDemo,
+  AlertDismissibleDemo,
+  AlertTitleOnlyDemo,
+  AlertNoIconDemo,
+} from '@/components/alert-demos';
+import { Preview } from '@/components/preview';
+
+The **Alert** is an inline, persistent message — a coloured accent, a tinted
+icon, a title and body, with optional actions and a dismiss button. It comes in
+the full severity palette across three appearances. For transient pop-up
+notifications use [Toast](/docs/messages/toast) instead. In Angular it's
+`<bpdm-alert>`.
+
+## Usage
+
+<Preview>
+  <AlertUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-usage.tsx"
+import { Alert } from '@bpdm/ui/alert';
+
+export function AlertUsage() {
+  return (
+    <Alert variant="warning" title="Approaching seat limit">
+      You've used 9 of 10 seats. Add more to keep inviting teammates.
+    </Alert>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'alert-usage',
+  imports: [BpdmAlert],
+  templateUrl: './alert-usage.html',
+})
+export class AlertUsage {}
+```
+
+```html title="alert-usage.html"
+<bpdm-alert variant="warning" title="Approaching seat limit">
+  You've used 9 of 10 seats. Add more to keep inviting teammates.
+</bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+The `variant` prop sets the severity — `default`, `primary`, `info`, `success`,
+`warning`, `error`, `help`, and `contrast` — each with a matching leading icon.
+
+<Preview>
+  <AlertVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-variants.tsx"
+import { Alert } from '@bpdm/ui/alert';
+
+export function AlertVariants() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Alert variant="info" title="Scheduled maintenance">
+        We'll be down for ~10 minutes at 02:00 UTC.
+      </Alert>
+      <Alert variant="success" title="Deployment complete">
+        v2.4.0 is live in production.
+      </Alert>
+      <Alert variant="warning" title="Approaching seat limit">
+        You've used 9 of 10 seats.
+      </Alert>
+      <Alert variant="error" title="Build failed">
+        3 tests failed in checkout.spec.ts.
+      </Alert>
+      <Alert variant="default" title="Heads up">
+        This workspace switches to the new editor next week.
+      </Alert>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-variants.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'alert-variants',
+  imports: [BpdmAlert],
+  templateUrl: './alert-variants.html',
+})
+export class AlertVariants {}
+```
+
+```html title="alert-variants.html"
+<bpdm-alert variant="info" title="Scheduled maintenance">
+  We'll be down for ~10 minutes at 02:00 UTC.
+</bpdm-alert>
+<bpdm-alert variant="success" title="Deployment complete">v2.4.0 is live in production.</bpdm-alert>
+<bpdm-alert variant="warning" title="Approaching seat limit">You've used 9 of 10 seats.</bpdm-alert>
+<bpdm-alert variant="error" title="Build failed">3 tests failed in checkout.spec.ts.</bpdm-alert>
+<bpdm-alert variant="default" title="Heads up">This workspace switches to the new editor next week.</bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## Appearances
+
+The `appearance` prop styles each variant — `soft` (tinted with an accent bar,
+default), `solid` (filled), and `outline` (bordered).
+
+<Preview>
+  <AlertAppearancesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-appearances.tsx"
+import { Alert } from '@bpdm/ui/alert';
+
+export function AlertAppearances() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Alert variant="info" appearance="soft" title="Soft (default)">
+        A tinted surface with a coloured accent bar.
+      </Alert>
+      <Alert variant="success" appearance="solid" title="Solid">
+        A filled, high-emphasis banner.
+      </Alert>
+      <Alert variant="error" appearance="outline" title="Outline">
+        A bordered, low-emphasis variant.
+      </Alert>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-appearances.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'alert-appearances',
+  imports: [BpdmAlert],
+  templateUrl: './alert-appearances.html',
+})
+export class AlertAppearances {}
+```
+
+```html title="alert-appearances.html"
+<bpdm-alert variant="info" appearance="soft" title="Soft (default)">
+  A tinted surface with a coloured accent bar.
+</bpdm-alert>
+<bpdm-alert variant="success" appearance="solid" title="Solid">A filled, high-emphasis banner.</bpdm-alert>
+<bpdm-alert variant="error" appearance="outline" title="Outline">A bordered, low-emphasis variant.</bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## With actions
+
+Pass `action` (React) — buttons or links shown under the body. In Angular,
+project them into the `[bpdmAlertActions]` slot.
+
+<Preview>
+  <AlertActionsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-actions.tsx"
+import { Alert } from '@bpdm/ui/alert';
+import { Button } from '@bpdm/ui/button';
+
+export function AlertWithActions() {
+  return (
+    <Alert
+      variant="warning"
+      title="Approaching seat limit"
+      action={
+        <>
+          <Button size="sm" variant="primary">Upgrade plan</Button>
+          <Button size="sm" variant="secondary" appearance="ghost">Manage members</Button>
+        </>
+      }
+    >
+      You've used 9 of 10 seats.
+    </Alert>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-actions.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert, BpdmAlertActions, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'alert-with-actions',
+  imports: [BpdmAlert, BpdmAlertActions, BpdmButton],
+  templateUrl: './alert-actions.html',
+})
+export class AlertWithActions {}
+```
+
+```html title="alert-actions.html"
+<bpdm-alert variant="warning" title="Approaching seat limit">
+  You've used 9 of 10 seats.
+  <div bpdmAlertActions>
+    <button bpdmButton size="sm" variant="primary">Upgrade plan</button>
+    <button bpdmButton size="sm" variant="secondary" appearance="ghost">Manage members</button>
+  </div>
+</bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## Dismissible
+
+Pass `onClose` (React) to show a dismiss button — the alert collapses and fades,
+then fires the callback. In Angular, set `dismissible` and handle `(closed)`.
+
+<Preview>
+  <AlertDismissibleDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-dismissible.tsx"
+import { useState } from 'react';
+import { Alert } from '@bpdm/ui/alert';
+import { Button } from '@bpdm/ui/button';
+
+export function DismissibleAlert() {
+  const [open, setOpen] = useState(true);
+  if (!open) {
+    return (
+      <Button variant="secondary" appearance="ghost" onClick={() => setOpen(true)}>
+        Show alert again
+      </Button>
+    );
+  }
+  return (
+    <Alert variant="success" title="Invite sent" onClose={() => setOpen(false)}>
+      Mara will get an email with a link to join.
+    </Alert>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-dismissible.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'dismissible-alert',
+  imports: [BpdmAlert],
+  templateUrl: './alert-dismissible.html',
+})
+export class DismissibleAlert {
+  readonly open = signal(true);
+}
+```
+
+```html title="alert-dismissible.html"
+@if (open()) {
+  <bpdm-alert variant="success" title="Invite sent" dismissible (closed)="open.set(false)">
+    Mara will get an email with a link to join.
+  </bpdm-alert>
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Title only
+
+Omit the body for a compact, single-line alert.
+
+<Preview>
+  <AlertTitleOnlyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-title-only.tsx"
+import { Alert } from '@bpdm/ui/alert';
+
+export function TitleOnly() {
+  return <Alert variant="info" title="Your changes have been saved." />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="alert-title-only.html"
+<bpdm-alert variant="info" title="Your changes have been saved." />
+```
+
+  </Tab>
+</Tabs>
+
+## No icon
+
+Hide the leading icon with `icon={null}` (React) / `[showIcon]="false"` (Angular).
+
+<Preview>
+  <AlertNoIconDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-no-icon.tsx"
+import { Alert } from '@bpdm/ui/alert';
+
+export function NoIcon() {
+  return (
+    <Alert variant="default" icon={null} title="Release notes">
+      We've shipped a faster editor and a few bug fixes.
+    </Alert>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="alert-no-icon.html"
+<bpdm-alert variant="default" [showIcon]="false" title="Release notes">
+  We've shipped a faster editor and a few bug fixes.
+</bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `default \| primary \| info \| success \| warning \| error \| help \| contrast` | `default` | Severity / colour + the default leading icon. |
+| `appearance` | `soft \| solid \| outline` | `soft` | Tinted-with-accent, filled, or bordered. |
+| `title` | `ReactNode` (Angular: `string`) | — | Bold heading line. |
+| `icon` | `ReactNode \| null` | per variant | **React** — override the icon, or `null` to hide it. Angular toggles with `[showIcon]`. |
+| `showIcon` | `boolean` | `true` | **Angular** — show/hide the leading icon. |
+| `action` | `ReactNode` | — | **React** — buttons/links under the body. Angular projects `[bpdmAlertActions]`. |
+| `onClose` | `() => void` | — | **React** — show a dismiss button; fires after the collapse. Angular uses `dismissible` + `(closed)`. |
+| `dismissible` | `boolean` | `false` | **Angular** — show the dismiss button (emits `closed`). |
+
+The body is `children` (React) / projected content (Angular). In React all native
+`<div>` attributes are forwarded onto the root.
+
+## Accessibility
+
+- The alert container has **`role="alert"`**, so assistive tech announces it when
+  it appears — use it for important, in-context messages.
+- The dismiss button has an `aria-label="Dismiss"` and is keyboard focusable; the
+  leading icon is decorative (`aria-hidden`), so meaning comes from the text.
+- Don't rely on colour alone — the `title`/body should read clearly on their own
+  (the per-variant icon reinforces, but doesn't replace, the wording).
+- For frequent, transient feedback prefer [Toast](/docs/messages/toast), whose
+  live-region timing suits ephemeral messages better than a persistent alert.

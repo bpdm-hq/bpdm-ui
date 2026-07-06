@@ -1,0 +1,279 @@
+---
+title: Popover
+description: A click-triggered floating panel — portaled, collision-aware, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  PopoverBasicDemo,
+  PopoverPlacementsDemo,
+  PopoverBorderlessDemo,
+  PopoverFormDemo,
+} from '@/components/popover-demos';
+import { Preview } from '@/components/preview';
+
+The **Popover** is a click-triggered floating panel built on Radix — portaled (so
+it escapes `overflow: hidden`), collision-aware, and theme-aware. Pass a `trigger`
+and the panel content. Use `PopoverClose` inside to add a close/confirm button.
+In Angular it's the `[bpdmPopover]` directive pointing at an `<ng-template>`.
+
+## Usage
+
+<Preview>
+  <PopoverBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-usage.tsx"
+import { Popover } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+export function Basic() {
+  return (
+    <Popover trigger={<Button variant="secondary" appearance="outline">Open popover</Button>}>
+      <p>A floating panel anchored to the trigger — click outside or press Esc to close.</p>
+    </Popover>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="basic.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'basic',
+  imports: [BpdmPopover, BpdmButton],
+  templateUrl: './basic.html',
+})
+export class Basic {}
+```
+
+```html title="basic.html"
+<button bpdmButton variant="secondary" appearance="outline" [bpdmPopover]="panel">Open popover</button>
+
+<ng-template #panel>
+  <p>A floating panel anchored to the trigger — click outside or press Esc to close.</p>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Placements
+
+The `side` prop (`top` / `right` / `bottom` / `left`) sets which edge it opens
+from; `align` (`start` / `center` / `end`) shifts it along that edge. It's
+collision-aware, so it flips to stay in view.
+
+<Preview>
+  <PopoverPlacementsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-placements.tsx"
+import { Popover } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+export function Placements() {
+  return (
+    <>
+      <Popover side="top" trigger={<Button>Top</Button>}><p>Opens on the top.</p></Popover>
+      <Popover side="right" trigger={<Button>Right</Button>}><p>Opens on the right.</p></Popover>
+      <Popover side="bottom" trigger={<Button>Bottom</Button>}><p>Opens on the bottom.</p></Popover>
+      <Popover side="left" trigger={<Button>Left</Button>}><p>Opens on the left.</p></Popover>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="placements.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'placements',
+  imports: [BpdmPopover, BpdmButton],
+  templateUrl: './placements.html',
+})
+export class Placements {}
+```
+
+```html title="placements.html"
+<button bpdmButton bpdmPopoverSide="top" [bpdmPopover]="p1">Top</button>
+<button bpdmButton bpdmPopoverSide="right" [bpdmPopover]="p2">Right</button>
+<button bpdmButton bpdmPopoverSide="bottom" [bpdmPopover]="p3">Bottom</button>
+<button bpdmButton bpdmPopoverSide="left" [bpdmPopover]="p4">Left</button>
+
+<ng-template #p1><p>Opens on the top.</p></ng-template>
+<ng-template #p2><p>Opens on the right.</p></ng-template>
+<ng-template #p3><p>Opens on the bottom.</p></ng-template>
+<ng-template #p4><p>Opens on the left.</p></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Border
+
+The panel has a subtle border by default so its edge reads clearly against any
+background. Set `bordered={false}` for a borderless panel that relies on the
+shadow alone.
+
+<Preview>
+  <PopoverBorderlessDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-border.tsx"
+import { Popover } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+export function Borderless() {
+  return (
+    <>
+      <Popover trigger={<Button>Bordered</Button>}>
+        <p>Default — a subtle border defines the edge.</p>
+      </Popover>
+      <Popover bordered={false} trigger={<Button>Borderless</Button>}>
+        <p>Borderless — relies on the shadow alone.</p>
+      </Popover>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="border.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'border-example',
+  imports: [BpdmPopover, BpdmButton],
+  templateUrl: './border.html',
+})
+export class BorderExample {}
+```
+
+```html title="border.html"
+<button bpdmButton [bpdmPopover]="bordered">Bordered</button>
+<button bpdmButton [bpdmPopover]="plain" [bpdmPopoverBordered]="false">Borderless</button>
+
+<ng-template #bordered><p>Default — a subtle border defines the edge.</p></ng-template>
+<ng-template #plain><p>Borderless — relies on the shadow alone.</p></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## With a form
+
+Give the panel a fixed `width` and put fields inside; `PopoverClose` dismisses it
+on Save / Cancel.
+
+<Preview>
+  <PopoverFormDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-form.tsx"
+import { Popover, PopoverClose } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+export function UpdateName() {
+  return (
+    <Popover width={260} trigger={<Button>Update name</Button>}>
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-medium">Display name</p>
+        <Input defaultValue="Aria Lindqvist" aria-label="Display name" />
+        <div className="flex justify-end gap-2">
+          <PopoverClose asChild>
+            <Button variant="secondary" appearance="ghost">Cancel</Button>
+          </PopoverClose>
+          <PopoverClose asChild>
+            <Button>Save</Button>
+          </PopoverClose>
+        </div>
+      </div>
+    </Popover>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="update-name.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmPopoverClose, BpdmButton, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'update-name',
+  imports: [BpdmPopover, BpdmPopoverClose, BpdmButton, BpdmInput],
+  templateUrl: './update-name.html',
+})
+export class UpdateName {}
+```
+
+```html title="update-name.html"
+<button bpdmButton [bpdmPopover]="panel" [bpdmPopoverWidth]="260">Update name</button>
+
+<ng-template #panel>
+  <div class="flex flex-col gap-3">
+    <p class="text-sm font-medium">Display name</p>
+    <input bpdmInput value="Aria Lindqvist" aria-label="Display name" />
+    <div class="flex justify-end gap-2">
+      <button bpdmButton variant="secondary" appearance="ghost" bpdmPopoverClose>Cancel</button>
+      <button bpdmButton bpdmPopoverClose>Save</button>
+    </div>
+  </div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `trigger` | `ReactNode` | — | The element that opens it (React). Angular: the host element with `[bpdmPopover]`. |
+| `side` | `top \| right \| bottom \| left` | `bottom` | Edge to open from. Angular: `bpdmPopoverSide`. |
+| `align` | `start \| center \| end` | `center` | Alignment along the side. Angular: `bpdmPopoverAlign`. |
+| `sideOffset` | `number` | `8` | Gap from the trigger, in px. Angular: `bpdmPopoverOffset`. |
+| `width` | `number \| string` | fit-content | Fixed panel width. Angular: `bpdmPopoverWidth`. |
+| `showArrow` | `boolean` | `false` | Draw an arrow at the trigger. Angular: `bpdmPopoverShowArrow`. |
+| `bordered` | `boolean` | `true` | Draw a border around the panel; `false` for borderless. Angular: `bpdmPopoverBordered`. |
+| `modal` | `boolean` | `false` | Trap focus + block outside interaction. Angular: `bpdmPopoverModal`. |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(bpdmPopoverOpen)]`. |
+
+Use **`PopoverClose`** (React) / **`bpdmPopoverClose`** (Angular) on a button
+inside the panel to dismiss it.
+
+## Accessibility
+
+- Built on Radix Popover — the trigger gets `aria-expanded` / `aria-controls`,
+  focus moves into the panel, and `Esc` / outside-click closes it (returning
+  focus to the trigger).
+- Set `modal` when the panel needs the user's full attention — it then traps
+  focus and blocks background interaction like a mini-dialog.
+- The panel is portaled, so it escapes `overflow: hidden` / stacking-context
+  clipping while staying wired to the trigger for assistive tech.

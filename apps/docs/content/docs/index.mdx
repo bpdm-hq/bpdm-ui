@@ -1,0 +1,52 @@
+---
+title: Introduction
+description: One design system, the same components in React and Angular.
+icon: BookOpen
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+**bpdm/ui** is an accessible, themeable component library built on one shared set of
+design tokens — with native implementations for **React** (`@bpdm/ui`) and
+**Angular** (`@bpdm/ng`). Same look, same behavior, in both frameworks.
+
+## Why bpdm/ui
+
+- **One source of truth** — colors, spacing, radius and motion live in `@bpdm/tokens`; both frameworks render identically.
+- **Accessible by default** — built on Radix (React) and the Angular CDK, following WAI-ARIA patterns.
+- **Themeable** — four built-in themes via a `data-theme` attribute; override any token.
+- **38 components**, shipping in both frameworks today.
+
+<Callout type="info">
+  The packages live in this monorepo; npm publishing is in progress. Until then,
+  browse every component live in [Storybook](https://ui.bpdm.dev).
+</Callout>
+
+## Installation
+
+<Tabs items={['React', 'Angular']}>
+  <Tab value="React">
+```bash
+npm install @bpdm/ui
+```
+  </Tab>
+  <Tab value="Angular">
+```bash
+npm install @bpdm/ng
+```
+  </Tab>
+</Tabs>
+
+Import the design tokens once in your global stylesheet (after Tailwind):
+
+```css
+@import "tailwindcss";
+@import "@bpdm/tokens/tokens.css";
+```
+
+## Next
+
+<Cards>
+  <Card title="Browse components" href="/docs/form/input" description="All 38 components, in React and Angular" />
+  <Card title="GitHub" href="https://github.com/BDev-9/bpdm-ui" description="Source for both libraries" />
+</Cards>

@@ -1,0 +1,13 @@
+{
+  "title": "Overlay",
+  "icon": "Layers",
+  "pages": [
+    "dialog",
+    "confirm-dialog",
+    "dynamic-dialog",
+    "step-dialog",
+    "drawer",
+    "popover",
+    "tooltip"
+  ]
+}

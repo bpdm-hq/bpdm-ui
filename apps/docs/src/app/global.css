@@ -1,0 +1,314 @@
+@import 'tailwindcss';
+/* shadcn theme: maps every --color-fd-* to shadcn-style vars (--primary,
+   --background, --border, --ring…) — exactly what @bpdm/tokens defines. */
+@import 'fumadocs-ui/css/shadcn.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* bpdm design tokens — CSS variables + 4 themes (data-theme). Defines --primary
+   (amber), --background, etc. that the shadcn theme above reads via var(). */
+@import '@bpdm/tokens/tokens.css';
+
+/* Tailwind v4 doesn't scan workspace packages by default. Point it at the bpdm
+   source so the utility classes used by @bpdm/ui components (bg-primary,
+   text-primary-foreground, border-input…) get generated in this app's CSS. */
+@source '../../../../packages/react/src';
+@source '../../../../packages/variants/src';
+
+/* ONE dark signal: next-themes toggles `.dark` (which Fumadocs + its shiki code
+   highlighting already key off). Mirror bpdm's "slate" dark palette under `.dark`
+   so the whole UI — background, components AND code — switches together, with no
+   light-bg/dark-code desync. (Sidebar vars below reference these, so they follow.) */
+.dark {
+  color-scheme: dark;
+  --background: #0d1117;
+  --foreground: #e6e8eb;
+  --card: #161b22;
+  --card-foreground: #e6e8eb;
+  --popover: #161b22;
+  --popover-foreground: #e6e8eb;
+  --muted: #1c2128;
+  --muted-foreground: #8b949e;
+  --border: #2a313c;
+  --input: #30363d;
+  --ring: #f5a623;
+  --primary: #f5a623;
+  --primary-foreground: #1a1205;
+  --secondary: #1c2128;
+  --secondary-foreground: #e6e8eb;
+  --accent: #ff7a3c;
+  --accent-foreground: #1a1205;
+  --destructive: #f0616d;
+  --destructive-foreground: #0d1117;
+  --success: #3fb950;
+  --success-foreground: #052e16;
+  --warning: #d29922;
+  --warning-foreground: #0d1117;
+  --info: #58a6ff;
+  --info-foreground: #0d1117;
+  --help: #a371f7;
+  --help-foreground: #0d1117;
+}
+
+/* @bpdm/tokens has no sidebar tokens; map them onto existing bpdm tokens so the
+   Fumadocs shadcn theme renders a correct, on-brand sidebar in every theme. */
+:root {
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-ring: var(--ring);
+  --sidebar-primary-foreground: var(--primary-foreground);
+}
+
+html {
+  scrollbar-gutter: stable;
+  background-color: var(--background);
+}
+
+/* ── Side gutters: keep the whole layout off the viewport edges so it breathes
+   (modern docs sit in a comfortable frame, not flush to the left). ── */
+#nd-docs-layout {
+  padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
+}
+
+/* ── Seamless sidebar: blend it into the page (no card surface, no divider) for a
+   modern single-surface feel instead of a boxed panel. The active item keeps its
+   amber highlight; the brand glow at top washes across the full width. ── */
+#nd-sidebar {
+  /* same colour as the page so it still reads as one seamless surface when
+     docked, but OPAQUE — so the collapsed→hover-reveal floating panel doesn't
+     let the page content bleed through it. */
+  background-color: var(--background);
+  border-inline-end-width: 0;
+}
+/* Collapsed → hover-reveal: the sidebar floats OVER the page content, so restore
+   a divider + a lift shadow there so it reads as a distinct panel and doesn't
+   look merged with the buttons/text underneath. The docked state stays seamless. */
+#nd-sidebar[data-collapsed='true'] {
+  border-inline-end-width: 1px;
+  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--foreground) 28%, transparent);
+}
+/* The floating collapse+search pill (shown when collapsed) defaults to the very
+   left edge, where it clashes with the sidebar's peeking edges. Nudge it right a
+   touch so it sits clear of them. */
+[data-sidebar-panel] {
+  inset-inline-start: 2rem;
+}
+/* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */
+#nd-sidebar p {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  color: color-mix(in oklab, var(--muted-foreground) 85%, transparent);
+}
+#nd-sidebar header {
+  /* breathing space above the logo + a solid (opaque) sticky header. It must be
+     opaque so the collapsed→hover-reveal floating panel isn't see-through at the
+     top; matching the page colour keeps it seamless when docked. */
+  padding-top: 0.85rem;
+  background-color: var(--background);
+  border-bottom-width: 0;
+}
+
+/* ── Premium reading typography (Linear / Stripe / Vercel direction): big, tight,
+   confident headings; generous section rhythm; relaxed body line-height. Clarity
+   over decoration. ── */
+#nd-page h1 {
+  font-size: clamp(2rem, 1.4rem + 2vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+}
+#nd-page h2 {
+  margin-top: 3.5rem;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+}
+#nd-page h3 {
+  margin-top: 2.25rem;
+  letter-spacing: -0.012em;
+}
+#nd-page :is(p, li) {
+  line-height: 1.7;
+}
+/* the page description (subtitle) — softer, larger, set apart */
+#nd-page h1 + p {
+  font-size: 1.075rem;
+  color: var(--muted-foreground);
+}
+/* links: amber, with a refined underline offset */
+#nd-page a:not([data-card]):not([class*='not-prose']) {
+  text-decoration-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+/* ── Brand touch: a gently-drifting two-tone aurora (amber + accent) plus a fine
+   dotted texture at the top, both fading out before the reading area. On-trend
+   (layered radial gradients + subtle motion), brand-consistent with the landing,
+   and decorative only (fixed, pointer-events:none, z-index:-1). ── */
+body {
+  background-color: transparent;
+  position: relative;
+  /* Lock the page horizontally (PrimeNG-style): the drifting aurora below is the
+     only thing that overflows sideways, and it lives inside <body>, so clipping
+     here contains it — the sticky sidebar/header never shift on a trackpad swipe.
+     `clip` (not `hidden`) creates no scroll container, so sticky keeps working;
+     and because this is <body> (not the root <html>), it does NOT clip the
+     position:fixed toast viewport — its containing block is the viewport, not
+     body. Wide content (tables, code) still scrolls inside its own box. */
+  overflow-x: clip;
+}
+
+/* aurora — two soft, slowly-drifting brand blobs (anchored to the top of the
+   page, so they scroll away as you read) */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 30rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--primary) 25%, transparent), transparent 60%),
+    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  animation: bpdm-aurora-drift 20s ease-in-out infinite alternate;
+}
+
+/* fine dotted texture — elegant, not a hard grid */
+body::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 24rem;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--primary) 38%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 1.5rem 1.5rem;
+  -webkit-mask-image: radial-gradient(80% 100% at 50% 0, #000 0, transparent 68%);
+  mask-image: radial-gradient(80% 100% at 50% 0, #000 0, transparent 68%);
+}
+
+@keyframes bpdm-aurora-drift {
+  from {
+    transform: translate3d(-1.5rem, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5rem, 0.5rem, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* ── Always-dark code blocks (PrimeNG / Tailwind-docs style) ──────────────────
+   Block code panels stay dark in BOTH page themes — crisp, high-contrast, and
+   consistent. Overrides the figure's themed bg + forces the dark token palette. */
+figure.shiki:not(.not-fumadocs-codeblock *) {
+  background-color: #161b22 !important; /* bpdm slate surface */
+  border-color: #2a313c !important;
+  --color-fd-muted-foreground: #8b949e; /* line numbers / counters readable on dark */
+}
+
+figure.shiki:not(.not-fumadocs-codeblock *) code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style);
+}
+
+/* keep the copy button + any controls legible on the dark panel */
+figure.shiki:not(.not-fumadocs-codeblock *) button {
+  color: #8b949e;
+}
+figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
+  color: #e6e8eb;
+}
+
+/* ── Callout accent bar: full edge-to-edge, clipped to the card's corners ─────
+   Fumadocs' Callout puts a short inset accent bar (w-0.5, rounded-sm) inside a
+   p-3 box, so it floats with gaps top/bottom. Pin it absolutely so it spans the
+   full height; the box's overflow-hidden + rounded-xl then curve its corners to
+   match the card (the "mod"). Solid brand-tinted colour, a touch bolder. */
+#nd-page [style*='--callout-color'] {
+  position: relative;
+  overflow: hidden;
+  padding-inline-start: 1.15rem;
+}
+#nd-page [style*='--callout-color'] > div:first-child {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 0.25rem;
+  height: auto;
+  border-radius: 0;
+  background-color: var(--callout-color);
+  opacity: 0.9;
+}
+
+/* ── Smooth sidebar expand/collapse (PrimeNG-style) ──────────────────────────
+   Fumadocs' sidebar folders are Radix Collapsibles but ship without an open/close
+   animation, so children appear instantly (harsh). Radix exposes the content
+   height as --radix-collapsible-content-height; animate against it for an elegant,
+   eased reveal. Radix keeps the closing content mounted while an animation runs. */
+@keyframes bpdm-collapse-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+@keyframes bpdm-collapse-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+#nd-sidebar div[id^='radix-'][data-state='open'] {
+  animation: bpdm-collapse-down 240ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+#nd-sidebar div[id^='radix-'][data-state='closed'] {
+  animation: bpdm-collapse-up 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* slightly softer, longer ease on the item hover/active swap so clicks don't snap */
+#nd-sidebar a {
+  transition:
+    background-color 200ms cubic-bezier(0.32, 0.72, 0, 1),
+    color 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  #nd-sidebar div[id^='radix-'][data-state] {
+    animation: none;
+  }
+}
+
+/* Fumadocs renders the sidebar/nav markup itself, so we can't add a className to
+   those links — we target its DOM and apply the Tailwind utility via @apply. */
+#nd-sidebar a,
+#nd-sidebar button,
+#nd-subnav a,
+#nd-subnav button,
+#nd-tocnav a,
+[role='tab'],
+figure button {
+  @apply cursor-pointer;
+}

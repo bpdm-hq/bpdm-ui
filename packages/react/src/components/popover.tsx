@@ -20,6 +20,8 @@ export interface PopoverProps {
   modal?: boolean;
   /** Show a little arrow pointing at the trigger. Default false. */
   showArrow?: boolean;
+  /** Draw a border around the panel. Default true; set false for a borderless panel. */
+  bordered?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -42,6 +44,7 @@ export function Popover({
   width,
   modal = false,
   showArrow = false,
+  bordered = true,
   open,
   defaultOpen,
   onOpenChange,
@@ -74,16 +77,17 @@ export function Popover({
           style={width !== undefined ? { width } : undefined}
           className={cn(
             "z-50 rounded-[var(--radius)] bg-popover p-4 text-popover-foreground shadow-lg outline-none",
+            bordered && "border border-border",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             className,
           )}
         >
           {children}
           {showArrow && (
-            // borderless panel + matching fill → the notch is seamless in every
-            // theme (same approach as Tooltip)
+            // fill matches the panel; when bordered, a border-coloured stroke keeps
+            // the notch visible against any background and consistent with the edge
             <PopoverPrimitive.Arrow
-              className="fill-popover"
+              className={cn("fill-popover", bordered && "stroke-border [stroke-width:1px]")}
               width={12}
               height={6}
             />

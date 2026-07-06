@@ -1,0 +1,138 @@
+---
+title: Step Dialog
+description: A multi-step wizard dialog — progress stepper with Back/Next/Finish, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { StepDialogWizardDemo } from '@/components/step-dialog-demos';
+import { Preview } from '@/components/preview';
+
+The **Step Dialog** is a multi-step "wizard" — a progress stepper, per-step
+content, and **Back / Next / Finish** navigation, built on the
+[Dialog](/docs/overlay/dialog). Pass an array of `steps`; the current step resets
+when the dialog closes, and `onComplete` (React) / `(complete)` (Angular) fires on
+Finish. In Angular it's `<bpdm-step-dialog>` with per-step `<ng-template>`s.
+
+## Usage
+
+Each step has a `title`, optional `description`, and `content`. The footer shows
+**Back** / **Next** automatically, and **Finish** on the last step.
+
+<Preview>
+  <StepDialogWizardDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="setup-wizard.tsx"
+import { StepDialog, type StepDialogStep } from '@bpdm/ui/step-dialog';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+const steps: StepDialogStep[] = [
+  {
+    title: 'Account',
+    description: 'Your login details.',
+    content: <Input type="email" placeholder="you@company.com" aria-label="Email" />,
+  },
+  {
+    title: 'Profile',
+    description: 'Tell us about you.',
+    content: <Input placeholder="Display name" aria-label="Display name" />,
+  },
+  {
+    title: 'Done',
+    description: 'Review and finish.',
+    content: <p>Everything looks good — click Finish to complete setup.</p>,
+  },
+];
+
+export function SetupWizard() {
+  return (
+    <StepDialog
+      trigger={<Button>Get started</Button>}
+      title="Set up workspace"
+      steps={steps}
+      onComplete={() => {
+        // …persist the wizard result…
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+In Angular each step's `content` is an `<ng-template>`; reference them with
+`viewChild` and build the `steps` array.
+
+```ts title="setup-wizard.ts"
+import { Component, computed, viewChild, type TemplateRef } from '@angular/core';
+import { BpdmStepDialog, BpdmStepDialogTrigger, BpdmButton, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'setup-wizard',
+  imports: [BpdmStepDialog, BpdmStepDialogTrigger, BpdmButton, BpdmInput],
+  templateUrl: './setup-wizard.html',
+})
+export class SetupWizard {
+  private readonly accountTpl = viewChild.required<TemplateRef<unknown>>('accountTpl');
+  private readonly profileTpl = viewChild.required<TemplateRef<unknown>>('profileTpl');
+  private readonly doneTpl = viewChild.required<TemplateRef<unknown>>('doneTpl');
+
+  readonly steps = computed(() => [
+    { title: 'Account', description: 'Your login details.', content: this.accountTpl() },
+    { title: 'Profile', description: 'Tell us about you.', content: this.profileTpl() },
+    { title: 'Done', description: 'Review and finish.', content: this.doneTpl() },
+  ]);
+
+  onComplete() {
+    // …persist the wizard result…
+  }
+}
+```
+
+```html title="setup-wizard.html"
+<bpdm-step-dialog title="Set up workspace" [steps]="steps()" (complete)="onComplete()">
+  <button bpdmButton bpdmStepDialogTrigger>Get started</button>
+</bpdm-step-dialog>
+
+<ng-template #accountTpl>
+  <input bpdmInput type="email" placeholder="you@company.com" aria-label="Email" />
+</ng-template>
+<ng-template #profileTpl>
+  <input bpdmInput placeholder="Display name" aria-label="Display name" />
+</ng-template>
+<ng-template #doneTpl>
+  <p>Everything looks good — click Finish to complete setup.</p>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `steps` | `StepDialogStep[]` | — | **Required.** `{ title, description?, content }` per step. |
+| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: `[bpdmStepDialogTrigger]`. |
+| `title` | `ReactNode` | current step's title | Overall dialog heading. |
+| `size` | `sm \| md \| lg \| xl` | `md` | Panel width. |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(open)]`. |
+| `onComplete` | `() => void` | — | **React** — fires on Finish. Angular: `(complete)`. |
+| `finishText` | `string` | `Finish` | Label of the last-step button. |
+
+`StepDialogStep`: `{ title: string; description?: string; content: ReactNode }`
+(React) / `content: TemplateRef` (Angular).
+
+## Accessibility
+
+- Built on the [Dialog](/docs/overlay/dialog) — focus trap, scroll lock,
+  `role="dialog"` + `aria-modal`, and labelling via the title / description.
+- The stepper is an ordered list (`<ol>`); completed steps show a check and the
+  current step is visually emphasised, so progress is clear at a glance.
+- Back / Next / Finish are real buttons — full keyboard and focus support; the
+  step content animates in but conveys no meaning through motion alone.

@@ -1,0 +1,288 @@
+---
+title: Multi-select
+description: Select multiple options — chips or count display, searchable, accessible, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  MultiSelectBasicDemo,
+  MultiSelectOverflowDemo,
+  MultiSelectCountDemo,
+  MultiSelectGroupedDemo,
+  MultiSelectBigDemo,
+  MultiSelectStatesDemo,
+} from '@/components/multi-select-demos';
+import { Preview } from '@/components/preview';
+
+The **Multi-select** lets users pick several options from a data-driven list.
+Selected items show as chips (with a "+N" overflow) or as a count, with optional
+search and a "select all" row.
+
+## Usage
+
+Selected options appear as removable chips.
+
+<Preview>
+  <MultiSelectBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-usage.tsx"
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+];
+
+export function MultiSelectUsage() {
+  return <MultiSelect options={FRAMEWORKS} defaultValue={['react', 'vue']} placeholder="Select frameworks" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="multi-select-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'multi-select-usage',
+  imports: [BpdmMultiSelect],
+  templateUrl: './multi-select-usage.html',
+})
+export class MultiSelectUsage {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'angular', label: 'Angular' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'svelte', label: 'Svelte' },
+  ];
+}
+```
+
+```html title="multi-select-usage.html"
+<bpdm-multi-select [options]="frameworks" [defaultValue]="['react', 'vue']" placeholder="Select frameworks" />
+```
+
+  </Tab>
+</Tabs>
+
+## Chip overflow
+
+`maxDisplay` caps how many chips show; the rest collapse into a **"+N"**. Here
+`maxDisplay={2}` with four selected shows two chips and "+2".
+
+<Preview>
+  <MultiSelectOverflowDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-overflow.tsx"
+<MultiSelect
+  options={frameworks}
+  maxDisplay={2}
+  defaultValue={['react', 'vue', 'svelte', 'solid']}
+  placeholder="Select frameworks"
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-overflow.html"
+<bpdm-multi-select
+  [options]="frameworks"
+  [maxDisplay]="2"
+  [defaultValue]="['react', 'vue', 'svelte', 'solid']"
+  placeholder="Select frameworks"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+## Count display
+
+By default up to `maxDisplay` chips show before a "+N". Set `maxDisplay={0}` to
+show a compact **"N selected"** count instead.
+
+<Preview>
+  <MultiSelectCountDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-count.tsx"
+<MultiSelect options={frameworks} maxDisplay={0} defaultValue={['react', 'angular', 'vue']} />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-count.html"
+<bpdm-multi-select [options]="frameworks" [maxDisplay]="0" [defaultValue]="['react', 'angular', 'vue']" />
+```
+
+  </Tab>
+</Tabs>
+
+## Grouped & searchable
+
+Pass groups (`{ label, options }`) for labelled sections, and `searchable` to
+filter.
+
+<Preview>
+  <MultiSelectGroupedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-grouped.tsx"
+const CITIES = [
+  { label: 'Europe', options: [
+    { value: 'lon', label: 'London' },
+    { value: 'par', label: 'Paris' },
+    { value: 'ber', label: 'Berlin' },
+  ] },
+  { label: 'Americas', options: [
+    { value: 'nyc', label: 'New York' },
+    { value: 'sf', label: 'San Francisco' },
+    { value: 'tor', label: 'Toronto' },
+  ] },
+];
+
+<MultiSelect options={CITIES} searchable placeholder="Select cities" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-grouped.html"
+<bpdm-multi-select [options]="cities" searchable placeholder="Select cities" />
+```
+
+  </Tab>
+</Tabs>
+
+## Large datasets
+
+The dropdown is **virtualized** — only visible rows render — so it stays smooth
+with thousands of options. Combine with `searchable` to filter.
+
+<Preview>
+  <MultiSelectBigDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-large.tsx"
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const options = Array.from({ length: 10000 }, (_, i) => ({
+  value: `item-${i}`,
+  label: `Item ${i + 1}`,
+}));
+
+export function MultiSelectLarge() {
+  return <MultiSelect searchable options={options} placeholder="Pick records" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-large.html"
+<bpdm-multi-select [options]="options" searchable placeholder="Pick records" />
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+<Preview>
+  <MultiSelectStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-states.tsx"
+<MultiSelect options={frameworks} placeholder="Default" />
+<MultiSelect options={frameworks} aria-invalid placeholder="Invalid" />
+<MultiSelect options={frameworks} disabled placeholder="Disabled" />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-states.html"
+<bpdm-multi-select [options]="frameworks" placeholder="Default" />
+<bpdm-multi-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
+<bpdm-multi-select [options]="frameworks" disabled placeholder="Disabled" />
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled value
+
+`value` is an array of selected values; drive it with `onValueChange` (React) or
+two-way `[(value)]` (Angular).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-controlled.tsx"
+import { useState } from 'react';
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+export function Controlled({ frameworks }) {
+  const [value, setValue] = useState<string[]>(['react']);
+  return <MultiSelect options={frameworks} value={value} onValueChange={setValue} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="multi-select-controlled.html"
+<bpdm-multi-select [options]="frameworks" [(value)]="selected" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `SelectItems` (flat or grouped) | — | **Required.** Data-driven options. |
+| `value` / `defaultValue` | `string[]` | — | Controlled / uncontrolled selection. |
+| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]`. |
+| `placeholder` | `string` | `Select…` | Text when nothing is selected. |
+| `maxDisplay` | `number` | `3` | Chips shown before "+N"; `0` → "N selected" count. |
+| `selectAll` | `boolean` | `true` | Show a "Select all" row. |
+| `searchable` | `boolean` | `false` | Show a filter box. |
+| `searchPlaceholder` | `string` | `Search…` | Filter placeholder. |
+| `emptyText` | `string` | `No results.` | Shown when the filter matches nothing. |
+| `size` | `sm \| md \| lg` | `md` | Trigger height / text size. |
+| `disabled` | `boolean` | `false` | Disable the control. |
+| `aria-invalid` | `boolean` | — | Error state. |
+
+## Accessibility
+
+- Follows the combobox/listbox multi-select pattern — full keyboard support
+  (arrows, Enter to toggle, type-ahead, Esc to close).
+- Pair with a `<label>` (via `id`) or an `aria-label`; set `aria-invalid` on error.

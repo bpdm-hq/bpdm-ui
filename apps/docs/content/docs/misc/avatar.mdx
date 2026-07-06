@@ -1,0 +1,485 @@
+---
+title: Avatar
+description: A user image with graceful initials/icon fallback — sizes, shapes, presence status, groups, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  AvatarUsageDemo,
+  AvatarInitialsDemo,
+  AvatarFallbackDemo,
+  AvatarSizesDemo,
+  AvatarShapesDemo,
+  AvatarStatusDemo,
+  AvatarGroupDemo,
+  AvatarBadgeDemo,
+} from '@/components/avatar-demos';
+import { Preview } from '@/components/preview';
+
+The **Avatar** shows a user's image and falls back gracefully — first to
+auto-tinted **initials** from the name, then to an **icon**. It supports six
+sizes, circle/square shapes, a presence dot, and an overlapping **group** with a
+`+N` overflow. In Angular it's `<bpdm-avatar>` / `<bpdm-avatar-group>`.
+
+## Usage
+
+Pass `name` (drives the initials, auto-colour, and alt text) and an optional
+`src`. If the image is missing or fails to load, the initials show instead.
+
+<Preview>
+  <AvatarUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-usage.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarUsage() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
+      <Avatar name="Theo Brandt" size="lg" /> {/* no image → initials */}
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-usage',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-usage.html',
+})
+export class AvatarUsage {}
+```
+
+```html title="avatar-usage.html"
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
+<bpdm-avatar name="Theo Brandt" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Initials
+
+With no image, the avatar renders up to two initials from `name`, auto-tinted to
+a stable colour per name.
+
+<Preview>
+  <AvatarInitialsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-initials.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarInitials() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" size="lg" />
+      <Avatar name="Theo Brandt" size="lg" />
+      <Avatar name="Lena Cho" size="lg" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-initials.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-initials',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-initials.html',
+})
+export class AvatarInitials {}
+```
+
+```html title="avatar-initials.html"
+<bpdm-avatar name="Aria Lindqvist" size="lg" />
+<bpdm-avatar name="Theo Brandt" size="lg" />
+<bpdm-avatar name="Lena Cho" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Fallbacks
+
+The chain is **image → initials → icon**. A broken `src` falls back to initials;
+with no `name`, it shows a custom **`icon`** if you pass one (React), otherwise a
+built-in user icon. Set `colorful={false}` for a neutral grey tint instead of the
+auto colour.
+
+<Preview>
+  <AvatarFallbackDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-fallback.tsx"
+import { Building2 } from 'lucide-react';
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarFallbacks() {
+  return (
+    <>
+      <Avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" /> {/* → initials */}
+      <Avatar size="lg" /> {/* no name → built-in user icon */}
+      <Avatar size="lg" icon={<Building2 />} /> {/* custom fallback icon */}
+      <Avatar name="JD" colorful={false} size="lg" /> {/* neutral */}
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`icon` is React-only; Angular always uses the built-in user icon when there's no
+image and no name.
+
+```ts title="avatar-fallback.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-fallback',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-fallback.html',
+})
+export class AvatarFallback {}
+```
+
+```html title="avatar-fallback.html"
+<bpdm-avatar name="Clara Bauer" src="https://invalid.example/none.jpg" size="lg" />
+<bpdm-avatar size="lg" />
+<bpdm-avatar name="JD" [colorful]="false" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+Six sizes: `xs`, `sm`, `md` (default), `lg`, `xl`, `2xl`.
+
+<Preview>
+  <AvatarSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-sizes.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarSizes() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="xs" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="sm" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="md" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="xl" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" size="2xl" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-sizes',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-sizes.html',
+})
+export class AvatarSizes {}
+```
+
+```html title="avatar-sizes.html"
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="xs" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="sm" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="md" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="xl" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="2xl" />
+```
+
+  </Tab>
+</Tabs>
+
+## Shapes
+
+`circle` (default) or `square` (a rounded square).
+
+<Preview>
+  <AvatarShapesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-shapes.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarShapes() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" shape="circle" size="lg" />
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" shape="square" size="lg" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-shapes.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-shapes',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-shapes.html',
+})
+export class AvatarShapes {}
+```
+
+```html title="avatar-shapes.html"
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" shape="circle" size="lg" />
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" shape="square" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Status
+
+A presence dot via `status`: `online`, `busy`, `away`, or `offline`.
+
+<Preview>
+  <AvatarStatusDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-status.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+
+export function AvatarStatus() {
+  return (
+    <>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
+      <Avatar name="Theo Brandt" status="busy" size="lg" />
+      <Avatar name="Lena Cho" src="/lena.jpg" status="away" size="lg" />
+      <Avatar name="Mateo Silva" status="offline" size="lg" />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-status.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar } from '@bpdm/ng';
+
+@Component({
+  selector: 'avatar-status',
+  imports: [BpdmAvatar],
+  templateUrl: './avatar-status.html',
+})
+export class AvatarStatus {}
+```
+
+```html title="avatar-status.html"
+<bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" status="online" size="lg" />
+<bpdm-avatar name="Theo Brandt" status="busy" size="lg" />
+<bpdm-avatar name="Lena Cho" src="/lena.jpg" status="away" size="lg" />
+<bpdm-avatar name="Mateo Silva" status="offline" size="lg" />
+```
+
+  </Tab>
+</Tabs>
+
+## Group
+
+`AvatarGroup` overlaps avatars and collapses the rest past `max` into a `+N`
+tile; each lifts on hover. In Angular, pass the people via the `users` input.
+
+<Preview>
+  <AvatarGroupDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-group.tsx"
+import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
+
+export function Team() {
+  return (
+    <AvatarGroup max={4}>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" />
+      <Avatar name="Theo Brandt" src="/theo.jpg" />
+      <Avatar name="Lena Cho" src="/lena.jpg" />
+      <Avatar name="Mateo Silva" />
+      <Avatar name="Ines Vidal" />
+      <Avatar name="Sam Reyes" />
+    </AvatarGroup>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-group.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatarGroup, type AvatarGroupUser } from '@bpdm/ng';
+
+@Component({
+  selector: 'team',
+  imports: [BpdmAvatarGroup],
+  templateUrl: './avatar-group.html',
+})
+export class Team {
+  readonly people: AvatarGroupUser[] = [
+    { name: 'Aria Lindqvist', src: '/aria.jpg' },
+    { name: 'Theo Brandt', src: '/theo.jpg' },
+    { name: 'Lena Cho', src: '/lena.jpg' },
+    { name: 'Mateo Silva' },
+    { name: 'Ines Vidal' },
+    { name: 'Sam Reyes' },
+  ];
+}
+```
+
+```html title="avatar-group.html"
+<bpdm-avatar-group [users]="people" [max]="4" />
+```
+
+  </Tab>
+</Tabs>
+
+## Notification badge
+
+Compose with `NotificationBadge` to overlay a count or dot on the corner — for
+unread messages, presence, and the like. The count caps at `max` (e.g. `99+`).
+
+<Preview>
+  <AvatarBadgeDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-badge.tsx"
+import { Avatar } from '@bpdm/ui/avatar';
+import { NotificationBadge } from '@bpdm/ui/badge';
+
+export function Badged() {
+  return (
+    <>
+      <NotificationBadge count={4}>
+        <Avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
+      </NotificationBadge>
+      <NotificationBadge count={128} max={99}>
+        <Avatar name="Lena Cho" src="/lena.jpg" size="lg" />
+      </NotificationBadge>
+      <NotificationBadge dot variant="success">
+        <Avatar name="Theo Brandt" size="lg" />
+      </NotificationBadge>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="avatar-badge.html"
+<bpdm-notification-badge [count]="4">
+  <bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
+</bpdm-notification-badge>
+<bpdm-notification-badge [count]="128" [max]="99">
+  <bpdm-avatar name="Lena Cho" src="/lena.jpg" size="lg" />
+</bpdm-notification-badge>
+<bpdm-notification-badge dot variant="success">
+  <bpdm-avatar name="Theo Brandt" size="lg" />
+</bpdm-notification-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `Avatar` / `<bpdm-avatar>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | — | Drives the initials, auto-colour, and alt text. |
+| `src` | `string` | — | Image URL; falls back to initials, then icon. |
+| `alt` | `string` | `name` | Image alt text. |
+| `icon` | `ReactNode` | user glyph | **React only** — custom fallback when there's no image and no name. Angular shows the built-in user icon. |
+| `size` | `xs \| sm \| md \| lg \| xl \| 2xl` | `md` | Avatar size. |
+| `shape` | `circle \| square` | `circle` | Circle or rounded square. |
+| `status` | `online \| busy \| away \| offline` | — | Presence dot. |
+| `colorful` | `boolean` | `true` | Auto-tint initials from the name; `false` → neutral. |
+
+### `AvatarGroup` / `<bpdm-avatar-group>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `max` | `number` | — | Show at most this many; the rest collapse into `+N`. |
+| `size` | `AvatarSize` | `md` | Applied to every avatar and the overflow tile. |
+| `users` | `AvatarGroupUser[]` | — | **Angular** — `{ name?, src?, status? }[]` (React composes `<Avatar>` children). |
+
+### `NotificationBadge` / `<bpdm-notification-badge>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `count` | `number` | — | Number to display; omit with `dot` for a plain indicator. |
+| `max` | `number` | `99` | Cap, e.g. `99+`. |
+| `dot` | `boolean` | `false` | Show a dot instead of a number. |
+| `showZero` | `boolean` | `false` | Render when `count` is 0. |
+| `variant` | `BadgeVariant` | `destructive` | Indicator colour. |
+
+## Accessibility
+
+- The image uses `alt` (defaults to `name`); decorative initials/icon fallbacks
+  are not announced as images, so a missing image never produces a broken-image
+  read-out.
+- The presence dot carries an `aria-label` of its status (e.g. "online").
+- For an avatar that acts as a control (a menu trigger, a link), wrap it in a
+  `<button>` / `<a>` with an accessible name rather than relying on the image.
+- `NotificationBadge` overlays a count visually; convey the same information in
+  the trigger's accessible name (e.g. `aria-label="Messages, 4 unread"`).

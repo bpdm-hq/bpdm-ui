@@ -1,0 +1,10 @@
+{
+  "title": "Misc",
+  "icon": "Shapes",
+  "pages": [
+    "avatar",
+    "badge",
+    "progress",
+    "spinner"
+  ]
+}

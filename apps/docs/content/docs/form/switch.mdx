@@ -1,0 +1,356 @@
+---
+title: Switch
+description: An on/off toggle — three sizes, three shapes, optional glyph, accessible, in React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  SwitchBasicDemo,
+  SwitchSizesDemo,
+  SwitchShapesDemo,
+  SwitchIconDemo,
+  SwitchStatesDemo,
+  SwitchLabelDemo,
+  SwitchSettingsDemo,
+  SwitchControlledDemo,
+} from '@/components/switch-demos';
+import { Preview } from '@/components/preview';
+
+The **Switch** is an on/off toggle built on Radix. Use it for instant settings
+(no Save button). It's controlled (`checked` + `onCheckedChange`) or uncontrolled
+(`defaultChecked`); in Angular it's `<bpdm-switch>` with `[(checked)]`,
+`[(ngModel)]`, or reactive forms.
+
+## Usage
+
+<Preview>
+  <SwitchBasicDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-usage.tsx"
+import { Switch } from '@bpdm/ui/switch';
+
+export function SwitchUsage() {
+  return <Switch defaultChecked aria-label="Toggle setting" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="switch-usage.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'switch-usage',
+  imports: [BpdmSwitch],
+  templateUrl: './switch-usage.html',
+})
+export class SwitchUsage {}
+```
+
+```html title="switch-usage.html"
+<bpdm-switch [checked]="true" aria-label="Toggle setting" />
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+The `size` prop offers `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <SwitchSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-sizes.tsx"
+<Switch size="sm" defaultChecked />
+<Switch size="md" defaultChecked />
+<Switch size="lg" defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-sizes.html"
+<bpdm-switch size="sm" [checked]="true" />
+<bpdm-switch size="md" [checked]="true" />
+<bpdm-switch size="lg" [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## Shapes
+
+The `shape` prop offers `pill` (default), `square` (rounded), and `sharp`.
+
+<Preview>
+  <SwitchShapesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-shapes.tsx"
+<Switch shape="pill" defaultChecked />
+<Switch shape="square" defaultChecked />
+<Switch shape="sharp" defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-shapes.html"
+<bpdm-switch shape="pill" [checked]="true" />
+<bpdm-switch shape="square" [checked]="true" />
+<bpdm-switch shape="sharp" [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## With icon
+
+Set `icon` to render a ✓ / ✗ glyph inside the thumb — handy when the on/off state
+needs to read at a glance.
+
+<Preview>
+  <SwitchIconDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-icon.tsx"
+<Switch icon defaultChecked />
+<Switch icon />
+<Switch icon size="lg" defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-icon.html"
+<bpdm-switch icon [checked]="true" />
+<bpdm-switch icon />
+<bpdm-switch icon size="lg" [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Off, on, and `disabled` (on or off).
+
+<Preview>
+  <SwitchStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-states.tsx"
+<Switch />
+<Switch defaultChecked />
+<Switch disabled />
+<Switch disabled defaultChecked />
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-states.html"
+<bpdm-switch />
+<bpdm-switch [checked]="true" />
+<bpdm-switch disabled />
+<bpdm-switch disabled [checked]="true" />
+```
+
+  </Tab>
+</Tabs>
+
+## With a label
+
+Link a `<label>` to the switch by `id` (`htmlFor` in React, `for` in Angular) so
+clicking the text toggles it and screen readers announce the control's name.
+
+<Preview>
+  <SwitchLabelDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-label.tsx"
+import { Switch } from '@bpdm/ui/switch';
+
+export function AirplaneToggle() {
+  return (
+    <div className="flex items-center gap-3">
+      <Switch id="airplane" defaultChecked />
+      <label htmlFor="airplane" className="text-sm font-medium">
+        Airplane mode
+      </label>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-label.html"
+<div class="flex items-center gap-3">
+  <bpdm-switch id="airplane" [checked]="true" />
+  <label for="airplane" class="text-sm font-medium">Airplane mode</label>
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Settings list
+
+A common real-world layout — one labelled row per toggle.
+
+<Preview>
+  <SwitchSettingsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-settings.tsx"
+import { Switch } from '@bpdm/ui/switch';
+
+const settings = [
+  { id: 's-2fa', label: 'Two-factor authentication', on: true },
+  { id: 's-email', label: 'Email notifications', on: false },
+  { id: 's-beta', label: 'Beta features', on: true },
+];
+
+export function SettingsList() {
+  return (
+    <div className="flex flex-col divide-y rounded-lg border">
+      {settings.map((s) => (
+        <div key={s.id} className="flex items-center justify-between gap-4 px-4 py-3">
+          <label htmlFor={s.id} className="text-sm">
+            {s.label}
+          </label>
+          <Switch id={s.id} defaultChecked={s.on} />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="switch-settings.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'settings-list',
+  imports: [BpdmSwitch],
+  templateUrl: './switch-settings.html',
+})
+export class SettingsList {
+  readonly settings = [
+    { id: 's-2fa', label: 'Two-factor authentication', on: true },
+    { id: 's-email', label: 'Email notifications', on: false },
+    { id: 's-beta', label: 'Beta features', on: true },
+  ];
+}
+```
+
+```html title="switch-settings.html"
+<div class="flex flex-col divide-y rounded-lg border">
+  @for (s of settings; track s.id) {
+    <div class="flex items-center justify-between gap-4 px-4 py-3">
+      <label [attr.for]="s.id" class="text-sm">{{ s.label }}</label>
+      <bpdm-switch [id]="s.id" [checked]="s.on" />
+    </div>
+  }
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Controlled value
+
+Drive the state yourself with `checked` + `onCheckedChange` (React) or two-way
+`[(checked)]` / `[(ngModel)]` (Angular).
+
+<Preview>
+  <SwitchControlledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch-controlled.tsx"
+import { useState } from 'react';
+import { Switch } from '@bpdm/ui/switch';
+
+export function WifiToggle() {
+  const [on, setOn] = useState(true);
+  return (
+    <div className="flex items-center gap-3">
+      <Switch id="wifi" checked={on} onCheckedChange={setOn} />
+      <label htmlFor="wifi" className="text-sm font-medium">
+        Wi-Fi is {on ? 'on' : 'off'}
+      </label>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="switch-controlled.html"
+<bpdm-switch [(checked)]="on" />
+<!-- or with forms -->
+<bpdm-switch [(ngModel)]="on" />
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `checked` / `defaultChecked` | `boolean` | — | Controlled / uncontrolled on state. |
+| `onCheckedChange` | `(checked: boolean) => void` | — | **React** — fires on toggle. Angular uses `[(checked)]` / `[(ngModel)]`. |
+| `size` | `sm \| md \| lg` | `md` | Track and thumb size. |
+| `shape` | `pill \| square \| sharp` | `pill` | Corner style of the track and thumb. |
+| `icon` | `boolean` | `false` | Show a ✓ / ✗ glyph inside the thumb. |
+| `disabled` | `boolean` | `false` | Disable the control. |
+
+In React, all native Radix Switch props (`name`, `value`, `required`, `id`, …)
+are supported. In Angular, `size` / `shape` / `icon` are `@Input`s on
+`<bpdm-switch>`, which is a `ControlValueAccessor`.
+
+## Accessibility
+
+- Built on Radix Switch — `role="switch"`, full keyboard support (**Space** /
+  **Enter** to toggle), and `aria-checked` reflects the state.
+- Always give it an accessible name: link a `<label>` by `id`, or pass an
+  `aria-label` when there's no visible text.
+- The thumb glyph (`icon`) is decorative — state is conveyed via `aria-checked`,
+  not the glyph.

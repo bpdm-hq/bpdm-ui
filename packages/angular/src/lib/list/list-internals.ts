@@ -51,7 +51,7 @@ export function sameOrder<T>(a: T[], b: T[], keyOf: (i: T) => ItemKey): boolean 
 
 /** Shared square icon-button styling for the control columns. */
 export const CONTROL_BTN_CLASS =
-  "inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border bg-card text-muted-foreground transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 [&_svg]:size-4";
+  "inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border/60 bg-card text-muted-foreground shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4";
 
 /** Context handed to a list's item template. */
 export interface ListItemContext<T> {
@@ -63,3 +63,21 @@ export interface ListItemContext<T> {
 export type ItemKeyFn<T> = (item: T) => ItemKey;
 /** A function reading an item's filterable / sortable text. */
 export type ItemTextFn<T> = (item: T) => string;
+
+/** A control-column move direction, for live-region announcements. */
+export type MoveKind = "up" | "top" | "down" | "bottom";
+
+/** Screen-reader announcement per move direction. */
+export const MOVE_MESSAGE: Record<MoveKind, string> = {
+  up: "Moved up one position",
+  top: "Moved to top",
+  down: "Moved down one position",
+  bottom: "Moved to bottom",
+};
+
+// Deterministic per-instance id source for listbox ⇄ option wiring
+// (aria-labelledby / aria-activedescendant). Deterministic order → SSR-safe.
+let _listUid = 0;
+export function nextListId(): string {
+  return `bpdm-list-${(_listUid += 1)}`;
+}

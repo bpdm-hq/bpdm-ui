@@ -10,7 +10,7 @@ interface Row {
 }
 
 const DATA: Row[] = [
-  { id: "a", name: "Hugo", tasks: 30 },
+  { id: "a", name: "Milo", tasks: 30 },
   { id: "b", name: "Ava", tasks: 10 },
   { id: "c", name: "Sara", tasks: 20 },
 ];
@@ -68,15 +68,15 @@ describe("BpdmDataTable", () => {
 
     nameSortBtn.click();
     fixture.detectChanges();
-    expect(cellText(fixture)).toEqual(["Ava", "Hugo", "Sara"]); // asc
+    expect(cellText(fixture)).toEqual(["Ava", "Milo", "Sara"]); // asc
 
     nameSortBtn.click();
     fixture.detectChanges();
-    expect(cellText(fixture)).toEqual(["Sara", "Hugo", "Ava"]); // desc
+    expect(cellText(fixture)).toEqual(["Sara", "Milo", "Ava"]); // desc
 
     nameSortBtn.click();
     fixture.detectChanges();
-    expect(cellText(fixture)).toEqual(["Hugo", "Ava", "Sara"]); // back to source order
+    expect(cellText(fixture)).toEqual(["Milo", "Ava", "Sara"]); // back to source order
   });
 
   it("selects rows and reports keys; header select-all toggles every row", () => {
@@ -160,8 +160,8 @@ describe("BpdmDataTable defaults", () => {
     const firstCells = Array.from(fixture.nativeElement.querySelectorAll("tbody tr")).map(
       (tr) => ((tr as HTMLElement).querySelector("td") as HTMLElement)?.textContent?.trim(),
     );
-    // name desc → Sara, Hugo, Ava
-    expect(firstCells).toEqual(["Sara", "Hugo", "Ava"]);
+    // name desc → Sara, Milo, Ava
+    expect(firstCells).toEqual(["Sara", "Milo", "Ava"]);
     // two numbered order badges (1, 2) appear in the headers
     const badges = Array.from(fixture.nativeElement.querySelectorAll("thead th span")).filter(
       (s) => /^[12]$/.test((s as HTMLElement).textContent?.trim() ?? ""),

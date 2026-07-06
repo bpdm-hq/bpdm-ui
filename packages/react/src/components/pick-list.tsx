@@ -29,6 +29,14 @@ export interface PickListProps<T> {
   /** Show the up/top/down/bottom reorder controls beside each list + drag. Default true. */
   reorder?: boolean;
   scrollHeight?: string;
+  /** Empty-state text for the source list (default "No items"). */
+  sourceEmptyText?: string;
+  /** Empty-state text for the target list (default "Nothing here yet"). */
+  targetEmptyText?: string;
+  /** Fired after a transfer, with the moved items and which list they landed in. */
+  onTransfer?: (moved: T[], to: "source" | "target") => void;
+  /** Predicate marking an item as disabled — not selectable, transferable, or draggable. */
+  isItemDisabled?: (item: T) => boolean;
   className?: string;
 }
 
@@ -50,8 +58,37 @@ export function PickList<T>({
   filterPlaceholder,
   reorder = true,
   scrollHeight,
+  sourceEmptyText = "No items",
+  targetEmptyText = "Nothing here yet",
+  onTransfer,
+  isItemDisabled,
   className,
 }: PickListProps<T>) {
+  const isDisabled = (item: T) => !!isItemDisabled?.(item);
+  const [message, setMessage] = React.useState("");
+  const flip = React.useRef(false);
+  const transferRef = React.useRef<HTMLDivElement>(null);
+
+  const listLabel = (to: "source" | "target") => {
+    const h = to === "target" ? targetHeader : sourceHeader;
+    return typeof h === "string" && h ? h : `${to} list`;
+  };
+  // announce transfers to screen readers, and keep keyboard focus inside the
+  // transfer group if the button just pressed becomes disabled.
+  const afterTransfer = (moving: T[], to: "source" | "target") => {
+    onTransfer?.(moving, to);
+    flip.current = !flip.current;
+    const noun = moving.length === 1 ? "item" : "items";
+    setMessage(`${moving.length} ${noun} moved to ${listLabel(to)}` + (flip.current ? "" : " "));
+    if (typeof requestAnimationFrame !== "function") return;
+    requestAnimationFrame(() => {
+      const grp = transferRef.current;
+      if (!grp) return;
+      const active = document.activeElement as HTMLElement | null;
+      const lost = !active || active === document.body || (active as HTMLButtonElement).disabled;
+      if (lost) grp.querySelector<HTMLButtonElement>("button:not([disabled])")?.focus();
+    });
+  };
   const [lists, setLists] = useControllable<PickListValue<T>>(valueProp, defaultValue, onChange);
   const { source, target } = lists;
   const [sourceSel, setSourceSel] = React.useState<Set<ItemKey>>(new Set());
@@ -65,39 +102,41 @@ export function PickList<T>({
       return next;
     });
 
-  const moveSelected = (from: T[], to: T[], sel: Set<ItemKey>) => {
-    const moving = from.filter((i) => sel.has(itemKey(i)));
-    if (moving.length === 0) return null;
-    return { from: from.filter((i) => !sel.has(itemKey(i))), to: [...to, ...moving] };
-  };
-
   const toTarget = () => {
-    const r = moveSelected(source, target, sourceSel);
-    if (!r) return;
-    setLists({ source: r.from, target: r.to });
+    const moving = source.filter((i) => sourceSel.has(itemKey(i)) && !isDisabled(i));
+    if (moving.length === 0) return;
+    const movingKeys = new Set(moving.map(itemKey));
+    setLists({ source: source.filter((i) => !movingKeys.has(itemKey(i))), target: [...target, ...moving] });
     setSourceSel(new Set());
+    afterTransfer(moving, "target");
   };
   const toSource = () => {
-    const r = moveSelected(target, source, targetSel);
-    if (!r) return;
-    setLists({ source: r.to, target: r.from });
+    const moving = target.filter((i) => targetSel.has(itemKey(i)) && !isDisabled(i));
+    if (moving.length === 0) return;
+    const movingKeys = new Set(moving.map(itemKey));
+    setLists({ source: [...source, ...moving], target: target.filter((i) => !movingKeys.has(itemKey(i))) });
     setTargetSel(new Set());
+    afterTransfer(moving, "source");
   };
   const allToTarget = () => {
-    if (source.length === 0) return;
-    setLists({ source: [], target: [...target, ...source] });
+    const moving = source.filter((i) => !isDisabled(i)); // locked items stay put
+    if (moving.length === 0) return;
+    setLists({ source: source.filter(isDisabled), target: [...target, ...moving] });
     setSourceSel(new Set());
+    afterTransfer(moving, "target");
   };
   const allToSource = () => {
-    if (target.length === 0) return;
-    setLists({ source: [...source, ...target], target: [] });
+    const moving = target.filter((i) => !isDisabled(i));
+    if (moving.length === 0) return;
+    setLists({ source: [...source, ...moving], target: target.filter(isDisabled) });
     setTargetSel(new Set());
+    afterTransfer(moving, "source");
   };
 
   return (
     <div
       className={cn(
-        "flex flex-col items-stretch gap-2 lg:flex-row lg:items-start",
+        "flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch",
         className,
       )}
     >
@@ -107,7 +146,7 @@ export function PickList<T>({
           itemKey={itemKey}
           selected={sourceSel}
           onChange={(next) => setLists({ source: next, target })}
-          className="self-center lg:self-start"
+          className="self-center"
         />
       )}
 
@@ -123,21 +162,23 @@ export function PickList<T>({
         filterBy={filterBy}
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
-        emptyText="No items"
+        emptyText={sourceEmptyText}
+        multiselectable
+        isItemDisabled={isItemDisabled}
       />
 
       {/* transfer controls — a row on mobile, a column on lg+ */}
-      <div className="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+      <div ref={transferRef} role="group" aria-label="Transfer between lists" className="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
         <ControlButton label="Move to target" disabled={sourceSel.size === 0} onClick={toTarget}>
           <ChevronRight />
         </ControlButton>
-        <ControlButton label="Move all to target" disabled={source.length === 0} onClick={allToTarget}>
+        <ControlButton label="Move all to target" disabled={!source.some((i) => !isDisabled(i))} onClick={allToTarget}>
           <ChevronsRight />
         </ControlButton>
         <ControlButton label="Move to source" disabled={targetSel.size === 0} onClick={toSource}>
           <ChevronLeft />
         </ControlButton>
-        <ControlButton label="Move all to source" disabled={target.length === 0} onClick={allToSource}>
+        <ControlButton label="Move all to source" disabled={!target.some((i) => !isDisabled(i))} onClick={allToSource}>
           <ChevronsLeft />
         </ControlButton>
       </div>
@@ -154,7 +195,9 @@ export function PickList<T>({
         filterBy={filterBy}
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
-        emptyText="Nothing here yet"
+        emptyText={targetEmptyText}
+        multiselectable
+        isItemDisabled={isItemDisabled}
       />
 
       {reorder && (
@@ -163,9 +206,13 @@ export function PickList<T>({
           itemKey={itemKey}
           selected={targetSel}
           onChange={(next) => setLists({ source, target: next })}
-          className="self-center lg:self-start"
+          className="self-center"
         />
       )}
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {message}
+      </div>
     </div>
   );
 }

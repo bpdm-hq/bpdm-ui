@@ -18,8 +18,9 @@ import { type AlertAppearance, alertTones, cn, type AlertVariant } from "@bpdm/v
 export class BpdmAlertActions {}
 
 /**
- * `<bpdm-alert>` — an inline, persistent alert: a colored accent, a tinted icon,
- * a title and body, with an optional actions slot and a dismiss button. Three
+ * `<bpdm-alert>` — an inline, persistent alert: a severity-tinted surface, an
+ * inline icon, a title and body, with an optional actions slot and a dismiss
+ * button. Three
  * appearances (`soft` / `solid` / `outline`) × the full severity palette.
  * Theme-aware across all four themes. For transient notifications use a toast.
  *
@@ -48,10 +49,7 @@ export class BpdmAlertActions {}
     <div class="min-h-0 overflow-hidden">
       <div role="alert" [class]="boxClass()">
         @if (showIcon()) {
-          <span
-            class="flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]"
-            [class]="iconWrapClass()"
-          >
+          <span [class]="iconWrapClass()">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -59,8 +57,7 @@ export class BpdmAlertActions {}
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-4"
-              [class]="iconColor()"
+              [class]="iconSvgClass()"
               aria-hidden="true"
             >
               @switch (variant()) {
@@ -130,18 +127,27 @@ export class BpdmAlert {
   private readonly solid = computed(() => this.appearance() === "solid");
 
   protected readonly boxClass = computed(() => {
-    const base = "relative flex w-full gap-3 overflow-hidden rounded-lg border p-4 shadow-sm";
+    const base = "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4";
     const a = this.appearance();
     if (a === "solid") return cn(base, this.tone().solid);
-    if (a === "outline") return cn(base, "bg-card text-card-foreground", this.tone().outline);
-    return cn(
-      base,
-      "border-border bg-card text-card-foreground before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
-      this.tone().accent,
-    );
+    if (a === "outline") return cn(base, "bg-card text-card-foreground shadow-sm", this.tone().outline);
+    // soft = tinted inline-message surface (distinct from the white floating Toast)
+    return cn(base, this.tone().soft);
   });
-  protected readonly iconWrapClass = computed(() => (this.solid() ? "bg-white/15" : this.tone().tint));
-  protected readonly iconColor = computed(() => (this.solid() ? "" : this.tone().fg));
+  private readonly box8 =
+    "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg animate-[bpdm-pop-in_220ms_ease-out]";
+  protected readonly iconWrapClass = computed(() => {
+    const a = this.appearance();
+    if (a === "soft") return cn("flex shrink-0 items-center", this.tone().fg); // inline coloured icon
+    if (a === "solid") return cn(this.box8, "bg-white/15");
+    return cn(this.box8, this.tone().tint); // outline
+  });
+  protected readonly iconSvgClass = computed(() => {
+    const a = this.appearance();
+    if (a === "soft") return "size-5";
+    if (a === "solid") return "size-4";
+    return cn("size-4", this.tone().fg); // outline
+  });
   protected readonly bodyClass = computed(() => (this.solid() ? "text-current/90" : "text-muted-foreground"));
   protected readonly closeClass = computed(() =>
     this.solid()
