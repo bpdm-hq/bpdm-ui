@@ -1,11 +1,277 @@
 ---
 title: Money Input
-description: Money Input — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Currency + locale-aware money input — grouped per locale, precise via bignumber.js, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Money Input** component — available in React (`@bpdm/ui/money-input`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  MoneyInputUsageDemo,
+  MoneyInputCurrenciesDemo,
+  MoneyInputPrecisionDemo,
+  MoneyInputSizesDemo,
+  MoneyInputStatesDemo,
+} from '@/components/money-input-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Money Input** is a currency- and locale-aware amount field. The display is grouped for the
+locale (e.g. `en-IN` → `1,00,000`) with the right currency symbol and decimal count, while the
+stored value stays a **precise numeric string** (`bignumber.js` — no float rounding). It's editable
+as a plain number on focus and formatted on blur. In React it's `<MoneyInput>`; in Angular it's
+`<bpdm-money-input>`.
+
+## Usage
+
+Give it a `currency`, a `locale`, and a starting amount.
+
+<Preview>
+  <MoneyInputUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="amount.tsx"
+import { useState } from 'react';
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function Amount() {
+  const [value, setValue] = useState('1234.5');
+  return <MoneyInput currency="USD" locale="en-US" value={value} onValueChange={setValue} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="amount.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmMoneyInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'amount',
+  imports: [BpdmMoneyInput],
+  template: `<bpdm-money-input currency="USD" locale="en-US" [(value)]="value" />`,
+})
+export class Amount {
+  readonly value = signal('1234.5');
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Currencies & locales
+
+The same stored amount renders differently per `currency` + `locale` — symbol, grouping, and
+decimal count all follow the locale (note `en-IN`'s `1,00,000` grouping and `JPY`'s zero decimals).
+
+<Preview>
+  <MoneyInputCurrenciesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="currencies.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function Currencies() {
+  return (
+    <div className="flex w-72 flex-col gap-3">
+      <MoneyInput currency="USD" locale="en-US" defaultValue="100000" /> {/* $100,000.00 */}
+      <MoneyInput currency="EUR" locale="de-DE" defaultValue="100000" /> {/* 100.000,00 € */}
+      <MoneyInput currency="INR" locale="en-IN" defaultValue="100000" /> {/* ₹1,00,000.00 */}
+      <MoneyInput currency="JPY" locale="ja-JP" defaultValue="100000" /> {/* ¥100,000 */}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="currencies.ts"
+import { Component } from '@angular/core';
+import { BpdmMoneyInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'currencies',
+  imports: [BpdmMoneyInput],
+  template: `
+    <div class="flex w-72 flex-col gap-3">
+      <bpdm-money-input currency="USD" locale="en-US" defaultValue="100000" />
+      <bpdm-money-input currency="EUR" locale="de-DE" defaultValue="100000" />
+      <bpdm-money-input currency="INR" locale="en-IN" defaultValue="100000" />
+      <bpdm-money-input currency="JPY" locale="ja-JP" defaultValue="100000" />
+    </div>
+  `,
+})
+export class Currencies {}
+```
+
+  </Tab>
+</Tabs>
+
+## Precision
+
+The stored value is a string folded through `bignumber.js`, so large amounts keep every digit — no
+float rounding, no exponential notation.
+
+<Preview>
+  <MoneyInputPrecisionDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="precision.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function Precision() {
+  return <MoneyInput currency="USD" locale="en-US" defaultValue="123456789012.34" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="precision.ts"
+import { Component } from '@angular/core';
+import { BpdmMoneyInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'precision',
+  imports: [BpdmMoneyInput],
+  template: `<bpdm-money-input currency="USD" locale="en-US" defaultValue="123456789012.34" />`,
+})
+export class Precision {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+`size` sets the height and text scale — `sm`, `md` (default), or `lg`.
+
+<Preview>
+  <MoneyInputSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function Sizes() {
+  return (
+    <div className="flex w-64 flex-col gap-3">
+      <MoneyInput size="sm" currency="USD" defaultValue="2500" />
+      <MoneyInput size="md" currency="USD" defaultValue="2500" />
+      <MoneyInput size="lg" currency="USD" defaultValue="2500" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmMoneyInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'sizes',
+  imports: [BpdmMoneyInput],
+  template: `
+    <div class="flex w-64 flex-col gap-3">
+      <bpdm-money-input size="sm" currency="USD" defaultValue="2500" />
+      <bpdm-money-input size="md" currency="USD" defaultValue="2500" />
+      <bpdm-money-input size="lg" currency="USD" defaultValue="2500" />
+    </div>
+  `,
+})
+export class Sizes {}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+`aria-invalid` turns the border destructive-red; `disabled` dims the field and blocks input.
+
+<Preview>
+  <MoneyInputStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function States() {
+  return (
+    <div className="flex flex-col gap-3">
+      <MoneyInput aria-invalid currency="USD" defaultValue="0" />
+      <MoneyInput disabled currency="USD" defaultValue="2500" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.ts"
+import { Component } from '@angular/core';
+import { BpdmMoneyInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'states',
+  imports: [BpdmMoneyInput],
+  template: `
+    <div class="flex flex-col gap-3">
+      <bpdm-money-input aria-invalid="true" currency="USD" defaultValue="0" />
+      <bpdm-money-input disabled currency="USD" defaultValue="2500" />
+    </div>
+  `,
+})
+export class States {}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+### `MoneyInput` / `bpdm-money-input`
+
+The stored value is always a raw numeric string (e.g. `"1234.50"`); only the display is formatted.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `currency` | `string` (ISO 4217) | `"USD"` | Currency code — sets the symbol and decimal count. |
+| `locale` | `string` (BCP 47) | `"en-US"` | Locale — sets grouping and symbol placement. |
+| `value` | `string` | — | Controlled value. React: pair with `onValueChange`. Angular: two-way `[(value)]`. |
+| `defaultValue` | `string` | `""` | Uncontrolled initial value. |
+| `onValueChange` *(React)* | `(value: string) => void` | — | Called with the raw numeric string on every change. |
+| `placeholder` | `string` | — | Placeholder shown when empty. |
+| `allowNegative` | `boolean` | `false` | Permit negative amounts. |
+| `size` | `sm \| md \| lg` | `md` | Height + text scale. |
+| `disabled` | `boolean` | `false` | Disable the field. |
+| `aria-invalid` | `boolean` | `false` | Invalid state — destructive border, announced by assistive tech. |
+| `id` | `string` | — | Field id (for `<label>` association). |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+
+## Accessibility
+
+- The currency symbol is a non-editable adornment (`select-none`, muted) — it isn't part of the
+  editable text, so screen readers announce only the amount.
+- The field uses `inputmode="decimal"`, so mobile shows a numeric keypad.
+- Invalid state is set with `aria-invalid` — it colours the border **and** is announced (never
+  colour-only).
+- Give the field a name — associate a `<label>` (via `htmlFor`/`id`) or add `aria-label`.
