@@ -19,7 +19,8 @@ control for accessibility. In React it's `<FloatLabel>` around any input; in Ang
 ## Usage
 
 Wrap a single control and give the label. Point `htmlFor` at the control's `id` so clicking the
-label focuses the field.
+label focuses the field — or omit it and a matching id is generated for you, so the label is always
+associated.
 
 <Preview>
   <FloatLabelUsageDemo />
@@ -193,3 +194,35 @@ export class StatesComponent {}
 
   </Tab>
 </Tabs>
+
+## API
+
+### `FloatLabel` / `bpdm-float-label`
+
+Wraps exactly one control (input / textarea / select). It sets a blank placeholder and the `peer`
+class on that control so the label can float via CSS — you don't wire anything up.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | — | **Required.** The floating label text. |
+| `htmlFor` | `string` | — | Id of the wrapped control. Omit it and a matching id is generated, so `<label for>` always resolves. |
+| `variant` | `over \| in \| on` | `over` | Label placement — above the field, inside near the top, or a notch on the border. |
+| `children` *(React)* / projected content *(Angular)* | element | — | The single control to wrap. |
+| `className` *(React)* | `string` | — | Extra classes on the wrapper. |
+
+In **React**, `FloatLabel` also spreads any extra native `<div>` props (`data-*`, `aria-*`,
+`style`, `id`, …) onto the wrapper. In **Angular**, style the host element directly.
+
+## Accessibility
+
+- The label is a real `<label>` associated with the control by `for`/`id`, so clicking it focuses
+  the field and assistive tech announces it as the field's **name**. The association is guaranteed:
+  the id comes from `htmlFor`, else the control's own `id`, else a generated one — it never dangles.
+- Because it's a true label (not a placeholder standing in for one), the field keeps its accessible
+  name even after the label floats away — unlike placeholder-only patterns, which lose the name as
+  soon as the user types.
+- The float is pure CSS (`peer` + `:placeholder-shown`); a blank placeholder is injected so an empty
+  field shows the resting label without a competing placeholder. Any real placeholder you set is
+  preserved.
+- State lives on the control, not the wrapper: set `disabled` or `aria-invalid` on the field and
+  pair `aria-invalid` with `aria-describedby` pointing at your error text.

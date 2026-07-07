@@ -6,13 +6,12 @@ import {
 } from "@bpdm/variants";
 import { cn } from "@/lib/utils";
 
-export interface FloatLabelProps {
+export interface FloatLabelProps extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
   label: string;
-  /** id of the wrapped control; the label's htmlFor points here. */
+  /** id of the wrapped control; the label's htmlFor points here. Auto-generated if omitted. */
   htmlFor?: string;
   /** over = floats above the field; in = top inside; on = notch on the border. */
   variant?: Variant;
-  className?: string;
   /** A single input-like control (needs to be the label's previous sibling). */
   children: React.ReactElement<{
     id?: string;
@@ -30,6 +29,10 @@ const floated = floatFloated;
  * a placeholder and floats up on focus or when filled. Drives entirely on CSS via
  * the `peer` + `:placeholder-shown` trick — the input gets `peer` and a blank
  * placeholder injected automatically.
+ *
+ * The label is always associated with the control: an id is taken from `htmlFor`,
+ * else the child's own `id`, else a generated one — so `<label for>` never dangles.
+ * Any extra props (`data-*`, `aria-*`, `style`, …) land on the wrapper.
  */
 export function FloatLabel({
   label,
@@ -37,8 +40,10 @@ export function FloatLabel({
   variant = "over",
   className,
   children,
+  ...rest
 }: FloatLabelProps) {
-  const id = htmlFor ?? children.props.id;
+  const generatedId = React.useId();
+  const id = htmlFor ?? children.props.id ?? generatedId;
   const control = React.cloneElement(children, {
     id,
     placeholder: children.props.placeholder ?? " ",
@@ -50,7 +55,7 @@ export function FloatLabel({
   });
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} {...rest}>
       {control}
       <label htmlFor={id} className={cn(resting, floated[variant])}>
         {label}
