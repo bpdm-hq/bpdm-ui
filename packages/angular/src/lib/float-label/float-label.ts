@@ -6,8 +6,12 @@ import {
   computed,
   inject,
   input,
+  signal,
 } from "@angular/core";
 import { cn, floatFloated, floatResting, type FloatLabelVariant } from "@bpdm/variants";
+
+/** Per-instance counter for a generated control id (guaranteed label association). */
+let floatUid = 0;
 
 /**
  * `<bpdm-float-label>` — wraps a single input/textarea; the label rests as a
@@ -27,17 +31,20 @@ import { cn, floatFloated, floatResting, type FloatLabelVariant } from "@bpdm/va
   host: { class: "relative block" },
   template: `
     <ng-content />
-    <label [attr.for]="htmlFor()" [class]="labelClass()">{{ label() }}</label>
+    <label [attr.for]="resolvedFor() ?? htmlFor()" [class]="labelClass()">{{ label() }}</label>
   `,
 })
 export class BpdmFloatLabel {
   readonly label = input.required<string>();
-  /** id of the wrapped control; the label's `for` points here. */
+  /** id of the wrapped control; the label's `for` points here. Auto-generated if omitted. */
   readonly htmlFor = input<string>();
   /** `over` floats above · `in` top-inside · `on` a notch on the border. */
   readonly variant = input<FloatLabelVariant>("over");
 
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** The id actually applied to the control + label after render (guarantees association). */
+  protected readonly resolvedFor = signal<string | undefined>(undefined);
 
   protected readonly labelClass = computed(() =>
     cn(floatResting, floatFloated[this.variant()]),
@@ -45,7 +52,8 @@ export class BpdmFloatLabel {
 
   constructor() {
     // mirror React's clone: give the wrapped control `peer` + a blank placeholder
-    // (so :placeholder-shown drives the float) without the consumer wiring it up
+    // (so :placeholder-shown drives the float), and guarantee `<label for>` matches
+    // the control's id — using htmlFor, else the control's own id, else a generated one
     afterNextRender(() => {
       const control = this.el.nativeElement.querySelector<HTMLInputElement>(
         "input, textarea, select",
@@ -54,6 +62,9 @@ export class BpdmFloatLabel {
       control.classList.add("peer");
       if (this.variant() === "in") control.classList.add("pt-4");
       if (!control.getAttribute("placeholder")) control.setAttribute("placeholder", " ");
+      const id = this.htmlFor() ?? control.getAttribute("id") ?? `bpdm-float-${(floatUid += 1)}`;
+      control.setAttribute("id", id);
+      this.resolvedFor.set(id);
     });
   }
 }
