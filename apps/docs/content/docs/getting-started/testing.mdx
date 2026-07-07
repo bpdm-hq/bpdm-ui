@@ -194,6 +194,139 @@ el.querySelector('input[name="price"]');
   </Tab>
 </Tabs>
 
+### Password Input
+
+The **Password Input** pairs an `<input>` with a labelled reveal `button` (`Show password` /
+`Hide password`) and a live strength label. A `type="password"` field exposes **no** `textbox`
+role, so target it by `data-testid` — in **React** props spread onto the input, so it lands there;
+in **Angular** query the `input` element. Drive the toggle by role.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="password.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<PasswordInput data-testid="pw" />);
+
+const field = screen.getByTestId('pw') as HTMLInputElement;
+expect(field).toHaveAttribute('type', 'password');
+
+// reveal via the labelled toggle
+await userEvent.click(screen.getByRole('button', { name: 'Show password' }));
+expect(field).toHaveAttribute('type', 'text');
+
+// the strength label is linked to the field via aria-describedby
+await userEvent.type(field, 'Abcd1234!xyz');
+const meterId = field.getAttribute('aria-describedby')!;
+expect(document.getElementById(meterId)).toHaveTextContent('Strong');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="password.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const field = el.querySelector('input') as HTMLInputElement;
+expect(field.type).toBe('password');
+
+el.querySelector<HTMLButtonElement>('button[aria-label="Show password"]')!.click();
+fixture.detectChanges();
+expect(field.type).toBe('text');
+// the strength label is exposed via aria-live and aria-describedby
+el.querySelector('[aria-live="polite"]');
+```
+
+  </Tab>
+</Tabs>
+
+### OTP Input
+
+The **OTP Input** is a `role="group"` (named by `aria-label`) wrapping one labelled `<input>` per
+cell (`Character N of M`). Query the group by role/name and the cells with `getAllByRole('textbox')`
+— no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="otp.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<InputOtp length={6} integerOnly aria-label="Verification code" />);
+
+screen.getByRole('group', { name: 'Verification code' });
+const cells = screen.getAllByRole('textbox');   // one per character
+expect(cells).toHaveLength(6);
+
+// typing auto-advances; paste fills every cell from any box
+await userEvent.type(cells[0], '1');
+expect(cells[1]).toHaveFocus();
+cells[0].focus();
+await userEvent.paste('123456');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="otp.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+el.querySelector('[role="group"]');                 // named by aria-label
+const cells = el.querySelectorAll('input');         // one per character
+expect(cells.length).toBe(6);
+
+// dispatch input on a cell, then detectChanges to advance
+cells[0].value = '1';
+cells[0].dispatchEvent(new Event('input'));
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
+### Secure Field
+
+The **Secure Field** wraps a text `<input>` (masked at rest) with labelled `Reveal` / `Hide` and
+`Copy` buttons. In **React** props spread onto the input, so `data-testid` / `name` / `aria-*` land
+there; in **Angular** query the `input`. Drive the controls by role, and assert the masked vs real
+display through the input's value.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="secret.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<SecureField data-testid="key" defaultValue="4242424242424242" format="grouped" unmaskedTail={4} />);
+
+const field = screen.getByTestId('key') as HTMLInputElement;
+expect(field.value).toBe('•••• •••• •••• 4242'); // masked at rest
+
+await userEvent.click(screen.getByRole('button', { name: 'Reveal' }));
+expect(field.value).toBe('4242 4242 4242 4242'); // revealed
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="secret.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const field = el.querySelector('input') as HTMLInputElement;
+expect(field.value).toBe('•••• •••• •••• 4242');
+
+el.querySelector<HTMLButtonElement>('button[aria-label="Reveal"]')!.click();
+fixture.detectChanges();
+expect(field.value).toBe('4242 4242 4242 4242');
+```
+
+  </Tab>
+</Tabs>
+
 ### Data Table
 
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —

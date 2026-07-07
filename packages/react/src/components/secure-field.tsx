@@ -62,7 +62,12 @@ function maskValue(formatted: string, tail: number) {
     .join("");
 }
 
-export interface SecureFieldProps extends VariantProps<typeof wrapVariants> {
+export interface SecureFieldProps
+  extends Omit<
+      React.ComponentProps<"input">,
+      "size" | "value" | "defaultValue" | "onChange" | "type" | "prefix"
+    >,
+    VariantProps<typeof wrapVariants> {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -74,11 +79,6 @@ export interface SecureFieldProps extends VariantProps<typeof wrapVariants> {
   revealable?: boolean;
   /** Show a copy-to-clipboard button. */
   copyable?: boolean;
-  placeholder?: string;
-  disabled?: boolean;
-  className?: string;
-  id?: string;
-  "aria-invalid"?: boolean;
 }
 
 /**
@@ -86,22 +86,31 @@ export interface SecureFieldProps extends VariantProps<typeof wrapVariants> {
  * Shows masked at rest with an optional visible tail, a reveal toggle, and an
  * optional copy button. Uses text + masking (not type=password) so password
  * managers don't hijack it. The real value is what you read/copy/onValueChange.
+ *
+ * Forwards its ref to the underlying `<input>` and spreads any extra native
+ * props (`name`, `required`, `readOnly`, `aria-describedby`, `data-*`, …) onto
+ * it. `className` styles the wrapper.
  */
-export function SecureField({
-  value,
-  defaultValue = "",
-  onValueChange,
-  format = "none",
-  unmaskedTail = 0,
-  revealable = true,
-  copyable = false,
-  placeholder,
-  size,
-  disabled,
-  className,
-  id,
-  "aria-invalid": ariaInvalid,
-}: SecureFieldProps) {
+export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
+  function SecureField(
+    {
+      value,
+      defaultValue = "",
+      onValueChange,
+      format = "none",
+      unmaskedTail = 0,
+      revealable = true,
+      copyable = false,
+      size,
+      disabled,
+      className,
+      "aria-invalid": ariaInvalid,
+      onFocus,
+      onBlur,
+      ...props
+    },
+    ref,
+  ) {
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue);
   const raw = isControlled ? (value ?? "") : internal;
@@ -151,7 +160,8 @@ export function SecureField({
       )}
     >
       <input
-        id={id}
+        ref={ref}
+        {...props}
         type="text"
         autoComplete="off"
         data-1p-ignore
@@ -159,10 +169,15 @@ export function SecureField({
         inputMode={format === "grouped" ? "numeric" : "text"}
         disabled={disabled}
         value={display}
-        placeholder={placeholder}
         aria-invalid={ariaInvalid}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
         onChange={onChange}
         className="w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
@@ -189,6 +204,11 @@ export function SecureField({
           <Eye off={revealed} />
         </button>
       )}
+      {copyable && (
+        <span className="sr-only" role="status" aria-live="polite">
+          {copied ? "Copied to clipboard" : ""}
+        </span>
+      )}
     </div>
   );
-}
+});

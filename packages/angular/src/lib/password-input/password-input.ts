@@ -28,6 +28,9 @@ const DEFAULT_LABELS: Record<number, string[]> = {
   5: ["Very weak", "Weak", "Fair", "Good", "Strong"],
 };
 
+/** Per-instance counter for a stable strength-meter id (aria-describedby). */
+let meterUid = 0;
+
 /**
  * `<bpdm-password-input>` — password input with a show/hide toggle and an
  * optional strength meter (segmented bar + label: Weak / Fair / Good / Strong).
@@ -49,10 +52,13 @@ const DEFAULT_LABELS: Record<number, string[]> = {
         <input
           [id]="id() || null"
           [type]="revealed() ? 'text' : 'password'"
+          [attr.name]="name() || null"
           [attr.autocomplete]="autoComplete() || null"
           [disabled]="disabled()"
           [value]="current()"
           [attr.placeholder]="placeholder() || null"
+          [attr.aria-label]="ariaLabel() || null"
+          [attr.aria-describedby]="describedBy()"
           [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
           (input)="value.set($any($event.target).value)"
           class="w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed"
@@ -75,14 +81,14 @@ const DEFAULT_LABELS: Record<number, string[]> = {
         </button>
       </div>
 
-      @if (feedback() && current().length > 0) {
+      @if (showMeter()) {
         <div class="mt-2">
           <div class="flex gap-1" aria-hidden="true">
             @for (i of segments(); track i) {
               <span [class]="'h-1 flex-1 rounded-full transition-colors ' + (i < filled() ? barColor() : 'bg-muted')"></span>
             }
           </div>
-          <p [class]="'mt-1 text-xs ' + textColor()" aria-live="polite">{{ meterLabel() }}</p>
+          <p [id]="meterId" [class]="'mt-1 text-xs ' + textColor()" aria-live="polite">{{ meterLabel() }}</p>
         </div>
       }
     </div>
@@ -108,12 +114,28 @@ export class BpdmPasswordInput {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
   readonly id = input<string>("");
+  /** Native `name` for form submission, forwarded to the inner `<input>`. */
+  readonly name = input<string>("");
+  /** Accessible name for the field, forwarded to the inner `<input>`. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** IDs of describing elements, merged with the strength meter's id. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+
+  /** Stable id linking the strength meter to the field via aria-describedby. */
+  protected readonly meterId = `bpdm-pw-strength-${(meterUid += 1)}`;
 
   protected readonly revealed = signal(false);
 
   protected readonly current = computed(() => {
     const v = this.value();
     return v === undefined ? this.defaultValue() : v;
+  });
+
+  protected readonly showMeter = computed(() => this.feedback() && this.current().length > 0);
+
+  protected readonly describedBy = computed(() => {
+    const parts = [this.ariaDescribedby(), this.showMeter() ? this.meterId : ""].filter(Boolean);
+    return parts.length ? parts.join(" ") : null;
   });
 
   private readonly rawScore = computed(() => {

@@ -285,3 +285,47 @@ export class StatesComponent {}
 
   </Tab>
 </Tabs>
+
+## API
+
+### `SecureField` / `bpdm-secure-field`
+
+`onValueChange` (React) and `[(value)]` (Angular) always give you the **real** value, never the
+masked display.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | — | Controlled value. React: pair with `onValueChange`. Angular: two-way `[(value)]`. |
+| `defaultValue` | `string` | `""` | Uncontrolled initial value. |
+| `onValueChange` *(React)* | `(value: string) => void` | — | Called with the real (unmasked) value on every change. |
+| `format` | `grouped \| none` | `none` | `grouped` chunks the value 4-4-4-4 and restricts input to digits. |
+| `unmaskedTail` | `number` | `0` | Characters kept visible while masked (e.g. `4` → `•••• •••• •••• 4242`). |
+| `revealable` | `boolean` | `true` | Show the reveal (eye) toggle. |
+| `copyable` | `boolean` | `false` | Show a copy-to-clipboard button. |
+| `size` | `sm \| md \| lg` | `md` | Height + text scale. |
+| `disabled` | `boolean` | `false` | Disable the field and its controls. |
+| `name` | `string` | — | Native `name` for form submission (forwarded to the `<input>`). |
+| `aria-invalid` | `boolean` | `false` | Invalid state — destructive border, announced by assistive tech. |
+| `aria-label` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the `<input>`. |
+| `id` | `string` | — | Field id (for `<label>` association). |
+| `placeholder` | `string` | — | Placeholder shown when empty. |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+
+In **React**, `SecureField` forwards its `ref` to the underlying `<input>` and spreads any other
+native `<input>` prop (`required`, `readOnly`, `data-*`, `onBlur`, …) onto it. In **Angular**,
+`name`, `aria-label`, and `aria-describedby` are dedicated inputs on `<bpdm-secure-field>`.
+
+## Accessibility
+
+- It's a standard text input with **visual** masking (not `type="password"`), so browser and
+  third-party password managers leave it alone (`data-1p-ignore` / `data-lpignore`). At rest the
+  input's value is the masked bullets, so a screen reader never reads the secret aloud until it's
+  revealed or focused.
+- The reveal control is a real `<button type="button">` with an `aria-label` (`Reveal` / `Hide`)
+  and `aria-pressed`; the eye glyph is `aria-hidden`.
+- The copy control is a labelled `<button>` (`Copy`); because the success tick is a visual-only
+  change, copying also announces **“Copied to clipboard”** through a polite live region.
+- `format="grouped"` sets `inputmode="numeric"` for a numeric keypad on mobile.
+- Invalid state is set with `aria-invalid` — it colours the border **and** is announced (never
+  colour-only). Pair it with `aria-describedby` pointing at your error text.
+- Give the field a name — associate a `<label>` (via `htmlFor`/`id`) or add `aria-label`.

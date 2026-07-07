@@ -44,7 +44,12 @@ const DEFAULT_LABELS: Record<number, string[]> = {
   5: ["Very weak", "Weak", "Fair", "Good", "Strong"],
 };
 
-export interface PasswordInputProps extends VariantProps<typeof wrapVariants> {
+export interface PasswordInputProps
+  extends Omit<
+      React.ComponentProps<"input">,
+      "size" | "value" | "defaultValue" | "onChange" | "type" | "prefix"
+    >,
+    VariantProps<typeof wrapVariants> {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -56,34 +61,37 @@ export interface PasswordInputProps extends VariantProps<typeof wrapVariants> {
   strength?: (value: string) => number;
   /** Labels per level (length = levels). Defaults provided for 3 / 4 / 5. */
   labels?: string[];
-  placeholder?: string;
-  disabled?: boolean;
-  autoComplete?: string;
-  className?: string;
-  id?: string;
-  "aria-invalid"?: boolean;
 }
 
 /**
  * Password input with a show/hide toggle and an optional strength meter
  * (segmented bar + label). Uses `type="password"` so password managers work.
+ *
+ * Forwards its ref to the underlying `<input>` and spreads any extra native
+ * props (`name`, `autoComplete`, `required`, `aria-describedby`, `data-*`, …)
+ * onto it, so it drops into forms and test harnesses unchanged. `className`
+ * styles the outer wrapper. When the strength meter is visible it is linked to
+ * the field via `aria-describedby`.
  */
-export function PasswordInput({
-  value,
-  defaultValue = "",
-  onValueChange,
-  feedback = true,
-  levels = 4,
-  strength,
-  labels,
-  placeholder,
-  size,
-  disabled,
-  autoComplete,
-  className,
-  id,
-  "aria-invalid": ariaInvalid,
-}: PasswordInputProps) {
+export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  function PasswordInput(
+    {
+      value,
+      defaultValue = "",
+      onValueChange,
+      feedback = true,
+      levels = 4,
+      strength,
+      labels,
+      size,
+      disabled,
+      className,
+      "aria-invalid": ariaInvalid,
+      "aria-describedby": ariaDescribedBy,
+      ...props
+    },
+    ref,
+  ) {
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue);
   const val = isControlled ? (value ?? "") : internal;
@@ -111,6 +119,11 @@ export function PasswordInput({
     onValueChange?.(s);
   };
 
+  const showMeter = feedback && val.length > 0;
+  const meterId = React.useId();
+  const describedBy =
+    [ariaDescribedBy, showMeter ? meterId : undefined].filter(Boolean).join(" ") || undefined;
+
   return (
     <div className={cn("w-full", className)}>
       <div
@@ -118,13 +131,13 @@ export function PasswordInput({
         className={cn(wrapVariants({ size }), disabled && "cursor-not-allowed opacity-50")}
       >
         <input
-          id={id}
+          ref={ref}
+          {...props}
           type={revealed ? "text" : "password"}
-          autoComplete={autoComplete}
           disabled={disabled}
           value={val}
-          placeholder={placeholder}
           aria-invalid={ariaInvalid}
+          aria-describedby={describedBy}
           onChange={(e) => setVal(e.target.value)}
           className="w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed"
         />
@@ -140,7 +153,7 @@ export function PasswordInput({
         </button>
       </div>
 
-      {feedback && val.length > 0 && (
+      {showMeter && (
         <div className="mt-2">
           <div className="flex gap-1" aria-hidden>
             {Array.from({ length: levels }, (_, i) => (
@@ -153,11 +166,11 @@ export function PasswordInput({
               />
             ))}
           </div>
-          <p className={cn("mt-1 text-xs", textColor)} aria-live="polite">
+          <p id={meterId} className={cn("mt-1 text-xs", textColor)} aria-live="polite">
             {meterLabel}
           </p>
         </div>
       )}
     </div>
   );
-}
+});
