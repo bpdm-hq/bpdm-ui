@@ -78,7 +78,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {showCount && (
           <div
             id={countId}
-            className="mt-1 text-right text-xs tabular-nums text-muted-foreground"
+            className="mt-1 text-end text-xs tabular-nums text-muted-foreground"
           >
             {count}
             {maxLength != null ? ` / ${maxLength}` : ""}

@@ -48,7 +48,7 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
         (focus)="onFocus($any($event.target))"
         (blur)="onBlur()"
         (input)="onInput($any($event.target).value)"
-        class="w-full min-w-0 bg-transparent text-right tabular-nums focus:outline-none disabled:cursor-not-allowed"
+        class="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
     </div>
   `,

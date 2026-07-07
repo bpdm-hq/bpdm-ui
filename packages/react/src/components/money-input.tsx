@@ -146,7 +146,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
           const v = e.target.value;
           if (v === "" || pattern.test(v)) setRaw(v);
         }}
-        className="w-full min-w-0 bg-transparent text-right tabular-nums focus:outline-none disabled:cursor-not-allowed"
+        className="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
     </div>
   );

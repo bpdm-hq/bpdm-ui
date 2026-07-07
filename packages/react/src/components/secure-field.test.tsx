@@ -73,4 +73,12 @@ describe("SecureField", () => {
     expect(btn("Reveal")).toBeDisabled();
     expect(btn("Copy")).toBeDisabled();
   });
+
+  it("allows translating the control labels via messages", () => {
+    render(
+      <SecureField data-testid="sf" copyable messages={{ reveal: "Révéler", copy: "Copier" }} />,
+    );
+    expect(screen.getByRole("button", { name: "Révéler" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copier" })).toBeInTheDocument();
+  });
 });

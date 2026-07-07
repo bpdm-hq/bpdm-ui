@@ -1,0 +1,160 @@
+---
+title: Internationalization
+description: Translating built-in labels, right-to-left (RTL) support, and locale-aware formatting across bpdm/ui form components — React (@bpdm/ui) and Angular (@bpdm/ng).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+bpdm/ui form components adapt to internationalized apps three ways: their built-in
+screen-reader strings are **translatable**, their layout is **right-to-left safe**, and
+value formatting is **locale-aware** where it applies.
+
+## Translating labels
+
+A few components render their own screen-reader text (button labels, live announcements).
+These default to English but are fully overridable — pass your translated strings and nothing
+else changes. In React it's a `messages` object (merged over the defaults); in Angular it's a
+`messages` input, except the OTP per-cell label which is a function.
+
+| Component | Prop | Default strings |
+| --- | --- | --- |
+| [Number Input](/docs/form/number-input) | `messages={{ increase, decrease }}` | `Increase` · `Decrease` |
+| [Password Input](/docs/form/password-input) | `messages={{ show, hide }}` (strength via `labels`) | `Show password` · `Hide password` |
+| [Secure Field](/docs/form/secure-field) | `messages={{ reveal, hide, copy, copied }}` | `Reveal` · `Hide` · `Copy` · `Copied to clipboard` |
+| [OTP Input](/docs/form/input-otp) | `aria-label` (group) + `cellLabel={(i, n) => …}` (per cell) | `One-time code` · `Character N of M` |
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="secret-fr.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function FrenchSecrets() {
+  return (
+    <>
+      <SecureField
+        copyable
+        messages={{ reveal: 'Révéler', hide: 'Masquer', copy: 'Copier', copied: 'Copié' }}
+      />
+      <InputOtp
+        length={6}
+        integerOnly
+        aria-label="Code de vérification"
+        cellLabel={(i, n) => `Chiffre ${i + 1} sur ${n}`}
+      />
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="secret-fr.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField, BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-french-secrets',
+  standalone: true,
+  imports: [BpdmSecureField, BpdmInputOtp],
+  template: `
+    <bpdm-secure-field copyable [messages]="secretMessages" />
+    <bpdm-input-otp
+      [length]="6"
+      integerOnly
+      aria-label="Code de vérification"
+      [cellLabel]="cellLabel" />
+  `,
+})
+export class FrenchSecretsComponent {
+  readonly secretMessages = { reveal: 'Révéler', hide: 'Masquer', copy: 'Copier', copied: 'Copié' };
+  readonly cellLabel = (i: number, n: number) => `Chiffre ${i + 1} sur ${n}`;
+}
+```
+
+  </Tab>
+</Tabs>
+
+Wire these to your i18n library (react-i18next, `@angular/localize`, etc.) by passing the
+translated values through — the components hold no message catalogue of their own.
+
+## Right-to-left (RTL)
+
+Every form component is built with CSS **logical properties** (`padding-inline`, `text-start`,
+`inset-inline`, logical border-radius) rather than physical `left`/`right`. So they mirror
+automatically inside a right-to-left context — set `dir="rtl"` on an ancestor and icons, affixes,
+alignment, and the connected OTP rounding all flip correctly. No component prop is required.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="rtl.tsx"
+import { Input } from '@bpdm/ui/input';
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function ArabicForm() {
+  return (
+    <div dir="rtl">
+      <Input startIcon={<SearchIcon />} placeholder="بحث" />
+      <MoneyInput currency="AED" locale="ar-AE" defaultValue="2500" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="rtl.html"
+<div dir="rtl">
+  <input bpdmInput placeholder="بحث" />
+  <bpdm-money-input currency="AED" locale="ar-AE" defaultValue="2500" />
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  One caveat: the OTP Input's **←/→ arrow keys** move by physical direction, not writing
+  direction, so in RTL they step opposite to the visual order. Typing, backspace, and
+  paste-to-fill are unaffected. Everything else mirrors cleanly.
+</Callout>
+
+## Locale-aware formatting
+
+The [Money Input](/docs/form/money-input) formats through the platform `Intl.NumberFormat`, so a
+single stored amount renders with the right grouping, symbol, and decimal count per `currency` +
+`locale` — `en-IN` groups as `1,00,000`, `de-DE` as `100.000,00 €`, `JPY` shows no decimals. The
+value you read back stays a precise numeric string.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="amounts.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function Amounts() {
+  return (
+    <>
+      <MoneyInput currency="INR" locale="en-IN" defaultValue="100000" /> {/* ₹1,00,000.00 */}
+      <MoneyInput currency="EUR" locale="de-DE" defaultValue="100000" /> {/* 100.000,00 € */}
+      <MoneyInput currency="JPY" locale="ja-JP" defaultValue="100000" /> {/* ￥100,000 */}
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="amounts.html"
+<bpdm-money-input currency="INR" locale="en-IN" defaultValue="100000" />
+<bpdm-money-input currency="EUR" locale="de-DE" defaultValue="100000" />
+<bpdm-money-input currency="JPY" locale="ja-JP" defaultValue="100000" />
+```
+
+  </Tab>
+</Tabs>

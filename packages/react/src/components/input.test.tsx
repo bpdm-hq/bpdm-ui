@@ -66,8 +66,8 @@ describe("Input", () => {
       />,
     );
     const input = screen.getByTestId("i");
-    expect(input).toHaveClass("pl-9");
-    expect(input).toHaveClass("pr-9");
+    expect(input).toHaveClass("ps-9"); // logical padding (RTL-safe)
+    expect(input).toHaveClass("pe-9");
     // decorative icon wrappers are removed from the accessibility tree
     expect(screen.getByTestId("start").closest("span")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByTestId("end").closest("span")).toHaveAttribute("aria-hidden", "true");

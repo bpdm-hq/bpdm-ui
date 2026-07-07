@@ -84,7 +84,7 @@ const BASE_CELL =
                 data-lpignore="true"
                 maxlength="1"
                 [disabled]="disabled()"
-                [attr.aria-label]="'Character ' + (cell.i + 1) + ' of ' + length()"
+                [attr.aria-label]="cellLabel()(cell.i, length())"
                 [value]="cells()[cell.i]"
                 [style.-webkit-text-security]="mask() ? 'disc' : null"
                 [class]="cellClass(cell)"
@@ -118,7 +118,7 @@ const BASE_CELL =
             data-lpignore="true"
             maxlength="1"
             [disabled]="disabled()"
-            [attr.aria-label]="'Character ' + (cell.i + 1) + ' of ' + length()"
+            [attr.aria-label]="cellLabel()(cell.i, length())"
             [value]="cells()[cell.i]"
             [style.-webkit-text-security]="mask() ? 'disc' : null"
             [class]="cellClass(cell)"
@@ -162,6 +162,10 @@ export class BpdmInputOtp {
   readonly id = input<string>("");
   readonly ariaLabel = input<string>("One-time code", { alias: "aria-label" });
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  /** Per-cell screen-reader label. Override for i18n. Default: `Character N of M`. */
+  readonly cellLabel = input<(index: number, length: number) => string>(
+    (index, len) => `Character ${index + 1} of ${len}`,
+  );
   /** Fired once every cell is filled — handy for auto-submit. */
   readonly complete = output<string>();
 
@@ -207,9 +211,9 @@ export class BpdmInputOtp {
       this.isGrouped()
         ? cn(
             "rounded-none",
-            !cell.isFirst && "-ml-px",
-            cell.isFirst && "rounded-l-[var(--radius)]",
-            cell.isLast && "rounded-r-[var(--radius)]",
+            !cell.isFirst && "-ms-px",
+            cell.isFirst && "rounded-s-[var(--radius)]",
+            cell.isLast && "rounded-e-[var(--radius)]",
           )
         : "rounded-[var(--radius)]",
     );

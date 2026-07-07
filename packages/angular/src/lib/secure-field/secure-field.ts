@@ -72,7 +72,7 @@ function maskValue(formatted: string, tail: number): string {
       @if (copyable()) {
         <button
           type="button"
-          aria-label="Copy"
+          [attr.aria-label]="t().copy"
           [disabled]="disabled() || !current()"
           (click)="copy()"
           [class]="btnClass"
@@ -92,7 +92,7 @@ function maskValue(formatted: string, tail: number): string {
       @if (revealable()) {
         <button
           type="button"
-          [attr.aria-label]="revealed() ? 'Hide' : 'Reveal'"
+          [attr.aria-label]="revealed() ? t().hide : t().reveal"
           [attr.aria-pressed]="revealed()"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
@@ -109,7 +109,7 @@ function maskValue(formatted: string, tail: number): string {
       }
       @if (copyable()) {
         <span class="sr-only" role="status" aria-live="polite">{{
-          copied() ? "Copied to clipboard" : ""
+          copied() ? t().copied : ""
         }}</span>
       }
     </div>
@@ -140,6 +140,16 @@ export class BpdmSecureField {
   readonly ariaLabel = input<string>("", { alias: "aria-label" });
   /** IDs of describing elements, forwarded to the inner `<input>`. */
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  /** Override the control labels + copy announcement (screen-reader text) for i18n. */
+  readonly messages = input<{ reveal?: string; hide?: string; copy?: string; copied?: string }>({});
+
+  protected readonly t = computed(() => ({
+    reveal: "Reveal",
+    hide: "Hide",
+    copy: "Copy",
+    copied: "Copied to clipboard",
+    ...this.messages(),
+  }));
 
   protected readonly revealed = signal(false);
   protected readonly focused = signal(false);

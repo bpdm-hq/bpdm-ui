@@ -65,7 +65,7 @@ let meterUid = 0;
         />
         <button
           type="button"
-          [attr.aria-label]="revealed() ? 'Hide password' : 'Show password'"
+          [attr.aria-label]="revealed() ? t().hide : t().show"
           [attr.aria-pressed]="revealed()"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
@@ -120,6 +120,14 @@ export class BpdmPasswordInput {
   readonly ariaLabel = input<string>("", { alias: "aria-label" });
   /** IDs of describing elements, merged with the strength meter's id. */
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  /** Override the reveal-toggle labels (screen-reader text) for i18n. */
+  readonly messages = input<{ show?: string; hide?: string }>({});
+
+  protected readonly t = computed(() => ({
+    show: "Show password",
+    hide: "Hide password",
+    ...this.messages(),
+  }));
 
   /** Stable id linking the strength meter to the field via aria-describedby. */
   protected readonly meterId = `bpdm-pw-strength-${(meterUid += 1)}`;

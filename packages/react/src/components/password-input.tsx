@@ -61,7 +61,11 @@ export interface PasswordInputProps
   strength?: (value: string) => number;
   /** Labels per level (length = levels). Defaults provided for 3 / 4 / 5. */
   labels?: string[];
+  /** Override the reveal-toggle labels (screen-reader text) for i18n. */
+  messages?: { show?: string; hide?: string };
 }
+
+const DEFAULT_MESSAGES = { show: "Show password", hide: "Hide password" };
 
 /**
  * Password input with a show/hide toggle and an optional strength meter
@@ -88,10 +92,12 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
       className,
       "aria-invalid": ariaInvalid,
       "aria-describedby": ariaDescribedBy,
+      messages,
       ...props
     },
     ref,
   ) {
+  const t = { ...DEFAULT_MESSAGES, ...messages };
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue);
   const val = isControlled ? (value ?? "") : internal;
@@ -143,7 +149,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
         />
         <button
           type="button"
-          aria-label={revealed ? "Hide password" : "Show password"}
+          aria-label={revealed ? t.hide : t.show}
           aria-pressed={revealed}
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}

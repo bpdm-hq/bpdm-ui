@@ -55,7 +55,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
       @if (buttonLayout() === "horizontal") {
         <button
           type="button"
-          aria-label="Decrease"
+          [attr.aria-label]="t().decrease"
           [disabled]="disabled() || atMin()"
           (click)="step1(-1)"
           [class]="btnClass('dec', dims().btn + ' border-r border-input')"
@@ -87,7 +87,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
       @if (buttonLayout() === "horizontal") {
         <button
           type="button"
-          aria-label="Increase"
+          [attr.aria-label]="t().increase"
           [disabled]="disabled() || atMax()"
           (click)="step1(1)"
           [class]="btnClass('inc', dims().btn + ' border-l border-input')"
@@ -100,7 +100,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
         <div class="flex w-7 flex-col border-l border-input">
           <button
             type="button"
-            aria-label="Increase"
+            [attr.aria-label]="t().increase"
             [disabled]="disabled() || atMax()"
             (click)="step1(1)"
             [class]="btnClass('inc', 'flex-1')"
@@ -111,7 +111,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           </button>
           <button
             type="button"
-            aria-label="Decrease"
+            [attr.aria-label]="t().decrease"
             [disabled]="disabled() || atMin()"
             (click)="step1(-1)"
             [class]="btnClass('dec', 'flex-1 border-t border-input')"
@@ -142,6 +142,14 @@ export class BpdmNumberInput {
   readonly suffix = input<string>("");
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Override the stepper button labels (screen-reader text) for i18n. */
+  readonly messages = input<{ increase?: string; decrease?: string }>({});
+
+  protected readonly t = computed(() => ({
+    increase: "Increase",
+    decrease: "Decrease",
+    ...this.messages(),
+  }));
 
   protected readonly glyph = GLYPH;
   protected readonly dims = computed(() => dims[this.size()]);
@@ -192,7 +200,7 @@ export class BpdmNumberInput {
   protected readonly inputClass = computed(() =>
     cn(
       "w-full min-w-0 border-0 bg-transparent text-foreground tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-      this.buttonLayout() === "horizontal" ? "text-center" : "text-left",
+      this.buttonLayout() === "horizontal" ? "text-center" : "text-start",
       this.dims().text,
     ),
   );

@@ -79,7 +79,16 @@ export interface SecureFieldProps
   revealable?: boolean;
   /** Show a copy-to-clipboard button. */
   copyable?: boolean;
+  /** Override the control labels + copy announcement (screen-reader text) for i18n. */
+  messages?: { reveal?: string; hide?: string; copy?: string; copied?: string };
 }
+
+const DEFAULT_MESSAGES = {
+  reveal: "Reveal",
+  hide: "Hide",
+  copy: "Copy",
+  copied: "Copied to clipboard",
+};
 
 /**
  * Masked input for sensitive values (API keys, secrets, license keys, tokens).
@@ -107,10 +116,12 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
       "aria-invalid": ariaInvalid,
       onFocus,
       onBlur,
+      messages,
       ...props
     },
     ref,
   ) {
+  const t = { ...DEFAULT_MESSAGES, ...messages };
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue);
   const raw = isControlled ? (value ?? "") : internal;
@@ -184,7 +195,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
       {copyable && (
         <button
           type="button"
-          aria-label="Copy"
+          aria-label={t.copy}
           disabled={disabled || !raw}
           onClick={copy}
           className={cn(btn)}
@@ -195,7 +206,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
       {revealable && (
         <button
           type="button"
-          aria-label={revealed ? "Hide" : "Reveal"}
+          aria-label={revealed ? t.hide : t.reveal}
           aria-pressed={revealed}
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
@@ -206,7 +217,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
       )}
       {copyable && (
         <span className="sr-only" role="status" aria-live="polite">
-          {copied ? "Copied to clipboard" : ""}
+          {copied ? t.copied : ""}
         </span>
       )}
     </div>
