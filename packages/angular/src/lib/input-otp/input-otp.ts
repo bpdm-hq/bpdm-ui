@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
@@ -6,6 +7,7 @@ import {
   ElementRef,
   input,
   model,
+  output,
   viewChildren,
 } from "@angular/core";
 import { cn } from "@bpdm/variants";
@@ -60,10 +62,16 @@ const BASE_CELL =
   host: { class: "inline-flex" },
   template: `
     @if (isGrouped()) {
-      <div role="group" [attr.aria-label]="ariaLabel()" class="flex items-center gap-3">
+      <div
+        role="group"
+        [id]="id() || null"
+        [attr.aria-label]="ariaLabel()"
+        [attr.aria-describedby]="ariaDescribedby() || null"
+        class="flex items-center gap-3"
+      >
         @for (group of groups(); track groupIndex; let groupIndex = $index) {
           @if (groupIndex > 0) {
-            <span class="select-none px-1 text-muted-foreground">{{ separator() }}</span>
+            <span aria-hidden="true" class="select-none px-1 text-muted-foreground">{{ separator() }}</span>
           }
           <div class="flex items-center">
             @for (cell of group; track cell.i) {
@@ -76,7 +84,7 @@ const BASE_CELL =
                 data-lpignore="true"
                 maxlength="1"
                 [disabled]="disabled()"
-                [attr.aria-label]="'Character ' + (cell.i + 1)"
+                [attr.aria-label]="'Character ' + (cell.i + 1) + ' of ' + length()"
                 [value]="cells()[cell.i]"
                 [style.-webkit-text-security]="mask() ? 'disc' : null"
                 [class]="cellClass(cell)"
@@ -88,9 +96,18 @@ const BASE_CELL =
             }
           </div>
         }
+        @if (name()) {
+          <input type="hidden" [attr.name]="name()" [value]="cells().join('')" />
+        }
       </div>
     } @else {
-      <div role="group" [attr.aria-label]="ariaLabel()" class="flex items-center gap-2">
+      <div
+        role="group"
+        [id]="id() || null"
+        [attr.aria-label]="ariaLabel()"
+        [attr.aria-describedby]="ariaDescribedby() || null"
+        class="flex items-center gap-2"
+      >
         @for (cell of groups()[0]; track cell.i) {
           <input
             #cellInput
@@ -101,7 +118,7 @@ const BASE_CELL =
             data-lpignore="true"
             maxlength="1"
             [disabled]="disabled()"
-            [attr.aria-label]="'Character ' + (cell.i + 1)"
+            [attr.aria-label]="'Character ' + (cell.i + 1) + ' of ' + length()"
             [value]="cells()[cell.i]"
             [style.-webkit-text-security]="mask() ? 'disc' : null"
             [class]="cellClass(cell)"
@@ -110,6 +127,9 @@ const BASE_CELL =
             (paste)="onPaste($event)"
             (focus)="$any($event.target).select()"
           />
+        }
+        @if (name()) {
+          <input type="hidden" [attr.name]="name()" [value]="cells().join('')" />
         }
       </div>
     }
@@ -134,9 +154,24 @@ export class BpdmInputOtp {
   /** Character shown between groups. */
   readonly separator = input<string>("−");
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Focus the first cell on mount. */
+  readonly autoFocus = input(false, { transform: booleanAttribute });
+  /** Emits the joined value under this `name` via a hidden input for native form submission. */
+  readonly name = input<string>("");
+  /** Group id (for label association / testing). */
+  readonly id = input<string>("");
   readonly ariaLabel = input<string>("One-time code", { alias: "aria-label" });
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  /** Fired once every cell is filled — handy for auto-submit. */
+  readonly complete = output<string>();
 
   private readonly cellInputs = viewChildren<ElementRef<HTMLInputElement>>("cellInput");
+
+  constructor() {
+    afterNextRender(() => {
+      if (this.autoFocus()) this.cellInputs()[0]?.nativeElement.focus();
+    });
+  }
 
   protected readonly isGrouped = computed(
     () => (!!this.groupSize() && this.groupSize()! > 0) || this.grouped(),
@@ -226,7 +261,11 @@ export class BpdmInputOtp {
   }
 
   private commit(next: string[]): void {
-    this.value.set(next.join(""));
+    const joined = next.join("");
+    this.value.set(joined);
+    if (next.length === this.length() && next.every((c) => c.length === 1)) {
+      this.complete.emit(joined);
+    }
   }
 
   private focusCell(i: number): void {

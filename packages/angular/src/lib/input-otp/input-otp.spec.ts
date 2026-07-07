@@ -16,6 +16,23 @@ class HostComponent {
 })
 class GroupedHost {}
 
+@Component({
+  imports: [BpdmInputOtp],
+  template: `
+    <bpdm-input-otp
+      [length]="4"
+      integerOnly
+      name="code"
+      aria-describedby="hint"
+      [(value)]="code"
+      (complete)="done.set($event)" />
+  `,
+})
+class CompleteHost {
+  readonly code = signal<string>("");
+  readonly done = signal<string | null>(null);
+}
+
 describe("BpdmInputOtp", () => {
   const cells = (f: { nativeElement: HTMLElement }) =>
     Array.from(f.nativeElement.querySelectorAll("input")) as HTMLInputElement[];
@@ -55,11 +72,32 @@ describe("BpdmInputOtp", () => {
     expect(document.activeElement).toBe(inputs[1]);
   });
 
-  it("renders 6 cells in two balanced groups when grouped", () => {
+  it("renders 6 cells in two balanced groups with a decorative separator when grouped", () => {
     const fixture = TestBed.createComponent(GroupedHost);
     fixture.detectChanges();
     expect(cells(fixture).length).toBe(6);
     const groups = fixture.nativeElement.querySelectorAll('[role="group"] > div.flex.items-center');
     expect(groups.length).toBe(2);
+    expect(fixture.nativeElement.querySelector('span[aria-hidden="true"]')).toBeTruthy();
+  });
+
+  it("fires (complete), forwards name via a hidden input, and links aria-describedby", () => {
+    const fixture = TestBed.createComponent(CompleteHost);
+    fixture.detectChanges();
+    const inputs = cells(fixture);
+    ["1", "2", "3", "4"].forEach((ch, i) => {
+      type(inputs[i], ch);
+      fixture.detectChanges();
+    });
+    expect(fixture.componentInstance.code()).toBe("1234");
+    expect(fixture.componentInstance.done()).toBe("1234");
+
+    const hidden = fixture.nativeElement.querySelector(
+      'input[type="hidden"][name="code"]',
+    ) as HTMLInputElement;
+    expect(hidden.value).toBe("1234");
+    expect(fixture.nativeElement.querySelector('[role="group"]').getAttribute("aria-describedby")).toBe(
+      "hint",
+    );
   });
 });

@@ -20,6 +20,18 @@ class StrongHost {}
 })
 class NoFeedbackHost {}
 
+@Component({
+  imports: [BpdmPasswordInput],
+  template: `
+    <bpdm-password-input
+      name="pw"
+      aria-label="Password"
+      aria-describedby="hint"
+      defaultValue="Abcd1234!" />
+  `,
+})
+class PassthroughHost {}
+
 describe("scorePassword", () => {
   it("scores from length + variety, capped at 4", () => {
     expect(scorePassword("")).toBe(0);
@@ -53,5 +65,18 @@ describe("BpdmPasswordInput", () => {
     const fixture = TestBed.createComponent(NoFeedbackHost);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[aria-live="polite"]')).toBeNull();
+  });
+
+  it("forwards name / aria-label and links the meter to the field via aria-describedby", () => {
+    const fixture = TestBed.createComponent(PassthroughHost);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector("input") as HTMLInputElement;
+    const meter = fixture.nativeElement.querySelector('[aria-live="polite"]') as HTMLElement;
+    expect(input.getAttribute("name")).toBe("pw");
+    expect(input.getAttribute("aria-label")).toBe("Password");
+    // caller-supplied id is preserved and the meter id is appended
+    const describedBy = input.getAttribute("aria-describedby") ?? "";
+    expect(describedBy.startsWith("hint ")).toBe(true);
+    expect(describedBy).toContain(meter.id);
   });
 });

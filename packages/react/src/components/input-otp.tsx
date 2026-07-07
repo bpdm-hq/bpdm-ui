@@ -9,6 +9,10 @@ export interface InputOtpProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
+  /** Fired once every cell is filled — handy for auto-submit. */
+  onComplete?: (value: string) => void;
+  /** Focus the first cell on mount. */
+  autoFocus?: boolean;
   /** Hide characters (one-time PINs). */
   mask?: boolean;
   /** Restrict input to digits 0-9. */
@@ -22,7 +26,12 @@ export interface InputOtpProps {
   separator?: React.ReactNode;
   disabled?: boolean;
   className?: string;
+  /** Emits the joined value under this `name` via a hidden input for native form submission. */
+  name?: string;
+  /** Group id (for label association / testing). */
+  id?: string;
   "aria-label"?: string;
+  "aria-describedby"?: string;
 }
 
 const cellSize: Record<Size, string> = {
@@ -62,6 +71,8 @@ export function InputOtp({
   value,
   defaultValue = "",
   onValueChange,
+  onComplete,
+  autoFocus,
   mask = false,
   integerOnly = false,
   size = "md",
@@ -70,7 +81,10 @@ export function InputOtp({
   separator = "−",
   disabled,
   className,
+  name,
+  id,
   "aria-label": ariaLabel = "One-time code",
+  "aria-describedby": ariaDescribedBy,
 }: InputOtpProps) {
   const refs = React.useRef<(HTMLInputElement | null)[]>([]);
   const isControlled = value !== undefined;
@@ -86,11 +100,19 @@ export function InputOtp({
 
   const commit = (next: string[]) => {
     if (!isControlled) setInternal(next);
-    onValueChange?.(next.join(""));
+    const joined = next.join("");
+    onValueChange?.(joined);
+    if (next.length === length && next.every((c) => c.length === 1)) onComplete?.(joined);
   };
 
   const focusCell = (i: number) =>
     refs.current[Math.max(0, Math.min(length - 1, i))]?.focus();
+
+  React.useEffect(() => {
+    if (autoFocus) refs.current[0]?.focus();
+    // focus once on mount when requested
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (i: number, raw: string) => {
     const ch = raw.slice(-1);
@@ -152,7 +174,7 @@ export function InputOtp({
       data-lpignore="true"
       maxLength={1}
       disabled={disabled}
-      aria-label={`Character ${i + 1}`}
+      aria-label={`Character ${i + 1} of ${length}`}
       value={cells[i]}
       onChange={(e) => handleChange(i, e.target.value)}
       onKeyDown={(e) => handleKeyDown(i, e)}
@@ -177,14 +199,21 @@ export function InputOtp({
     />
   );
 
+  const hiddenField = name ? (
+    <input type="hidden" name={name} value={cells.join("")} />
+  ) : null;
+
   if (!isGrouped) {
     return (
       <div
         role="group"
+        id={id}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
         className={cn("flex items-center gap-2", className)}
       >
         {cells.map((_, i) => renderCell(i, false, false))}
+        {hiddenField}
       </div>
     );
   }
@@ -195,7 +224,9 @@ export function InputOtp({
   return (
     <div
       role="group"
+      id={id}
       aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
       className={cn("flex items-center gap-3", className)}
     >
       {sizes.map((sz, g) => {
@@ -204,7 +235,7 @@ export function InputOtp({
         return (
           <React.Fragment key={g}>
             {g > 0 && (
-              <span className="select-none px-1 text-muted-foreground">
+              <span aria-hidden className="select-none px-1 text-muted-foreground">
                 {separator}
               </span>
             )}
@@ -216,6 +247,7 @@ export function InputOtp({
           </React.Fragment>
         );
       })}
+      {hiddenField}
     </div>
   );
 }

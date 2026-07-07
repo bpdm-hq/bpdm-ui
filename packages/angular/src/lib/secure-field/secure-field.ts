@@ -59,7 +59,10 @@ function maskValue(formatted: string, tail: number): string {
         [attr.inputmode]="format() === 'grouped' ? 'numeric' : 'text'"
         [disabled]="disabled()"
         [value]="display()"
+        [attr.name]="name() || null"
         [attr.placeholder]="placeholder() || null"
+        [attr.aria-label]="ariaLabel() || null"
+        [attr.aria-describedby]="ariaDescribedby() || null"
         [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
         (focus)="focused.set(true)"
         (blur)="focused.set(false)"
@@ -104,6 +107,11 @@ function maskValue(formatted: string, tail: number): string {
           </svg>
         </button>
       }
+      @if (copyable()) {
+        <span class="sr-only" role="status" aria-live="polite">{{
+          copied() ? "Copied to clipboard" : ""
+        }}</span>
+      }
     </div>
   `,
 })
@@ -126,6 +134,12 @@ export class BpdmSecureField {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
   readonly id = input<string>("");
+  /** Native `name` for form submission, forwarded to the inner `<input>`. */
+  readonly name = input<string>("");
+  /** Accessible name for the field, forwarded to the inner `<input>`. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** IDs of describing elements, forwarded to the inner `<input>`. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
 
   protected readonly revealed = signal(false);
   protected readonly focused = signal(false);

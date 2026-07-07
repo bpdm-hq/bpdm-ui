@@ -38,15 +38,25 @@ export function Verify() {
 }
 ```
 
-For a controlled field, pass `value` and `onValueChange` — fire your check when it's full:
+For a controlled field, pass `value` and `onValueChange` — and use `onComplete` to fire your check
+the moment every box is filled (`autoFocus` puts the cursor in the first box on mount):
 
 ```tsx title="controlled.tsx"
 import { useState } from 'react';
 import { InputOtp } from '@bpdm/ui/input-otp';
 
-export function Controlled() {
+export function Controlled({ onVerify }: { onVerify: (code: string) => void }) {
   const [code, setCode] = useState('');
-  return <InputOtp length={6} integerOnly value={code} onValueChange={setCode} />;
+  return (
+    <InputOtp
+      length={6}
+      integerOnly
+      autoFocus
+      value={code}
+      onValueChange={setCode}
+      onComplete={onVerify}
+    />
+  );
 }
 ```
 
@@ -66,7 +76,8 @@ import { BpdmInputOtp } from '@bpdm/ng';
 export class VerifyComponent {}
 ```
 
-For a controlled field, use two-way binding on `value`:
+For a controlled field, use two-way binding on `value`, and `(complete)` to fire your check the
+moment every box is filled (`autoFocus` puts the cursor in the first box on mount):
 
 ```ts title="controlled.component.ts"
 import { Component } from '@angular/core';
@@ -76,10 +87,16 @@ import { BpdmInputOtp } from '@bpdm/ng';
   selector: 'app-controlled',
   standalone: true,
   imports: [BpdmInputOtp],
-  template: `<bpdm-input-otp [length]="6" integerOnly [(value)]="code" />`,
+  template: `
+    <bpdm-input-otp [length]="6" integerOnly autoFocus [(value)]="code" (complete)="verify($event)" />
+  `,
 })
 export class ControlledComponent {
   code = '';
+
+  verify(code: string) {
+    // submit the code
+  }
 }
 ```
 
@@ -261,3 +278,45 @@ export class StatesComponent {}
 
   </Tab>
 </Tabs>
+
+## API
+
+### `InputOtp` / `bpdm-input-otp`
+
+The value is a plain string of the entered characters (`""` when empty).
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `length` | `number` | `6` | Number of cells. |
+| `value` | `string` | — | Controlled value. React: pair with `onValueChange`. Angular: two-way `[(value)]`. |
+| `defaultValue` | `string` | `""` | Uncontrolled initial value. |
+| `onValueChange` *(React)* | `(value: string) => void` | — | Called with the joined value on every change. |
+| `onComplete` *(React)* / `(complete)` *(Angular)* | `(value: string) => void` | — | Fired once every cell is filled — handy for auto-submit. |
+| `autoFocus` | `boolean` | `false` | Focus the first cell on mount. |
+| `mask` | `boolean` | `false` | Hide characters (one-time PINs). |
+| `integerOnly` | `boolean` | `false` | Restrict input to digits `0–9` (also sets `inputmode="numeric"`). |
+| `size` | `sm \| md \| lg` | `md` | Cell size. |
+| `groupSize` | `number` | — | Connect cells into fixed groups of this size (last = remainder). |
+| `grouped` | `boolean` | `false` | Auto-group into two balanced segments. Ignored if `groupSize` is set. |
+| `separator` | `ReactNode` *(React)* / `string` *(Angular)* | `−` | Node/character shown between groups. |
+| `disabled` | `boolean` | `false` | Disable every cell. |
+| `name` | `string` | — | Emits the joined value under this `name` via a hidden input for native form submission. |
+| `id` | `string` | — | Group id (for label association / testing). |
+| `aria-label` | `string` | `"One-time code"` | Accessible name for the group. |
+| `aria-describedby` | `string` | — | IDs of describing elements (help / error text). |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the group. |
+
+## Accessibility
+
+- The cells sit in a `role="group"` named by `aria-label` (default `One-time code`) — give it a
+  meaningful name such as `Verification code`. Link help or error text with `aria-describedby`.
+- Each cell is a labelled `<input>` (`Character N of M`) with full keyboard support: type to
+  auto-advance, **Backspace** to clear and step back, **←/→** to move between cells, and
+  paste-to-fill from any cell.
+- The first cell carries `autocomplete="one-time-code"`, so iOS/Android offer to fill an SMS code;
+  `integerOnly` also sets `inputmode="numeric"` for a numeric keypad.
+- `mask` hides characters with `-webkit-text-security` while keeping a normal text input (and tells
+  password managers to ignore it), so the real value is still reported to `onValueChange`.
+- The group separator is decorative (`aria-hidden`), so screen readers read the code as one field.
+- Setting `name` emits the joined value through a hidden input, so the field submits with a native
+  `<form>`.
