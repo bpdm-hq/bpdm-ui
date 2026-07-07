@@ -3,6 +3,8 @@ title: Configuration
 description: Themes, dark mode, and customising the design tokens.
 ---
 
+import { ThemeStarter } from '@/components/theme-starter';
+
 Everything visual in bpdm/ui is driven by the CSS variables in `@bpdm/tokens`,
 so theming is just setting (or overriding) those tokens — no config files, same
 for React and Angular.
@@ -52,6 +54,14 @@ component follows:
   --radius: 0.5rem;          /* tighter corners everywhere */
 }
 ```
+
+## Custom theme starter
+
+Prefer to start from a whole file? Grab the starter below — it lists every variable
+with the required ones marked. Rename the selector, set your colours, then apply it with
+`data-theme="my-brand"`. Copy it inline, or download `bpdm-theme.css`.
+
+<ThemeStarter />
 
 ## Design tokens
 
