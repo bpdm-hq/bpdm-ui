@@ -1,11 +1,287 @@
 ---
 title: Secure Field
-description: Secure Field — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Masked input for secrets — API keys, license keys, tokens — with reveal and copy, grouping and a visible tail, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Secure Field** component — available in React (`@bpdm/ui/secure-field`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  SecureFieldUsageDemo,
+  SecureFieldRevealCopyDemo,
+  SecureFieldFormatDemo,
+  SecureFieldSizesDemo,
+  SecureFieldStatesDemo,
+} from '@/components/secure-field-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Secure Field** is a masked input for sensitive values — API keys, license keys, tokens,
+serials. It's masked at rest (with an optional visible tail), has a reveal toggle, and an optional
+copy button. It uses a regular text input with masking rather than `type="password"`, so password
+managers don't try to hijack it — while `onValueChange` and copy always give the real value. In
+React it's `<SecureField>`; in Angular it's `<bpdm-secure-field>`.
+
+## Usage
+
+Give it a value and a placeholder. By default it's masked with a reveal toggle; `unmaskedTail`
+leaves the last few characters visible for recognition.
+
+<Preview>
+  <SecureFieldUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="license.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function License() {
+  return <SecureField format="grouped" unmaskedTail={4} placeholder="License key" />;
+}
+```
+
+For a controlled field, pass `value` and `onValueChange` (you always receive the real value):
+
+```tsx title="controlled.tsx"
+import { useState } from 'react';
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function Controlled() {
+  const [key, setKey] = useState('');
+  return <SecureField value={key} onValueChange={setKey} placeholder="License key" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="license.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-license',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `<bpdm-secure-field format="grouped" [unmaskedTail]="4" placeholder="License key" />`,
+})
+export class LicenseComponent {}
+```
+
+For a controlled field, use two-way binding on `value`:
+
+```ts title="controlled.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-controlled',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `<bpdm-secure-field [(value)]="key" placeholder="License key" />`,
+})
+export class ControlledComponent {
+  key = '';
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Reveal & copy
+
+The reveal toggle is on by default (`revealable={false}` removes it). Add `copyable` for a copy
+button — it copies the real value, not the masked text.
+
+<Preview>
+  <SecureFieldRevealCopyDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="api-key.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function ApiKey() {
+  return <SecureField copyable placeholder="API key" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="api-key.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-api-key',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `<bpdm-secure-field copyable placeholder="API key" />`,
+})
+export class ApiKeyComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Masking & format
+
+`unmaskedTail` keeps the last N characters visible so a value is recognisable without exposing it.
+`format="grouped"` chunks the masked value for readability; `format="none"` (the default) masks it
+as a single run.
+
+<Preview>
+  <SecureFieldFormatDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="format.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function Format() {
+  return (
+    <div className="flex w-80 flex-col gap-4">
+      <SecureField format="grouped" unmaskedTail={4} placeholder="Grouped, last 4 shown" />
+      <SecureField unmaskedTail={4} copyable placeholder="Serial, last 4 shown" />
+      <SecureField format="none" placeholder="Fully masked" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="format.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-format',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `
+    <div class="flex w-80 flex-col gap-4">
+      <bpdm-secure-field format="grouped" [unmaskedTail]="4" placeholder="Grouped, last 4 shown" />
+      <bpdm-secure-field [unmaskedTail]="4" copyable placeholder="Serial, last 4 shown" />
+      <bpdm-secure-field format="none" placeholder="Fully masked" />
+    </div>
+  `,
+})
+export class FormatComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+Three heights — `sm`, `md` (default), and `lg` — to match the rest of the form.
+
+<Preview>
+  <SecureFieldSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function Sizes() {
+  return (
+    <div className="flex w-80 flex-col gap-3">
+      {(['sm', 'md', 'lg'] as const).map((s) => (
+        <SecureField key={s} size={s} format="grouped" unmaskedTail={4} placeholder={`Size ${s}`} />
+      ))}
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sizes',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `
+    <div class="flex w-80 flex-col gap-3">
+      @for (s of sizes; track s) {
+        <bpdm-secure-field [size]="s" format="grouped" [unmaskedTail]="4" [placeholder]="'Size ' + s" />
+      }
+    </div>
+  `,
+})
+export class SizesComponent {
+  sizes = ['sm', 'md', 'lg'] as const;
+}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Disable the field, or mark it invalid with `aria-invalid` and a described error message.
+
+<Preview>
+  <SecureFieldStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function States() {
+  return (
+    <div className="flex w-80 flex-col gap-4">
+      <SecureField disabled placeholder="Disabled" />
+      <div className="flex flex-col gap-1.5">
+        <SecureField aria-invalid aria-describedby="sf-err" format="grouped" unmaskedTail={4} />
+        <p id="sf-err" className="text-sm text-destructive">
+          That key looks too short.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `
+    <div class="flex w-80 flex-col gap-4">
+      <bpdm-secure-field [disabled]="true" placeholder="Disabled" />
+      <div class="flex flex-col gap-1.5">
+        <bpdm-secure-field aria-invalid aria-describedby="sf-err" format="grouped" [unmaskedTail]="4" />
+        <p id="sf-err" class="text-sm text-destructive">That key looks too short.</p>
+      </div>
+    </div>
+  `,
+})
+export class StatesComponent {}
+```
+
+  </Tab>
+</Tabs>
