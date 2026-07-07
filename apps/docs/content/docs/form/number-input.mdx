@@ -58,103 +58,6 @@ export class Quantity {}
   </Tab>
 </Tabs>
 
-## Sizes
-
-`size` sets the height and text scale — `sm`, `md` (default), or `lg`.
-
-<Preview>
-  <NumberInputSizesDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="sizes.tsx"
-import { NumberInput } from '@bpdm/ui/number-input';
-
-export function Sizes() {
-  return (
-    <div className="flex items-center gap-4">
-      <NumberInput size="sm" defaultValue="8" />
-      <NumberInput size="md" defaultValue="8" />
-      <NumberInput size="lg" defaultValue="8" />
-    </div>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="sizes.ts"
-import { Component } from '@angular/core';
-import { BpdmNumberInput } from '@bpdm/ng';
-
-@Component({
-  selector: 'sizes',
-  imports: [BpdmNumberInput],
-  template: `
-    <div class="flex items-center gap-4">
-      <bpdm-number-input size="sm" defaultValue="8" />
-      <bpdm-number-input size="md" defaultValue="8" />
-      <bpdm-number-input size="lg" defaultValue="8" />
-    </div>
-  `,
-})
-export class Sizes {}
-```
-
-  </Tab>
-</Tabs>
-
-## Button layout
-
-`buttonLayout` chooses the steppers — `stacked` (up/down chevrons on the right, default) or
-`horizontal` (−/+ on each side).
-
-<Preview>
-  <NumberInputLayoutDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="layout.tsx"
-import { NumberInput } from '@bpdm/ui/number-input';
-
-export function Layout() {
-  return (
-    <div className="flex items-center gap-4">
-      <NumberInput buttonLayout="stacked" defaultValue="8" />
-      <NumberInput buttonLayout="horizontal" defaultValue="8" />
-    </div>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="layout.ts"
-import { Component } from '@angular/core';
-import { BpdmNumberInput } from '@bpdm/ng';
-
-@Component({
-  selector: 'layout',
-  imports: [BpdmNumberInput],
-  template: `
-    <div class="flex items-center gap-4">
-      <bpdm-number-input buttonLayout="stacked" defaultValue="8" />
-      <bpdm-number-input buttonLayout="horizontal" defaultValue="8" />
-    </div>
-  `,
-})
-export class Layout {}
-```
-
-  </Tab>
-</Tabs>
-
 ## Range & step
 
 `min` and `max` clamp the value (the relevant stepper disables at the bound); `step` sets how much
@@ -198,6 +101,59 @@ import { BpdmNumberInput } from '@bpdm/ng';
   `,
 })
 export class Range {}
+```
+
+  </Tab>
+</Tabs>
+
+## Precision
+
+The value is a **string** and every step/clamp runs through `bignumber.js`, so high-decimal steps
+and integers beyond `Number.MAX_SAFE_INTEGER` stay exact — no float drift, no exponential
+notation. Read the value as a string via `onValueChange` (React) or `[(value)]` (Angular).
+
+<Preview>
+  <NumberInputPrecisionDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="precision.tsx"
+import { useState } from 'react';
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Precision() {
+  const [value, setValue] = useState('1.2500');
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput value={value} onValueChange={setValue} step="0.0001" suffix="kg" />
+      <NumberInput defaultValue="9007199254740993" />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="precision.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'precision',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input [(value)]="value" step="0.0001" suffix="kg" />
+      <bpdm-number-input defaultValue="9007199254740993" />
+    </div>
+  `,
+})
+export class Precision {
+  readonly value = signal('1.2500');
+}
 ```
 
   </Tab>
@@ -253,29 +209,26 @@ export class Affix {}
   </Tab>
 </Tabs>
 
-## Precision
+## Button layout
 
-The value is a **string** and every step/clamp runs through `bignumber.js`, so high-decimal steps
-and integers beyond `Number.MAX_SAFE_INTEGER` stay exact — no float drift, no exponential
-notation. Read the value as a string via `onValueChange` (React) or `[(value)]` (Angular).
+`buttonLayout` chooses the steppers — `stacked` (up/down chevrons on the right, default) or
+`horizontal` (−/+ on each side).
 
 <Preview>
-  <NumberInputPrecisionDemo />
+  <NumberInputLayoutDemo />
 </Preview>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="precision.tsx"
-import { useState } from 'react';
+```tsx title="layout.tsx"
 import { NumberInput } from '@bpdm/ui/number-input';
 
-export function Precision() {
-  const [value, setValue] = useState('1.2500');
+export function Layout() {
   return (
     <div className="flex items-center gap-4">
-      <NumberInput value={value} onValueChange={setValue} step="0.0001" suffix="kg" />
-      <NumberInput defaultValue="9007199254740993" />
+      <NumberInput buttonLayout="stacked" defaultValue="8" />
+      <NumberInput buttonLayout="horizontal" defaultValue="8" />
     </div>
   );
 }
@@ -284,23 +237,70 @@ export function Precision() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="precision.ts"
-import { Component, signal } from '@angular/core';
+```ts title="layout.ts"
+import { Component } from '@angular/core';
 import { BpdmNumberInput } from '@bpdm/ng';
 
 @Component({
-  selector: 'precision',
+  selector: 'layout',
   imports: [BpdmNumberInput],
   template: `
     <div class="flex items-center gap-4">
-      <bpdm-number-input [(value)]="value" step="0.0001" suffix="kg" />
-      <bpdm-number-input defaultValue="9007199254740993" />
+      <bpdm-number-input buttonLayout="stacked" defaultValue="8" />
+      <bpdm-number-input buttonLayout="horizontal" defaultValue="8" />
     </div>
   `,
 })
-export class Precision {
-  readonly value = signal('1.2500');
+export class Layout {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+`size` sets the height and text scale — `sm`, `md` (default), or `lg`.
+
+<Preview>
+  <NumberInputSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Sizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <NumberInput size="sm" defaultValue="8" />
+      <NumberInput size="md" defaultValue="8" />
+      <NumberInput size="lg" defaultValue="8" />
+    </div>
+  );
 }
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'sizes',
+  imports: [BpdmNumberInput],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-number-input size="sm" defaultValue="8" />
+      <bpdm-number-input size="md" defaultValue="8" />
+      <bpdm-number-input size="lg" defaultValue="8" />
+    </div>
+  `,
+})
+export class Sizes {}
 ```
 
   </Tab>

@@ -64,7 +64,6 @@ export function InputTypesDemo() {
       <Input type="email" placeholder="email@company.com" />
       <Input type="password" placeholder="••••••••" />
       <Input type="number" placeholder="0" />
-      <Input type="file" />
     </Stack>
   );
 }

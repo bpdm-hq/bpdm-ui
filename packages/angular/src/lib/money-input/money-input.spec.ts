@@ -14,6 +14,18 @@ class UsdHost {}
 })
 class JpyHost {}
 
+@Component({
+  imports: [BpdmMoneyInput],
+  template: `
+    <bpdm-money-input
+      name="price"
+      aria-label="Total"
+      aria-describedby="hint"
+      defaultValue="10" />
+  `,
+})
+class PassthroughHost {}
+
 describe("BpdmMoneyInput", () => {
   const input = (f: { nativeElement: HTMLElement }) =>
     f.nativeElement.querySelector("input") as HTMLInputElement;
@@ -49,5 +61,15 @@ describe("BpdmMoneyInput", () => {
     // stored value is rounded to 2dp ("2500.50"); the grouped display uses
     // minimumFractionDigits: 0, so a trailing zero is dropped → "2,500.5"
     expect(input(fixture).value).toBe("2,500.5");
+  });
+
+  it("forwards name / aria-label / aria-describedby to the input and hides the symbol", () => {
+    const fixture = TestBed.createComponent(PassthroughHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    expect(el.getAttribute("name")).toBe("price");
+    expect(el.getAttribute("aria-label")).toBe("Total");
+    expect(el.getAttribute("aria-describedby")).toBe("hint");
+    expect(symbol(fixture).getAttribute("aria-hidden")).toBe("true");
   });
 });

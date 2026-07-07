@@ -28,7 +28,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative flex w-full items-center">
         {startIcon && (
-          <span className="pointer-events-none absolute left-3 flex items-center text-muted-foreground [&_svg]:size-4">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 flex items-center text-muted-foreground [&_svg]:size-4"
+          >
             {startIcon}
           </span>
         )}
@@ -43,7 +46,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {endIcon && (
-          <span className="pointer-events-none absolute right-3 flex items-center text-muted-foreground [&_svg]:size-4">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 flex items-center text-muted-foreground [&_svg]:size-4"
+          >
             {endIcon}
           </span>
         )}
