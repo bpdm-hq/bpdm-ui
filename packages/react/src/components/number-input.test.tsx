@@ -64,4 +64,10 @@ describe("NumberInput", () => {
     expect(stepper("Increase")).toBeDisabled();
     expect(stepper("Decrease")).toBeDisabled();
   });
+
+  it("allows translating the stepper labels via messages", () => {
+    render(<NumberInput messages={{ increase: "Augmenter", decrease: "Diminuer" }} />);
+    expect(screen.getByRole("button", { name: "Augmenter" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Diminuer" })).toBeInTheDocument();
+  });
 });

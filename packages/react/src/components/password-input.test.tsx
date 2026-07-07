@@ -87,4 +87,9 @@ describe("PasswordInput", () => {
     expect(field()).toBeDisabled();
     expect(toggle("Show password")).toBeDisabled();
   });
+
+  it("allows translating the reveal-toggle label via messages", () => {
+    render(<PasswordInput data-testid="pw" feedback={false} messages={{ show: "Afficher" }} />);
+    expect(screen.getByRole("button", { name: "Afficher" })).toBeInTheDocument();
+  });
 });

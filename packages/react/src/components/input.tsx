@@ -30,7 +30,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {startIcon && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute left-3 flex items-center text-muted-foreground [&_svg]:size-4"
+            className="pointer-events-none absolute start-3 flex items-center text-muted-foreground [&_svg]:size-4"
           >
             {startIcon}
           </span>
@@ -39,8 +39,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={cn(
             inputVariants({ variant, size }),
-            startIcon && "pl-9",
-            endIcon && "pr-9",
+            startIcon && "ps-9",
+            endIcon && "pe-9",
             className,
           )}
           {...props}
@@ -48,7 +48,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {endIcon && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute right-3 flex items-center text-muted-foreground [&_svg]:size-4"
+            className="pointer-events-none absolute end-3 flex items-center text-muted-foreground [&_svg]:size-4"
           >
             {endIcon}
           </span>

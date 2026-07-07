@@ -26,7 +26,11 @@ export interface NumberInputProps
   suffix?: string;
   /** Called with the (string) value on every change — never loses precision. */
   onValueChange?: (value: string) => void;
+  /** Override the stepper button labels (screen-reader text) for i18n. */
+  messages?: { increase?: string; decrease?: string };
 }
+
+const DEFAULT_MESSAGES = { increase: "Increase", decrease: "Decrease" };
 
 const dims: Record<Size, { h: string; btn: string; text: string }> = {
   sm: { h: "h-8", btn: "w-8", text: "text-sm" },
@@ -122,10 +126,12 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       suffix,
       disabled,
       onValueChange,
+      messages,
       ...props
     },
     ref,
   ) => {
+    const t = { ...DEFAULT_MESSAGES, ...messages };
     const isControlled = value !== undefined;
     const [internal, setInternal] = React.useState(String(defaultValue));
     const current = isControlled ? String(value) : internal;
@@ -180,7 +186,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           onBlur={() => commit(current)}
           className={cn(
             "w-full min-w-0 border-0 bg-transparent text-foreground tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-            buttonLayout === "horizontal" ? "text-center" : "text-left",
+            buttonLayout === "horizontal" ? "text-center" : "text-start",
             d.text,
           )}
           {...props}
@@ -203,7 +209,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       >
         {buttonLayout === "horizontal" && (
           <StepButton
-            label="Decrease"
+            label={t.decrease}
             path={Glyph.minus}
             disabled={disabled || atMin}
             onTrigger={dec}
@@ -215,7 +221,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
         {buttonLayout === "horizontal" ? (
           <StepButton
-            label="Increase"
+            label={t.increase}
             path={Glyph.plus}
             disabled={disabled || atMax}
             onTrigger={inc}
@@ -224,14 +230,14 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         ) : (
           <div className="flex w-7 flex-col border-l border-input">
             <StepButton
-              label="Increase"
+              label={t.increase}
               path={Glyph.up}
               disabled={disabled || atMax}
               onTrigger={inc}
               className="flex-1"
             />
             <StepButton
-              label="Decrease"
+              label={t.decrease}
               path={Glyph.down}
               disabled={disabled || atMin}
               onTrigger={dec}

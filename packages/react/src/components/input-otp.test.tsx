@@ -88,4 +88,12 @@ describe("InputOtp", () => {
     render(<InputOtp disabled />);
     cells().forEach((c) => expect(c).toBeDisabled());
   });
+
+  it("allows translating the group + per-cell labels for i18n", () => {
+    render(
+      <InputOtp length={4} aria-label="Code de vérification" cellLabel={(i, n) => `Chiffre ${i + 1}/${n}`} />,
+    );
+    expect(screen.getByRole("group", { name: "Code de vérification" })).toBeInTheDocument();
+    expect(cells()[0]).toHaveAttribute("aria-label", "Chiffre 1/4");
+  });
 });

@@ -32,6 +32,8 @@ export interface InputOtpProps {
   id?: string;
   "aria-label"?: string;
   "aria-describedby"?: string;
+  /** Per-cell screen-reader label. Override for i18n. Default: `Character N of M`. */
+  cellLabel?: (index: number, length: number) => string;
 }
 
 const cellSize: Record<Size, string> = {
@@ -85,6 +87,7 @@ export function InputOtp({
   id,
   "aria-label": ariaLabel = "One-time code",
   "aria-describedby": ariaDescribedBy,
+  cellLabel = (index: number, len: number) => `Character ${index + 1} of ${len}`,
 }: InputOtpProps) {
   const refs = React.useRef<(HTMLInputElement | null)[]>([]);
   const isControlled = value !== undefined;
@@ -174,7 +177,7 @@ export function InputOtp({
       data-lpignore="true"
       maxLength={1}
       disabled={disabled}
-      aria-label={`Character ${i + 1} of ${length}`}
+      aria-label={cellLabel(i, length)}
       value={cells[i]}
       onChange={(e) => handleChange(i, e.target.value)}
       onKeyDown={(e) => handleKeyDown(i, e)}
@@ -190,9 +193,9 @@ export function InputOtp({
         isGrouped
           ? cn(
               "rounded-none",
-              !isFirst && "-ml-px", // collapse adjacent borders into one divider
-              isFirst && "rounded-l-[var(--radius)]",
-              isLast && "rounded-r-[var(--radius)]",
+              !isFirst && "-ms-px", // collapse adjacent borders into one divider
+              isFirst && "rounded-s-[var(--radius)]",
+              isLast && "rounded-e-[var(--radius)]",
             )
           : "rounded-[var(--radius)]",
       )}
