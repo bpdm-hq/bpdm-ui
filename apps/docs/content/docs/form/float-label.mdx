@@ -1,11 +1,195 @@
 ---
 title: Float Label
-description: Float Label — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Floating-label wrapper — the label starts as a placeholder and floats up on focus or when filled, in three variants, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **Float Label** component — available in React (`@bpdm/ui/float-label`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  FloatLabelUsageDemo,
+  FloatLabelVariantsDemo,
+  FloatLabelStatesDemo,
+} from '@/components/float-label-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **Float Label** wraps a single field so its label starts as a placeholder and **floats up** on
+focus or when the field has a value. It's pure CSS — no JavaScript — and links the label to the
+control for accessibility. In React it's `<FloatLabel>` around any input; in Angular it's
+`<bpdm-float-label>` around a control with the `bpdmInput` directive.
+
+## Usage
+
+Wrap a single control and give the label. Point `htmlFor` at the control's `id` so clicking the
+label focuses the field.
+
+<Preview>
+  <FloatLabelUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="email.tsx"
+import { FloatLabel } from '@bpdm/ui/float-label';
+import { Input } from '@bpdm/ui/input';
+
+export function Email() {
+  return (
+    <FloatLabel label="Email" variant="over" htmlFor="email">
+      <Input id="email" />
+    </FloatLabel>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="email.component.ts"
+import { Component } from '@angular/core';
+import { BpdmFloatLabel, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-email',
+  standalone: true,
+  imports: [BpdmFloatLabel, BpdmInput],
+  template: `
+    <bpdm-float-label label="Email" variant="over" htmlFor="email">
+      <input bpdmInput id="email" />
+    </bpdm-float-label>
+  `,
+})
+export class EmailComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Variants
+
+Three placements: `over` (default — the label rests above the field), `in` (inside, near the top),
+and `on` (a notch that sits on the border).
+
+<Preview>
+  <FloatLabelVariantsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="variants.tsx"
+import { FloatLabel } from '@bpdm/ui/float-label';
+import { Input } from '@bpdm/ui/input';
+
+export function Variants() {
+  return (
+    <div className="flex w-72 flex-col gap-6">
+      <FloatLabel label="Over (default)" variant="over" htmlFor="a">
+        <Input id="a" />
+      </FloatLabel>
+      <FloatLabel label="In" variant="in" htmlFor="b">
+        <Input id="b" />
+      </FloatLabel>
+      <FloatLabel label="On the border" variant="on" htmlFor="c">
+        <Input id="c" />
+      </FloatLabel>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="variants.component.ts"
+import { Component } from '@angular/core';
+import { BpdmFloatLabel, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-variants',
+  standalone: true,
+  imports: [BpdmFloatLabel, BpdmInput],
+  template: `
+    <div class="flex w-72 flex-col gap-6">
+      <bpdm-float-label label="Over (default)" variant="over" htmlFor="a">
+        <input bpdmInput id="a" />
+      </bpdm-float-label>
+      <bpdm-float-label label="In" variant="in" htmlFor="b">
+        <input bpdmInput id="b" />
+      </bpdm-float-label>
+      <bpdm-float-label label="On the border" variant="on" htmlFor="c">
+        <input bpdmInput id="c" />
+      </bpdm-float-label>
+    </div>
+  `,
+})
+export class VariantsComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+The wrapper defers to the field it wraps — disable the control, or mark it `aria-invalid` and pair
+it with a described error message.
+
+<Preview>
+  <FloatLabelStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { FloatLabel } from '@bpdm/ui/float-label';
+import { Input } from '@bpdm/ui/input';
+
+export function States() {
+  return (
+    <div className="flex w-72 flex-col gap-6">
+      <FloatLabel label="Email" variant="on" htmlFor="disabled-email">
+        <Input id="disabled-email" disabled defaultValue="jane@company.com" />
+      </FloatLabel>
+      <div className="flex flex-col gap-1.5">
+        <FloatLabel label="Email" variant="on" htmlFor="invalid-email">
+          <Input id="invalid-email" aria-invalid aria-describedby="email-err" />
+        </FloatLabel>
+        <p id="email-err" className="text-sm text-destructive">
+          Enter a valid email.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmFloatLabel, BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmFloatLabel, BpdmInput],
+  template: `
+    <div class="flex w-72 flex-col gap-6">
+      <bpdm-float-label label="Email" variant="on" htmlFor="disabled-email">
+        <input bpdmInput id="disabled-email" [disabled]="true" value="jane@company.com" />
+      </bpdm-float-label>
+      <div class="flex flex-col gap-1.5">
+        <bpdm-float-label label="Email" variant="on" htmlFor="invalid-email">
+          <input bpdmInput id="invalid-email" aria-invalid aria-describedby="email-err" />
+        </bpdm-float-label>
+        <p id="email-err" class="text-sm text-destructive">Enter a valid email.</p>
+      </div>
+    </div>
+  `,
+})
+export class StatesComponent {}
+```
+
+  </Tab>
+</Tabs>
