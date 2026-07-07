@@ -1,11 +1,263 @@
 ---
 title: OTP Input
-description: OTP Input — accessible, themeable, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: One-time-code input with auto-advance, paste-to-fill, masking and grouping — sizes and states, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
-The **OTP Input** component — available in React (`@bpdm/ui/input-otp`) and Angular (`@bpdm/ng`), from the same design tokens.
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import {
+  InputOtpUsageDemo,
+  InputOtpMaskedDemo,
+  InputOtpGroupedDemo,
+  InputOtpSizesDemo,
+  InputOtpStatesDemo,
+} from '@/components/input-otp-demos';
+import { Preview } from '@/components/preview';
 
-<Callout type="info">
-  Live preview, usage code (React & Angular) and the auto-generated API table are
-  being added to this page. For now, see it live in [Storybook](https://ui.bpdm.dev).
-</Callout>
+The **OTP Input** is a one-time-code field — one box per character, with **auto-advance**,
+backspace-to-previous, arrow-key navigation, and **paste-to-fill** (paste the whole code into any
+box). The value is a plain string; it runs controlled (`value` + `onValueChange`) or uncontrolled
+(`defaultValue`). In React it's `<InputOtp>`; in Angular it's `<bpdm-input-otp>`.
+
+## Usage
+
+Set the number of boxes with `length`. Add `integerOnly` to accept digits only (typical for SMS /
+authenticator codes).
+
+<Preview>
+  <InputOtpUsageDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="verify.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function Verify() {
+  return <InputOtp length={6} integerOnly aria-label="Verification code" />;
+}
+```
+
+For a controlled field, pass `value` and `onValueChange` — fire your check when it's full:
+
+```tsx title="controlled.tsx"
+import { useState } from 'react';
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function Controlled() {
+  const [code, setCode] = useState('');
+  return <InputOtp length={6} integerOnly value={code} onValueChange={setCode} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="verify.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-verify',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `<bpdm-input-otp [length]="6" integerOnly aria-label="Verification code" />`,
+})
+export class VerifyComponent {}
+```
+
+For a controlled field, use two-way binding on `value`:
+
+```ts title="controlled.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-controlled',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `<bpdm-input-otp [length]="6" integerOnly [(value)]="code" />`,
+})
+export class ControlledComponent {
+  code = '';
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Masked (PIN)
+
+For a PIN or other secret code, add `mask` to render dots instead of the characters. The real value
+is still reported through `onValueChange`.
+
+<Preview>
+  <InputOtpMaskedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pin.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function Pin() {
+  return <InputOtp length={4} mask integerOnly aria-label="PIN" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pin.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-pin',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `<bpdm-input-otp [length]="4" mask integerOnly aria-label="PIN" />`,
+})
+export class PinComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Grouping
+
+`grouped` splits the boxes into even halves with a separator; `groupSize` groups every N boxes
+instead. Set the separator character with `separator` (default `−`).
+
+<Preview>
+  <InputOtpGroupedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="grouped.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function Grouped() {
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <InputOtp length={6} grouped separator="−" integerOnly />
+      <InputOtp length={9} groupSize={3} separator="−" integerOnly />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="grouped.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-grouped',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `
+    <div class="flex flex-col items-center gap-4">
+      <bpdm-input-otp [length]="6" grouped separator="−" integerOnly />
+      <bpdm-input-otp [length]="9" [groupSize]="3" separator="−" integerOnly />
+    </div>
+  `,
+})
+export class GroupedComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Sizes
+
+Three cell sizes — `sm`, `md` (default), and `lg`.
+
+<Preview>
+  <InputOtpSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sizes.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function Sizes() {
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <InputOtp length={4} size="sm" integerOnly />
+      <InputOtp length={4} size="md" integerOnly />
+      <InputOtp length={4} size="lg" integerOnly />
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sizes',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `
+    <div class="flex flex-col items-center gap-4">
+      <bpdm-input-otp [length]="4" size="sm" integerOnly />
+      <bpdm-input-otp [length]="4" size="md" integerOnly />
+      <bpdm-input-otp [length]="4" size="lg" integerOnly />
+    </div>
+  `,
+})
+export class SizesComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## States
+
+Disable the whole field while a request is in flight or the code is locked.
+
+<Preview>
+  <InputOtpStatesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="states.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function States() {
+  return <InputOtp length={6} disabled defaultValue="123456" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `<bpdm-input-otp [length]="6" disabled defaultValue="123456" />`,
+})
+export class StatesComponent {}
+```
+
+  </Tab>
+</Tabs>
