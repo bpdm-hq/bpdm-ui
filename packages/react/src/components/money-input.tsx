@@ -17,7 +17,12 @@ const wrapVariants = cva(
   },
 );
 
-export interface MoneyInputProps extends VariantProps<typeof wrapVariants> {
+export interface MoneyInputProps
+  extends Omit<
+      React.ComponentProps<"input">,
+      "size" | "value" | "defaultValue" | "onChange" | "prefix"
+    >,
+    VariantProps<typeof wrapVariants> {
   /** ISO 4217 code, e.g. "USD", "EUR", "INR", "JPY". */
   currency?: string;
   /** BCP 47 locale for grouping/symbol, e.g. "en-US", "de-DE", "en-IN", "ja-JP". */
@@ -27,12 +32,7 @@ export interface MoneyInputProps extends VariantProps<typeof wrapVariants> {
   defaultValue?: string;
   /** Called with the raw (unformatted) numeric string on every change. */
   onValueChange?: (value: string) => void;
-  placeholder?: string;
   allowNegative?: boolean;
-  disabled?: boolean;
-  className?: string;
-  id?: string;
-  "aria-invalid"?: boolean;
 }
 
 /**
@@ -40,21 +40,30 @@ export interface MoneyInputProps extends VariantProps<typeof wrapVariants> {
  * (e.g. en-IN → 1,00,000) with the currency symbol and the currency's decimal
  * count, while the stored value stays a precise numeric string (bignumber.js — no
  * float rounding). Editable as a plain number on focus, formatted on blur.
+ *
+ * Forwards its ref to the underlying `<input>` and spreads any extra native props
+ * (`name`, `aria-label`, `aria-describedby`, `required`, `autoComplete`,
+ * `data-*`, …) onto it, so it drops into forms and test harnesses unchanged.
+ * `className` styles the wrapper.
  */
-export function MoneyInput({
-  currency = "USD",
-  locale = "en-US",
-  value,
-  defaultValue = "",
-  onValueChange,
-  placeholder,
-  allowNegative = false,
-  size,
-  disabled,
-  className,
-  id,
-  "aria-invalid": ariaInvalid,
-}: MoneyInputProps) {
+export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(function MoneyInput(
+  {
+    currency = "USD",
+    locale = "en-US",
+    value,
+    defaultValue = "",
+    onValueChange,
+    allowNegative = false,
+    size,
+    disabled,
+    className,
+    "aria-invalid": ariaInvalid,
+    onFocus,
+    onBlur,
+    ...props
+  },
+  ref,
+) {
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue);
   const raw = isControlled ? (value ?? "") : internal;
@@ -109,25 +118,29 @@ export function MoneyInput({
         className,
       )}
     >
-      <span className="shrink-0 select-none text-muted-foreground">{symbol}</span>
+      <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
+        {symbol}
+      </span>
       <input
-        id={id}
+        ref={ref}
+        {...props}
         type="text"
         inputMode="decimal"
         disabled={disabled}
         value={focused ? raw : grouped}
-        placeholder={placeholder}
         aria-invalid={ariaInvalid}
         onFocus={(e) => {
           setFocused(true);
           e.currentTarget.select();
+          onFocus?.(e);
         }}
-        onBlur={() => {
+        onBlur={(e) => {
           setFocused(false);
           if (raw !== "" && raw !== "-" && raw !== ".") {
             const bn = new BigNumber(raw);
             if (!bn.isNaN()) setRaw(bn.toFixed(fractionDigits));
           }
+          onBlur?.(e);
         }}
         onChange={(e) => {
           const v = e.target.value;
@@ -137,4 +150,4 @@ export function MoneyInput({
       />
     </div>
   );
-}
+});

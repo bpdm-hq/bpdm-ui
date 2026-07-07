@@ -304,5 +304,6 @@ Extends the native `<textarea>` — `placeholder`, `value`, `defaultValue`, `row
 - Invalid state is set with `aria-invalid` — it colours the border **and** is
   announced by assistive tech (never colour-only).
 - Disabled uses the native `disabled` attribute (removed from the tab order).
-- `showCount` is a visual aid; where the limit matters, pair the field with your own
-  `aria-describedby` hint for a spoken cue.
+- `showCount` renders a character counter that's automatically linked to the field via
+  `aria-describedby`, so screen readers get the current count and limit as the field's
+  description (any `aria-describedby` you pass is preserved).

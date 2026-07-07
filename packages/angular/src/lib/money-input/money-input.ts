@@ -33,14 +33,17 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
   host: { class: "block w-full" },
   template: `
     <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null">
-      <span class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+      <span aria-hidden="true" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
       <input
         [id]="id() || null"
         type="text"
         inputmode="decimal"
         [disabled]="disabled()"
         [value]="focused() ? current() : grouped()"
+        [attr.name]="name() || null"
         [attr.placeholder]="placeholder() || null"
+        [attr.aria-label]="ariaLabel() || null"
+        [attr.aria-describedby]="ariaDescribedby() || null"
         [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
         (focus)="onFocus($any($event.target))"
         (blur)="onBlur()"
@@ -66,6 +69,12 @@ export class BpdmMoneyInput {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
   readonly id = input<string>("");
+  /** Native `name` for form submission, forwarded to the inner `<input>`. */
+  readonly name = input<string>("");
+  /** Accessible name for the field, forwarded to the inner `<input>`. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** IDs of describing elements, forwarded to the inner `<input>`. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
 
   protected readonly focused = signal(false);
 

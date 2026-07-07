@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 This applies to **every bpdm/ui component**. How you target one in a test depends
 on the kind of component:
 
-- **Simple components** (Button, Input, Badge, Switch, …) wrap a single native
+- **Simple components** (Button, Input, Textarea, Badge, Switch, …) wrap a single native
   element and forward extra attributes — so a `data-testid` lands directly on it.
 - **Composed components** (Select, Multi-select, Tree Select, Dialog, …) render a
   small tree and don't yet forward arbitrary attributes onto their root — target
@@ -114,6 +114,81 @@ import { By } from '@angular/platform-browser';
 // query the host element by tag, or the wrapper you control
 fixture.debugElement.query(By.css('bpdm-select'));
 fixture.debugElement.query(By.css('[data-testid="status"]'));
+```
+
+  </Tab>
+</Tabs>
+
+### Number Input
+
+The **Number Input** is a `role="group"` wrapping a `textbox` and two labelled stepper
+`button`s (`Increase` / `Decrease`) — so drive it entirely by role. No test ids needed.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="quantity.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<NumberInput defaultValue="8" max="10" />);
+
+// the field is a textbox; the steppers are labelled buttons
+const field = screen.getByRole('textbox') as HTMLInputElement;
+await userEvent.click(screen.getByRole('button', { name: 'Increase' }));
+expect(field.value).toBe('9');
+
+// at the bound the stepper is disabled
+await userEvent.click(screen.getByRole('button', { name: 'Increase' })); // → 10
+expect(screen.getByRole('button', { name: 'Increase' })).toBeDisabled();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="quantity.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const field = el.querySelector('input') as HTMLInputElement;
+el.querySelector<HTMLButtonElement>('button[aria-label="Increase"]')!.click();
+fixture.detectChanges();
+expect(field.value).toBe('9');
+// the button carries `disabled` once the value hits `max`
+```
+
+  </Tab>
+</Tabs>
+
+### Money Input
+
+The **Money Input** renders a `textbox` next to a decorative (`aria-hidden`) currency symbol.
+Query the field by role. In **React** extra props spread onto the `<input>`, so `data-testid`,
+`name`, and `aria-*` land directly on it; in **Angular** query by role or a wrapper you own.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="price.test.tsx"
+import { render, screen } from '@testing-library/react';
+
+render(<MoneyInput currency="USD" defaultValue="1234.5" data-testid="price" />);
+
+// the field is a textbox; data-testid / name / aria-* land on the input
+const field = screen.getByRole('textbox') as HTMLInputElement;
+expect(field).toBe(screen.getByTestId('price'));
+expect(field.value).toBe('1,234.5'); // grouped display at rest
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="price.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const field = el.querySelector('input') as HTMLInputElement;
+expect(field.value).toBe('1,234.5');
+// name / aria-label / aria-describedby are forwarded onto the input too
+el.querySelector('input[name="price"]');
 ```
 
   </Tab>

@@ -23,6 +23,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       value,
       defaultValue,
       onChange,
+      "aria-describedby": ariaDescribedBy,
       ...props
     },
     ref,
@@ -32,6 +33,11 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [count, setCount] = React.useState(
       String(value ?? defaultValue ?? "").length,
     );
+    // Link the counter to the field for screen readers (a static description, not a per-keystroke
+    // live announcement). Preserves any consumer-supplied aria-describedby.
+    const countId = `${React.useId()}-count`;
+    const describedBy =
+      [ariaDescribedBy, showCount ? countId : undefined].filter(Boolean).join(" ") || undefined;
 
     const adjust = React.useCallback(() => {
       const el = innerRef.current;
@@ -57,6 +63,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           value={value}
           defaultValue={defaultValue}
           maxLength={maxLength}
+          aria-describedby={describedBy}
           onChange={(e) => {
             setCount(e.target.value.length);
             adjust();
@@ -69,7 +76,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {showCount && (
-          <div className="mt-1 text-right text-xs tabular-nums text-muted-foreground">
+          <div
+            id={countId}
+            className="mt-1 text-right text-xs tabular-nums text-muted-foreground"
+          >
             {count}
             {maxLength != null ? ` / ${maxLength}` : ""}
           </div>

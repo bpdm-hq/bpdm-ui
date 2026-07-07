@@ -263,15 +263,26 @@ The stored value is always a raw numeric string (e.g. `"1234.50"`); only the dis
 | `allowNegative` | `boolean` | `false` | Permit negative amounts. |
 | `size` | `sm \| md \| lg` | `md` | Height + text scale. |
 | `disabled` | `boolean` | `false` | Disable the field. |
+| `name` | `string` | — | Native `name` for form submission (forwarded to the `<input>`). |
 | `aria-invalid` | `boolean` | `false` | Invalid state — destructive border, announced by assistive tech. |
+| `aria-label` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the `<input>`. |
 | `id` | `string` | — | Field id (for `<label>` association). |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
 
+In **React**, `MoneyInput` forwards its `ref` to the underlying `<input>` and spreads any other
+native `<input>` prop (`required`, `autoComplete`, `data-*`, `onFocus`, `onBlur`, …) onto it, so it
+drops into forms and test harnesses unchanged. In **Angular**, `name`, `aria-label`, and
+`aria-describedby` are dedicated inputs on `<bpdm-money-input>`.
+
 ## Accessibility
 
-- The currency symbol is a non-editable adornment (`select-none`, muted) — it isn't part of the
-  editable text, so screen readers announce only the amount.
+- The currency symbol is a **decorative adornment** (`aria-hidden`, `select-none`, muted) — it is
+  **not** announced. So give the field a name that carries the currency (e.g.
+  `aria-label="Amount in USD"`) via a `<label>` (`htmlFor`/`id`) or `aria-label`; the symbol alone
+  won't tell a screen-reader user which currency they're entering.
 - The field uses `inputmode="decimal"`, so mobile shows a numeric keypad.
 - Invalid state is set with `aria-invalid` — it colours the border **and** is announced (never
-  colour-only).
-- Give the field a name — associate a `<label>` (via `htmlFor`/`id`) or add `aria-label`.
+  colour-only). Pair it with `aria-describedby` pointing at your error text.
+- Labelling attributes reach the `<input>` directly: `aria-label`, `aria-describedby`, and `name`
+  are forwarded in both frameworks (React spreads every native `<input>` prop; Angular exposes them
+  as inputs).
