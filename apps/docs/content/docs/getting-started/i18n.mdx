@@ -118,9 +118,8 @@ export function ArabicForm() {
 </Tabs>
 
 <Callout type="info">
-  One caveat: the OTP Input's **←/→ arrow keys** move by physical direction, not writing
-  direction, so in RTL they step opposite to the visual order. Typing, backspace, and
-  paste-to-fill are unaffected. Everything else mirrors cleanly.
+  The OTP Input's **←/→ arrow keys** follow the visual cell order too: inside `dir="rtl"`,
+  ArrowLeft advances to the next cell and ArrowRight steps back, matching the mirrored layout.
 </Callout>
 
 ## Locale-aware formatting

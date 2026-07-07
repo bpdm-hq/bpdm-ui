@@ -42,6 +42,13 @@ const cellSize: Record<Size, string> = {
   lg: "size-14 text-lg",
 };
 
+// resolved text direction of an element — used so arrow keys follow the
+// visual cell order (in RTL, ArrowLeft advances to the next cell).
+function isRtl(el: HTMLElement): boolean {
+  if (el.closest('[dir="rtl"]')) return true;
+  return typeof getComputedStyle === "function" && getComputedStyle(el).direction === "rtl";
+}
+
 // Group sizes: explicit groupSize wins (last group = remainder); otherwise auto
 // into 2 balanced groups (even → equal halves, odd → ceil + floor).
 function getGroups(
@@ -138,12 +145,11 @@ export function InputOtp({
         commit(next);
         focusCell(i - 1);
       }
-    } else if (e.key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
-      focusCell(i - 1);
-    } else if (e.key === "ArrowRight") {
-      e.preventDefault();
-      focusCell(i + 1);
+      // arrows follow visual order — in RTL, ArrowLeft moves to the next cell
+      const forward = e.key === (isRtl(e.currentTarget) ? "ArrowLeft" : "ArrowRight");
+      focusCell(forward ? i + 1 : i - 1);
     }
   };
 

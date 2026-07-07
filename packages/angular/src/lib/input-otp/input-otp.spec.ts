@@ -18,6 +18,12 @@ class GroupedHost {}
 
 @Component({
   imports: [BpdmInputOtp],
+  template: `<div dir="rtl"><bpdm-input-otp [length]="4" integerOnly /></div>`,
+})
+class RtlHost {}
+
+@Component({
+  imports: [BpdmInputOtp],
   template: `
     <bpdm-input-otp
       [length]="4"
@@ -79,6 +85,16 @@ describe("BpdmInputOtp", () => {
     const groups = fixture.nativeElement.querySelectorAll('[role="group"] > div.flex.items-center');
     expect(groups.length).toBe(2);
     expect(fixture.nativeElement.querySelector('span[aria-hidden="true"]')).toBeTruthy();
+  });
+
+  it("flips arrow-key direction inside dir='rtl'", () => {
+    const fixture = TestBed.createComponent(RtlHost);
+    fixture.detectChanges();
+    const inputs = cells(fixture);
+    inputs[0].focus();
+    inputs[0].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+    fixture.detectChanges();
+    expect(document.activeElement).toBe(inputs[1]); // visual-left advances in RTL
   });
 
   it("fires (complete), forwards name via a hidden input, and links aria-describedby", () => {

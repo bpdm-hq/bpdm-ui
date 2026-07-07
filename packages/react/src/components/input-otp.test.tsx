@@ -89,6 +89,28 @@ describe("InputOtp", () => {
     cells().forEach((c) => expect(c).toBeDisabled());
   });
 
+  it("moves between cells with arrow keys by visual order (LTR)", async () => {
+    render(<InputOtp />);
+    cells()[0].focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(cells()[1]).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(cells()[0]).toHaveFocus();
+  });
+
+  it("flips arrow-key direction inside dir='rtl'", async () => {
+    render(
+      <div dir="rtl">
+        <InputOtp />
+      </div>,
+    );
+    cells()[0].focus();
+    await userEvent.keyboard("{ArrowLeft}"); // visual-left advances in RTL
+    expect(cells()[1]).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(cells()[0]).toHaveFocus();
+  });
+
   it("allows translating the group + per-cell labels for i18n", () => {
     render(
       <InputOtp length={4} aria-label="Code de vérification" cellLabel={(i, n) => `Chiffre ${i + 1}/${n}`} />,
