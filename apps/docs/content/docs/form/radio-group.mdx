@@ -257,19 +257,38 @@ export function Controlled() {
 | --- | --- | --- | --- |
 | `value` | `string` | — | **Required.** The item's value. |
 | `size` | `sm \| md \| lg` | `md` | Control size. |
+| `disabled` | `boolean` | `false` | Disable just this option (skipped by arrow-key navigation). |
 | `aria-invalid` | `boolean` | — | Error state. |
+| `id` | `string` | — | Control id (label association / testing), forwarded to the radio. |
+| `aria-label` / `aria-labelledby` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the radio. |
 
-In React, all native Radix RadioGroup props are supported. In Angular,
-`orientation` / `disabled` are `@Input`s on `<bpdm-radio-group>` (a
-`ControlValueAccessor`), and `value` / `size` / `aria-invalid` on `<bpdm-radio>`.
+In React, all native Radix RadioGroup props (`name`, `dir`, `aria-*`, `data-*`, …)
+are spread and `ref`s are forwarded. In Angular, `orientation` / `disabled` are
+`@Input`s on `<bpdm-radio-group>` (a `ControlValueAccessor`), and `value` / `size` /
+`disabled` / `aria-invalid` / `id` / `aria-label` / `aria-labelledby` /
+`aria-describedby` on `<bpdm-radio>`.
 
 ## Accessibility
 
-- Built on Radix Radio Group — `role="radiogroup"`, roving focus, and full
-  keyboard support (**arrow keys** move and select, **Space** selects).
-- Always link each item to a `<label>` by `id` (`htmlFor` in React, `for` in
-  Angular), or wrap the control in the label.
-- Set **`aria-invalid`** on items that fail validation; bpdm styles them with the
-  destructive colour and assistive tech announces the state.
-- Give the group an accessible name with `aria-label` / `aria-labelledby` when
+- A proper `role="radiogroup"` of `role="radio"` items with **roving tabindex** — the
+  group is a single tab stop, and **arrow keys** move focus *and* selection between
+  options (wrapping, skipping disabled ones); **Space** selects. Implemented in both
+  frameworks (React via Radix, Angular natively).
+- Give each item an accessible name — link a `<label>` by `id` (`htmlFor` in React,
+  `for` in Angular), wrap the control in the label, or pass `aria-label` /
+  `aria-labelledby` (forwarded to the control in both frameworks).
+- Give the **group** an accessible name with `aria-label` / `aria-labelledby` when
   there's no visible group heading.
+- Set **`aria-invalid`** on items that fail validation; bpdm styles them destructive-red
+  and assistive tech announces the state. The selected dot is decorative.
+
+## Internationalization
+
+- The radio group renders **no text of its own** — pass translated **accessible names**
+  (item `aria-label` / associated `<label>`, and a group `aria-label`) and translated
+  help/error via `aria-describedby`. There's nothing hard-coded to override.
+- **RTL-safe**: the controls are symmetric circles with no physical spacing, so the group
+  mirrors under `dir="rtl"`, and the **arrow keys follow the visual order** — ArrowLeft
+  advances in a right-to-left layout. In Angular this is automatic from the ambient
+  `dir`; in React pass `dir="rtl"` to `<RadioGroup>` (or use a Radix `DirectionProvider`).
+  See the [Internationalization guide](/docs/getting-started/i18n).
