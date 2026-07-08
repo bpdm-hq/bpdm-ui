@@ -341,16 +341,31 @@ export function WifiToggle() {
 | `shape` | `pill \| square \| sharp` | `pill` | Corner style of the track and thumb. |
 | `icon` | `boolean` | `false` | Show a ✓ / ✗ glyph inside the thumb. |
 | `disabled` | `boolean` | `false` | Disable the control. |
+| `id` | `string` | — | Control id (label association / testing), forwarded to the switch. |
+| `aria-label` / `aria-labelledby` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the switch. |
 
-In React, all native Radix Switch props (`name`, `value`, `required`, `id`, …)
-are supported. In Angular, `size` / `shape` / `icon` are `@Input`s on
-`<bpdm-switch>`, which is a `ControlValueAccessor`.
+In React, all native Radix Switch props (`name`, `value`, `required`, `id`, `aria-*`,
+`data-*`, …) are spread onto the control and the `ref` is forwarded. In Angular,
+`size` / `shape` / `icon` / `id` / `aria-label` / `aria-labelledby` / `aria-describedby`
+are `@Input`s on `<bpdm-switch>`, which is a `ControlValueAccessor` (`[(ngModel)]` /
+reactive forms) with a standalone `[(checked)]`.
 
 ## Accessibility
 
-- Built on Radix Switch — `role="switch"`, full keyboard support (**Space** /
-  **Enter** to toggle), and `aria-checked` reflects the state.
-- Always give it an accessible name: link a `<label>` by `id`, or pass an
-  `aria-label` when there's no visible text.
-- The thumb glyph (`icon`) is decorative — state is conveyed via `aria-checked`,
-  not the glyph.
+- A true `role="switch"` with `aria-checked` reflecting state and full keyboard support
+  (**Space** / **Enter** toggle; **Tab** focuses with a visible ring).
+- **Give it an accessible name** — link a `<label>` by `id` (`htmlFor` in React, `for`
+  in Angular), or pass `aria-label` / `aria-labelledby` (forwarded to the control in both
+  frameworks).
+- The thumb glyph (`icon`) is `aria-hidden` and decorative — state is conveyed via
+  `aria-checked`, never the glyph alone.
+
+## Internationalization
+
+- The switch renders **no text of its own** — pass a translated accessible name
+  (`aria-label` / associated `<label>`) and translated help via `aria-describedby`. There's
+  nothing hard-coded to override.
+- **RTL-safe**: in a `dir="rtl"` context the thumb slides to the **left** when on (the
+  checked-state translate is mirrored), so the motion reads correctly right-to-left. Works
+  from the ambient `dir` in both frameworks. See the
+  [Internationalization guide](/docs/getting-started/i18n).

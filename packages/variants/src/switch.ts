@@ -26,9 +26,11 @@ export const thumbVariants = cva(
   {
     variants: {
       size: {
-        sm: "size-4 data-[state=checked]:translate-x-4",
-        md: "size-5 data-[state=checked]:translate-x-5",
-        lg: "size-6 data-[state=checked]:translate-x-[1.375rem]",
+        // RTL: the thumb slides to the other side — a negative translate wins in a
+        // [dir=rtl] context (higher specificity), so the switch mirrors correctly.
+        sm: "size-4 data-[state=checked]:translate-x-4 rtl:data-[state=checked]:-translate-x-4",
+        md: "size-5 data-[state=checked]:translate-x-5 rtl:data-[state=checked]:-translate-x-5",
+        lg: "size-6 data-[state=checked]:translate-x-[1.375rem] rtl:data-[state=checked]:-translate-x-[1.375rem]",
       },
       shape: {
         pill: "rounded-full",

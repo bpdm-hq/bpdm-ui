@@ -25,6 +25,7 @@ export const Switch = React.forwardRef<
           <svg
             viewBox="0 0 16 16"
             fill="none"
+            aria-hidden
             className="hidden size-[62%] text-primary group-data-[state=checked]:block"
           >
             <path
@@ -38,6 +39,7 @@ export const Switch = React.forwardRef<
           <svg
             viewBox="0 0 16 16"
             fill="none"
+            aria-hidden
             className="hidden size-[62%] text-muted-foreground group-data-[state=unchecked]:block"
           >
             <path
