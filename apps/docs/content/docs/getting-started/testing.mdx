@@ -367,6 +367,46 @@ expect(label.getAttribute('for')).toBe(field.id); // never dangling
   </Tab>
 </Tabs>
 
+### Checkbox
+
+The **Checkbox** is a `role="checkbox"` with an accessible name — query it by role/name,
+toggle by clicking, and assert `aria-checked` (`true` / `false` / `mixed` for indeterminate).
+No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="checkbox.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<Checkbox aria-label="Accept terms" />);
+
+const cb = screen.getByRole('checkbox', { name: 'Accept terms' });
+await userEvent.click(cb);
+expect(cb).toHaveAttribute('aria-checked', 'true');
+
+// indeterminate is exposed as aria-checked="mixed"
+render(<Checkbox aria-label="Some" checked="indeterminate" onCheckedChange={() => {}} />);
+expect(screen.getByRole('checkbox', { name: 'Some' })).toHaveAttribute('aria-checked', 'mixed');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="checkbox.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const cb = el.querySelector('[role="checkbox"]') as HTMLButtonElement;
+cb.click();
+fixture.detectChanges();
+expect(cb.getAttribute('aria-checked')).toBe('true');
+// indeterminate → aria-checked="mixed"; pass aria-label for the accessible name
+```
+
+  </Tab>
+</Tabs>
+
 ### Data Table
 
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
