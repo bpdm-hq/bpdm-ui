@@ -373,3 +373,11 @@ Values accept a `string` or `number`; strings are recommended to preserve precis
 - At `min`/`max` the relevant stepper is `disabled` (removed from the tab order), so the value
   can't leave its range.
 - Give the field a name — associate a `<label>` (via `htmlFor`/`id`) or add `aria-label`.
+
+## Internationalization
+
+- The stepper button labels (`Increase` / `Decrease`) are translatable via the `messages` prop —
+  see [Translating labels](/docs/getting-started/i18n). Give the field itself a translated
+  accessible name.
+- **RTL-safe**: field alignment uses a logical property (`text-start`) and the steppers sit via
+  flex layout, so the control mirrors under `dir="rtl"`.

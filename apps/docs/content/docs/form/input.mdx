@@ -318,3 +318,12 @@ are `@Input`s on the `input[bpdmInput]` directive.
 - Set **`aria-invalid`** when a field fails validation — bpdm styles it with the
   destructive colour, and screen readers announce the error state.
 - It's a native `<input>`, so keyboard and assistive-tech behaviour are built in.
+
+## Internationalization
+
+- The input renders **no text of its own** — pass a translated `placeholder`, a translated
+  accessible name (associated `<label>` or `aria-label`), and translated help/error via
+  `aria-describedby`.
+- **RTL-safe**: the start/end icon padding uses logical properties (`ps`/`pe`, `start`/`end`),
+  so the field and its icons mirror under `dir="rtl"`. See the
+  [Internationalization guide](/docs/getting-started/i18n).
