@@ -22,6 +22,12 @@ class IndeterminateHost {}
 })
 class InvalidHost {}
 
+@Component({
+  imports: [BpdmCheckbox],
+  template: `<bpdm-checkbox id="terms" aria-label="Accept terms" aria-describedby="hint" [checked]="true" />`,
+})
+class LabelledHost {}
+
 describe("BpdmCheckbox", () => {
   it("toggles checked state on click", () => {
     const fixture = TestBed.createComponent(HostComponent);
@@ -48,5 +54,16 @@ describe("BpdmCheckbox", () => {
     fixture.detectChanges();
     const btn = fixture.nativeElement.querySelector('[role="checkbox"]') as HTMLButtonElement;
     expect(btn.getAttribute("aria-invalid")).toBe("true");
+  });
+
+  it("forwards id + accessible-name attributes and hides the glyph", () => {
+    const fixture = TestBed.createComponent(LabelledHost);
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector('[role="checkbox"]') as HTMLButtonElement;
+    expect(btn.getAttribute("id")).toBe("terms");
+    expect(btn.getAttribute("aria-label")).toBe("Accept terms");
+    expect(btn.getAttribute("aria-describedby")).toBe("hint");
+    // the check glyph is decorative
+    expect(fixture.nativeElement.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
   });
 });

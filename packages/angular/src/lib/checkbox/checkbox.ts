@@ -32,9 +32,13 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
     <button
       type="button"
       role="checkbox"
+      [id]="id() || null"
       [class]="boxClass()"
       [attr.data-state]="state()"
       [attr.aria-checked]="indeterminate() ? 'mixed' : checked()"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-labelledby]="ariaLabelledby() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
       [disabled]="disabled()"
       (click)="toggle()"
@@ -44,7 +48,7 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
         <span
           class="flex size-full items-center justify-center text-current animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
         >
-          <svg viewBox="0 0 16 16" fill="none" class="size-full p-[14%]">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-full p-[14%]">
             @if (indeterminate()) {
               <path d="M4 8h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             } @else {
@@ -62,6 +66,14 @@ export class BpdmCheckbox implements ControlValueAccessor {
   /** Invalid state — set `aria-invalid="true"`; styled red. */
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Control id (for label association / testing), forwarded to the checkbox. */
+  readonly id = input<string>("");
+  /** Accessible name — pass a translated string for i18n. Forwarded to the checkbox. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** Id(s) of the element(s) labelling the checkbox. Forwarded to the checkbox. */
+  readonly ariaLabelledby = input<string>("", { alias: "aria-labelledby" });
+  /** Id(s) of describing elements (help / error text). Forwarded to the checkbox. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
   /** Standalone two-way binding; also driven by ngModel / formControl. */
   readonly checked = model(false);
 

@@ -30,4 +30,17 @@ describe("Checkbox", () => {
     await userEvent.click(screen.getByRole("checkbox", { name: "Locked" }));
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("reports a mixed state when indeterminate", () => {
+    render(<Checkbox aria-label="Mixed" checked="indeterminate" onCheckedChange={() => {}} />);
+    const cb = screen.getByRole("checkbox", { name: "Mixed" });
+    expect(cb).toHaveAttribute("aria-checked", "mixed");
+    expect(cb).toHaveAttribute("data-state", "indeterminate");
+  });
+
+  it("hides the decorative check glyph from assistive tech", () => {
+    render(<Checkbox aria-label="On" checked onCheckedChange={() => {}} />);
+    const svg = screen.getByRole("checkbox", { name: "On" }).querySelector("svg");
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+  });
 });

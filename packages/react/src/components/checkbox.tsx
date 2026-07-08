@@ -17,7 +17,7 @@ export const Checkbox = React.forwardRef<
     {...props}
   >
     <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]">
-      <svg viewBox="0 0 16 16" fill="none" className="size-full p-[14%]">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden className="size-full p-[14%]">
         {props.checked === "indeterminate" ? (
           <path
             d="M4 8h8"

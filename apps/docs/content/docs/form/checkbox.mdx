@@ -296,18 +296,33 @@ children in your component:
 | `size` | `sm \| md \| lg` | `md` | Control size. |
 | `disabled` | `boolean` | `false` | Disable the control. |
 | `aria-invalid` | `boolean` | — | Error state. |
+| `id` | `string` | — | Control id (label association / testing), forwarded to the checkbox. |
+| `aria-label` / `aria-labelledby` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the checkbox. |
 
-In React, all native Radix Checkbox props (`name`, `value`, `required`, `id`, …)
-are supported. In Angular, `size` / `indeterminate` / `aria-invalid` are `@Input`s
-on `<bpdm-checkbox>`, which is a `ControlValueAccessor`.
+In React, all native Radix Checkbox props (`name`, `value`, `required`, `id`,
+`aria-*`, `data-*`, …) are spread onto the control and the `ref` is forwarded. In
+Angular, `size` / `indeterminate` / `aria-invalid` / `id` / `aria-label` /
+`aria-labelledby` / `aria-describedby` are `@Input`s on `<bpdm-checkbox>`, which is
+also a `ControlValueAccessor` (`[(ngModel)]` / reactive forms) with a standalone
+`[(checked)]`.
 
 ## Accessibility
 
-- Built on Radix Checkbox — `role="checkbox"`, `aria-checked` (`true` / `false` /
-  `mixed`), and keyboard support (**Space** toggles).
-- Always link a `<label>` by `id` (`htmlFor` in React, `for` in Angular), or wrap
-  the control in the label.
+- A true `role="checkbox"` with `aria-checked` (`true` / `false` / `mixed`) and
+  keyboard support (**Space** toggles; **Tab** moves focus with a visible ring).
+- **Give it an accessible name** — link a `<label>` by `id` (`htmlFor` in React,
+  `for` in Angular), wrap the control in the label, or pass `aria-label` /
+  `aria-labelledby`. These reach the control in both frameworks.
 - Set **`aria-invalid`** when validation fails and link the message with
   **`aria-describedby`** so assistive tech reads the error.
 - The indeterminate state is communicated as `aria-checked="mixed"`, not by the
-  glyph alone.
+  glyph alone — and the check/dash glyph is `aria-hidden`, so nothing is announced twice.
+
+## Internationalization
+
+- The checkbox renders **no text of its own**, so there's nothing to translate inside
+  it — pass a translated **accessible name** (`aria-label`, or the `<label>` you
+  associate) and translated help/error text via `aria-describedby`.
+- It's **RTL-safe by construction**: the control is a symmetric box with no physical
+  spacing, so it mirrors correctly under `dir="rtl"` (the box/label order flips with
+  your layout's writing direction). See the [Internationalization guide](/docs/getting-started/i18n).
