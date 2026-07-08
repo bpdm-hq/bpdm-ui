@@ -407,6 +407,47 @@ expect(cb.getAttribute('aria-checked')).toBe('true');
   </Tab>
 </Tabs>
 
+### Radio Group
+
+The **Radio Group** is a `role="radiogroup"` of `role="radio"` items, each with an accessible
+name. Query the group and items by role/name, select by clicking (or arrow keys), and assert
+`aria-checked`. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="plan.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(
+  <RadioGroup aria-label="Plan">
+    <RadioGroupItem value="free" aria-label="Free" />
+    <RadioGroupItem value="pro" aria-label="Pro" />
+  </RadioGroup>,
+);
+
+screen.getByRole('radiogroup', { name: 'Plan' });
+await userEvent.click(screen.getByRole('radio', { name: 'Pro' }));
+expect(screen.getByRole('radio', { name: 'Pro' })).toHaveAttribute('aria-checked', 'true');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="plan.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const radios = el.querySelectorAll('[role="radio"]');
+(radios[1] as HTMLButtonElement).click();
+fixture.detectChanges();
+expect(radios[1].getAttribute('aria-checked')).toBe('true');
+// arrow keys move + select; pass aria-label for each item's accessible name
+```
+
+  </Tab>
+</Tabs>
+
 ### Data Table
 
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
