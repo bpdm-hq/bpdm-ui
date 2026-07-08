@@ -80,22 +80,43 @@ Unchecked, checked, **indeterminate**, and `disabled` (on or off). Set
   <Tab value="React">
 
 ```tsx title="checkbox-states.tsx"
-<Checkbox />
-<Checkbox defaultChecked />
-<Checkbox checked="indeterminate" />
-<Checkbox disabled />
-<Checkbox disabled defaultChecked />
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+export function States() {
+  return (
+    <div className="flex items-center gap-4">
+      <Checkbox aria-label="Unchecked" />
+      <Checkbox defaultChecked aria-label="Checked" />
+      <Checkbox checked="indeterminate" aria-label="Indeterminate" />
+      <Checkbox disabled aria-label="Disabled" />
+      <Checkbox disabled defaultChecked aria-label="Disabled and checked" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="checkbox-states.html"
-<bpdm-checkbox />
-<bpdm-checkbox [checked]="true" />
-<bpdm-checkbox indeterminate />
-<bpdm-checkbox disabled />
-<bpdm-checkbox disabled [checked]="true" />
+```ts title="checkbox-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmCheckbox],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-checkbox aria-label="Unchecked" />
+      <bpdm-checkbox [checked]="true" aria-label="Checked" />
+      <bpdm-checkbox indeterminate aria-label="Indeterminate" />
+      <bpdm-checkbox disabled aria-label="Disabled" />
+      <bpdm-checkbox disabled [checked]="true" aria-label="Disabled and checked" />
+    </div>
+  `,
+})
+export class StatesComponent {}
 ```
 
   </Tab>
@@ -113,18 +134,39 @@ The `size` prop offers `sm`, `md` (default), and `lg`.
   <Tab value="React">
 
 ```tsx title="checkbox-sizes.tsx"
-<Checkbox size="sm" defaultChecked />
-<Checkbox size="md" defaultChecked />
-<Checkbox size="lg" defaultChecked />
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+export function Sizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <Checkbox size="sm" defaultChecked aria-label="Small" />
+      <Checkbox size="md" defaultChecked aria-label="Medium" />
+      <Checkbox size="lg" defaultChecked aria-label="Large" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="checkbox-sizes.html"
-<bpdm-checkbox size="sm" [checked]="true" />
-<bpdm-checkbox size="md" [checked]="true" />
-<bpdm-checkbox size="lg" [checked]="true" />
+```ts title="checkbox-sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sizes',
+  standalone: true,
+  imports: [BpdmCheckbox],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-checkbox size="sm" [checked]="true" aria-label="Small" />
+      <bpdm-checkbox size="md" [checked]="true" aria-label="Medium" />
+      <bpdm-checkbox size="lg" [checked]="true" aria-label="Large" />
+    </div>
+  `,
+})
+export class SizesComponent {}
 ```
 
   </Tab>
@@ -143,27 +185,44 @@ error message with `aria-describedby` so screen readers announce it.
   <Tab value="React">
 
 ```tsx title="checkbox-invalid.tsx"
-<div className="flex flex-col gap-1.5">
-  <div className="flex items-center gap-2.5">
-    <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
-    <label htmlFor="agree">I agree to the terms</label>
-  </div>
-  <p id="agree-err" className="text-xs text-destructive">
-    You must accept before continuing.
-  </p>
-</div>
+import { Checkbox } from '@bpdm/ui/checkbox';
+
+export function Invalid() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-2.5">
+        <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
+        <label htmlFor="agree">I agree to the terms</label>
+      </div>
+      <p id="agree-err" className="text-xs text-destructive">
+        You must accept before continuing.
+      </p>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="checkbox-invalid.html"
-<div class="flex flex-col gap-1.5">
-  <label class="flex items-center gap-2.5">
-    <bpdm-checkbox aria-invalid="true" aria-describedby="agree-err" /> I agree to the terms
-  </label>
-  <p id="agree-err" class="text-xs text-destructive">You must accept before continuing.</p>
-</div>
+```ts title="checkbox-invalid.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-invalid',
+  standalone: true,
+  imports: [BpdmCheckbox],
+  template: `
+    <div class="flex flex-col gap-1.5">
+      <label class="flex items-center gap-2.5">
+        <bpdm-checkbox aria-invalid="true" aria-describedby="agree-err" /> I agree to the terms
+      </label>
+      <p id="agree-err" class="text-xs text-destructive">You must accept before continuing.</p>
+    </div>
+  `,
+})
+export class InvalidComponent {}
 ```
 
   </Tab>
@@ -206,10 +265,29 @@ export function Preferences() {
   </Tab>
   <Tab value="Angular">
 
-```html title="checkbox-group.html"
-<label class="flex items-center gap-2.5"><bpdm-checkbox [checked]="true" /> Email notifications</label>
-<label class="flex items-center gap-2.5"><bpdm-checkbox /> SMS notifications</label>
-<label class="flex items-center gap-2.5"><bpdm-checkbox [checked]="true" /> Push notifications</label>
+```ts title="checkbox-group.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-preferences',
+  standalone: true,
+  imports: [BpdmCheckbox],
+  template: `
+    @for (o of prefs; track o.label) {
+      <label class="flex items-center gap-2.5">
+        <bpdm-checkbox [(checked)]="o.on" /> {{ o.label }}
+      </label>
+    }
+  `,
+})
+export class PreferencesComponent {
+  prefs = [
+    { label: 'Email notifications', on: true },
+    { label: 'SMS notifications', on: false },
+    { label: 'Push notifications', on: true },
+  ];
+}
 ```
 
   </Tab>
@@ -271,15 +349,45 @@ export function SelectAll() {
 `indeterminate` is a separate input from `[(checked)]`, so compute it from the
 children in your component:
 
-```html title="checkbox-select-all.html"
-<label class="flex items-center gap-2.5 font-medium">
-  <bpdm-checkbox [checked]="allChecked()" [indeterminate]="someChecked()" (checkedChange)="toggleAll($event)" />
-  Select all
-</label>
-@for (t of toppings; track t.name) {
-  <label class="flex items-center gap-2.5 ps-1">
-    <bpdm-checkbox [(checked)]="t.on" /> {{ t.name }}
-  </label>
+```ts title="checkbox-select-all.component.ts"
+import { Component, computed, signal } from '@angular/core';
+import { BpdmCheckbox } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select-all',
+  standalone: true,
+  imports: [BpdmCheckbox],
+  template: `
+    <label class="flex items-center gap-2.5 font-medium">
+      <bpdm-checkbox
+        [checked]="allChecked()"
+        [indeterminate]="someChecked() && !allChecked()"
+        (checkedChange)="toggleAll($event)" />
+      Select all
+    </label>
+    @for (t of toppings(); track t.name) {
+      <label class="flex items-center gap-2.5 ps-1">
+        <bpdm-checkbox [checked]="t.on" (checkedChange)="set(t.name, $event)" /> {{ t.name }}
+      </label>
+    }
+  `,
+})
+export class SelectAllComponent {
+  readonly toppings = signal([
+    { name: 'Cheese', on: true },
+    { name: 'Mushrooms', on: false },
+    { name: 'Olives', on: false },
+  ]);
+
+  readonly allChecked = computed(() => this.toppings().every((t) => t.on));
+  readonly someChecked = computed(() => this.toppings().some((t) => t.on));
+
+  set(name: string, on: boolean): void {
+    this.toppings.update((list) => list.map((t) => (t.name === name ? { ...t, on } : t)));
+  }
+  toggleAll(on: boolean): void {
+    this.toppings.update((list) => list.map((t) => ({ ...t, on })));
+  }
 }
 ```
 

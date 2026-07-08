@@ -37,7 +37,24 @@ export interface MultiSelectProps extends VariantProps<typeof triggerVariants> {
   contentClassName?: string;
   "aria-invalid"?: boolean;
   id?: string;
+  /** Accessible name for the trigger + option list (when there's no visible `<label>`). */
+  "aria-label"?: string;
+  "aria-describedby"?: string;
+  /** Screen-reader labels + count text — override for i18n. */
+  messages?: {
+    selectAll?: string;
+    clearAll?: string;
+    remove?: (label: string) => string;
+    selected?: (count: number) => string;
+  };
 }
+
+const DEFAULT_MESSAGES = {
+  selectAll: "Select all",
+  clearAll: "Clear all",
+  remove: (label: string) => `Remove ${label}`,
+  selected: (count: number) => `${count} selected`,
+};
 
 /**
  * Searchable, virtualized multi-select (Select's bigger sibling). Same options
@@ -62,7 +79,16 @@ export function MultiSelect({
   contentClassName,
   "aria-invalid": ariaInvalid,
   id,
+  "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedBy,
+  messages,
 }: MultiSelectProps) {
+  const t = { ...DEFAULT_MESSAGES, ...messages };
+  const baseId = React.useId();
+  const listboxId = `${baseId}-listbox`;
+  const optionId = (index: number) => `${baseId}-opt-${index}`;
+  const searchRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = React.useState(false);
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState<string[]>(defaultValue ?? []);
@@ -196,6 +222,9 @@ export function MultiSelect({
   const chips = maxDisplay > 0 ? selectedOptions.slice(0, maxDisplay) : [];
   const extra = selectedOptions.length - chips.length;
 
+  // id of the highlighted option, exposed via aria-activedescendant
+  const activeId = rows[active]?.kind === "item" ? optionId(active) : undefined;
+
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
@@ -203,7 +232,11 @@ export function MultiSelect({
           ref={triggerRef}
           id={id}
           role="combobox"
+          aria-haspopup="listbox"
           aria-expanded={open}
+          aria-controls={open ? listboxId : undefined}
+          aria-label={ariaLabel}
+          aria-describedby={ariaDescribedBy}
           aria-invalid={ariaInvalid}
           aria-disabled={disabled}
           data-disabled={disabled ? "" : undefined}
@@ -220,7 +253,7 @@ export function MultiSelect({
             {selected.length === 0 ? (
               <span className="text-muted-foreground">{placeholder}</span>
             ) : maxDisplay === 0 ? (
-              <span>{selected.length} selected</span>
+              <span>{t.selected(selected.length)}</span>
             ) : (
               <>
                 {chips.map((o) => (
@@ -231,7 +264,7 @@ export function MultiSelect({
                     <span className="truncate">{o.label}</span>
                     <button
                       type="button"
-                      aria-label={`Remove ${o.label}`}
+                      aria-label={t.remove(o.label)}
                       tabIndex={-1}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
@@ -255,7 +288,7 @@ export function MultiSelect({
             {selected.length > 0 && !disabled && (
               <button
                 type="button"
-                aria-label="Clear all"
+                aria-label={t.clearAll}
                 tabIndex={-1}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
@@ -278,6 +311,10 @@ export function MultiSelect({
           sideOffset={4}
           collisionPadding={8}
           onKeyDown={onKeyDown}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            (searchable ? searchRef.current : listRef.current)?.focus();
+          }}
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
@@ -290,9 +327,11 @@ export function MultiSelect({
               {selectAll && filteredItemValues.length > 0 && (
                 <button
                   type="button"
+                  role="checkbox"
+                  aria-checked={allSel ? true : someSel ? "mixed" : false}
                   onClick={toggleAll}
-                  aria-label="Select all"
-                  title="Select all"
+                  aria-label={t.selectAll}
+                  title={t.selectAll}
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground",
                     !searchable && "w-full",
@@ -308,7 +347,7 @@ export function MultiSelect({
                   >
                     {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
                   </span>
-                  {!searchable && "Select all"}
+                  {!searchable && t.selectAll}
                 </button>
               )}
               {selectAll && filteredItemValues.length > 0 && searchable && (
@@ -318,11 +357,16 @@ export function MultiSelect({
                 <>
                   <FieldSearch />
                   <input
-                    autoFocus
+                    ref={searchRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={searchPlaceholder}
                     aria-label={searchPlaceholder}
+                    role="combobox"
+                    aria-expanded
+                    aria-controls={listboxId}
+                    aria-autocomplete="list"
+                    aria-activedescendant={activeId}
                     className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                   />
                 </>
@@ -333,7 +377,20 @@ export function MultiSelect({
           {rows.length === 0 ? (
             <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
           ) : (
-            <div ref={setListEl} role="listbox" aria-multiselectable style={{ maxHeight }} className="min-h-0 flex-1 overflow-auto p-1">
+            <div
+              ref={(el) => {
+                listRef.current = el;
+                setListEl(el);
+              }}
+              id={listboxId}
+              role="listbox"
+              aria-multiselectable
+              aria-label={ariaLabel ?? placeholder}
+              tabIndex={-1}
+              aria-activedescendant={searchable ? undefined : activeId}
+              style={{ maxHeight }}
+              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
+            >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
                 {virtualizer.getVirtualItems().map((vi) => {
                   const r = rows[vi.index];
@@ -344,7 +401,8 @@ export function MultiSelect({
                     return (
                       <div
                         key={`g-${vi.index}`}
-                        className="absolute left-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
+                        aria-hidden="true"
+                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
                         {...common}
                       >
                         {r.icon}
@@ -358,6 +416,7 @@ export function MultiSelect({
                   return (
                     <button
                       key={o.value}
+                      id={optionId(vi.index)}
                       type="button"
                       role="option"
                       aria-selected={isSelected}
@@ -365,7 +424,7 @@ export function MultiSelect({
                       onClick={() => !o.disabled && toggle(o.value)}
                       onMouseMove={() => setActive(vi.index)}
                       className={cn(
-                        "absolute left-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+                        "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         isActive && "bg-muted",
                       )}
                       {...common}

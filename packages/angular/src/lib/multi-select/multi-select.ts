@@ -33,6 +33,9 @@ import {
 
 const ROW_H = 36;
 
+/** Per-instance counter for stable listbox/option ids (aria-activedescendant). */
+let multiUid = 0;
+
 /**
  * `<bpdm-multi-select>` — searchable, virtualized multi-select (Select's bigger
  * sibling). Same `options` (flat or grouped), always virtualized. The trigger
@@ -48,8 +51,12 @@ const ROW_H = 36;
     <div
       #trigger
       role="combobox"
+      aria-haspopup="listbox"
       [attr.id]="id() || null"
       [attr.aria-expanded]="open()"
+      [attr.aria-controls]="open() ? listboxId : null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
       [attr.aria-disabled]="disabled() || null"
       [attr.data-disabled]="disabled() ? '' : null"
@@ -62,12 +69,12 @@ const ROW_H = 36;
         @if (selected().length === 0) {
           <span class="text-muted-foreground">{{ placeholder() }}</span>
         } @else if (maxDisplay() === 0) {
-          <span>{{ selected().length }} selected</span>
+          <span>{{ t().selected(selected().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
             <span class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
               <span class="truncate">{{ o.label }}</span>
-              <button type="button" [attr.aria-label]="'Remove ' + o.label" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); toggle(o.value)" class="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+              <button type="button" [attr.aria-label]="t().remove(o.label)" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); toggle(o.value)" class="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
               </button>
             </span>
@@ -79,7 +86,7 @@ const ROW_H = 36;
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selected().length > 0 && !disabled()) {
-          <button type="button" aria-label="Clear all" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+          <button type="button" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -92,7 +99,7 @@ const ROW_H = 36;
         @if (searchable() || (selectAll() && filteredValues().length > 0)) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             @if (selectAll() && filteredValues().length > 0) {
-              <button type="button" (click)="toggleAll()" aria-label="Select all" title="Select all" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
+              <button type="button" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -100,25 +107,25 @@ const ROW_H = 36;
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M4 8h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
                   }
                 </span>
-                @if (!searchable()) { Select all }
+                @if (!searchable()) { {{ t().selectAll }} }
               </button>
               @if (searchable()) { <span class="w-px shrink-0 self-stretch bg-border" aria-hidden="true"></span> }
             }
             @if (searchable()) {
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-              <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+              <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
             }
           </div>
         }
         @if (rows().length === 0) {
           <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
-          <cdk-virtual-scroll-viewport #viewport role="listbox" aria-multiselectable="true" [itemSize]="36" [style.height.px]="viewportHeight()" class="overflow-auto px-1">
+          <cdk-virtual-scroll-viewport #viewport role="listbox" aria-multiselectable="true" tabindex="-1" [attr.id]="listboxId" [attr.aria-label]="ariaLabel() || placeholder()" [attr.aria-activedescendant]="searchable() ? null : activeDescId()" [itemSize]="36" [style.height.px]="viewportHeight()" class="overflow-auto px-1 focus:outline-none">
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
+                <div aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
               } @else {
-                <button type="button" role="option" [attr.aria-selected]="selectedSet().has(r.option.value)" [disabled]="r.option.disabled || null" (click)="toggle(r.option.value)" (mousemove)="active.set(i)" [class]="optionClass(i)">
+                <button type="button" role="option" [attr.id]="optionId(i)" [attr.aria-selected]="selectedSet().has(r.option.value)" [disabled]="r.option.disabled || null" (click)="toggle(r.option.value)" (mousemove)="active.set(i)" [class]="optionClass(i)">
                   <span [class]="boxClass(selectedSet().has(r.option.value))">
                     @if (selectedSet().has(r.option.value)) {
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -157,15 +164,43 @@ export class BpdmMultiSelect implements OnDestroy {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
+  /** Accessible name for the trigger + option list — pass a translated string. */
+  readonly ariaLabel = input("", { alias: "aria-label" });
+  readonly ariaDescribedby = input("", { alias: "aria-describedby" });
+  /** Screen-reader labels + count text — override for i18n. */
+  readonly messages = input<{
+    selectAll?: string;
+    clearAll?: string;
+    remove?: (label: string) => string;
+    selected?: (count: number) => string;
+  }>({});
+
+  protected readonly t = computed(() => ({
+    selectAll: "Select all",
+    clearAll: "Clear all",
+    remove: (l: string) => `Remove ${l}`,
+    selected: (n: number) => `${n} selected`,
+    ...this.messages(),
+  }));
 
   protected readonly open = signal(false);
   protected readonly query = signal("");
   protected readonly active = signal(0);
   protected readonly panelWidth = signal(0);
 
+  /** Stable ids linking trigger → listbox → active option (aria-activedescendant). */
+  protected readonly baseId = `bpdm-multiselect-${(multiUid += 1)}`;
+  protected readonly listboxId = `${this.baseId}-listbox`;
+  protected optionId(index: number): string {
+    return `${this.baseId}-opt-${index}`;
+  }
+  protected readonly activeDescId = computed(() => {
+    const r = this.rows()[this.active()];
+    return r?.kind === "item" ? this.optionId(this.active()) : null;
+  });
+
   private readonly triggerEl = viewChild.required<ElementRef<HTMLElement>>("trigger");
   private readonly panelTpl = viewChild.required<TemplateRef<unknown>>("panel");
-  private readonly panelRoot = viewChild<ElementRef<HTMLElement>>("panelRoot");
   private readonly searchEl = viewChild<ElementRef<HTMLInputElement>>("search");
   private readonly viewport = viewChild<CdkVirtualScrollViewport>("viewport");
   private overlayRef?: OverlayRef;
@@ -235,7 +270,7 @@ export class BpdmMultiSelect implements OnDestroy {
   }
   protected optionClass(i: number): string {
     return cn(
-      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
       i === this.active() && "bg-muted",
     );
   }
@@ -289,8 +324,10 @@ export class BpdmMultiSelect implements OnDestroy {
     setTimeout(() => {
       this.viewport()?.checkViewportSize();
       const search = this.searchEl()?.nativeElement;
+      // focus the search box (editable combobox) or the listbox itself, so
+      // aria-activedescendant is announced from the focused element
       if (search) search.focus();
-      else this.panelRoot()?.nativeElement.focus();
+      else this.viewport()?.elementRef.nativeElement.focus();
     });
   }
 

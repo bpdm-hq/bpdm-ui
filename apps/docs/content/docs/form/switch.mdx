@@ -72,18 +72,39 @@ The `size` prop offers `sm`, `md` (default), and `lg`.
   <Tab value="React">
 
 ```tsx title="switch-sizes.tsx"
-<Switch size="sm" defaultChecked />
-<Switch size="md" defaultChecked />
-<Switch size="lg" defaultChecked />
+import { Switch } from '@bpdm/ui/switch';
+
+export function Sizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <Switch size="sm" defaultChecked aria-label="Small" />
+      <Switch size="md" defaultChecked aria-label="Medium" />
+      <Switch size="lg" defaultChecked aria-label="Large" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-sizes.html"
-<bpdm-switch size="sm" [checked]="true" />
-<bpdm-switch size="md" [checked]="true" />
-<bpdm-switch size="lg" [checked]="true" />
+```ts title="switch-sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sizes',
+  standalone: true,
+  imports: [BpdmSwitch],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-switch size="sm" [checked]="true" aria-label="Small" />
+      <bpdm-switch size="md" [checked]="true" aria-label="Medium" />
+      <bpdm-switch size="lg" [checked]="true" aria-label="Large" />
+    </div>
+  `,
+})
+export class SizesComponent {}
 ```
 
   </Tab>
@@ -101,18 +122,39 @@ The `shape` prop offers `pill` (default), `square` (rounded), and `sharp`.
   <Tab value="React">
 
 ```tsx title="switch-shapes.tsx"
-<Switch shape="pill" defaultChecked />
-<Switch shape="square" defaultChecked />
-<Switch shape="sharp" defaultChecked />
+import { Switch } from '@bpdm/ui/switch';
+
+export function Shapes() {
+  return (
+    <div className="flex items-center gap-4">
+      <Switch shape="pill" defaultChecked aria-label="Pill" />
+      <Switch shape="square" defaultChecked aria-label="Square" />
+      <Switch shape="sharp" defaultChecked aria-label="Sharp" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-shapes.html"
-<bpdm-switch shape="pill" [checked]="true" />
-<bpdm-switch shape="square" [checked]="true" />
-<bpdm-switch shape="sharp" [checked]="true" />
+```ts title="switch-shapes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-shapes',
+  standalone: true,
+  imports: [BpdmSwitch],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-switch shape="pill" [checked]="true" aria-label="Pill" />
+      <bpdm-switch shape="square" [checked]="true" aria-label="Square" />
+      <bpdm-switch shape="sharp" [checked]="true" aria-label="Sharp" />
+    </div>
+  `,
+})
+export class ShapesComponent {}
 ```
 
   </Tab>
@@ -131,18 +173,39 @@ needs to read at a glance.
   <Tab value="React">
 
 ```tsx title="switch-icon.tsx"
-<Switch icon defaultChecked />
-<Switch icon />
-<Switch icon size="lg" defaultChecked />
+import { Switch } from '@bpdm/ui/switch';
+
+export function WithIcon() {
+  return (
+    <div className="flex items-center gap-4">
+      <Switch icon defaultChecked aria-label="On" />
+      <Switch icon aria-label="Off" />
+      <Switch icon size="lg" defaultChecked aria-label="Large on" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-icon.html"
-<bpdm-switch icon [checked]="true" />
-<bpdm-switch icon />
-<bpdm-switch icon size="lg" [checked]="true" />
+```ts title="switch-icon.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-with-icon',
+  standalone: true,
+  imports: [BpdmSwitch],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-switch icon [checked]="true" aria-label="On" />
+      <bpdm-switch icon aria-label="Off" />
+      <bpdm-switch icon size="lg" [checked]="true" aria-label="Large on" />
+    </div>
+  `,
+})
+export class WithIconComponent {}
 ```
 
   </Tab>
@@ -160,20 +223,41 @@ Off, on, and `disabled` (on or off).
   <Tab value="React">
 
 ```tsx title="switch-states.tsx"
-<Switch />
-<Switch defaultChecked />
-<Switch disabled />
-<Switch disabled defaultChecked />
+import { Switch } from '@bpdm/ui/switch';
+
+export function States() {
+  return (
+    <div className="flex items-center gap-4">
+      <Switch aria-label="Off" />
+      <Switch defaultChecked aria-label="On" />
+      <Switch disabled aria-label="Disabled" />
+      <Switch disabled defaultChecked aria-label="Disabled and on" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-states.html"
-<bpdm-switch />
-<bpdm-switch [checked]="true" />
-<bpdm-switch disabled />
-<bpdm-switch disabled [checked]="true" />
+```ts title="switch-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmSwitch],
+  template: `
+    <div class="flex items-center gap-4">
+      <bpdm-switch aria-label="Off" />
+      <bpdm-switch [checked]="true" aria-label="On" />
+      <bpdm-switch disabled aria-label="Disabled" />
+      <bpdm-switch disabled [checked]="true" aria-label="Disabled and on" />
+    </div>
+  `,
+})
+export class StatesComponent {}
 ```
 
   </Tab>
@@ -209,11 +293,22 @@ export function AirplaneToggle() {
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-label.html"
-<div class="flex items-center gap-3">
-  <bpdm-switch id="airplane" [checked]="true" />
-  <label for="airplane" class="text-sm font-medium">Airplane mode</label>
-</div>
+```ts title="switch-label.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-labelled-switch',
+  standalone: true,
+  imports: [BpdmSwitch],
+  template: `
+    <div class="flex items-center gap-3">
+      <bpdm-switch id="airplane" [checked]="true" />
+      <label for="airplane" class="text-sm font-medium">Airplane mode</label>
+    </div>
+  `,
+})
+export class LabelledSwitchComponent {}
 ```
 
   </Tab>
@@ -322,10 +417,21 @@ export function WifiToggle() {
   </Tab>
   <Tab value="Angular">
 
-```html title="switch-controlled.html"
-<bpdm-switch [(checked)]="on" />
-<!-- or with forms -->
-<bpdm-switch [(ngModel)]="on" />
+```ts title="switch-controlled.component.ts"
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BpdmSwitch } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-controlled-switch',
+  standalone: true,
+  imports: [FormsModule, BpdmSwitch],
+  // [(checked)] shown here; [(ngModel)] / reactive forms work the same way
+  template: `<bpdm-switch [(checked)]="on" aria-label="Notifications" />`,
+})
+export class ControlledSwitchComponent {
+  on = true;
+}
 ```
 
   </Tab>
