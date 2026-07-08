@@ -95,8 +95,24 @@ export function SelectSearchable({ frameworks }) {
   </Tab>
   <Tab value="Angular">
 
-```html title="select-searchable.html"
-<bpdm-select [options]="frameworks" searchable placeholder="Search frameworks" />
+```ts title="select-searchable.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-searchable-select',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `<bpdm-select [options]="frameworks" searchable placeholder="Search frameworks" />`,
+})
+export class SearchableSelectComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+    { value: 'svelte', label: 'Svelte' },
+  ];
+}
 ```
 
   </Tab>
@@ -133,20 +149,27 @@ export function SelectWithIcons() {
   </Tab>
   <Tab value="Angular">
 
-In Angular, `icon` takes a string template (or any renderable the component
-supports); pass your status options with an icon per entry:
+In Angular, `icon` takes a string (or any renderable the component supports); pass
+your status options with an icon per entry:
 
-```ts title="select-icons.ts"
-readonly statuses = [
-  { value: 'todo', label: 'Todo', icon: '○' },
-  { value: 'in-progress', label: 'In progress', icon: '◐' },
-  { value: 'done', label: 'Done', icon: '✓' },
-  { value: 'canceled', label: 'Canceled', icon: '✕' },
-];
-```
+```ts title="select-icons.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
 
-```html title="select-icons.html"
-<bpdm-select [options]="statuses" placeholder="Set status" />
+@Component({
+  selector: 'app-select-icons',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `<bpdm-select [options]="statuses" placeholder="Set status" />`,
+})
+export class SelectIconsComponent {
+  readonly statuses = [
+    { value: 'todo', label: 'Todo', icon: '○' },
+    { value: 'in-progress', label: 'In progress', icon: '◐' },
+    { value: 'done', label: 'Done', icon: '✓' },
+    { value: 'canceled', label: 'Canceled', icon: '✕' },
+  ];
+}
 ```
 
   </Tab>
@@ -195,24 +218,37 @@ export function SelectGroups() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="select-groups.ts"
-readonly cities = [
-  { label: '🇩🇪 Germany', options: [
-    { value: 'berlin', label: 'Berlin' },
-    { value: 'frankfurt', label: 'Frankfurt' },
-    { value: 'hamburg', label: 'Hamburg' },
-    { value: 'munich', label: 'Munich' },
-  ] },
-  { label: '🇺🇸 USA', options: [
-    { value: 'nyc', label: 'New York' },
-    { value: 'la', label: 'Los Angeles' },
-    { value: 'chicago', label: 'Chicago' },
-  ] },
-];
-```
+```ts title="select-groups.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect, type SelectItems } from '@bpdm/ng';
 
-```html title="select-groups.html"
-<bpdm-select [options]="cities" placeholder="Select a city" />
+@Component({
+  selector: 'app-select-groups',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `<bpdm-select [options]="cities" placeholder="Select a city" />`,
+})
+export class SelectGroupsComponent {
+  readonly cities: SelectItems = [
+    {
+      label: '🇩🇪 Germany',
+      options: [
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'frankfurt', label: 'Frankfurt' },
+        { value: 'hamburg', label: 'Hamburg' },
+        { value: 'munich', label: 'Munich' },
+      ],
+    },
+    {
+      label: '🇺🇸 USA',
+      options: [
+        { value: 'nyc', label: 'New York' },
+        { value: 'la', label: 'Los Angeles' },
+        { value: 'chicago', label: 'Chicago' },
+      ],
+    },
+  ];
+}
 ```
 
   </Tab>
@@ -246,15 +282,22 @@ export function SelectLarge() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="select-large.ts"
-readonly options = Array.from({ length: 10000 }, (_, i) => ({
-  value: `item-${i}`,
-  label: `Item ${i + 1}`,
-}));
-```
+```ts title="select-large.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
 
-```html title="select-large.html"
-<bpdm-select [options]="options" placeholder="Scroll 10,000 records" />
+@Component({
+  selector: 'app-select-large',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `<bpdm-select [options]="options" placeholder="Scroll 10,000 records" />`,
+})
+export class SelectLargeComponent {
+  readonly options = Array.from({ length: 10000 }, (_, i) => ({
+    value: `item-${i}`,
+    label: `Item ${i + 1}`,
+  }));
+}
 ```
 
   </Tab>
@@ -272,18 +315,51 @@ The `size` prop offers `sm`, `md` (default), and `lg`.
   <Tab value="React">
 
 ```tsx title="select-sizes.tsx"
-<Select size="sm" options={frameworks} placeholder="Small" />
-<Select size="md" options={frameworks} placeholder="Medium" />
-<Select size="lg" options={frameworks} placeholder="Large" />
+import { Select } from '@bpdm/ui/select';
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+];
+
+export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Select size="sm" options={frameworks} placeholder="Small" />
+      <Select size="md" options={frameworks} placeholder="Medium" />
+      <Select size="lg" options={frameworks} placeholder="Large" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="select-sizes.html"
-<bpdm-select size="sm" [options]="frameworks" placeholder="Small" />
-<bpdm-select size="md" [options]="frameworks" placeholder="Medium" />
-<bpdm-select size="lg" [options]="frameworks" placeholder="Large" />
+```ts title="select-sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sizes',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `
+    <div class="flex flex-col gap-3">
+      <bpdm-select size="sm" [options]="frameworks" placeholder="Small" />
+      <bpdm-select size="md" [options]="frameworks" placeholder="Medium" />
+      <bpdm-select size="lg" [options]="frameworks" placeholder="Large" />
+    </div>
+  `,
+})
+export class SizesComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}
 ```
 
   </Tab>
@@ -302,20 +378,53 @@ Set a `defaultValue`, mark the field with `aria-invalid` for errors, or
   <Tab value="React">
 
 ```tsx title="select-states.tsx"
-<Select options={frameworks} placeholder="Default" />
-<Select options={frameworks} defaultValue="react" />
-<Select options={frameworks} aria-invalid placeholder="Invalid" />
-<Select options={frameworks} disabled placeholder="Disabled" />
+import { Select } from '@bpdm/ui/select';
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+];
+
+export function States() {
+  return (
+    <div className="flex flex-col gap-3">
+      <Select options={frameworks} placeholder="Default" />
+      <Select options={frameworks} defaultValue="react" />
+      <Select options={frameworks} aria-invalid placeholder="Invalid" />
+      <Select options={frameworks} disabled placeholder="Disabled" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="select-states.html"
-<bpdm-select [options]="frameworks" placeholder="Default" />
-<bpdm-select [options]="frameworks" defaultValue="react" />
-<bpdm-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
-<bpdm-select [options]="frameworks" disabled placeholder="Disabled" />
+```ts title="select-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `
+    <div class="flex flex-col gap-3">
+      <bpdm-select [options]="frameworks" placeholder="Default" />
+      <bpdm-select [options]="frameworks" defaultValue="react" />
+      <bpdm-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
+      <bpdm-select [options]="frameworks" disabled placeholder="Disabled" />
+    </div>
+  `,
+})
+export class StatesComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}
 ```
 
   </Tab>
@@ -333,7 +442,13 @@ Drive the selection yourself with `value` + `onValueChange` (React) or two-way
 import { useState } from 'react';
 import { Select } from '@bpdm/ui/select';
 
-export function SelectControlled({ frameworks }) {
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+];
+
+export function SelectControlled() {
   const [value, setValue] = useState('react');
   return <Select options={frameworks} value={value} onValueChange={setValue} />;
 }
@@ -342,8 +457,24 @@ export function SelectControlled({ frameworks }) {
   </Tab>
   <Tab value="Angular">
 
-```html title="select-controlled.html"
-<bpdm-select [options]="frameworks" [(value)]="selected" />
+```ts title="select-controlled.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-select-controlled',
+  standalone: true,
+  imports: [BpdmSelect],
+  template: `<bpdm-select [options]="frameworks" [(value)]="selected" />`,
+})
+export class SelectControlledComponent {
+  selected = 'react';
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}
 ```
 
   </Tab>
@@ -363,10 +494,32 @@ export function SelectControlled({ frameworks }) {
 | `size` | `sm \| md \| lg` | `md` | Trigger height and text size. |
 | `disabled` | `boolean` | `false` | Disable the control. |
 | `aria-invalid` | `boolean` | — | Error state (destructive border). |
+| `id` | `string` | — | Trigger id (for `<label>` association / testing). |
+| `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + option list. |
+
+`maxHeight` (px) caps the scrollable list. In React, `contentClassName` styles the dropdown
+panel. Both frameworks accept `aria-label` / `aria-describedby` (forwarded to the trigger and used
+to name the listbox).
 
 ## Accessibility
 
-- The trigger and listbox follow the combobox/listbox pattern — full **keyboard
-  support** (arrows to move, Enter to select, Esc to close, type-ahead).
-- Pair it with a `<label>` (linked via `id`) or an `aria-label`.
-- Set `aria-invalid` when selection fails validation.
+- Full **WAI-ARIA combobox + listbox** wiring: the trigger is `role="combobox"` with
+  `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls` pointing at the
+  `role="listbox"` panel; options are `role="option"` with `aria-selected`.
+- The highlighted option is exposed via **`aria-activedescendant`** on the focused element (the
+  search box when `searchable`, otherwise the listbox), so screen readers announce each option as
+  you arrow through — even though the list is virtualized. Group headers are decorative
+  (`aria-hidden`).
+- **Keyboard**: arrows move the active option, Enter selects, Esc closes, and `searchable` makes
+  the filter an editable combobox (`aria-autocomplete="list"`).
+- Give it a name — pair a `<label>` (linked via `id`) or pass `aria-label`. Set `aria-invalid`
+  when selection fails validation.
+
+## Internationalization
+
+- All built-in copy is **translatable via props**: `placeholder`, `searchPlaceholder`, and
+  `emptyText` — pass your localized strings (there's no hard-coded catalogue). Option/group
+  `label`s are your data, already translated. Give the field a translated `aria-label`.
+- **RTL-safe**: options use logical alignment (`text-start`) and the trigger lays out with
+  `justify-between`, so the chevron, checkmark, and text mirror under `dir="rtl"`. See the
+  [Internationalization guide](/docs/getting-started/i18n).

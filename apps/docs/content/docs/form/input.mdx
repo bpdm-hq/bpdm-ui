@@ -86,9 +86,22 @@ export function InputVariants() {
   </Tab>
   <Tab value="Angular">
 
-```html title="input-variants.html"
-<input bpdmInput variant="outline" placeholder="Outline (default)" />
-<input bpdmInput variant="underline" placeholder="Underline" />
+```ts title="input-variants.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-variants',
+  standalone: true,
+  imports: [BpdmInput],
+  template: `
+    <div class="flex flex-col gap-3">
+      <input bpdmInput variant="outline" placeholder="Outline (default)" />
+      <input bpdmInput variant="underline" placeholder="Underline" />
+    </div>
+  `,
+})
+export class InputVariantsComponent {}
 ```
 
   </Tab>
@@ -122,10 +135,23 @@ export function InputSizes() {
   </Tab>
   <Tab value="Angular">
 
-```html title="input-sizes.html"
-<input bpdmInput size="sm" placeholder="Small" />
-<input bpdmInput size="md" placeholder="Medium" />
-<input bpdmInput size="lg" placeholder="Large" />
+```ts title="input-sizes.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-sizes',
+  standalone: true,
+  imports: [BpdmInput],
+  template: `
+    <div class="flex flex-col gap-3">
+      <input bpdmInput size="sm" placeholder="Small" />
+      <input bpdmInput size="md" placeholder="Medium" />
+      <input bpdmInput size="lg" placeholder="Large" />
+    </div>
+  `,
+})
+export class InputSizesComponent {}
 ```
 
   </Tab>
@@ -161,11 +187,24 @@ export function InputStates() {
   </Tab>
   <Tab value="Angular">
 
-```html title="input-states.html"
-<input bpdmInput placeholder="Default" />
-<input bpdmInput value="With a value" />
-<input bpdmInput aria-invalid="true" value="Invalid value" />
-<input bpdmInput disabled placeholder="Disabled" />
+```ts title="input-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-states',
+  standalone: true,
+  imports: [BpdmInput],
+  template: `
+    <div class="flex flex-col gap-3">
+      <input bpdmInput placeholder="Default" />
+      <input bpdmInput value="With a value" />
+      <input bpdmInput aria-invalid="true" value="Invalid value" />
+      <input bpdmInput disabled placeholder="Disabled" />
+    </div>
+  `,
+})
+export class InputStatesComponent {}
 ```
 
   </Tab>
@@ -205,14 +244,26 @@ export function InputIcons() {
 `startIcon` / `endIcon` are a React convenience. In Angular, wrap the input and
 position the icon, padding the field to clear it:
 
-```html title="input-icons.html"
-<div class="relative flex items-center">
-  <svg class="pointer-events-none absolute left-3 size-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <circle cx="11" cy="11" r="7" />
-    <path d="m21 21-4.3-4.3" />
-  </svg>
-  <input bpdmInput class="pl-9" placeholder="Search" />
-</div>
+```ts title="input-icons.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-icons',
+  standalone: true,
+  imports: [BpdmInput],
+  // logical `start-3` / `ps-9` so the icon + padding mirror under dir="rtl"
+  template: `
+    <div class="relative flex items-center">
+      <svg class="pointer-events-none absolute start-3 size-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+      <input bpdmInput class="ps-9" placeholder="Search" />
+    </div>
+  `,
+})
+export class InputIconsComponent {}
 ```
 
   </Tab>
@@ -246,10 +297,23 @@ export function InputTypes() {
   </Tab>
   <Tab value="Angular">
 
-```html title="input-types.html"
-<input bpdmInput type="email" placeholder="email@company.com" />
-<input bpdmInput type="password" placeholder="••••••••" />
-<input bpdmInput type="number" placeholder="0" />
+```ts title="input-types.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-types',
+  standalone: true,
+  imports: [BpdmInput],
+  template: `
+    <div class="flex flex-col gap-3">
+      <input bpdmInput type="email" placeholder="email@company.com" />
+      <input bpdmInput type="password" placeholder="••••••••" />
+      <input bpdmInput type="number" placeholder="0" />
+    </div>
+  `,
+})
+export class InputTypesComponent {}
 ```
 
   </Tab>
@@ -287,12 +351,23 @@ export function InputField() {
   </Tab>
   <Tab value="Angular">
 
-```html title="input-field.html"
-<div class="flex flex-col gap-1.5">
-  <label for="email" class="text-sm font-medium">Email</label>
-  <input bpdmInput id="email" type="email" placeholder="you@company.com" />
-  <p class="text-xs text-muted-foreground">We'll never share your email.</p>
-</div>
+```ts title="input-field.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInput } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-input-field',
+  standalone: true,
+  imports: [BpdmInput],
+  template: `
+    <div class="flex flex-col gap-1.5">
+      <label for="email" class="text-sm font-medium">Email</label>
+      <input bpdmInput id="email" type="email" placeholder="you@company.com" />
+      <p class="text-xs text-muted-foreground">We'll never share your email.</p>
+    </div>
+  `,
+})
+export class InputFieldComponent {}
 ```
 
   </Tab>

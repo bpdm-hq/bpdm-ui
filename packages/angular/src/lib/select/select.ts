@@ -48,6 +48,9 @@ export type SelectRow =
 
 const ROW_H = 36;
 
+/** Per-instance counter for stable listbox/option ids (aria-activedescendant). */
+let selectUid = 0;
+
 export function flattenSelectRows(options: SelectItems): SelectRow[] {
   const rows: SelectRow[] = [];
   for (const entry of options) {
@@ -98,8 +101,12 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       #trigger
       type="button"
       role="combobox"
+      aria-haspopup="listbox"
       [attr.id]="id() || null"
       [attr.aria-expanded]="open()"
+      [attr.aria-controls]="open() ? listboxId : null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
       [attr.data-state]="open() ? 'open' : 'closed'"
       [disabled]="disabled() || null"
@@ -120,7 +127,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
         @if (searchable()) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-            <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+            <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
           </div>
         }
         @if (rows().length === 0) {
@@ -129,17 +136,22 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
           <cdk-virtual-scroll-viewport
             #viewport
             role="listbox"
+            tabindex="-1"
+            [attr.id]="listboxId"
+            [attr.aria-label]="ariaLabel() || placeholder()"
+            [attr.aria-activedescendant]="searchable() ? null : activeDescId()"
             [itemSize]="36"
             [style.height.px]="viewportHeight()"
-            class="overflow-auto px-1"
+            class="overflow-auto px-1 focus:outline-none"
           >
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
+                <div aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
               } @else {
                 <button
                   type="button"
                   role="option"
+                  [attr.id]="optionId(i)"
                   [attr.aria-selected]="r.option.value === selected()"
                   [disabled]="r.option.disabled || null"
                   (click)="commit(r.option)"
@@ -180,14 +192,27 @@ export class BpdmSelect implements OnDestroy {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
+  /** Accessible name for the trigger + option list — pass a translated string. */
+  readonly ariaLabel = input("", { alias: "aria-label" });
+  readonly ariaDescribedby = input("", { alias: "aria-describedby" });
 
   protected readonly open = signal(false);
   protected readonly query = signal("");
   protected readonly active = signal(0);
 
+  /** Stable ids linking trigger → listbox → active option (aria-activedescendant). */
+  protected readonly baseId = `bpdm-select-${(selectUid += 1)}`;
+  protected readonly listboxId = `${this.baseId}-listbox`;
+  protected optionId(index: number): string {
+    return `${this.baseId}-opt-${index}`;
+  }
+  protected readonly activeDescId = computed(() => {
+    const r = this.rows()[this.active()];
+    return r?.kind === "item" ? this.optionId(this.active()) : null;
+  });
+
   private readonly triggerEl = viewChild.required<ElementRef<HTMLButtonElement>>("trigger");
   private readonly panelTpl = viewChild.required<TemplateRef<unknown>>("panel");
-  private readonly panelRoot = viewChild<ElementRef<HTMLElement>>("panelRoot");
   private readonly searchEl = viewChild<ElementRef<HTMLInputElement>>("search");
   private readonly viewport = viewChild<CdkVirtualScrollViewport>("viewport");
 
@@ -213,7 +238,7 @@ export class BpdmSelect implements OnDestroy {
 
   protected optionClass(i: number): string {
     return cn(
-      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
       i === this.active() && "bg-muted",
     );
   }
@@ -251,8 +276,10 @@ export class BpdmSelect implements OnDestroy {
     setTimeout(() => {
       this.viewport()?.checkViewportSize();
       const search = this.searchEl()?.nativeElement;
+      // focus the search box (editable combobox) or the listbox itself, so
+      // aria-activedescendant is announced from the focused element
       if (search) search.focus();
-      else this.panelRoot()?.nativeElement.focus();
+      else this.viewport()?.elementRef.nativeElement.focus();
     });
   }
 

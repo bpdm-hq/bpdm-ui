@@ -86,24 +86,54 @@ export class MultiSelectUsage {
   <Tab value="React">
 
 ```tsx title="multi-select-overflow.tsx"
-<MultiSelect
-  options={frameworks}
-  maxDisplay={2}
-  defaultValue={['react', 'vue', 'svelte', 'solid']}
-  placeholder="Select frameworks"
-/>
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+];
+
+export function ChipOverflow() {
+  return (
+    <MultiSelect
+      options={frameworks}
+      maxDisplay={2}
+      defaultValue={['react', 'vue', 'svelte', 'solid']}
+      placeholder="Select frameworks"
+    />
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-overflow.html"
-<bpdm-multi-select
-  [options]="frameworks"
-  [maxDisplay]="2"
-  [defaultValue]="['react', 'vue', 'svelte', 'solid']"
-  placeholder="Select frameworks"
-/>
+```ts title="multi-select-overflow.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-chip-overflow',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `
+    <bpdm-multi-select
+      [options]="frameworks"
+      [maxDisplay]="2"
+      [defaultValue]="['react', 'vue', 'svelte', 'solid']"
+      placeholder="Select frameworks" />
+  `,
+})
+export class ChipOverflowComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'svelte', label: 'Svelte' },
+    { value: 'solid', label: 'Solid' },
+  ];
+}
 ```
 
   </Tab>
@@ -122,14 +152,39 @@ show a compact **"N selected"** count instead.
   <Tab value="React">
 
 ```tsx title="multi-select-count.tsx"
-<MultiSelect options={frameworks} maxDisplay={0} defaultValue={['react', 'angular', 'vue']} />
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'vue', label: 'Vue' },
+];
+
+export function CountDisplay() {
+  return <MultiSelect options={frameworks} maxDisplay={0} defaultValue={['react', 'angular', 'vue']} />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-count.html"
-<bpdm-multi-select [options]="frameworks" [maxDisplay]="0" [defaultValue]="['react', 'angular', 'vue']" />
+```ts title="multi-select-count.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-count-display',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `<bpdm-multi-select [options]="frameworks" [maxDisplay]="0" [defaultValue]="['react', 'angular', 'vue']" />`,
+})
+export class CountDisplayComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'angular', label: 'Angular' },
+    { value: 'vue', label: 'Vue' },
+  ];
+}
 ```
 
   </Tab>
@@ -148,27 +203,65 @@ filter.
   <Tab value="React">
 
 ```tsx title="multi-select-grouped.tsx"
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
 const CITIES = [
-  { label: 'Europe', options: [
-    { value: 'lon', label: 'London' },
-    { value: 'par', label: 'Paris' },
-    { value: 'ber', label: 'Berlin' },
-  ] },
-  { label: 'Americas', options: [
-    { value: 'nyc', label: 'New York' },
-    { value: 'sf', label: 'San Francisco' },
-    { value: 'tor', label: 'Toronto' },
-  ] },
+  {
+    label: 'Europe',
+    options: [
+      { value: 'lon', label: 'London' },
+      { value: 'par', label: 'Paris' },
+      { value: 'ber', label: 'Berlin' },
+    ],
+  },
+  {
+    label: 'Americas',
+    options: [
+      { value: 'nyc', label: 'New York' },
+      { value: 'sf', label: 'San Francisco' },
+      { value: 'tor', label: 'Toronto' },
+    ],
+  },
 ];
 
-<MultiSelect options={CITIES} searchable placeholder="Select cities" />
+export function GroupedCities() {
+  return <MultiSelect options={CITIES} searchable placeholder="Select cities" />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-grouped.html"
-<bpdm-multi-select [options]="cities" searchable placeholder="Select cities" />
+```ts title="multi-select-grouped.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect, type SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-grouped-cities',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `<bpdm-multi-select [options]="cities" searchable placeholder="Select cities" />`,
+})
+export class GroupedCitiesComponent {
+  readonly cities: SelectItems = [
+    {
+      label: 'Europe',
+      options: [
+        { value: 'lon', label: 'London' },
+        { value: 'par', label: 'Paris' },
+        { value: 'ber', label: 'Berlin' },
+      ],
+    },
+    {
+      label: 'Americas',
+      options: [
+        { value: 'nyc', label: 'New York' },
+        { value: 'sf', label: 'San Francisco' },
+        { value: 'tor', label: 'Toronto' },
+      ],
+    },
+  ];
+}
 ```
 
   </Tab>
@@ -202,8 +295,22 @@ export function MultiSelectLarge() {
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-large.html"
-<bpdm-multi-select [options]="options" searchable placeholder="Pick records" />
+```ts title="multi-select-large.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-multi-select-large',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `<bpdm-multi-select [options]="options" searchable placeholder="Pick records" />`,
+})
+export class MultiSelectLargeComponent {
+  readonly options = Array.from({ length: 10000 }, (_, i) => ({
+    value: `item-${i}`,
+    label: `Item ${i + 1}`,
+  }));
+}
 ```
 
   </Tab>
@@ -219,18 +326,51 @@ export function MultiSelectLarge() {
   <Tab value="React">
 
 ```tsx title="multi-select-states.tsx"
-<MultiSelect options={frameworks} placeholder="Default" />
-<MultiSelect options={frameworks} aria-invalid placeholder="Invalid" />
-<MultiSelect options={frameworks} disabled placeholder="Disabled" />
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+];
+
+export function States() {
+  return (
+    <div className="flex flex-col gap-3">
+      <MultiSelect options={frameworks} placeholder="Default" />
+      <MultiSelect options={frameworks} aria-invalid placeholder="Invalid" />
+      <MultiSelect options={frameworks} disabled placeholder="Disabled" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-states.html"
-<bpdm-multi-select [options]="frameworks" placeholder="Default" />
-<bpdm-multi-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
-<bpdm-multi-select [options]="frameworks" disabled placeholder="Disabled" />
+```ts title="multi-select-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `
+    <div class="flex flex-col gap-3">
+      <bpdm-multi-select [options]="frameworks" placeholder="Default" />
+      <bpdm-multi-select [options]="frameworks" aria-invalid="true" placeholder="Invalid" />
+      <bpdm-multi-select [options]="frameworks" disabled placeholder="Disabled" />
+    </div>
+  `,
+})
+export class StatesComponent {
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}
 ```
 
   </Tab>
@@ -257,8 +397,24 @@ export function Controlled({ frameworks }) {
   </Tab>
   <Tab value="Angular">
 
-```html title="multi-select-controlled.html"
-<bpdm-multi-select [options]="frameworks" [(value)]="selected" />
+```ts title="multi-select-controlled.component.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-controlled-multi',
+  standalone: true,
+  imports: [BpdmMultiSelect],
+  template: `<bpdm-multi-select [options]="frameworks" [(value)]="selected" />`,
+})
+export class ControlledMultiComponent {
+  selected: string[] = ['react'];
+  readonly frameworks = [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'angular', label: 'Angular' },
+  ];
+}
 ```
 
   </Tab>
@@ -280,9 +436,31 @@ export function Controlled({ frameworks }) {
 | `size` | `sm \| md \| lg` | `md` | Trigger height / text size. |
 | `disabled` | `boolean` | `false` | Disable the control. |
 | `aria-invalid` | `boolean` | — | Error state. |
+| `id` | `string` | — | Trigger id (for `<label>` association / testing). |
+| `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + option list. |
+| `messages` | `{ selectAll, clearAll, remove(label), selected(count) }` | English | Override the built-in labels + count text for i18n. |
+
+`maxHeight` (px) caps the list; in React `contentClassName` styles the panel.
 
 ## Accessibility
 
-- Follows the combobox/listbox multi-select pattern — full keyboard support
-  (arrows, Enter to toggle, type-ahead, Esc to close).
-- Pair with a `<label>` (via `id`) or an `aria-label`; set `aria-invalid` on error.
+- Full **WAI-ARIA combobox + multi-selectable listbox** wiring: the trigger is
+  `role="combobox"` with `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls`;
+  the panel is `role="listbox"` `aria-multiselectable="true"` and each option is
+  `role="option"` with `aria-selected`.
+- The active option is exposed via **`aria-activedescendant`** on the focused element (the
+  search box when `searchable`, otherwise the listbox), so screen readers announce each row as
+  you arrow — even virtualized. Group headers are `aria-hidden`.
+- **Select all** is a tri-state `role="checkbox"` (`aria-checked` = `true` / `mixed` / `false`);
+  each chip's remove button and the clear-all button carry descriptive `aria-label`s.
+- **Keyboard**: arrows move, Enter toggles, Esc closes; `searchable` makes the filter an
+  editable combobox. Give it a name via `<label>` (`id`) or `aria-label`; set `aria-invalid` on error.
+
+## Internationalization
+
+- All built-in copy is **translatable**: `placeholder` / `searchPlaceholder` / `emptyText` are
+  props, and the `messages` prop overrides `selectAll`, `clearAll`, the per-chip `remove(label)`
+  label, and the `selected(count)` count text (e.g. `"3 selected"`). Option labels are your data.
+- **RTL-safe**: options use logical alignment (`text-start`); chips, the count, and the chevron
+  lay out with flex, so everything mirrors under `dir="rtl"`. See the
+  [Internationalization guide](/docs/getting-started/i18n).

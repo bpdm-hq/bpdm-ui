@@ -102,14 +102,49 @@ expanded.
   <Tab value="React">
 
 ```tsx title="tree-select-searchable.tsx"
-<TreeSelect options={tree} searchable placeholder="Search technologies" />
+import { TreeSelect } from '@bpdm/ui/tree-select';
+
+const TREE = [
+  { value: 'frontend', label: 'Frontend', children: [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+  ] },
+  { value: 'backend', label: 'Backend', children: [
+    { value: 'node', label: 'Node.js' },
+    { value: 'go', label: 'Go' },
+  ] },
+];
+
+export function SearchableTree() {
+  return <TreeSelect options={TREE} searchable placeholder="Search technologies" />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="tree-select-searchable.html"
-<bpdm-tree-select [options]="tree" searchable placeholder="Search technologies" />
+```ts title="tree-select-searchable.component.ts"
+import { Component } from '@angular/core';
+import { BpdmTreeSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-searchable-tree',
+  standalone: true,
+  imports: [BpdmTreeSelect],
+  template: `<bpdm-tree-select [options]="tree" searchable placeholder="Search technologies" />`,
+})
+export class SearchableTreeComponent {
+  readonly tree = [
+    { value: 'frontend', label: 'Frontend', children: [
+      { value: 'react', label: 'React' },
+      { value: 'vue', label: 'Vue' },
+    ] },
+    { value: 'backend', label: 'Backend', children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+    ] },
+  ];
+}
 ```
 
   </Tab>
@@ -128,14 +163,49 @@ instead of chips.
   <Tab value="React">
 
 ```tsx title="tree-select-count.tsx"
-<TreeSelect options={tree} maxDisplay={0} defaultValue={['react', 'angular', 'vue', 'node']} />
+import { TreeSelect } from '@bpdm/ui/tree-select';
+
+const TREE = [
+  { value: 'frontend', label: 'Frontend', children: [
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+  ] },
+  { value: 'backend', label: 'Backend', children: [
+    { value: 'node', label: 'Node.js' },
+    { value: 'go', label: 'Go' },
+  ] },
+];
+
+export function CountDisplay() {
+  return <TreeSelect options={TREE} maxDisplay={0} defaultValue={['react', 'vue', 'node']} />;
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="tree-select-count.html"
-<bpdm-tree-select [options]="tree" [maxDisplay]="0" [defaultValue]="['react', 'angular', 'vue', 'node']" />
+```ts title="tree-select-count.component.ts"
+import { Component } from '@angular/core';
+import { BpdmTreeSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-count-display',
+  standalone: true,
+  imports: [BpdmTreeSelect],
+  template: `<bpdm-tree-select [options]="tree" [maxDisplay]="0" [defaultValue]="['react', 'vue', 'node']" />`,
+})
+export class CountDisplayComponent {
+  readonly tree = [
+    { value: 'frontend', label: 'Frontend', children: [
+      { value: 'react', label: 'React' },
+      { value: 'vue', label: 'Vue' },
+    ] },
+    { value: 'backend', label: 'Backend', children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+    ] },
+  ];
+}
 ```
 
   </Tab>
@@ -151,18 +221,49 @@ instead of chips.
   <Tab value="React">
 
 ```tsx title="tree-select-states.tsx"
-<TreeSelect options={tree} placeholder="Default" />
-<TreeSelect options={tree} aria-invalid placeholder="Invalid" />
-<TreeSelect options={tree} disabled placeholder="Disabled" />
+import { TreeSelect } from '@bpdm/ui/tree-select';
+
+const TREE = [
+  { value: 'frontend', label: 'Frontend', children: [{ value: 'react', label: 'React' }] },
+  { value: 'backend', label: 'Backend', children: [{ value: 'node', label: 'Node.js' }] },
+];
+
+export function States() {
+  return (
+    <div className="flex flex-col gap-3">
+      <TreeSelect options={TREE} placeholder="Default" />
+      <TreeSelect options={TREE} aria-invalid placeholder="Invalid" />
+      <TreeSelect options={TREE} disabled placeholder="Disabled" />
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="tree-select-states.html"
-<bpdm-tree-select [options]="tree" placeholder="Default" />
-<bpdm-tree-select [options]="tree" aria-invalid="true" placeholder="Invalid" />
-<bpdm-tree-select [options]="tree" disabled placeholder="Disabled" />
+```ts title="tree-select-states.component.ts"
+import { Component } from '@angular/core';
+import { BpdmTreeSelect } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-states',
+  standalone: true,
+  imports: [BpdmTreeSelect],
+  template: `
+    <div class="flex flex-col gap-3">
+      <bpdm-tree-select [options]="tree" placeholder="Default" />
+      <bpdm-tree-select [options]="tree" aria-invalid="true" placeholder="Invalid" />
+      <bpdm-tree-select [options]="tree" disabled placeholder="Disabled" />
+    </div>
+  `,
+})
+export class StatesComponent {
+  readonly tree = [
+    { value: 'frontend', label: 'Frontend', children: [{ value: 'react', label: 'React' }] },
+    { value: 'backend', label: 'Backend', children: [{ value: 'node', label: 'Node.js' }] },
+  ];
+}
 ```
 
   </Tab>
@@ -184,10 +285,28 @@ instead of chips.
 | `size` | `sm \| md \| lg` | `md` | Trigger height / text size. |
 | `disabled` | `boolean` | `false` | Disable the control. |
 | `aria-invalid` | `boolean` | — | Error state. |
+| `id` | `string` | — | Trigger id (for `<label>` association / testing). |
+| `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + tree. |
+| `messages` | `{ expand, collapse, selectAll, clearAll, selected(count) }` | English | Override the built-in labels + count text for i18n. |
 
 ## Accessibility
 
-- Parent/child checkboxes use proper roles and **tristate** (a parent is
-  indeterminate when only some children are selected).
-- Full keyboard support (expand/collapse, toggle, type-ahead); pair with a
-  `<label>` or `aria-label`, and set `aria-invalid` on error.
+- A real **WAI-ARIA tree**: the panel is `role="tree"` (`aria-multiselectable`), each node is a
+  `role="treeitem"` carrying `aria-level`, `aria-expanded` (branches), and `aria-checked`
+  (`true` / `false` / **`mixed`** — a parent is mixed when only some descendants are selected);
+  child nodes sit in a nested `role="group"`. The trigger is `role="combobox"` with
+  `aria-haspopup="tree"` and `aria-controls`.
+- The caret and the checkbox glyph are decorative (`aria-hidden`) — state is conveyed by
+  `aria-expanded` / `aria-checked`, never a glyph alone. **Select all** is a tri-state
+  `role="checkbox"`.
+- Expand/collapse and toggle are operable by keyboard; give the field a name via `<label>`
+  (`id`) or `aria-label`, and set `aria-invalid` on error.
+
+## Internationalization
+
+- All built-in copy is **translatable**: `placeholder` / `searchPlaceholder` / `emptyText` are
+  props, and the `messages` prop overrides the branch `expand` / `collapse` labels, `selectAll`,
+  `clearAll`, and the `selected(count)` count text. Node labels are your data.
+- **RTL-safe**: node indentation uses `padding-inline-start`, the caret mirrors under `dir="rtl"`,
+  and labels use logical alignment (`text-start`), so the whole tree flips correctly right-to-left.
+  See the [Internationalization guide](/docs/getting-started/i18n).

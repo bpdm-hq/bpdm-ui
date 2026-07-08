@@ -15,7 +15,7 @@ export type TreeNode = {
 
 function Caret({ open }: { open: boolean }) {
   return (
-    <svg viewBox="0 0 16 16" fill="none" className={cn("size-3.5 transition-transform", open && "rotate-90")} aria-hidden>
+    <svg viewBox="0 0 16 16" fill="none" className={cn("size-3.5 transition-transform rtl:-scale-x-100", open && "rotate-90")} aria-hidden>
       <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -69,7 +69,26 @@ export interface TreeSelectProps extends VariantProps<typeof triggerVariants> {
   contentClassName?: string;
   "aria-invalid"?: boolean;
   id?: string;
+  /** Accessible name for the trigger + tree (when there's no visible `<label>`). */
+  "aria-label"?: string;
+  "aria-describedby"?: string;
+  /** Screen-reader labels + count text — override for i18n. */
+  messages?: {
+    expand?: string;
+    collapse?: string;
+    selectAll?: string;
+    clearAll?: string;
+    selected?: (count: number) => string;
+  };
 }
+
+const DEFAULT_MESSAGES = {
+  expand: "Expand",
+  collapse: "Collapse",
+  selectAll: "Select all",
+  clearAll: "Clear all",
+  selected: (count: number) => `${count} selected`,
+};
 
 /**
  * Hierarchical multi-select. Expand/collapse branches; checking a parent selects
@@ -95,7 +114,12 @@ export function TreeSelect({
   contentClassName,
   "aria-invalid": ariaInvalid,
   id,
+  "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedBy,
+  messages,
 }: TreeSelectProps) {
+  const t = { ...DEFAULT_MESSAGES, ...messages };
+  const treeId = React.useId();
   const [open, setOpen] = React.useState(false);
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState<string[]>(defaultValue ?? []);
@@ -191,15 +215,22 @@ export function TreeSelect({
       : expanded.has(node.value);
 
     return (
-      <React.Fragment key={node.value}>
+      <div
+        key={node.value}
+        role="treeitem"
+        aria-level={depth + 1}
+        aria-checked={indeterminate ? "mixed" : checked}
+        aria-expanded={hasChildren ? isOpen : undefined}
+        aria-disabled={node.disabled || undefined}
+      >
         <div
-          className="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pr-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted"
-          style={{ paddingLeft: 8 + depth * 18 }}
+          className="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted"
+          style={{ paddingInlineStart: 8 + depth * 18 }}
         >
           {hasChildren ? (
             <button
               type="button"
-              aria-label={isOpen ? "Collapse" : "Expand"}
+              aria-label={isOpen ? t.collapse : t.expand}
               onClick={() => toggleExpand(node.value)}
               className="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground"
             >
@@ -211,13 +242,12 @@ export function TreeSelect({
 
           <button
             type="button"
-            role="checkbox"
-            aria-checked={indeterminate ? "mixed" : checked}
             disabled={node.disabled}
             onClick={() => toggleNode(node)}
-            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left text-sm text-foreground disabled:pointer-events-none disabled:opacity-50"
+            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-foreground disabled:pointer-events-none disabled:opacity-50"
           >
             <span
+              aria-hidden="true"
               className={cn(
                 "grid size-4 shrink-0 place-items-center rounded-[4px] border",
                 checked || indeterminate
@@ -231,8 +261,10 @@ export function TreeSelect({
             <span className="truncate">{node.label}</span>
           </button>
         </div>
-        {hasChildren && isOpen && node.children!.map((c) => renderNode(c, depth + 1))}
-      </React.Fragment>
+        {hasChildren && isOpen && (
+          <div role="group">{node.children!.map((c) => renderNode(c, depth + 1))}</div>
+        )}
+      </div>
     );
   };
 
@@ -243,7 +275,11 @@ export function TreeSelect({
           ref={triggerRef}
           id={id}
           role="combobox"
+          aria-haspopup="tree"
           aria-expanded={open}
+          aria-controls={open ? treeId : undefined}
+          aria-label={ariaLabel}
+          aria-describedby={ariaDescribedBy}
           aria-invalid={ariaInvalid}
           aria-disabled={disabled}
           data-disabled={disabled ? "" : undefined}
@@ -260,7 +296,7 @@ export function TreeSelect({
             {selectedLeaves.length === 0 ? (
               <span className="text-muted-foreground">{placeholder}</span>
             ) : maxDisplay === 0 ? (
-              <span>{selectedLeaves.length} selected</span>
+              <span>{t.selected(selectedLeaves.length)}</span>
             ) : (
               <>
                 {chips.map((o, i) => (
@@ -279,7 +315,7 @@ export function TreeSelect({
             {selectedLeaves.length > 0 && !disabled && (
               <button
                 type="button"
-                aria-label="Clear all"
+                aria-label={t.clearAll}
                 tabIndex={-1}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
@@ -313,9 +349,11 @@ export function TreeSelect({
               {selectAll && allVisibleLeaves.length > 0 && (
                 <button
                   type="button"
+                  role="checkbox"
+                  aria-checked={allSel ? true : someSel ? "mixed" : false}
                   onClick={toggleAll}
-                  aria-label="Select all"
-                  title="Select all"
+                  aria-label={t.selectAll}
+                  title={t.selectAll}
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground",
                     !searchable && "w-full",
@@ -331,7 +369,7 @@ export function TreeSelect({
                   >
                     {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
                   </span>
-                  {!searchable && "Select all"}
+                  {!searchable && t.selectAll}
                 </button>
               )}
               {selectAll && allVisibleLeaves.length > 0 && searchable && (
@@ -355,7 +393,14 @@ export function TreeSelect({
           {visibleTree.length === 0 ? (
             <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
           ) : (
-            <div style={{ maxHeight }} className="min-h-0 flex-1 overflow-auto p-1">
+            <div
+              role="tree"
+              id={treeId}
+              aria-label={ariaLabel ?? placeholder}
+              aria-multiselectable="true"
+              style={{ maxHeight }}
+              className="min-h-0 flex-1 overflow-auto p-1"
+            >
               {visibleTree.map((n) => renderNode(n, 0))}
             </div>
           )}

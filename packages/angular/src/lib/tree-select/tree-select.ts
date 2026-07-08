@@ -55,6 +55,9 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
   return { nodes: rec(nodes), expand };
 }
 
+/** Per-instance counter for a stable tree id (aria-controls). */
+let treeUid = 0;
+
 /**
  * `<bpdm-tree-select>` — hierarchical multi-select. Expand/collapse branches;
  * checking a parent selects all its (enabled) leaves, and a parent shows
@@ -70,8 +73,12 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
     <div
       #trigger
       role="combobox"
+      aria-haspopup="tree"
       [attr.id]="id() || null"
       [attr.aria-expanded]="open()"
+      [attr.aria-controls]="open() ? treeId : null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
       [attr.aria-disabled]="disabled() || null"
       [attr.data-disabled]="disabled() ? '' : null"
@@ -84,7 +91,7 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
         @if (selectedLeaves().length === 0) {
           <span class="text-muted-foreground">{{ placeholder() }}</span>
         } @else if (maxDisplay() === 0) {
-          <span>{{ selectedLeaves().length }} selected</span>
+          <span>{{ t().selected(selectedLeaves().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
             <span class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
@@ -98,7 +105,7 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selectedLeaves().length > 0 && !disabled()) {
-          <button type="button" aria-label="Clear all" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+          <button type="button" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -111,7 +118,7 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
         @if (searchable() || (selectAll() && visibleLeaves().length > 0)) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             @if (selectAll() && visibleLeaves().length > 0) {
-              <button type="button" (click)="toggleAll()" aria-label="Select all" title="Select all" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
+              <button type="button" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -119,7 +126,7 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M4 8h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
                   }
                 </span>
-                @if (!searchable()) { Select all }
+                @if (!searchable()) { {{ t().selectAll }} }
               </button>
               @if (searchable()) { <span class="w-px shrink-0 self-stretch bg-border" aria-hidden="true"></span> }
             }
@@ -132,7 +139,14 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
         @if (visibleTree().length === 0) {
           <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
-          <div class="min-h-0 flex-1 overflow-auto p-1" [style.maxHeight.px]="maxHeight()">
+          <div
+            role="tree"
+            [attr.id]="treeId"
+            [attr.aria-label]="ariaLabel() || placeholder()"
+            aria-multiselectable="true"
+            class="min-h-0 flex-1 overflow-auto p-1"
+            [style.maxHeight.px]="maxHeight()"
+          >
             @for (n of visibleTree(); track n.value) {
               <ng-container [ngTemplateOutlet]="nodeTpl" [ngTemplateOutletContext]="{ $implicit: n, depth: 0 }" />
             }
@@ -142,30 +156,40 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
     </ng-template>
 
     <ng-template #nodeTpl let-n let-depth="depth">
-      <div class="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pr-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted" [style.paddingLeft.px]="8 + depth * 18">
-        @if (n.children?.length) {
-          <button type="button" [attr.aria-label]="isExpanded(n) ? 'Collapse' : 'Expand'" (click)="toggleExpand(n.value)" class="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 transition-transform" [class.rotate-90]="isExpanded(n)"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div
+        role="treeitem"
+        [attr.aria-level]="depth + 1"
+        [attr.aria-checked]="nodeIndeterminate(n) ? 'mixed' : nodeChecked(n)"
+        [attr.aria-expanded]="n.children?.length ? isExpanded(n) : null"
+        [attr.aria-disabled]="n.disabled || null"
+      >
+        <div class="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted" [style.paddingInlineStart.px]="8 + depth * 18">
+          @if (n.children?.length) {
+            <button type="button" [attr.aria-label]="isExpanded(n) ? t().collapse : t().expand" (click)="toggleExpand(n.value)" class="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 transition-transform rtl:-scale-x-100" [class.rotate-90]="isExpanded(n)"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+          } @else {
+            <span class="size-4 shrink-0"></span>
+          }
+          <button type="button" [disabled]="n.disabled || null" (click)="toggleNode(n)" class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-foreground disabled:pointer-events-none disabled:opacity-50">
+            <span aria-hidden="true" [class]="boxClass(nodeChecked(n) || nodeIndeterminate(n))">
+              @if (nodeChecked(n)) {
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              } @else if (nodeIndeterminate(n)) {
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M4 8h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
+              }
+            </span>
+            <span class="truncate">{{ n.label }}</span>
           </button>
-        } @else {
-          <span class="size-4 shrink-0"></span>
-        }
-        <button type="button" role="checkbox" [attr.aria-checked]="nodeIndeterminate(n) ? 'mixed' : nodeChecked(n)" [disabled]="n.disabled || null" (click)="toggleNode(n)" class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left text-sm text-foreground disabled:pointer-events-none disabled:opacity-50">
-          <span [class]="boxClass(nodeChecked(n) || nodeIndeterminate(n))">
-            @if (nodeChecked(n)) {
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            } @else if (nodeIndeterminate(n)) {
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M4 8h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
+        </div>
+        @if (n.children?.length && isExpanded(n)) {
+          <div role="group">
+            @for (c of n.children; track c.value) {
+              <ng-container [ngTemplateOutlet]="nodeTpl" [ngTemplateOutletContext]="{ $implicit: c, depth: depth + 1 }" />
             }
-          </span>
-          <span class="truncate">{{ n.label }}</span>
-        </button>
-      </div>
-      @if (n.children?.length && isExpanded(n)) {
-        @for (c of n.children; track c.value) {
-          <ng-container [ngTemplateOutlet]="nodeTpl" [ngTemplateOutletContext]="{ $implicit: c, depth: depth + 1 }" />
+          </div>
         }
-      }
+      </div>
     </ng-template>
   `,
 })
@@ -191,6 +215,27 @@ export class BpdmTreeSelect implements OnDestroy {
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
+  /** Accessible name for the trigger + tree — pass a translated string. */
+  readonly ariaLabel = input("", { alias: "aria-label" });
+  readonly ariaDescribedby = input("", { alias: "aria-describedby" });
+  /** Screen-reader labels + count text — override for i18n. */
+  readonly messages = input<{
+    expand?: string;
+    collapse?: string;
+    selectAll?: string;
+    clearAll?: string;
+    selected?: (count: number) => string;
+  }>({});
+
+  protected readonly t = computed(() => ({
+    expand: "Expand",
+    collapse: "Collapse",
+    selectAll: "Select all",
+    clearAll: "Clear all",
+    selected: (n: number) => `${n} selected`,
+    ...this.messages(),
+  }));
+  protected readonly treeId = `bpdm-tree-${(treeUid += 1)}`;
 
   protected readonly open = signal(false);
   protected readonly query = signal("");

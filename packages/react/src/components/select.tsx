@@ -60,6 +60,9 @@ export interface SelectProps extends VariantProps<typeof triggerVariants> {
   contentClassName?: string;
   "aria-invalid"?: boolean;
   id?: string;
+  /** Accessible name for the trigger + option list (when there's no visible `<label>`). */
+  "aria-label"?: string;
+  "aria-describedby"?: string;
 }
 
 /**
@@ -83,7 +86,14 @@ export function Select({
   contentClassName,
   "aria-invalid": ariaInvalid,
   id,
+  "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedBy,
 }: SelectProps) {
+  const baseId = React.useId();
+  const listboxId = `${baseId}-listbox`;
+  const optionId = (index: number) => `${baseId}-opt-${index}`;
+  const searchRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = React.useState(false);
   const isControlled = value !== undefined;
   const [internal, setInternal] = React.useState(defaultValue ?? "");
@@ -201,6 +211,10 @@ export function Select({
     }
   };
 
+  // the id of the highlighted option, exposed via aria-activedescendant so screen
+  // readers announce the active row as you arrow through the list
+  const activeId = rows[active]?.kind === "item" ? optionId(active) : undefined;
+
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
@@ -209,7 +223,11 @@ export function Select({
           type="button"
           id={id}
           role="combobox"
+          aria-haspopup="listbox"
           aria-expanded={open}
+          aria-controls={open ? listboxId : undefined}
+          aria-label={ariaLabel}
+          aria-describedby={ariaDescribedBy}
           aria-invalid={ariaInvalid}
           disabled={disabled}
           className={cn(triggerVariants({ size }), "group", className)}
@@ -227,6 +245,12 @@ export function Select({
           sideOffset={4}
           collisionPadding={8}
           onKeyDown={onKeyDown}
+          onOpenAutoFocus={(e) => {
+            // focus the search box (editable combobox) or the listbox itself, so
+            // aria-activedescendant is announced from the focused element
+            e.preventDefault();
+            (searchable ? searchRef.current : listRef.current)?.focus();
+          }}
           // cap to the space available in the viewport/modal and flip if needed,
           // so it never overflows or squishes a small modal (it's portaled to
           // <body>, so opening never resizes the modal either)
@@ -241,11 +265,16 @@ export function Select({
             <div className="flex shrink-0 items-center gap-2 border-b border-border px-3">
               <FieldSearch />
               <input
-                autoFocus
+                ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
+                role="combobox"
+                aria-expanded
+                aria-controls={listboxId}
+                aria-autocomplete="list"
+                aria-activedescendant={activeId}
                 className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
             </div>
@@ -257,10 +286,17 @@ export function Select({
             </div>
           ) : (
             <div
-              ref={setListEl}
+              ref={(el) => {
+                listRef.current = el;
+                setListEl(el);
+              }}
+              id={listboxId}
               role="listbox"
+              aria-label={ariaLabel ?? placeholder}
+              tabIndex={-1}
+              aria-activedescendant={searchable ? undefined : activeId}
               style={{ maxHeight }}
-              className="min-h-0 flex-1 overflow-auto p-1"
+              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
             >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
                 {virtualizer.getVirtualItems().map((vi) => {
@@ -275,7 +311,8 @@ export function Select({
                     return (
                       <div
                         key={`g-${vi.index}`}
-                        className="absolute left-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
+                        aria-hidden="true"
+                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
                         {...common}
                       >
                         {r.icon}
@@ -289,6 +326,7 @@ export function Select({
                   return (
                     <button
                       key={o.value}
+                      id={optionId(vi.index)}
                       type="button"
                       role="option"
                       aria-selected={isSelected}
@@ -296,7 +334,7 @@ export function Select({
                       onClick={() => !o.disabled && commit(o.value)}
                       onMouseMove={() => setActive(vi.index)}
                       className={cn(
-                        "absolute left-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-left text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+                        "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         isActive && "bg-muted",
                       )}
                       {...common}
