@@ -286,3 +286,12 @@ drops into forms and test harnesses unchanged. In **Angular**, `name`, `aria-lab
 - Labelling attributes reach the `<input>` directly: `aria-label`, `aria-describedby`, and `name`
   are forwarded in both frameworks (React spreads every native `<input>` prop; Angular exposes them
   as inputs).
+
+## Internationalization
+
+- **Locale-aware formatting** is the core i18n feature: `currency` + `locale` drive the grouping,
+  symbol placement, and decimal count via `Intl.NumberFormat` (`en-IN` → `1,00,000`, `de-DE` →
+  `100.000,00 €`, `JPY` → no decimals). The stored value stays a precise numeric string.
+- The currency symbol is decorative, so give the field a translated accessible name that
+  **includes the currency**. **RTL-safe**: alignment uses a logical property (`text-end`), so it
+  mirrors under `dir="rtl"`. See the [Internationalization guide](/docs/getting-started/i18n).

@@ -307,3 +307,10 @@ Extends the native `<textarea>` — `placeholder`, `value`, `defaultValue`, `row
 - `showCount` renders a character counter that's automatically linked to the field via
   `aria-describedby`, so screen readers get the current count and limit as the field's
   description (any `aria-describedby` you pass is preserved).
+
+## Internationalization
+
+- The textarea renders **no text of its own** — pass a translated `placeholder` / accessible
+  name; the `showCount` readout is numeric (`n / max`), so it's locale-neutral.
+- **RTL-safe**: alignment uses a logical property (`text-end`), so it mirrors under `dir="rtl"`.
+  See the [Internationalization guide](/docs/getting-started/i18n).

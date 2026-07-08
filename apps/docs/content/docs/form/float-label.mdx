@@ -226,3 +226,11 @@ In **React**, `FloatLabel` also spreads any extra native `<div>` props (`data-*`
   preserved.
 - State lives on the control, not the wrapper: set `disabled` or `aria-invalid` on the field and
   pair `aria-invalid` with `aria-describedby` pointing at your error text.
+
+## Internationalization
+
+- The floating `label` is **your** text — pass it already translated (same for any `placeholder`
+  on the wrapped control). There's nothing hard-coded to override.
+- **RTL-safe**: the resting label position uses a logical property (`start-3`), so the label rests
+  and floats from the correct side under `dir="rtl"`. See the
+  [Internationalization guide](/docs/getting-started/i18n).

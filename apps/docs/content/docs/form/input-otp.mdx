@@ -321,3 +321,11 @@ The value is a plain string of the entered characters (`""` when empty).
 - The group separator is decorative (`aria-hidden`), so screen readers read the code as one field.
 - Setting `name` emits the joined value through a hidden input, so the field submits with a native
   `<form>`.
+
+## Internationalization
+
+- The group name (`aria-label`) and the per-cell label (`cellLabel`, default `Character N of M`)
+  are translatable — see [Translating labels](/docs/getting-started/i18n).
+- **RTL-safe**: the connected-cell rounding uses logical properties and the **arrow keys follow
+  the visual order** (ArrowLeft advances in `dir="rtl"`); `autocomplete="one-time-code"` still
+  triggers SMS autofill.
