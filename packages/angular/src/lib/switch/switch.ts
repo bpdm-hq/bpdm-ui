@@ -32,19 +32,23 @@ import { cn, switchVariants, thumbVariants, type SwitchVariants } from "@bpdm/va
     <button
       type="button"
       role="switch"
+      [id]="id() || null"
       [class]="trackClass()"
       [attr.data-state]="state()"
       [attr.aria-checked]="checked()"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-labelledby]="ariaLabelledby() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
       [disabled]="disabled()"
       (click)="toggle()"
       (blur)="onTouched()"
     >
       <span [class]="thumbClass()" [attr.data-state]="state()">
         @if (icon()) {
-          <svg viewBox="0 0 16 16" fill="none" class="hidden size-[62%] text-primary group-data-[state=checked]:block">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-primary group-data-[state=checked]:block">
             <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <svg viewBox="0 0 16 16" fill="none" class="hidden size-[62%] text-muted-foreground group-data-[state=unchecked]:block">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-muted-foreground group-data-[state=unchecked]:block">
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         }
@@ -58,6 +62,14 @@ export class BpdmSwitch implements ControlValueAccessor {
   /** Show a ✓ / ✗ glyph inside the thumb. */
   readonly icon = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Control id (label association / testing), forwarded to the switch. */
+  readonly id = input<string>("");
+  /** Accessible name — pass a translated string for i18n. Forwarded to the switch. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** Id(s) of the element(s) labelling the switch. Forwarded to the switch. */
+  readonly ariaLabelledby = input<string>("", { alias: "aria-labelledby" });
+  /** Id(s) of describing elements (help text). Forwarded to the switch. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
   /** Standalone two-way binding; also driven by ngModel / formControl. */
   readonly checked = model(false);
 

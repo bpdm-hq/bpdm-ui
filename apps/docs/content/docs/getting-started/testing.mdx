@@ -448,6 +448,43 @@ expect(radios[1].getAttribute('aria-checked')).toBe('true');
   </Tab>
 </Tabs>
 
+### Switch
+
+The **Switch** is a `role="switch"` with an accessible name — query it by role/name, toggle by
+clicking, and assert `aria-checked`. In React `data-testid` also lands on the control (props are
+spread); in Angular query by role.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="switch.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<Switch aria-label="Notifications" />);
+
+const s = screen.getByRole('switch', { name: 'Notifications' });
+expect(s).toHaveAttribute('aria-checked', 'false');
+await userEvent.click(s);
+expect(s).toHaveAttribute('aria-checked', 'true');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="switch.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const s = el.querySelector('[role="switch"]') as HTMLButtonElement;
+s.click();
+fixture.detectChanges();
+expect(s.getAttribute('aria-checked')).toBe('true');
+// pass aria-label for the accessible name
+```
+
+  </Tab>
+</Tabs>
+
 ### Data Table
 
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
