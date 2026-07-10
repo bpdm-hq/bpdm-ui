@@ -156,6 +156,9 @@ export interface ColumnFilter {
   rules: { op: FilterOperator; value: string }[];
 }
 
+// Operator lists as value sets — the visible labels are sourced from
+// `DataTableMessages.operators` at render time (so they translate). The `label`
+// here is the English fallback and matches the message defaults.
 export const TEXT_OPS: { value: FilterOperator; label: string }[] = [
   { value: "contains", label: "Contains" },
   { value: "startsWith", label: "Starts with" },
@@ -171,6 +174,150 @@ export const NUM_OPS: { value: FilterOperator; label: string }[] = [
   { value: "lt", label: "<" },
   { value: "lte", label: "≤" },
 ];
+
+// --- i18n --------------------------------------------------------------------
+
+/**
+ * All user-facing / screen-reader strings the table renders. Pass a partial
+ * `messages` input to translate any subset; the rest fall back to
+ * `DEFAULT_DATA_TABLE_MESSAGES` (English). Mirrors the React twin.
+ */
+export interface DataTableMessages {
+  /** aria-label of the global search input. */
+  search: string;
+  /** Footer text when the filtered result set is empty. */
+  noResults: string;
+  /** Placeholder of the column-visibility control. */
+  columns: string;
+  /** "Reset columns" button after a drag reorder. */
+  resetColumns: string;
+  /** aria-label of the header select-all checkbox. */
+  selectAllRows: string;
+  /** Base aria-label of a per-row selection control. */
+  selectRow: string;
+  /** aria-label of a card/expander when collapsed (responsive). */
+  expand: string;
+  /** aria-label of a card/expander when expanded (responsive). */
+  collapse: string;
+  /** aria-label of a row expander when collapsed. */
+  expandRow: string;
+  /** aria-label of a row expander when expanded. */
+  collapseRow: string;
+  /** aria-label of the row-reorder lead header. */
+  reorder: string;
+  /** aria-label of a row drag handle. */
+  dragToReorder: string;
+  /** aria-label of the per-column options (pin) menu trigger. */
+  columnOptions: string;
+  /** "Pin left" menu item. */
+  pinLeft: string;
+  /** "Pin right" menu item. */
+  pinRight: string;
+  /** "Unpin" menu item. */
+  unpin: string;
+  /** aria-label of the per-column filter menu trigger. */
+  filterColumn: string;
+  /** "Match all" option in the filter match-mode select. */
+  matchAll: string;
+  /** "Match any" option in the filter match-mode select. */
+  matchAny: string;
+  /** Placeholder of a filter rule value input. */
+  filterValue: string;
+  /** "Add rule" button (rendered with a leading "+"). */
+  addRule: string;
+  /** "Remove rule" button. */
+  removeRule: string;
+  /** "Clear" button (filters/search). */
+  clear: string;
+  /** "Apply" button in a filter menu. */
+  apply: string;
+  /** Shown when a "select" filter has no distinct values. */
+  noValues: string;
+  /** aria-label of the previous-page button. */
+  previousPage: string;
+  /** aria-label of the next-page button. */
+  nextPage: string;
+  /** Visible text of the cursor-pagination previous button. */
+  prev: string;
+  /** Visible text of the cursor-pagination next button. */
+  next: string;
+  /** Label beside the page-size selector. */
+  rowsPerPage: string;
+  /** aria-label on the pagination <nav>. */
+  pagination: string;
+  /** Per-operator labels (text ops read words, number ops read symbols). */
+  operators: {
+    contains: string;
+    startsWith: string;
+    endsWith: string;
+    equals: string;
+    notEquals: string;
+    gt: string;
+    gte: string;
+    lt: string;
+    lte: string;
+  };
+  /** aria-label of a numbered page button. */
+  goToPage: (page: number) => string;
+  /** Numbered footer range text, e.g. "Showing 1–10 of 42". */
+  range: (from: number, to: number, total: number) => string;
+  /** aria-live announcement when the active sort changes. */
+  announceSort: (column: string, direction: "asc" | "desc" | "none") => string;
+  /** aria-live announcement when the processed result count changes. */
+  announceResults: (count: number) => string;
+}
+
+export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
+  search: "Search",
+  noResults: "No results",
+  columns: "Columns",
+  resetColumns: "Reset columns",
+  selectAllRows: "Select all rows",
+  selectRow: "Select row",
+  expand: "Expand",
+  collapse: "Collapse",
+  expandRow: "Expand row",
+  collapseRow: "Collapse row",
+  reorder: "Reorder",
+  dragToReorder: "Drag to reorder",
+  columnOptions: "Column options",
+  pinLeft: "Pin left",
+  pinRight: "Pin right",
+  unpin: "Unpin",
+  filterColumn: "Filter column",
+  matchAll: "Match all",
+  matchAny: "Match any",
+  filterValue: "Value",
+  addRule: "Add rule",
+  removeRule: "Remove rule",
+  clear: "Clear",
+  apply: "Apply",
+  noValues: "No values",
+  previousPage: "Previous page",
+  nextPage: "Next page",
+  prev: "Prev",
+  next: "Next",
+  rowsPerPage: "Rows",
+  pagination: "Pagination",
+  operators: {
+    contains: "Contains",
+    startsWith: "Starts with",
+    endsWith: "Ends with",
+    equals: "Equals",
+    notEquals: "Not equals",
+    gt: ">",
+    gte: "≥",
+    lt: "<",
+    lte: "≤",
+  },
+  goToPage: (page) => `Go to page ${page}`,
+  range: (from, to, total) => `Showing ${from}–${to} of ${total}`,
+  announceSort: (column, direction) =>
+    direction === "none"
+      ? `Cleared sort on ${column}`
+      : `Sorted by ${column} ${direction === "asc" ? "ascending" : "descending"}`,
+  announceResults: (count) => `${count} result${count === 1 ? "" : "s"}`,
+};
 
 // --- sorting helpers -------------------------------------------------------
 

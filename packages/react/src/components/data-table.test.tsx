@@ -135,4 +135,66 @@ describe("DataTable", () => {
     // even with a non-matching controlled filter, all rows stay (parent owns filtering)
     expect(bodyRowCount(container)).toBe(3);
   });
+
+  // --- hardening: i18n `messages`, `getRowLabel`, aria-live, pagination <nav> ---
+
+  it("uses `messages` to translate the empty/no-results text and the search label", async () => {
+    const { container } = render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        rowKey={rowKey}
+        searchable
+        pagination={{ pageSize: 2 }}
+        messages={{ noResults: "Keine Ergebnisse", search: "Suchen" }}
+      />,
+    );
+    // custom search label overrides the built-in "Search"
+    const search = screen.getByRole("textbox", { name: "Suchen" });
+    // filter everything out → the footer shows the translated no-results string
+    await userEvent.type(search, "zzz");
+    expect(container.textContent).toContain("Keine Ergebnisse");
+  });
+
+  it("names each row's selection checkbox via `getRowLabel`", () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        rowKey={rowKey}
+        selectable
+        getRowLabel={(r) => r.name}
+      />,
+    );
+    // each row checkbox's accessible name is "Select row: {name}"
+    expect(screen.getByRole("checkbox", { name: /Select row: Milo/ })).toBeTruthy();
+    expect(screen.getByRole("checkbox", { name: /Select row: Ava/ })).toBeTruthy();
+  });
+
+  it("renders a polite aria-live status region for announcements", () => {
+    render(<DataTable columns={COLUMNS} data={DATA} rowKey={rowKey} />);
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-live", "polite");
+  });
+
+  it("wraps client pagination in an accessible <nav> with numbered page buttons", () => {
+    render(<DataTable columns={COLUMNS} data={DATA} rowKey={rowKey} pagination={{ pageSize: 2 }} />);
+    expect(screen.getByRole("navigation", { name: /pagination/i })).toBeTruthy();
+    // 3 rows / pageSize 2 → pages 1 and 2, each a numbered "Go to page N" button
+    expect(screen.getByRole("button", { name: /go to page 2/i })).toBeTruthy();
+  });
+
+  it("applies a per-column text filter from the header filter menu", async () => {
+    const cols: DataTableColumn<Row>[] = [
+      { id: "name", header: "Name", filterable: true, accessor: (r) => r.name },
+      { id: "tasks", header: "Tasks", numeric: true, accessor: (r) => r.tasks },
+    ];
+    const { container } = render(<DataTable columns={cols} data={DATA} rowKey={rowKey} />);
+    // open the "Filter column" menu on the Name column
+    await userEvent.click(screen.getByRole("button", { name: "Filter column" }));
+    // default operator is "contains"; type a value and apply
+    await userEvent.type(screen.getByPlaceholderText("Value"), "av");
+    await userEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(firstCol(container)).toEqual(["Ava"]);
+  });
 });

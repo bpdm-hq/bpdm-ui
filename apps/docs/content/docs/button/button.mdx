@@ -10,26 +10,28 @@ import {
   ButtonVariantsDemo,
   ButtonAppearancesDemo,
   ButtonSizesDemo,
+  ButtonCustomSizeDemo,
+  ButtonShapeDemo,
   ButtonIconTextDemo,
   ButtonIconSizesDemo,
   ButtonIconRowDemo,
-  ButtonShapeDemo,
-  ButtonLinkDemo,
+  ButtonLoadingDemo,
   ButtonDisabledDemo,
-  ButtonCustomSizeDemo,
+  ButtonLinkDemo,
 } from '@/components/button-demos';
 
 The **Button** triggers an action. It ships from one shared token set, so the
 React (`@bpdm/ui`) and Angular (`@bpdm/ng`) versions render identically — same
 colours, same motion (overshoot ease + a subtle press scale). It has two
 independent axes — `variant` (colour) and `appearance` (`solid` / `outline` /
-`ghost`) — plus `size`, `shape`, and `asChild`.
+`ghost`) — plus `size`, `shape`, a `loading` state, and `asChild`.
 
 ## Usage
 
 In React, `Button` is a component; in Angular, `bpdmButton` is an attribute
-directive you put on a native `<button>` (or `<a>`), so `type`, `disabled`,
-focus and keyboard behaviour stay native.
+directive you put on a native `<button>` (or `<a>`), so `disabled`, focus and
+keyboard behaviour stay native. `type` defaults to `button`, so a button never
+submits a surrounding `<form>` by accident.
 
 <Preview>
   <ButtonBasicDemo />
@@ -189,7 +191,7 @@ export class ButtonAppearances {}
 
 ## Sizes
 
-The `size` prop offers `sm`, `md` (default), and `lg`.
+The `size` prop offers `sm`, `md` (default), and `lg` for text buttons.
 
 <Preview>
   <ButtonSizesDemo />
@@ -238,30 +240,29 @@ export class ButtonSizes {}
   </Tab>
 </Tabs>
 
-## With icon and text
+## Custom size
 
-Drop an icon into the children alongside the label — the button's base `gap`
-spaces it automatically.
+`size="none"` drops the preset height and padding, so you control the sizing
+entirely with your own classes (merged via tailwind-merge, so yours win).
 
 <Preview>
-  <ButtonIconTextDemo />
+  <ButtonCustomSizeDemo />
 </Preview>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="button-icon-text.tsx"
-import { Plus, ArrowRight } from 'lucide-react';
+```tsx title="button-custom-size.tsx"
 import { Button } from '@bpdm/ui/button';
 
-export function ButtonIconText() {
+export function ButtonCustomSize() {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button>
-        <Plus className="size-4" /> New item
+      <Button size="none" variant="secondary" appearance="outline" className="h-7 rounded-md px-2 text-xs">
+        Tiny
       </Button>
-      <Button variant="secondary" appearance="outline">
-        Continue <ArrowRight className="size-4" />
+      <Button size="none" variant="primary" className="h-14 rounded-2xl px-8 text-lg">
+        Chunky
       </Button>
     </div>
   );
@@ -271,103 +272,25 @@ export function ButtonIconText() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="button-icon-text.ts"
+```ts title="button-custom-size.ts"
 import { Component } from '@angular/core';
 import { BpdmButton } from '@bpdm/ng';
 
 @Component({
-  selector: 'button-icon-text',
+  selector: 'button-custom-size',
   imports: [BpdmButton],
-  templateUrl: './button-icon-text.html',
+  templateUrl: './button-custom-size.html',
 })
-export class ButtonIconText {}
+export class ButtonCustomSize {}
 ```
 
-```html title="button-icon-text.html"
+```html title="button-custom-size.html"
 <div class="flex flex-wrap items-center gap-3">
-  <button bpdmButton>
-    <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-    New item
+  <button bpdmButton size="none" variant="secondary" appearance="outline" class="h-7 rounded-md px-2 text-xs">
+    Tiny
   </button>
-  <button bpdmButton variant="secondary" appearance="outline">
-    Continue
-    <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  </button>
-</div>
-```
-
-  </Tab>
-</Tabs>
-
-## Icon buttons
-
-For square, icon-only buttons use the icon sizes `iconSm`, `icon`, and `iconLg`.
-Always set an `aria-label` since there's no visible text.
-
-<Preview>
-  <ButtonIconSizesDemo />
-</Preview>
-
-Icon buttons work with every variant — pair `shape="round"` for circles:
-
-<Preview>
-  <ButtonIconRowDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="button-icons.tsx"
-import { Plus, Star, Trash2 } from 'lucide-react';
-import { Button } from '@bpdm/ui/button';
-
-export function ButtonIcons() {
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button size="icon" shape="round" aria-label="Add">
-        <Plus className="size-[18px]" />
-      </Button>
-      <Button size="icon" shape="round" variant="secondary" appearance="outline" aria-label="Favorite">
-        <Star className="size-[18px]" />
-      </Button>
-      <Button size="icon" shape="round" variant="destructive" aria-label="Delete">
-        <Trash2 className="size-[18px]" />
-      </Button>
-    </div>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="button-icons.ts"
-import { Component } from '@angular/core';
-import { BpdmButton } from '@bpdm/ng';
-
-@Component({
-  selector: 'button-icons',
-  imports: [BpdmButton],
-  templateUrl: './button-icons.html',
-})
-export class ButtonIcons {}
-```
-
-```html title="button-icons.html"
-<div class="flex flex-wrap items-center gap-3">
-  <button bpdmButton size="icon" shape="round" aria-label="Add">
-    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-  </button>
-  <button bpdmButton size="icon" shape="round" variant="destructive" aria-label="Delete">
-    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
-    </svg>
+  <button bpdmButton size="none" variant="primary" class="h-14 rounded-2xl px-8 text-lg">
+    Chunky
   </button>
 </div>
 ```
@@ -433,29 +356,30 @@ export class ButtonShape {}
   </Tab>
 </Tabs>
 
-## Custom size
+## With icon and text
 
-`size="none"` drops the preset height and padding, so you control the sizing
-entirely with your own classes.
+Drop an icon into the children alongside the label — the button's base `gap`
+spaces it automatically, and the order mirrors correctly under RTL.
 
 <Preview>
-  <ButtonCustomSizeDemo />
+  <ButtonIconTextDemo />
 </Preview>
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="button-custom-size.tsx"
+```tsx title="button-icon-text.tsx"
+import { Plus, ArrowRight } from 'lucide-react';
 import { Button } from '@bpdm/ui/button';
 
-export function ButtonCustomSize() {
+export function ButtonIconText() {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button size="none" variant="secondary" appearance="outline" className="h-7 rounded-md px-2 text-xs">
-        Tiny
+      <Button>
+        <Plus className="size-4" /> New item
       </Button>
-      <Button size="none" variant="primary" className="h-14 rounded-2xl px-8 text-lg">
-        Chunky
+      <Button variant="secondary" appearance="outline">
+        Continue <ArrowRight className="size-4" />
       </Button>
     </div>
   );
@@ -465,26 +389,228 @@ export function ButtonCustomSize() {
   </Tab>
   <Tab value="Angular">
 
-```ts title="button-custom-size.ts"
+```ts title="button-icon-text.ts"
 import { Component } from '@angular/core';
 import { BpdmButton } from '@bpdm/ng';
 
 @Component({
-  selector: 'button-custom-size',
+  selector: 'button-icon-text',
   imports: [BpdmButton],
-  templateUrl: './button-custom-size.html',
+  templateUrl: './button-icon-text.html',
 })
-export class ButtonCustomSize {}
+export class ButtonIconText {}
 ```
 
-```html title="button-custom-size.html"
+```html title="button-icon-text.html"
 <div class="flex flex-wrap items-center gap-3">
-  <button bpdmButton size="none" variant="secondary" appearance="outline" class="h-7 rounded-md px-2 text-xs">
-    Tiny
+  <button bpdmButton>
+    <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+    New item
   </button>
-  <button bpdmButton size="none" variant="primary" class="h-14 rounded-2xl px-8 text-lg">
-    Chunky
+  <button bpdmButton variant="secondary" appearance="outline">
+    Continue
+    <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
   </button>
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Icon buttons
+
+For square, icon-only buttons use the icon sizes `iconSm`, `icon`, and `iconLg`.
+Always set an `aria-label` since there's no visible text — a dev-mode warning
+fires if you forget.
+
+<Preview>
+  <ButtonIconSizesDemo />
+</Preview>
+
+Icon buttons work with every variant — pair `shape="round"` for circles:
+
+<Preview>
+  <ButtonIconRowDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="button-icons.tsx"
+import { Plus, Star, Trash2 } from 'lucide-react';
+import { Button } from '@bpdm/ui/button';
+
+export function ButtonIcons() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button size="icon" shape="round" aria-label="Add">
+        <Plus className="size-[18px]" />
+      </Button>
+      <Button size="icon" shape="round" variant="secondary" appearance="outline" aria-label="Favorite">
+        <Star className="size-[18px]" />
+      </Button>
+      <Button size="icon" shape="round" variant="destructive" aria-label="Delete">
+        <Trash2 className="size-[18px]" />
+      </Button>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="button-icons.ts"
+import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'button-icons',
+  imports: [BpdmButton],
+  templateUrl: './button-icons.html',
+})
+export class ButtonIcons {}
+```
+
+```html title="button-icons.html"
+<div class="flex flex-wrap items-center gap-3">
+  <button bpdmButton size="icon" shape="round" aria-label="Add">
+    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  </button>
+  <button bpdmButton size="icon" shape="round" variant="secondary" appearance="outline" aria-label="Favorite">
+    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l2.9 6.3 6.9.6-5.2 4.5 1.6 6.8L12 17.3 5.8 20.8l1.6-6.8L2.2 9.5l6.9-.6L12 2Z" />
+    </svg>
+  </button>
+  <button bpdmButton size="icon" shape="round" variant="destructive" aria-label="Delete">
+    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+    </svg>
+  </button>
+</div>
+```
+
+  </Tab>
+</Tabs>
+
+## Loading
+
+Set `loading` to show a spinner, mark the button `aria-busy`, and block clicks
+while a request is in flight. The spinner is a leading indicator; the label
+stays for context. `loadingLabel` (default `"Loading"`) is the screen-reader
+text announced while busy.
+
+<Preview>
+  <ButtonLoadingDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="button-loading.tsx"
+import { useState } from 'react';
+import { Button } from '@bpdm/ui/button';
+
+export function ButtonLoading() {
+  const [saving, setSaving] = useState(false);
+
+  const save = () => {
+    setSaving(true);
+    // …await your request, then:
+    setTimeout(() => setSaving(false), 1600);
+  };
+
+  return (
+    <Button loading={saving} onClick={save}>
+      {saving ? 'Saving…' : 'Save changes'}
+    </Button>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="button-loading.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'button-loading',
+  imports: [BpdmButton],
+  templateUrl: './button-loading.html',
+})
+export class ButtonLoading {
+  readonly saving = signal(false);
+
+  save() {
+    this.saving.set(true);
+    // …await your request, then:
+    setTimeout(() => this.saving.set(false), 1600);
+  }
+}
+```
+
+```html title="button-loading.html"
+<button bpdmButton [loading]="saving()" (click)="save()">
+  {{ saving() ? 'Saving…' : 'Save changes' }}
+</button>
+```
+
+  </Tab>
+</Tabs>
+
+## Disabled
+
+Use the native `disabled` attribute — focus and pointer events are removed and
+the button dims automatically. (For `asChild`/anchor buttons, `disabled` is
+translated to `aria-disabled` + an untabbable, non-interactive link.)
+
+<Preview>
+  <ButtonDisabledDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="button-disabled.tsx"
+import { Button } from '@bpdm/ui/button';
+
+export function ButtonDisabled() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button disabled>Disabled</Button>
+      <Button disabled appearance="outline">Disabled</Button>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="button-disabled.ts"
+import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'button-disabled',
+  imports: [BpdmButton],
+  templateUrl: './button-disabled.html',
+})
+export class ButtonDisabled {}
+```
+
+```html title="button-disabled.html"
+<div class="flex flex-wrap items-center gap-3">
+  <button bpdmButton disabled>Disabled</button>
+  <button bpdmButton appearance="outline" disabled>Disabled</button>
 </div>
 ```
 
@@ -495,7 +621,8 @@ export class ButtonCustomSize {}
 
 To render a link that looks like a button: in React pass `asChild` and nest an
 anchor (Radix `Slot` merges the styles onto it); in Angular put `bpdmButton`
-directly on an `<a>`.
+directly on an `<a>`. Note the role becomes **link** (not button), so
+<kbd>Space</kbd> no longer activates it — that's correct link behaviour.
 
 <Preview>
   <ButtonLinkDemo />
@@ -548,56 +675,6 @@ export class ButtonLink {}
   </Tab>
 </Tabs>
 
-## Disabled
-
-Use the native `disabled` attribute — focus and pointer events are removed and
-the button dims automatically.
-
-<Preview>
-  <ButtonDisabledDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="button-disabled.tsx"
-import { Button } from '@bpdm/ui/button';
-
-export function ButtonDisabled() {
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button disabled>Disabled</Button>
-      <Button disabled appearance="outline">Disabled</Button>
-    </div>
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="button-disabled.ts"
-import { Component } from '@angular/core';
-import { BpdmButton } from '@bpdm/ng';
-
-@Component({
-  selector: 'button-disabled',
-  imports: [BpdmButton],
-  templateUrl: './button-disabled.html',
-})
-export class ButtonDisabled {}
-```
-
-```html title="button-disabled.html"
-<div class="flex flex-wrap items-center gap-3">
-  <button bpdmButton disabled>Disabled</button>
-  <button bpdmButton appearance="outline" disabled>Disabled</button>
-</div>
-```
-
-  </Tab>
-</Tabs>
-
 ## API
 
 | Prop | Type | Default | Description |
@@ -606,19 +683,25 @@ export class ButtonDisabled {}
 | `appearance` | `solid \| outline \| ghost` | `solid` | Visual weight — filled, bordered, or text-only. |
 | `size` | `sm \| md \| lg \| iconSm \| icon \| iconLg \| none` | `md` | Text sizes, square icon sizes, or `none` to bring your own. |
 | `shape` | `default \| round` | `default` | Corner radius — token radius, or `round` (pill / circle). |
+| `loading` | `boolean` | `false` | Show a spinner, set `aria-busy`, and block interaction. |
+| `loadingLabel` | `string` | `Loading` | Screen-reader text announced while `loading` (i18n). |
+| `type` | `button \| submit \| reset` | `button` | Native button type. Defaults to `button` so it never submits a form by accident (not applied to anchors). |
 | `asChild` | `boolean` | `false` | **React only** — render as the child element (e.g. a link) via Radix `Slot`. |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes, merged with the variant classes via tailwind-merge (yours win). |
 
-All native `<button>` attributes (`onClick`, `disabled`, `type`, …) are supported. In
-Angular the same options are `@Input`s on the `bpdmButton` directive, with identical names.
+All native `<button>` attributes (`onClick`, `disabled`, `form`, …) are supported. In
+Angular these are inputs on the `bpdmButton` directive with identical names (except
+`asChild`, which is React-only — in Angular you apply the directive directly to an `<a>`).
 
 ## Accessibility
 
 ### Screen reader
 
 The button renders a native `<button>` (React) or applies `bpdmButton` to a
-native `<button>`/`<a>` (Angular), so its role and focus behaviour come from the
-element itself. Text buttons are announced by their content; **icon-only**
-buttons have no text, so pass an `aria-label` that describes the action.
+native `<button>`/`<a>` (Angular), so its role, focus, and keyboard behaviour
+come from the element itself. Text buttons are announced by their content;
+**icon-only** buttons have no text, so pass an `aria-label` that describes the
+action — a dev-mode warning fires when an `icon*` size ships without one.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
@@ -627,38 +710,116 @@ buttons have no text, so pass an `aria-label` that describes the action.
 import { Search } from 'lucide-react';
 import { Button } from '@bpdm/ui/button';
 
-// the text content is the accessible name
-<Button>Submit</Button>
+export function ButtonA11y() {
+  return (
+    <div className="flex items-center gap-3">
+      {/* the text content is the accessible name */}
+      <Button>Submit</Button>
 
-// icon-only — describe the action with aria-label
-<Button size="icon" aria-label="Search">
-  <Search className="size-[18px]" />
-</Button>
+      {/* icon-only — describe the action with aria-label */}
+      <Button size="icon" aria-label="Search">
+        <Search className="size-[18px]" />
+      </Button>
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="button-a11y.html"
-<!-- the text content is the accessible name -->
-<button bpdmButton>Submit</button>
+```ts title="button-a11y.ts"
+import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
 
-<!-- icon-only — describe the action with aria-label -->
-<button bpdmButton size="icon" aria-label="Search">
-  <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <circle cx="11" cy="11" r="7" />
-    <path d="m21 21-4.3-4.3" />
-  </svg>
-</button>
+@Component({
+  selector: 'button-a11y',
+  imports: [BpdmButton],
+  templateUrl: './button-a11y.html',
+})
+export class ButtonA11y {}
+```
+
+```html title="button-a11y.html"
+<div class="flex items-center gap-3">
+  <!-- the text content is the accessible name -->
+  <button bpdmButton>Submit</button>
+
+  <!-- icon-only — describe the action with aria-label -->
+  <button bpdmButton size="icon" aria-label="Search">
+    <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  </button>
+</div>
 ```
 
   </Tab>
 </Tabs>
+
+### Notes
+
+- **Focus**: a visible focus ring (`focus-visible:ring-2` with an offset) shows on
+  keyboard focus only, not on mouse click.
+- **`type`**: defaults to `button`, so a button inside a `<form>` won't submit it —
+  set `type="submit"` explicitly for the submit action.
+- **`loading`**: sets `aria-busy="true"`, keeps the accessible name, appends the
+  `loadingLabel` for screen readers, and blocks activation while busy.
+- **As a link**: `asChild`/`<a bpdmButton>` renders a `link` role — <kbd>Space</kbd>
+  does not activate a link (that's correct), only <kbd>Enter</kbd> follows it.
 
 ### Keyboard
 
 | Key | Action |
 | --- | --- |
 | <kbd>Tab</kbd> | Moves focus to the button. |
-| <kbd>Enter</kbd> | Activates the button. |
-| <kbd>Space</kbd> | Activates the button. |
+| <kbd>Enter</kbd> | Activates the button (or follows the link). |
+| <kbd>Space</kbd> | Activates the button (buttons only, not links). |
+
+## Internationalization
+
+The Button's label is your own content, so there's nothing built-in to
+translate — **except** the loading state's screen-reader text. Provide a
+localized `loadingLabel` per locale (default `"Loading"`).
+
+Layout is direction-agnostic: it uses logical `gap` + flexbox and symmetric
+padding, so an icon + label pair mirrors automatically under `dir="rtl"` — no
+configuration needed.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="button-i18n.tsx"
+import { Button } from '@bpdm/ui/button';
+
+export function ButtonI18n() {
+  return (
+    <Button loading loadingLabel="Wird geladen">
+      Speichern
+    </Button>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="button-i18n.ts"
+import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'button-i18n',
+  imports: [BpdmButton],
+  templateUrl: './button-i18n.html',
+})
+export class ButtonI18n {}
+```
+
+```html title="button-i18n.html"
+<button bpdmButton loading loadingLabel="Wird geladen">Speichern</button>
+```
+
+  </Tab>
+</Tabs>

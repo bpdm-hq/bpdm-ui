@@ -28,8 +28,10 @@ import {
   type ColumnFilter,
   compareValues,
   type DataTableColumn,
+  type DataTableMessages,
   type DataTablePagination,
   type DataTableSort,
+  DEFAULT_DATA_TABLE_MESSAGES,
   evalRule,
   getSortValue,
   nextDirection,
@@ -43,12 +45,15 @@ import {
 
 type Key = string | number;
 
+// Instance counter so expandable-panel ids are unique across multiple tables.
+let dataTableUid = 0;
+
 const CELL_PAD: Record<"sm" | "md" | "lg", string> = {
   sm: "px-3 py-2.5 text-sm",
   md: "px-4 py-3 text-sm",
   lg: "px-6 py-4 text-base",
 };
-const ALIGN_CLASS = { left: "text-left", center: "text-center", right: "text-right" } as const;
+const ALIGN_CLASS = { left: "text-start", center: "text-center", right: "text-end" } as const;
 const JUSTIFY_CLASS = { left: "justify-start", center: "justify-center", right: "justify-end" } as const;
 const FOOTER_JUSTIFY = { between: "justify-between", center: "justify-center", end: "justify-end" } as const;
 
@@ -76,6 +81,8 @@ interface RenderRow<T> {
     @let cols = orderedColumns();
     @let rows = pageRows();
 
+    <div role="status" aria-live="polite" class="sr-only">{{ liveMessage() }}</div>
+
     @if (showToolbar()) {
       <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
@@ -84,11 +91,11 @@ interface RenderRow<T> {
               <svg viewBox="0 0 16 16" fill="none" class="size-3.5" aria-hidden="true">
                 <path d="M2 3.5h12l-4.6 5.4v3.6l-2.8 1.4V8.9L2 3.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" />
               </svg>
-              Clear
+              {{ t().clear }}
             </button>
           }
           @if (orderChanged()) {
-            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="resetColumns()">Reset columns</button>
+            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="resetColumns()">{{ t().resetColumns }}</button>
           }
         </div>
         <div class="flex items-center gap-2">
@@ -99,7 +106,7 @@ interface RenderRow<T> {
                 [maxDisplay]="0"
                 [selectAll]="false"
                 searchable
-                placeholder="Columns"
+                [placeholder]="t().columns"
                 [options]="toggleOptions()"
                 [value]="visibleToggleIds()"
                 (valueChange)="onToggleColumns($event)"
@@ -108,7 +115,7 @@ interface RenderRow<T> {
           }
           @if (searchable()) {
             <div class="relative">
-              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
                 <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" />
                 <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
               </svg>
@@ -117,8 +124,8 @@ interface RenderRow<T> {
                 [value]="query()"
                 (input)="setQuery($any($event.target).value)"
                 [attr.placeholder]="searchPlaceholder()"
-                aria-label="Search"
-                class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background pl-8 pr-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                [attr.aria-label]="t().search"
+                class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           }
@@ -142,17 +149,17 @@ interface RenderRow<T> {
                 <div class="mb-3 flex items-center justify-between" (click)="$event.stopPropagation()">
                   @if (selectable()) {
                     @if (selectionMode() === "single") {
-                      <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" aria-label="Select row" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
+                      <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
                         @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
                       </button>
                     } @else {
-                      <bpdm-checkbox size="sm" aria-label="Select row" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
+                      <bpdm-checkbox size="sm" [attr.aria-label]="rowSelectLabel(rr)" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
                     }
                   } @else {
                     <span></span>
                   }
                   @if (canExpand(rr.row)) {
-                    <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? 'Collapse' : 'Expand'" [attr.aria-expanded]="expandedSet().has(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                    <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapse : t().expand" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                       <svg viewBox="0 0 16 16" [class]="'size-4 transition-transform ' + (expandedSet().has(rr.key) ? 'rotate-90' : '')" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     </button>
                   }
@@ -161,7 +168,7 @@ interface RenderRow<T> {
               <dl class="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
                 @for (col of cols; track col.id) {
                   <dt class="truncate text-muted-foreground">{{ col.header ?? col.id }}</dt>
-                  <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-right ' + (col.numeric ? 'tabular-nums' : '')">
+                  <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-end ' + (col.numeric ? 'tabular-nums' : '')">
                     @if (col.cell) {
                       <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="cellCtx(rr)" />
                     } @else {
@@ -171,7 +178,7 @@ interface RenderRow<T> {
                 }
               </dl>
               @if (expandedSet().has(rr.key) && expandedTemplate()) {
-                <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                <div [attr.id]="rowPanelId(rr.key)" class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
                   <div class="overflow-hidden">
                     <div class="mt-3 border-t border-border pt-3">
                       <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
@@ -196,24 +203,26 @@ interface RenderRow<T> {
             <thead>
               <tr #headRow>
                 @if (reorderableRows()) {
-                  <th scope="col" aria-label="Reorder" [class]="leadHeadClass(false)"></th>
+                  <th scope="col" [attr.aria-label]="t().reorder" [class]="leadHeadClass(false)"
+                    [style.position]="stickyHeader() ? 'sticky' : null"
+                    [style.top.px]="stickyHeader() ? 0 : null"></th>
                 }
                 @if (expandable()) {
-                  <th scope="col" aria-label="Expand" data-pin-id="__lead_expand"
+                  <th scope="col" [attr.aria-label]="t().expand" data-pin-id="__lead_expand"
                     [class]="leadHeadClass(true)"
                     [style.position]="hasLeftPin() || stickyHeader() ? 'sticky' : null"
-                    [style.left.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"
+                    [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"
                     [style.top.px]="stickyHeader() ? 0 : null"></th>
                 }
                 @if (selectable()) {
                   <th scope="col" data-pin-id="__lead_select"
                     [class]="leadHeadClass(true) + ' text-muted-foreground'"
                     [style.position]="hasLeftPin() || stickyHeader() ? 'sticky' : null"
-                    [style.left.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null"
+                    [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null"
                     [style.top.px]="stickyHeader() ? 0 : null">
                     @if (selectionMode() === "multiple") {
                       <div class="flex justify-center">
-                        <bpdm-checkbox size="sm" aria-label="Select all rows" [checked]="allSelected()" [indeterminate]="someSelected()" (checkedChange)="toggleAll()" />
+                        <bpdm-checkbox size="sm" [attr.aria-label]="t().selectAllRows" [checked]="allSelected()" [indeterminate]="someSelected()" (checkedChange)="toggleAll()" />
                       </div>
                     }
                   </th>
@@ -230,8 +239,8 @@ interface RenderRow<T> {
                     [attr.aria-sort]="ariaSort(col)"
                     [style.width]="colWidth(col)"
                     [style.position]="thPosition(col)"
-                    [style.left.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
-                    [style.right.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
+                    [style.inset-inline-start.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
+                    [style.inset-inline-end.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
                     [style.top.px]="stickyHeader() ? 0 : null"
                     [class]="headCellClass(col)"
                   >
@@ -257,12 +266,13 @@ interface RenderRow<T> {
                           [type]="col.filterType ?? (col.numeric ? 'number' : 'text')"
                           [options]="filterOptionsFor(col)"
                           [filter]="filters()[col.id]"
+                          [messages]="t()"
                           (apply)="applyFilter(col.id, $event)"
                           (clear)="clearFilter(col.id)"
                         />
                       }
                       @if (pinnable() && !col.disablePinning) {
-                        <bpdm-column-pin-menu [pin]="col.pin" (pinChange)="setPin(col.id, $event)" />
+                        <bpdm-column-pin-menu [pin]="col.pin" [messages]="t()" (pinChange)="setPin(col.id, $event)" />
                       }
                     </div>
                   </th>
@@ -289,12 +299,12 @@ interface RenderRow<T> {
                     [class]="rowClass(rr, last)"
                   >
                     @if (reorderableRows()) {
-                      <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-r border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
+                      <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-e border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
                         <div
                           draggable="true"
                           (dragstart)="dragRowKey.set(rr.key)"
                           (dragend)="dragRowKey.set(null); dropTarget.set(null)"
-                          aria-label="Drag to reorder"
+                          [attr.aria-label]="t().dragToReorder"
                           [class]="'grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing ' + (dragRowKey() === rr.key ? 'opacity-40' : '')"
                         >
                           <svg viewBox="0 0 16 16" class="size-4" fill="none" aria-hidden="true"><path d="M5 4h.01M5 8h.01M5 12h.01M11 4h.01M11 8h.01M11 12h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
@@ -302,23 +312,23 @@ interface RenderRow<T> {
                       </td>
                     }
                     @if (expandable()) {
-                      <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.left.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null" (click)="$event.stopPropagation()">
+                      <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null" (click)="$event.stopPropagation()">
                         @if (canExpand(rr.row)) {
-                          <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? 'Collapse row' : 'Expand row'" [attr.aria-expanded]="expandedSet().has(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                          <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapseRow : t().expandRow" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                             <svg viewBox="0 0 16 16" [class]="'size-4 transition-transform ' + (expandedSet().has(rr.key) ? 'rotate-90' : '')" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           </button>
                         }
                       </td>
                     }
                     @if (selectable()) {
-                      <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.left.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null" (click)="$event.stopPropagation()">
+                      <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null" (click)="$event.stopPropagation()">
                         <div class="flex justify-center">
                           @if (selectionMode() === "single") {
-                            <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" aria-label="Select row" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
+                            <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
                               @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
                             </button>
                           } @else {
-                            <bpdm-checkbox size="sm" aria-label="Select row" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
+                            <bpdm-checkbox size="sm" [attr.aria-label]="rowSelectLabel(rr)" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
                           }
                         </div>
                       </td>
@@ -326,8 +336,8 @@ interface RenderRow<T> {
                     @for (col of cols; track col.id) {
                       <td
                         [style.position]="col.pin ? 'sticky' : null"
-                        [style.left.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
-                        [style.right.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
+                        [style.inset-inline-start.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
+                        [style.inset-inline-end.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
                         [class]="bodyCellClass(col)"
                       >
                         @if (col.cell) {
@@ -339,7 +349,7 @@ interface RenderRow<T> {
                     }
                   </tr>
                   @if (expandedSet().has(rr.key) && expandedTemplate()) {
-                    <tr [class]="'bg-muted/30 ' + (divided() ? 'border-t border-border' : '')">
+                    <tr [attr.id]="rowPanelId(rr.key)" [class]="'bg-muted/30 ' + (divided() ? 'border-t border-border' : '')">
                       <td [attr.colspan]="colCount()" class="p-0">
                         <!-- grid 0fr→1fr animates the reveal to natural height smoothly -->
                         <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
@@ -366,16 +376,16 @@ interface RenderRow<T> {
                     <td [class]="cellPad() + ' w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0'"></td>
                   }
                   @if (expandable()) {
-                    <td [class]="footLeadClass()" [style.position]="hasLeftPin() ? 'sticky' : 'sticky'" [style.left.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"></td>
+                    <td [class]="footLeadClass()" [style.position]="'sticky'" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"></td>
                   }
                   @if (selectable()) {
-                    <td [class]="footLeadClass()" [style.position]="'sticky'" [style.left.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null"></td>
+                    <td [class]="footLeadClass()" [style.position]="'sticky'" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null"></td>
                   }
                   @for (col of cols; track col.id) {
                     <td
                       [style.position]="col.pin ? 'sticky' : null"
-                      [style.left.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
-                      [style.right.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
+                      [style.inset-inline-start.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
+                      [style.inset-inline-end.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
                       [class]="footCellClass(col)"
                     >
                       @if (isTemplate(col.footer)) {
@@ -399,26 +409,26 @@ interface RenderRow<T> {
       @let fm = footerModel()!;
       <div [class]="footerClass(fm.align, fm.attached)">
         @if (fm.kind === "numbered") {
-          <span class="text-muted-foreground">{{ fm.total === 0 ? "No results" : "Showing " + fm.rangeFrom + "–" + fm.rangeTo + " of " + fm.total }}</span>
+          <span class="text-muted-foreground">{{ fm.total === 0 ? t().noResults : t().range(fm.rangeFrom, fm.rangeTo, fm.total) }}</span>
           <div class="flex items-center gap-3">
             @if (fm.sizeOptions && fm.onSize) {
               <ng-container [ngTemplateOutlet]="sizeSelect" [ngTemplateOutletContext]="{ value: fm.pageSize, options: fm.sizeOptions, onChange: fm.onSize }" />
             }
-            <div class="flex items-center gap-1">
-              <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" aria-label="Previous page" [disabled]="fm.page <= 1" (click)="fm.onPage(fm.page - 1)">
-                <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <nav [attr.aria-label]="t().pagination" class="flex items-center gap-1">
+              <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" [attr.aria-label]="t().previousPage" [disabled]="fm.page <= 1" (click)="fm.onPage(fm.page - 1)">
+                <svg viewBox="0 0 16 16" class="size-3.5 rtl:-scale-x-100" fill="none" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
               @for (p of fm.pages; track $index) {
                 @if (p === "ellipsis") {
-                  <span class="px-1 text-muted-foreground">…</span>
+                  <span class="px-1 text-muted-foreground" aria-hidden="true">…</span>
                 } @else {
-                  <button bpdmButton [variant]="p === fm.page ? 'primary' : 'secondary'" [appearance]="p === fm.page ? 'solid' : 'ghost'" size="sm" [attr.aria-current]="p === fm.page ? 'page' : null" (click)="fm.onPage($any(p))" class="min-w-8 px-2.5">{{ p }}</button>
+                  <button bpdmButton [variant]="p === fm.page ? 'primary' : 'secondary'" [appearance]="p === fm.page ? 'solid' : 'ghost'" size="sm" [attr.aria-current]="p === fm.page ? 'page' : null" [attr.aria-label]="t().goToPage($any(p))" (click)="fm.onPage($any(p))" class="min-w-8 px-2.5">{{ p }}</button>
                 }
               }
-              <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" aria-label="Next page" [disabled]="fm.page >= fm.pageCount" (click)="fm.onPage(fm.page + 1)">
-                <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" [attr.aria-label]="t().nextPage" [disabled]="fm.page >= fm.pageCount" (click)="fm.onPage(fm.page + 1)">
+                <svg viewBox="0 0 16 16" class="size-3.5 rtl:-scale-x-100" fill="none" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
-            </div>
+            </nav>
           </div>
         } @else {
           @if (fm.rangeLabel) {
@@ -427,13 +437,13 @@ interface RenderRow<T> {
             <span></span>
           }
           <div class="flex items-center gap-2">
-            <button bpdmButton variant="secondary" appearance="ghost" size="sm" aria-label="Previous page" [disabled]="!fm.hasPrev" (click)="fm.onPrev()">
-              <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-              Prev
+            <button bpdmButton variant="secondary" appearance="ghost" size="sm" [attr.aria-label]="t().previousPage" [disabled]="!fm.hasPrev" (click)="fm.onPrev()">
+              <svg viewBox="0 0 16 16" class="size-3.5 rtl:-scale-x-100" fill="none" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              {{ t().prev }}
             </button>
-            <button bpdmButton variant="secondary" appearance="ghost" size="sm" aria-label="Next page" [disabled]="!fm.hasNext" (click)="fm.onNext()">
-              Next
-              <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <button bpdmButton variant="secondary" appearance="ghost" size="sm" [attr.aria-label]="t().nextPage" [disabled]="!fm.hasNext" (click)="fm.onNext()">
+              {{ t().next }}
+              <svg viewBox="0 0 16 16" class="size-3.5 rtl:-scale-x-100" fill="none" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </button>
             @if (fm.sizeOptions && fm.onSize && fm.pageSize !== undefined) {
               <ng-container [ngTemplateOutlet]="sizeSelect" [ngTemplateOutletContext]="{ value: fm.pageSize, options: fm.sizeOptions, onChange: fm.onSize }" />
@@ -445,12 +455,12 @@ interface RenderRow<T> {
 
     <ng-template #sizeSelect let-value="value" let-options="options" let-onChange="onChange">
       <label class="flex items-center gap-2 text-muted-foreground">
-        <span>Rows</span>
+        <span>{{ t().rowsPerPage }}</span>
         <div class="relative">
-          <select [value]="value" (change)="onChange(+$any($event.target).value)" class="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background pl-2.5 pr-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <select [value]="value" (change)="onChange(+$any($event.target).value)" class="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background ps-2.5 pe-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             @for (o of options; track o) { <option [value]="o">{{ o }}</option> }
           </select>
-          <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </div>
       </label>
     </ng-template>
@@ -511,7 +521,26 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly reorderableRows = input(false, { transform: booleanAttribute });
   readonly rowReorder = output<T[]>();
   readonly label = input<string>("");
+  /** Screen-reader labels, pagination text and announcements — override for i18n. */
+  readonly messages = input<Partial<DataTableMessages>>({});
+  /** Build an accessible name for each row's selection control (e.g. the row's name). */
+  readonly getRowLabel = input<((row: T, index: number) => string) | undefined>(undefined);
   readonly classInput = input<string>("", { alias: "class" });
+
+  /** Merged i18n strings: defaults overlaid with any `messages` overrides. */
+  protected readonly t = computed(() => ({ ...DEFAULT_DATA_TABLE_MESSAGES, ...this.messages() }));
+
+  private readonly uid = (dataTableUid += 1);
+  protected rowPanelId(key: Key): string {
+    return `bpdm-dt-${this.uid}-panel-${key}`;
+  }
+  protected rowSelectLabel(rr: RenderRow<T>): string {
+    const gl = this.getRowLabel();
+    return gl ? `${this.t().selectRow}: ${gl(rr.row, rr.index)}` : this.t().selectRow;
+  }
+
+  /** aria-live announcement (sort changes + result-count changes). */
+  protected readonly liveMessage = signal("");
 
   private readonly headRow = viewChild<ElementRef<HTMLTableRowElement>>("headRow");
   private readonly injector = inject(Injector);
@@ -596,6 +625,54 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
         },
         { injector: this.injector },
       );
+    });
+
+    // announce sort changes to assistive tech
+    let firstSort = true;
+    let prevSort = new Map<string, SortDirection>();
+    effect(() => {
+      const state = this.sortState();
+      const cur = new Map(state.map((s) => [s.id, s.dir] as const));
+      untracked(() => {
+        if (firstSort) {
+          firstSort = false;
+          prevSort = cur;
+          return;
+        }
+        let changed: string | undefined;
+        let dir: SortDirection | "none" = "none";
+        for (const [id, d] of cur) {
+          if (prevSort.get(id) !== d) { changed = id; dir = d; break; }
+        }
+        if (!changed) {
+          for (const id of prevSort.keys()) {
+            if (!cur.has(id)) { changed = id; dir = "none"; break; }
+          }
+        }
+        prevSort = cur;
+        if (changed) {
+          const label = this.colById().get(changed)?.header ?? changed;
+          this.liveMessage.set(this.t().announceSort(label, dir));
+        }
+      });
+    });
+
+    // announce result-count changes (search / filter) to assistive tech
+    let firstCount = true;
+    let prevCount = -1;
+    effect(() => {
+      const count = this.processedRows().length;
+      untracked(() => {
+        if (firstCount) {
+          firstCount = false;
+          prevCount = count;
+          return;
+        }
+        if (count !== prevCount) {
+          prevCount = count;
+          this.liveMessage.set(this.t().announceResults(count));
+        }
+      });
     });
   }
 
@@ -789,18 +866,28 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     this.setQuery("");
     this.setFilters({});
   }
-  protected filterOptionsFor(col: DataTableColumn<T>): { value: string; label: string }[] {
-    if (col.filterType !== "select") return [];
-    if (col.filterOptions) return col.filterOptions;
-    const seen = new Set<string>();
-    const out: { value: string; label: string }[] = [];
-    for (const row of this.data()) {
-      const v = getSortValue(col, row);
-      if (v == null || v === "") continue;
-      const s = String(v);
-      if (!seen.has(s)) { seen.add(s); out.push({ value: s, label: s }); }
+  // Distinct-value options for every "select" filter column, memoized per column
+  // id — so the O(rows) scan runs once per data/column change, not on every CD pass.
+  private readonly filterOptionsMap = computed(() => {
+    const data = this.data();
+    const map: Record<string, { value: string; label: string }[]> = {};
+    for (const col of this.effectiveColumns()) {
+      if (col.filterType !== "select") continue;
+      if (col.filterOptions) { map[col.id] = col.filterOptions; continue; }
+      const seen = new Set<string>();
+      const out: { value: string; label: string }[] = [];
+      for (const row of data) {
+        const v = getSortValue(col, row);
+        if (v == null || v === "") continue;
+        const s = String(v);
+        if (!seen.has(s)) { seen.add(s); out.push({ value: s, label: s }); }
+      }
+      map[col.id] = out.sort((a, b) => a.label.localeCompare(b.label));
     }
-    return out.sort((a, b) => a.label.localeCompare(b.label));
+    return map;
+  });
+  protected filterOptionsFor(col: DataTableColumn<T>): { value: string; label: string }[] {
+    return this.filterOptionsMap()[col.id] ?? [];
   }
 
   private readonly filteredData = computed(() => {
@@ -987,7 +1074,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   // ---- selection ----
   private readonly selectionArr = computed(() => this.selectedKeys() ?? this.internalSelection() ?? this.defaultSelectedKeys());
   protected readonly selectedSet = computed(() => new Set(this.selectionArr()));
-  private readonly allKeys = computed(() => this.pageRows().map((rr) => rr.key));
+  // Select-all covers the whole processed dataset when virtualized (pageRows is
+  // only the visible window there); otherwise the current page's rows.
+  private readonly allKeys = computed(() =>
+    this.virtualized()
+      ? this.processedRows().map((row, i) => this.keyOf(row, i))
+      : this.pageRows().map((rr) => rr.key),
+  );
   protected readonly allSelected = computed(() => {
     const keys = this.allKeys();
     const set = this.selectedSet();
@@ -1118,7 +1211,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "w-[1%]",
       (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
-      canPin && this.bordered() && "border-r border-border",
+      canPin && this.bordered() && "border-e border-border",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
       this.headerClassName(),
     );
@@ -1138,10 +1231,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // bleed through; otherwise transparent
       this.frame() || col.pin || this.stickyHeader() ? "bg-card" : "bg-transparent",
       "shadow-[inset_0_-1px_0_var(--border)]",
-      this.bordered() && "border-r border-border/55 last:border-r-0",
+      this.bordered() && "border-e border-border/55 last:border-e-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
-      col.id === this.lastLeftId() && "border-r border-border",
-      col.id === this.firstRightId() && "border-l border-border",
+      col.id === this.lastLeftId() && "border-e border-border",
+      col.id === this.firstRightId() && "border-s border-border",
       this.headerClassName(),
       col.className,
     );
@@ -1164,7 +1257,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     ),
   );
   protected leadBodyClass(): string {
-    return cn(this.cellPad(), "w-[1%]", this.bordered() && "border-r border-border", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName());
+    return cn(this.cellPad(), "w-[1%]", this.bordered() && "border-e border-border", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName());
   }
   protected bodyCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
@@ -1172,16 +1265,16 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.cellPad(),
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
-      this.bordered() && "border-r border-border/55 last:border-r-0",
+      this.bordered() && "border-e border-border/55 last:border-e-0",
       col.pin && `z-10 ${this.pinnedBg()}`,
-      col.id === this.lastLeftId() && "border-r border-border",
-      col.id === this.firstRightId() && "border-l border-border",
+      col.id === this.lastLeftId() && "border-e border-border",
+      col.id === this.firstRightId() && "border-s border-border",
       this.cellClassName(),
       col.className,
     );
   }
   protected footLeadClass(): string {
-    return cn(this.cellPad(), "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]", this.bordered() && "border-r border-border", "bottom-0", this.hasLeftPin() && "z-20");
+    return cn(this.cellPad(), "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]", this.bordered() && "border-e border-border", "bottom-0", this.hasLeftPin() && "z-20");
   }
   protected footCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
@@ -1190,10 +1283,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
       "sticky bottom-0 bg-muted font-medium text-foreground shadow-[inset_0_1px_0_var(--border)]",
-      this.bordered() && "border-r border-border/55 last:border-r-0",
+      this.bordered() && "border-e border-border/55 last:border-e-0",
       col.pin ? "z-20" : "z-10",
-      col.id === this.lastLeftId() && "border-r border-border",
-      col.id === this.firstRightId() && "border-l border-border",
+      col.id === this.lastLeftId() && "border-e border-border",
+      col.id === this.firstRightId() && "border-s border-border",
       col.className,
     );
   }
@@ -1216,9 +1309,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.rowSpacing() && "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
       this.striped() && "even:bg-muted/40",
       // bpdm signature: a warm amber focus language — soft amber hover, and
-      // selected rows get an amber tint + a left accent bar
+      // selected rows get an amber tint + an inline-start accent bar (RTL flips it)
       this.hoverable() && "hover:bg-primary/[0.04]",
-      this.selectedSet().has(rr.key) && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+      this.selectedSet().has(rr.key) && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
       this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-primary/[0.14]",
       t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--primary)]",
       t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--primary)]",

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from "@angular/core";
 import { BpdmPopover } from "../popover/popover";
+import { DEFAULT_DATA_TABLE_MESSAGES, type DataTableMessages } from "./data-table-types";
 
 const PIN_ITEM =
   "flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-4px)] px-2 py-1.5 text-sm outline-none transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40";
@@ -13,7 +14,7 @@ const PIN_ITEM =
   template: `
     <button
       type="button"
-      aria-label="Column options"
+      [attr.aria-label]="messages().columnOptions"
       [bpdmPopover]="panel"
       [(bpdmPopoverOpen)]="open"
       bpdmPopoverAlign="end"
@@ -30,20 +31,20 @@ const PIN_ITEM =
 
     <ng-template #panel>
       <button type="button" [class]="item" [disabled]="pin() === 'left'" (click)="choose('left')">
-        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
           <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        Pin left
+        {{ messages().pinLeft }}
       </button>
       <button type="button" [class]="item" [disabled]="pin() === 'right'" (click)="choose('right')">
-        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
           <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        Pin right
+        {{ messages().pinRight }}
       </button>
       <button type="button" [class]="item" [disabled]="!pin()" (click)="choose(undefined)">
         <span class="size-3.5"></span>
-        Unpin
+        {{ messages().unpin }}
       </button>
     </ng-template>
   `,
@@ -51,6 +52,8 @@ const PIN_ITEM =
 export class BpdmColumnPinMenu {
   readonly pin = input<"left" | "right" | undefined>(undefined);
   readonly pinChange = output<"left" | "right" | undefined>();
+  /** Resolved i18n strings from the parent table. */
+  readonly messages = input<DataTableMessages>(DEFAULT_DATA_TABLE_MESSAGES);
 
   protected readonly item = PIN_ITEM;
   protected readonly open = signal(false);

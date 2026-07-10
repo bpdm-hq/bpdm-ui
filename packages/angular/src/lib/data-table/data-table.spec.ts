@@ -1,7 +1,11 @@
 import { Component, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { BpdmDataTable } from "./data-table";
-import type { DataTableColumn, DataTablePagination } from "./data-table-types";
+import type {
+  DataTableColumn,
+  DataTableMessages,
+  DataTablePagination,
+} from "./data-table-types";
 
 interface Row {
   id: string;
@@ -30,6 +34,8 @@ const COLUMNS: DataTableColumn<Row>[] = [
       [selectable]="selectable"
       [searchable]="searchable"
       [pagination]="pagination"
+      [messages]="messages"
+      [getRowLabel]="getRowLabel"
       (selectionChange)="lastSelection.set($event.keys)"
     />
   `,
@@ -41,6 +47,8 @@ class Host {
   selectable = false;
   searchable = false;
   pagination: DataTablePagination | undefined = undefined;
+  messages: Partial<DataTableMessages> = {};
+  getRowLabel: ((row: Row, index: number) => string) | undefined = undefined;
   readonly lastSelection = signal<(string | number)[]>([]);
 }
 
@@ -119,6 +127,59 @@ describe("BpdmDataTable", () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain("No data");
   });
+
+  // --- hardening: i18n `messages`, `getRowLabel`, aria-live, pagination <nav> ---
+
+  it("uses `messages` to translate the no-results text and the search label", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.searchable = true;
+    fixture.componentInstance.pagination = { pageSize: 2 };
+    fixture.componentInstance.messages = { noResults: "Keine Ergebnisse", search: "Suchen" };
+    fixture.detectChanges();
+    // custom search label overrides the built-in "Search"
+    const search = fixture.nativeElement.querySelector(
+      'input[aria-label="Suchen"]',
+    ) as HTMLInputElement;
+    expect(search).toBeTruthy();
+    // filter everything out → the footer shows the translated no-results string
+    search.value = "zzz";
+    search.dispatchEvent(new Event("input"));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain("Keine Ergebnisse");
+  });
+
+  it("names each row's selection checkbox via `getRowLabel`", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.selectable = true;
+    fixture.componentInstance.getRowLabel = (r: Row) => r.name;
+    fixture.detectChanges();
+    const rowCheckboxes = Array.from(
+      fixture.nativeElement.querySelectorAll("tbody bpdm-checkbox"),
+    ) as HTMLElement[];
+    // first data row is Milo (source order); label is "Select row: {name}"
+    expect(rowCheckboxes[0].getAttribute("aria-label")).toContain("Select row: Milo");
+  });
+
+  it("renders a polite aria-live status region for announcements", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"][aria-live="polite"]');
+    expect(status).toBeTruthy();
+  });
+
+  it("wraps client pagination in an accessible <nav> with numbered page buttons", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.pagination = { pageSize: 2 };
+    fixture.detectChanges();
+    const nav = fixture.nativeElement.querySelector("nav[aria-label]") as HTMLElement;
+    expect(nav).toBeTruthy();
+    expect(nav.getAttribute("aria-label")).toBe("Pagination");
+    // 3 rows / pageSize 2 → numbered "Go to page N" buttons exist
+    const pageButtons = Array.from(nav.querySelectorAll("button")).filter((b) =>
+      /go to page/i.test((b as HTMLElement).getAttribute("aria-label") ?? ""),
+    );
+    expect(pageButtons.length).toBeGreaterThan(0);
+  });
 });
 
 @Component({
@@ -152,6 +213,21 @@ class ExpandHost {
   readonly rowKey = (r: Row) => r.id;
 }
 
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" />
+  `,
+})
+class FilterHost {
+  readonly columns: DataTableColumn<Row>[] = [
+    { id: "name", header: "Name", filterable: true, accessor: (r) => r.name },
+    { id: "tasks", header: "Tasks", numeric: true, accessor: (r) => r.tasks },
+  ];
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+}
+
 describe("BpdmDataTable defaults", () => {
 
   it("applies a multi-column defaultSort with numbered badges", () => {
@@ -175,5 +251,17 @@ describe("BpdmDataTable defaults", () => {
     const detail = fixture.nativeElement.querySelector(".detail") as HTMLElement;
     expect(detail).toBeTruthy();
     expect(detail.textContent).toContain("detail for Ava"); // key 'b' = Ava
+  });
+
+  // The full filter-apply flow lives behind a CDK-overlay popover, which is flaky
+  // to drive in TestBed; assert the filterable column exposes its "Filter column"
+  // trigger instead (the apply flow is covered end-to-end in the React suite).
+  it("renders a 'Filter column' trigger on a filterable column", () => {
+    const fixture = TestBed.createComponent(FilterHost);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector(
+      'thead button[aria-label="Filter column"]',
+    ) as HTMLElement;
+    expect(trigger).toBeTruthy();
   });
 });
