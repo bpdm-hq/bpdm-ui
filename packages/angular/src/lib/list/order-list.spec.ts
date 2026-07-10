@@ -1,6 +1,6 @@
 import { Component, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmOrderList } from "./order-list";
+import { BpdmOrderList, type OrderListMessages } from "./order-list";
 
 @Component({
   imports: [BpdmOrderList],
@@ -13,6 +13,20 @@ class Host {
   readonly items = signal<string[]>(["A", "B", "C", "D"]);
   readonly key = (w: string) => w;
   mode: "single" | "multiple" = "single";
+}
+
+// host with no header + configurable messages (i18n / empty-state coverage)
+@Component({
+  imports: [BpdmOrderList],
+  template: `
+    <bpdm-order-list [(value)]="items" [itemKey]="key" [itemTemplate]="tpl" [messages]="messages" />
+    <ng-template #tpl let-item>{{ item }}</ng-template>
+  `,
+})
+class MsgHost {
+  readonly items = signal<string[]>(["A", "B", "C"]);
+  readonly key = (w: string) => w;
+  messages: Partial<OrderListMessages> = {};
 }
 
 describe("BpdmOrderList", () => {
@@ -40,6 +54,24 @@ describe("BpdmOrderList", () => {
     ctrl(fixture, "Move down").click();
     fixture.detectChanges();
     expect(fixture.componentInstance.items()).toEqual(["B", "A", "C", "D"]);
+  });
+
+  it("moves the selected item up", () => {
+    const fixture = setup();
+    options(fixture)[1].click(); // select "B"
+    fixture.detectChanges();
+    ctrl(fixture, "Move up").click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.items()).toEqual(["B", "A", "C", "D"]);
+  });
+
+  it("moves the selected item to the top", () => {
+    const fixture = setup();
+    options(fixture)[2].click(); // select "C"
+    fixture.detectChanges();
+    ctrl(fixture, "Move to top").click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.items()).toEqual(["C", "A", "B", "D"]);
   });
 
   it("moves the selected item to the bottom", () => {
@@ -110,5 +142,28 @@ describe("BpdmOrderList", () => {
     fixture.detectChanges();
     const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
     expect(status.textContent?.trim()).toBe("Moved down one position");
+  });
+
+  it("translates the move announcement via the messages input", () => {
+    const fixture = TestBed.createComponent(MsgHost);
+    fixture.componentInstance.messages = { movedDown: "Déplacé vers le bas" };
+    fixture.detectChanges();
+    const opt = fixture.nativeElement.querySelectorAll('[role="option"]')[0] as HTMLElement;
+    opt.click();
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('button[aria-label="Move down"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status.textContent?.trim()).toBe("Déplacé vers le bas");
+  });
+
+  it("shows a translated empty-state and names the listbox from messages", () => {
+    const fixture = TestBed.createComponent(MsgHost);
+    fixture.componentInstance.messages = { empty: "Rien à trier", listLabel: "Étapes" };
+    fixture.componentInstance.items.set([]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain("Rien à trier");
+    const lb = fixture.nativeElement.querySelector('[role="listbox"]') as HTMLElement;
+    expect(lb.getAttribute("aria-label")).toBe("Étapes");
   });
 });

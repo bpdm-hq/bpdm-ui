@@ -111,6 +111,36 @@ class OlTemplateHost {
   readonly key = (w: Widget) => w.id;
 }
 
+// i18n host (Internationalized) — translate the built-in strings via [messages]
+@Component({
+  selector: "ol-i18n",
+  imports: [BpdmOrderList],
+  template: `
+    <div class="w-80">
+      <bpdm-order-list
+        [(value)]="items"
+        [itemKey]="key"
+        [itemTemplate]="tpl"
+        header="Étapes du pipeline"
+        [messages]="messages"
+      />
+    </div>
+    <ng-template #tpl let-item>{{ item }}</ng-template>
+  `,
+})
+class OlI18nHost {
+  readonly items = signal<string[]>(["Analyse", "Compilation", "Tests", "Déploiement"]);
+  readonly key = (w: string) => w;
+  readonly messages = {
+    movedUp: "Déplacé vers le haut",
+    movedToTop: "Placé en haut",
+    movedDown: "Déplacé vers le bas",
+    movedToBottom: "Placé en bas",
+    empty: "Aucun élément",
+    listLabel: "Liste ordonnable",
+  };
+}
+
 /**
  * Reorder a collection: select one or more items, then move them with the control
  * column (up / to top / down / to bottom), or drag to reorder. Controlled
@@ -127,7 +157,7 @@ const meta: Meta = {
   title: "Data Display/OrderList",
   component: BpdmOrderList,
   decorators: [
-    moduleMetadata({ imports: [OlStringHost, OlFilterHost, OlTemplateHost] }),
+    moduleMetadata({ imports: [OlStringHost, OlFilterHost, OlTemplateHost, OlI18nHost] }),
   ],
   tags: ["autodocs"],
 };
@@ -264,6 +294,38 @@ import { BpdmOrderList } from '@bpdm/ng';
 export class OrderMultipleComponent {
   readonly items = signal(['Overview', 'Traffic', 'Revenue', 'Sessions', 'Team activity', 'Uptime']);
   readonly key = (w: string) => w;
+}`,
+      },
+    },
+  },
+};
+
+// translate the built-in strings via the [messages] input
+export const Internationalized: Story = {
+  tags: ["!dev"],
+  render: () => ({ template: `<ol-i18n />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, signal } from '@angular/core';
+import { BpdmOrderList, type OrderListMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-order-i18n',
+  imports: [BpdmOrderList],
+  template: \`
+    <bpdm-order-list [(value)]="items" [itemKey]="key" [itemTemplate]="tpl" header="Étapes du pipeline" [messages]="messages" />
+    <ng-template #tpl let-item>{{ item }}</ng-template>
+  \`,
+})
+export class OrderI18nComponent {
+  readonly items = signal(['Analyse', 'Compilation', 'Tests', 'Déploiement']);
+  readonly key = (w: string) => w;
+  readonly messages: Partial<OrderListMessages> = {
+    movedDown: 'Déplacé vers le bas',
+    empty: 'Aucun élément',
+    listLabel: 'Liste ordonnable',
+  };
 }`,
       },
     },

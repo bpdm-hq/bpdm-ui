@@ -5,11 +5,47 @@ import {
   type ItemKeyFn,
   type ItemTextFn,
   type ListItemContext,
-  MOVE_MESSAGE,
   type MoveKind,
 } from "./list-internals";
 import { BpdmReorderControls } from "./reorder-controls";
 import { BpdmSelectableList } from "./selectable-list";
+
+/**
+ * Every screen-reader string OrderList renders — pass a partial to translate.
+ * Defaults are English; merged once with {@link DEFAULT_ORDER_LIST_MESSAGES}.
+ */
+export interface OrderListMessages {
+  /** Accessible name for the reorder control group. */
+  reorderGroup: string;
+  /** Reorder button labels (aria-label + tooltip). */
+  moveUp: string;
+  moveToTop: string;
+  moveDown: string;
+  moveToBottom: string;
+  /** Live-region text announced after each successful move. */
+  movedUp: string;
+  movedToTop: string;
+  movedDown: string;
+  movedToBottom: string;
+  /** Empty-state text. */
+  empty: string;
+  /** Accessible name for the list when there's no visible `header`. */
+  listLabel: string;
+}
+
+export const DEFAULT_ORDER_LIST_MESSAGES: OrderListMessages = {
+  reorderGroup: "Reorder",
+  moveUp: "Move up",
+  moveToTop: "Move to top",
+  moveDown: "Move down",
+  moveToBottom: "Move to bottom",
+  movedUp: "Moved up one position",
+  movedToTop: "Moved to top",
+  movedDown: "Moved down one position",
+  movedToBottom: "Moved to bottom",
+  empty: "No items",
+  listLabel: "Orderable list",
+};
 
 /**
  * `<bpdm-order-list>` — reorder a collection: select one or more items, then move
@@ -33,6 +69,7 @@ import { BpdmSelectableList } from "./selectable-list";
         [items]="items()"
         [itemKey]="itemKey()"
         [selected]="selected()"
+        [labels]="{ group: t().reorderGroup, up: t().moveUp, top: t().moveToTop, down: t().moveDown, bottom: t().moveToBottom }"
         (reorder)="setItems($event)"
         (moved)="announce($event)"
       />
@@ -48,7 +85,8 @@ import { BpdmSelectableList } from "./selectable-list";
         [filterPlaceholder]="filterPlaceholder()"
         [scrollHeight]="scrollHeight()"
         [multiselectable]="selectionMode() === 'multiple'"
-        [ariaLabel]="ariaLabel()"
+        [ariaLabel]="ariaLabel() || t().listLabel"
+        [emptyText]="t().empty"
         [isItemDisabled]="isItemDisabled()"
         (toggle)="onToggle($event.key)"
         (reorder)="setItems($event)"
@@ -76,11 +114,17 @@ export class BpdmOrderList<T = unknown> {
   readonly ariaLabel = input<string>("");
   /** Predicate marking an item as disabled — not selectable, movable, or draggable. */
   readonly isItemDisabled = input<((item: T) => boolean) | undefined>(undefined);
+  /** Override the built-in screen-reader strings for i18n. */
+  readonly messages = input<Partial<OrderListMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly selected = signal<Set<ItemKey>>(new Set());
   protected readonly items = computed<T[]>(() => this.value() ?? this.defaultValue());
   protected readonly message = signal("");
+  protected readonly t = computed<OrderListMessages>(() => ({
+    ...DEFAULT_ORDER_LIST_MESSAGES,
+    ...this.messages(),
+  }));
   private flip = false;
   protected readonly rootClass = computed(() =>
     cn("flex flex-col gap-2 sm:flex-row sm:items-center", this.classInput()),
@@ -94,7 +138,14 @@ export class BpdmOrderList<T = unknown> {
   // node and is re-announced by the polite live region.
   protected announce(kind: MoveKind): void {
     this.flip = !this.flip;
-    this.message.set(MOVE_MESSAGE[kind] + (this.flip ? "" : " "));
+    const t = this.t();
+    const moved: Record<MoveKind, string> = {
+      up: t.movedUp,
+      top: t.movedToTop,
+      down: t.movedDown,
+      bottom: t.movedToBottom,
+    };
+    this.message.set(moved[kind] + (this.flip ? "" : " "));
   }
 
   protected onToggle(key: ItemKey): void {

@@ -20,27 +20,44 @@ import {
   sameOrder,
 } from "./list-internals";
 
+/** Overridable labels for the reorder control column (i18n). */
+export interface ReorderControlLabels {
+  group: string;
+  up: string;
+  top: string;
+  down: string;
+  bottom: string;
+}
+const DEFAULT_REORDER_LABELS: ReorderControlLabels = {
+  group: "Reorder",
+  up: "Move up",
+  top: "Move to top",
+  down: "Move down",
+  bottom: "Move to bottom",
+};
+
 /**
  * `<bpdm-reorder-controls>` — the up / to-top / down / to-bottom column used by
  * `OrderList` and `PickList`. Emits the reordered array, plus a `moved` event
- * (the direction) for live-region announcements.
+ * (the direction) for live-region announcements. Button/group labels are
+ * overridable via `labels` for i18n (English defaults).
  */
 @Component({
   selector: "bpdm-reorder-controls",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "contents" },
   template: `
-    <div role="group" aria-label="Reorder" [class]="rootClass()">
-      <button type="button" aria-label="Move up" title="Move up" [class]="btn" [disabled]="!canUp()" (click)="apply('up')">
+    <div role="group" [attr.aria-label]="t().group" [class]="rootClass()">
+      <button type="button" [attr.aria-label]="t().up" [attr.title]="t().up" [class]="btn" [disabled]="!canUp()" (click)="apply('up')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" aria-label="Move to top" title="Move to top" [class]="btn" [disabled]="!canTop()" (click)="apply('top')">
+      <button type="button" [attr.aria-label]="t().top" [attr.title]="t().top" [class]="btn" [disabled]="!canTop()" (click)="apply('top')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 17 5-5 5 5M7 11l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" aria-label="Move down" title="Move down" [class]="btn" [disabled]="!canDown()" (click)="apply('down')">
+      <button type="button" [attr.aria-label]="t().down" [attr.title]="t().down" [class]="btn" [disabled]="!canDown()" (click)="apply('down')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" aria-label="Move to bottom" title="Move to bottom" [class]="btn" [disabled]="!canBottom()" (click)="apply('bottom')">
+      <button type="button" [attr.aria-label]="t().bottom" [attr.title]="t().bottom" [class]="btn" [disabled]="!canBottom()" (click)="apply('bottom')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 5 5 5-5M7 13l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
     </div>
@@ -51,6 +68,12 @@ export class BpdmReorderControls<T = unknown> {
   readonly itemKey = input.required<ItemKeyFn<T>>();
   readonly selected = input<Set<ItemKey>>(new Set());
   readonly classInput = input<string>("", { alias: "class" });
+  /** Override the group + button labels for i18n. */
+  readonly labels = input<Partial<ReorderControlLabels>>({});
+  protected readonly t = computed<ReorderControlLabels>(() => ({
+    ...DEFAULT_REORDER_LABELS,
+    ...this.labels(),
+  }));
   readonly reorder = output<T[]>();
   /** Emitted after a move actually changes the order (drives announcements). */
   readonly moved = output<MoveKind>();

@@ -1,7 +1,7 @@
 import { Component, signal } from "@angular/core";
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
-import { BpdmPickList, type PickListValue } from "./pick-list";
+import { BpdmPickList, type PickListMessages, type PickListValue } from "./pick-list";
 
 type Story = StoryObj;
 
@@ -112,6 +112,42 @@ class PlTemplateHost {
   readonly key = (w: Widget) => w.id;
 }
 
+// i18n + RTL host (Internationalized): every string via `messages`, dir="rtl"
+// flips the transfer arrows.
+@Component({
+  selector: "pl-i18n",
+  imports: [BpdmPickList],
+  template: `
+    <div dir="rtl">
+      <bpdm-pick-list
+        [(value)]="lists"
+        [itemKey]="key"
+        [itemTemplate]="tpl"
+        sourceHeader="المتاح"
+        targetHeader="مُفعّل"
+        [messages]="messages"
+      />
+      <ng-template #tpl let-item>{{ item }}</ng-template>
+    </div>
+  `,
+})
+class PlI18nHost {
+  readonly lists = signal<PickListValue<string>>({
+    source: ["Traffic", "Revenue", "Active sessions", "Team activity", "Uptime"],
+    target: ["Overview"],
+  });
+  readonly key = (w: string) => w;
+  readonly messages: Partial<PickListMessages> = {
+    transferGroup: "النقل بين القوائم",
+    moveToTarget: "نقل إلى الهدف",
+    moveAllToTarget: "نقل الكل إلى الهدف",
+    moveToSource: "نقل إلى المصدر",
+    moveAllToSource: "نقل الكل إلى المصدر",
+    filterPlaceholder: "تصفية",
+    transferAnnouncement: (count, list) => `تم نقل ${count} إلى ${list}`,
+  };
+}
+
 /**
  * Move items between two lists. Select items on either side and transfer them with
  * the middle controls (move / move all, each way); optionally reorder within each
@@ -129,7 +165,7 @@ const meta: Meta = {
   title: "Data Display/PickList",
   component: BpdmPickList,
   decorators: [
-    moduleMetadata({ imports: [PlStringHost, PlFilterHost, PlTemplateHost] }),
+    moduleMetadata({ imports: [PlStringHost, PlFilterHost, PlTemplateHost, PlI18nHost] }),
     // PickList is fluid; constrain + centre it in the story canvas so the two
     // panes read as a compact, balanced pair.
     (storyFn) => {
@@ -300,6 +336,53 @@ export class PickTransferComponent {
     target: ['Overview'],
   });
   readonly key = (w: string) => w;
+}`,
+      },
+    },
+  },
+};
+
+// i18n + RTL: every string overridden via [messages]; dir="rtl" flips the arrows.
+export const Internationalized: Story = {
+  render: () => ({ template: `<pl-i18n />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, signal } from '@angular/core';
+import { BpdmPickList, type PickListMessages, type PickListValue } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-pick-i18n',
+  imports: [BpdmPickList],
+  template: \`
+    <div dir="rtl">
+      <bpdm-pick-list
+        [(value)]="lists"
+        [itemKey]="key"
+        [itemTemplate]="tpl"
+        sourceHeader="المتاح"
+        targetHeader="مُفعّل"
+        [messages]="messages"
+      />
+      <ng-template #tpl let-item>{{ item }}</ng-template>
+    </div>
+  \`,
+})
+export class PickI18nComponent {
+  readonly lists = signal<PickListValue<string>>({
+    source: ['Traffic', 'Revenue', 'Active sessions', 'Team activity', 'Uptime'],
+    target: ['Overview'],
+  });
+  readonly key = (w: string) => w;
+  readonly messages: Partial<PickListMessages> = {
+    transferGroup: 'النقل بين القوائم',
+    moveToTarget: 'نقل إلى الهدف',
+    moveAllToTarget: 'نقل الكل إلى الهدف',
+    moveToSource: 'نقل إلى المصدر',
+    moveAllToSource: 'نقل الكل إلى المصدر',
+    filterPlaceholder: 'تصفية',
+    transferAnnouncement: (count, list) => \`تم نقل \${count} إلى \${list}\`,
+  };
 }`,
       },
     },

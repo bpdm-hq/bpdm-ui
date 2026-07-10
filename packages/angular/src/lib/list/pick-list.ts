@@ -16,6 +16,52 @@ export interface PickListValue<T> {
 }
 
 /**
+ * Every user-facing / screen-reader string in the Pick List, for i18n. Pass a
+ * `Partial<PickListMessages>` via `[messages]` to override any subset; the rest
+ * fall back to {@link defaultPickListMessages} (English).
+ */
+export interface PickListMessages {
+  /** `aria-label` for the middle transfer-control group. */
+  transferGroup: string;
+  /** Move-selected → target button (aria-label + tooltip). */
+  moveToTarget: string;
+  /** Move-all ⇒ target button. */
+  moveAllToTarget: string;
+  /** Move-selected ← source button. */
+  moveToSource: string;
+  /** Move-all ⇐ source button. */
+  moveAllToSource: string;
+  /** Empty-state text for the source list. */
+  sourceEmpty: string;
+  /** Empty-state text for the target list. */
+  targetEmpty: string;
+  /** Placeholder + aria-label for the filter box (both lists). */
+  filterPlaceholder: string;
+  /** Fallback accessible name for the source list when it has no visible header. */
+  sourceLabel: string;
+  /** Fallback accessible name for the target list when it has no visible header. */
+  targetLabel: string;
+  /** Live-region announcement built after each transfer. */
+  transferAnnouncement: (count: number, listLabel: string) => string;
+}
+
+/** English defaults for {@link PickListMessages}. */
+export const defaultPickListMessages: PickListMessages = {
+  transferGroup: "Transfer between lists",
+  moveToTarget: "Move to target",
+  moveAllToTarget: "Move all to target",
+  moveToSource: "Move to source",
+  moveAllToSource: "Move all to source",
+  sourceEmpty: "No items",
+  targetEmpty: "Nothing here yet",
+  filterPlaceholder: "Filter",
+  sourceLabel: "source list",
+  targetLabel: "target list",
+  transferAnnouncement: (count, listLabel) =>
+    `${count} ${count === 1 ? "item" : "items"} moved to ${listLabel}`,
+};
+
+/**
  * `<bpdm-pick-list>` — move items between two lists. Select items on either side
  * and transfer them with the middle controls (move / move all, each way);
  * optionally reorder within each list (drag or the side controls). Controlled
@@ -54,27 +100,30 @@ export interface PickListValue<T> {
         [reorderable]="reorder()"
         [header]="sourceHeader()"
         [filterBy]="filterBy()"
-        [filterPlaceholder]="filterPlaceholder()"
+        [filterPlaceholder]="filterPlaceholder() || t().filterPlaceholder"
         [scrollHeight]="scrollHeight()"
         [multiselectable]="true"
-        [emptyText]="sourceEmptyText()"
+        [emptyText]="sourceEmptyText() || t().sourceEmpty"
+        [ariaLabel]="t().sourceLabel"
         [isItemDisabled]="isItemDisabled()"
         (toggle)="toggleSel(sourceSel, $event.key)"
         (reorder)="setLists({ source: $event, target: target() })"
       />
 
-      <div data-transfer-group role="group" aria-label="Transfer between lists" class="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
-        <button type="button" aria-label="Move to target" title="Move to target" [class]="btn" [disabled]="sourceSel().size === 0" (click)="toTarget()">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <!-- transfer controls — a row on mobile, a column on lg+. The horizontal
+           arrows flip under RTL so "toward target" always points at the target. -->
+      <div data-transfer-group role="group" [attr.aria-label]="t().transferGroup" class="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+        <button type="button" [attr.aria-label]="t().moveToTarget" [attr.title]="t().moveToTarget" [class]="btn" [disabled]="sourceSel().size === 0" (click)="toTarget()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
-        <button type="button" aria-label="Move all to target" title="Move all to target" [class]="btn" [disabled]="!sourceHasEnabled()" (click)="allToTarget()">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 5 5-5 5M13 7l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <button type="button" [attr.aria-label]="t().moveAllToTarget" [attr.title]="t().moveAllToTarget" [class]="btn" [disabled]="!sourceHasEnabled()" (click)="allToTarget()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m7 7 5 5-5 5M13 7l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
-        <button type="button" aria-label="Move to source" title="Move to source" [class]="btn" [disabled]="targetSel().size === 0" (click)="toSource()">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <button type="button" [attr.aria-label]="t().moveToSource" [attr.title]="t().moveToSource" [class]="btn" [disabled]="targetSel().size === 0" (click)="toSource()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
-        <button type="button" aria-label="Move all to source" title="Move all to source" [class]="btn" [disabled]="!targetHasEnabled()" (click)="allToSource()">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m17 7-5 5 5 5M11 7l-5 5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <button type="button" [attr.aria-label]="t().moveAllToSource" [attr.title]="t().moveAllToSource" [class]="btn" [disabled]="!targetHasEnabled()" (click)="allToSource()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m17 7-5 5 5 5M11 7l-5 5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
       </div>
 
@@ -87,10 +136,11 @@ export interface PickListValue<T> {
         [reorderable]="reorder()"
         [header]="targetHeader()"
         [filterBy]="filterBy()"
-        [filterPlaceholder]="filterPlaceholder()"
+        [filterPlaceholder]="filterPlaceholder() || t().filterPlaceholder"
         [scrollHeight]="scrollHeight()"
         [multiselectable]="true"
-        [emptyText]="targetEmptyText()"
+        [emptyText]="targetEmptyText() || t().targetEmpty"
+        [ariaLabel]="t().targetLabel"
         [isItemDisabled]="isItemDisabled()"
         (toggle)="toggleSel(targetSel, $event.key)"
         (reorder)="setLists({ source: source(), target: $event })"
@@ -119,22 +169,30 @@ export class BpdmPickList<T = unknown> {
   readonly sourceHeader = input<string>("");
   readonly targetHeader = input<string>("");
   readonly filterBy = input<ItemTextFn<T> | undefined>(undefined);
-  readonly filterPlaceholder = input<string>("Filter");
+  /** Filter box placeholder. Overrides `messages.filterPlaceholder` when set. */
+  readonly filterPlaceholder = input<string>("");
   /** Show the reorder controls beside each list + within-list drag. Default true. */
   readonly reorder = input(true);
   readonly scrollHeight = input<string>("18rem");
-  /** Empty-state text for the source list (default "No items"). */
-  readonly sourceEmptyText = input<string>("No items");
-  /** Empty-state text for the target list (default "Nothing here yet"). */
-  readonly targetEmptyText = input<string>("Nothing here yet");
+  /** Empty-state text for the source list. Overrides `messages.sourceEmpty` when set. */
+  readonly sourceEmptyText = input<string>("");
+  /** Empty-state text for the target list. Overrides `messages.targetEmpty` when set. */
+  readonly targetEmptyText = input<string>("");
   /** Predicate marking an item as disabled — not selectable, transferable, or draggable. */
   readonly isItemDisabled = input<((item: T) => boolean) | undefined>(undefined);
+  /** Override any user-facing / screen-reader string for i18n. */
+  readonly messages = input<Partial<PickListMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
 
   /** Fired after a transfer, with the moved items and which list they landed in. */
   readonly transfer = output<{ moved: T[]; to: "source" | "target" }>();
 
   protected readonly btn = CONTROL_BTN_CLASS;
+  /** Merged messages — English defaults overlaid with any caller overrides. */
+  protected readonly t = computed<PickListMessages>(() => ({
+    ...defaultPickListMessages,
+    ...this.messages(),
+  }));
   protected readonly sourceSel = signal<Set<ItemKey>>(new Set());
   protected readonly targetSel = signal<Set<ItemKey>>(new Set());
 
@@ -163,15 +221,15 @@ export class BpdmPickList<T = unknown> {
 
   private listLabel(to: "source" | "target"): string {
     const h = to === "target" ? this.targetHeader() : this.sourceHeader();
-    return h || `${to} list`;
+    if (h) return h;
+    return to === "target" ? this.t().targetLabel : this.t().sourceLabel;
   }
   // emit the transfer, announce it to screen readers, and keep keyboard focus in
   // the transfer group if the pressed button becomes disabled.
   private afterTransfer(moving: T[], to: "source" | "target"): void {
     this.transfer.emit({ moved: moving, to });
     this.flip = !this.flip;
-    const noun = moving.length === 1 ? "item" : "items";
-    this.message.set(`${moving.length} ${noun} moved to ${this.listLabel(to)}` + (this.flip ? "" : " "));
+    this.message.set(this.t().transferAnnouncement(moving.length, this.listLabel(to)) + (this.flip ? "" : " "));
     setTimeout(() => {
       const el = this.host.nativeElement;
       const grp = el.querySelector<HTMLElement>("[data-transfer-group]");

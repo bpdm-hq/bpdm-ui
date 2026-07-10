@@ -105,7 +105,6 @@ export function SelectableList<T>({
   const [overKey, setOverKey] = React.useState<ItemKey | null>(null);
   // roving "active" option for the WAI-ARIA listbox keyboard pattern
   const [activeKey, setActiveKey] = React.useState<ItemKey | null>(null);
-  const [focused, setFocused] = React.useState(false);
 
   const baseId = React.useId();
   const headerId = header ? `${baseId}-label` : undefined;
@@ -214,14 +213,12 @@ export function SelectableList<T>({
         tabIndex={0}
         aria-activedescendant={activeIndex >= 0 ? optionId(activeKey as ItemKey) : undefined}
         onFocus={() => {
-          setFocused(true);
           if (activeIndex < 0) setActiveTo(findEnabled(0, 1));
         }}
-        onBlur={() => setFocused(false)}
         onKeyDown={onListKeyDown}
-        // Focus lives on the container (aria-activedescendant), but the visible
-        // focus indicator is the active option's ring — so no ring on the container.
-        className="min-h-0 flex-1 overflow-y-auto p-1 outline-none"
+        // Focus lives on the container (aria-activedescendant); the keyboard-active
+        // accent shows only while the container is :focus-visible (see below).
+        className="group/lb min-h-0 flex-1 overflow-y-auto p-1 outline-none"
         style={{ maxHeight: scrollHeight }}
       >
         {shown.length === 0 ? (
@@ -277,13 +274,19 @@ export function SelectableList<T>({
                         isSel
                           ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
                           : "text-foreground hover:bg-muted",
-                        isSel || (focused && isActive) || isOver ? "before:opacity-100" : "before:opacity-0",
+                        // selection + drop-target: bar always; keyboard-active: bar only
+                        // while the list is :focus-visible, so a mouse deselect leaves none
+                        isSel || isOver ? "before:opacity-100" : "before:opacity-0",
+                        isActive && !isSel && !isOver && "group-focus-visible/lb:before:opacity-100",
                       ),
                   dragKey === key && "opacity-50",
                 )}
               >
                 {draggable && (
-                  <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground" />
+                  <GripVertical
+                    aria-hidden
+                    className="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground"
+                  />
                 )}
                 <div className="min-w-0 flex-1">{renderItem(item)}</div>
               </div>
@@ -327,6 +330,24 @@ function sameOrder<T>(a: T[], b: T[], keyOf: (i: T) => ItemKey) {
 
 export type MoveKind = "up" | "top" | "down" | "bottom";
 
+/** Translatable labels for the reorder control column. */
+export interface ReorderControlLabels {
+  /** Accessible name for the control group. */
+  group: string;
+  up: string;
+  top: string;
+  down: string;
+  bottom: string;
+}
+
+const DEFAULT_REORDER_LABELS: ReorderControlLabels = {
+  group: "Reorder",
+  up: "Move up",
+  top: "Move to top",
+  down: "Move down",
+  bottom: "Move to bottom",
+};
+
 // ── ReorderControls — the up/top/down/bottom column (used by OrderList + PickList)
 export function ReorderControls<T>({
   items,
@@ -334,6 +355,7 @@ export function ReorderControls<T>({
   selected,
   onChange,
   onMoved,
+  labels,
   className,
 }: {
   items: T[];
@@ -342,8 +364,11 @@ export function ReorderControls<T>({
   onChange: (next: T[]) => void;
   /** Called after a move actually changes the order (drives live-region announcements). */
   onMoved?: (kind: MoveKind) => void;
+  /** Translatable button + group labels. Defaults to English. */
+  labels?: Partial<ReorderControlLabels>;
   className?: string;
 }) {
+  const l = { ...DEFAULT_REORDER_LABELS, ...labels };
   const groupRef = React.useRef<HTMLDivElement>(null);
 
   const move = (
@@ -369,28 +394,58 @@ export function ReorderControls<T>({
     selected.size > 0 && !sameOrder(fn(items, itemKey, selected), items, itemKey);
 
   return (
-    <div ref={groupRef} role="group" aria-label="Reorder" className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
-      <ControlButton label="Move up" disabled={!can(moveSelectedUp)} onClick={() => move("up", moveSelectedUp)}>
-        <ChevronUp />
+    <div ref={groupRef} role="group" aria-label={l.group} className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
+      <ControlButton label={l.up} disabled={!can(moveSelectedUp)} onClick={() => move("up", moveSelectedUp)}>
+        <ChevronUp aria-hidden />
       </ControlButton>
-      <ControlButton label="Move to top" disabled={!can(moveSelectedTop)} onClick={() => move("top", moveSelectedTop)}>
-        <ChevronsUp />
+      <ControlButton label={l.top} disabled={!can(moveSelectedTop)} onClick={() => move("top", moveSelectedTop)}>
+        <ChevronsUp aria-hidden />
       </ControlButton>
-      <ControlButton label="Move down" disabled={!can(moveSelectedDown)} onClick={() => move("down", moveSelectedDown)}>
-        <ChevronDown />
+      <ControlButton label={l.down} disabled={!can(moveSelectedDown)} onClick={() => move("down", moveSelectedDown)}>
+        <ChevronDown aria-hidden />
       </ControlButton>
-      <ControlButton label="Move to bottom" disabled={!can(moveSelectedBottom)} onClick={() => move("bottom", moveSelectedBottom)}>
-        <ChevronsDown />
+      <ControlButton label={l.bottom} disabled={!can(moveSelectedBottom)} onClick={() => move("bottom", moveSelectedBottom)}>
+        <ChevronsDown aria-hidden />
       </ControlButton>
     </div>
   );
 }
 
-const MOVE_MESSAGE: Record<MoveKind, string> = {
-  up: "Moved up one position",
-  top: "Moved to top",
-  down: "Moved down one position",
-  bottom: "Moved to bottom",
+/**
+ * Every screen-reader string OrderList renders — pass a partial to translate.
+ * Defaults are English; merge once with {@link DEFAULT_ORDER_LIST_MESSAGES}.
+ */
+export interface OrderListMessages {
+  /** Accessible name for the reorder control group. */
+  reorderGroup: string;
+  /** Reorder button labels (aria-label + tooltip). */
+  moveUp: string;
+  moveToTop: string;
+  moveDown: string;
+  moveToBottom: string;
+  /** Live-region text announced after each successful move. */
+  movedUp: string;
+  movedToTop: string;
+  movedDown: string;
+  movedToBottom: string;
+  /** Empty-state text. */
+  empty: string;
+  /** Accessible name for the list when there's no visible `header`. */
+  listLabel: string;
+}
+
+export const DEFAULT_ORDER_LIST_MESSAGES: OrderListMessages = {
+  reorderGroup: "Reorder",
+  moveUp: "Move up",
+  moveToTop: "Move to top",
+  moveDown: "Move down",
+  moveToBottom: "Move to bottom",
+  movedUp: "Moved up one position",
+  movedToTop: "Moved to top",
+  movedDown: "Moved down one position",
+  movedToBottom: "Moved to bottom",
+  empty: "No items",
+  listLabel: "Orderable list",
 };
 
 // ── OrderList — SelectableList + a reorder control column ─────────────────────
@@ -418,6 +473,8 @@ export interface OrderListProps<T> {
   ariaLabel?: string;
   /** Predicate marking an item as disabled — not selectable, movable, or draggable. */
   isItemDisabled?: (item: T) => boolean;
+  /** Override the built-in screen-reader strings for i18n. */
+  messages?: Partial<OrderListMessages>;
   className?: string;
 }
 
@@ -441,6 +498,7 @@ export function OrderList<T>({
   scrollHeight,
   ariaLabel,
   isItemDisabled,
+  messages,
   className,
 }: OrderListProps<T>) {
   const [items, setItems] = useControllable<T[]>(valueProp, defaultValue, onChange);
@@ -448,28 +506,52 @@ export function OrderList<T>({
   const [message, setMessage] = React.useState("");
   const flip = React.useRef(false);
 
+  // Merge the i18n strings once, then derive the label + announcement maps.
+  const t = React.useMemo(() => ({ ...DEFAULT_ORDER_LIST_MESSAGES, ...messages }), [messages]);
+  const reorderLabels = React.useMemo<ReorderControlLabels>(
+    () => ({ group: t.reorderGroup, up: t.moveUp, top: t.moveToTop, down: t.moveDown, bottom: t.moveToBottom }),
+    [t],
+  );
+  const movedText = React.useMemo<Record<MoveKind, string>>(
+    () => ({ up: t.movedUp, top: t.movedToTop, down: t.movedDown, bottom: t.movedToBottom }),
+    [t],
+  );
+
   // Toggle a trailing space so an identical action (e.g. two "Move to top"s in a
   // row) still changes the text node and is re-announced by the live region.
-  const announce = (kind: MoveKind) => {
-    flip.current = !flip.current;
-    setMessage(MOVE_MESSAGE[kind] + (flip.current ? "" : " "));
-  };
+  const announce = React.useCallback(
+    (kind: MoveKind) => {
+      flip.current = !flip.current;
+      setMessage(movedText[kind] + (flip.current ? "" : " "));
+    },
+    [movedText],
+  );
 
-  const toggle = (key: ItemKey) =>
-    setSelected((prev) => {
-      if (selectionMode === "single") {
-        // toggle a single selection: re-click clears it
-        return prev.has(key) && prev.size === 1 ? new Set() : new Set([key]);
-      }
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+  const toggle = React.useCallback(
+    (key: ItemKey) =>
+      setSelected((prev) => {
+        if (selectionMode === "single") {
+          // toggle a single selection: re-click clears it
+          return prev.has(key) && prev.size === 1 ? new Set() : new Set([key]);
+        }
+        const next = new Set(prev);
+        if (next.has(key)) next.delete(key);
+        else next.add(key);
+        return next;
+      }),
+    [selectionMode],
+  );
 
   return (
     <div className={cn("flex flex-col gap-2 sm:flex-row sm:items-center", className)}>
-      <ReorderControls items={items} itemKey={itemKey} selected={selected} onChange={setItems} onMoved={announce} />
+      <ReorderControls
+        items={items}
+        itemKey={itemKey}
+        selected={selected}
+        onChange={setItems}
+        onMoved={announce}
+        labels={reorderLabels}
+      />
 
       <SelectableList
         className="flex-1"
@@ -484,7 +566,8 @@ export function OrderList<T>({
         filterPlaceholder={filterPlaceholder}
         scrollHeight={scrollHeight}
         multiselectable={selectionMode === "multiple"}
-        ariaLabel={ariaLabel}
+        ariaLabel={ariaLabel ?? t.listLabel}
+        emptyText={t.empty}
         isItemDisabled={isItemDisabled}
       />
 

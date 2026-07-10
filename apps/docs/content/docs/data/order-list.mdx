@@ -10,6 +10,7 @@ import {
   OrderListFilterDemo,
   OrderListMultipleDemo,
   OrderListControlsDemo,
+  OrderListI18nDemo,
 } from '@/components/order-list-demos';
 import { Preview } from '@/components/preview';
 
@@ -409,7 +410,12 @@ export class ControlsOnly {
 | `selectionMode` | `single \| multiple` | `single` | Move one, or several together via the controls. |
 | `scrollHeight` | `string` | `18rem` | Max body height before the list scrolls. |
 | `ariaLabel` | `string` | `Orderable list` | Accessible name for the listbox when there's no visible `header`. |
+| `messages` | `Partial<OrderListMessages>` | English | Override every built-in screen-reader string for i18n — see [Internationalization](#internationalization). |
 | `className` | `string` (Angular `class`) | — | Extra classes. |
+
+`itemKey` and `renderItem` (Angular `itemTemplate`) are the only required props; every
+other prop is optional. The component is controlled when you pass `value`, uncontrolled
+when you pass `defaultValue` (or nothing).
 
 ## Accessibility
 
@@ -429,3 +435,101 @@ export class ControlsOnly {
   reachable from the keyboard via the controls.
 - Layout uses logical properties, so the selection accent and control column
   mirror correctly in RTL.
+
+## Internationalization
+
+Every built-in string is **translatable**. `header`, `filterPlaceholder`, and each item's
+rendered content are yours already; the `messages` prop (React) / `[messages]` input
+(Angular) overrides the rest — the reorder button + group labels, the move announcements
+read out by the live region, the empty-state text, and the listbox's fallback name. Pass a
+partial; anything you omit keeps its English default.
+
+<Preview>
+  <OrderListI18nDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list-i18n.tsx"
+import { useState } from 'react';
+import { OrderList } from '@bpdm/ui/order-list';
+
+const STUFEN = ['Analyse', 'Erstellung', 'Tests', 'Bereitstellung'];
+
+export function Pipeline() {
+  const [items, setItems] = useState(STUFEN);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      header="Pipeline-Phasen"
+      messages={{
+        reorderGroup: 'Neu ordnen',
+        moveUp: 'Nach oben',
+        moveToTop: 'Ganz nach oben',
+        moveDown: 'Nach unten',
+        moveToBottom: 'Ganz nach unten',
+        movedUp: 'Nach oben verschoben',
+        movedToTop: 'Ganz nach oben verschoben',
+        movedDown: 'Nach unten verschoben',
+        movedToBottom: 'Ganz nach unten verschoben',
+        empty: 'Keine Einträge',
+        listLabel: 'Sortierbare Liste',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list-i18n.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmOrderList, type OrderListMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'pipeline',
+  imports: [BpdmOrderList],
+  template: `
+    <bpdm-order-list
+      [(value)]="items"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      header="Pipeline-Phasen"
+      [messages]="messages"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-order-list>
+  `,
+})
+export class Pipeline {
+  readonly itemKey = (s: string) => s;
+  readonly items = signal(['Analyse', 'Erstellung', 'Tests', 'Bereitstellung']);
+  readonly messages: Partial<OrderListMessages> = {
+    reorderGroup: 'Neu ordnen',
+    moveUp: 'Nach oben',
+    moveToTop: 'Ganz nach oben',
+    moveDown: 'Nach unten',
+    moveToBottom: 'Ganz nach unten',
+    movedUp: 'Nach oben verschoben',
+    movedToTop: 'Ganz nach oben verschoben',
+    movedDown: 'Nach unten verschoben',
+    movedToBottom: 'Ganz nach unten verschoben',
+    empty: 'Keine Einträge',
+    listLabel: 'Sortierbare Liste',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
+The `messages` prop covers every reorder button + group label, the move announcements, the
+empty-state, and the listbox name — in **both** frameworks. Anything you omit falls back to
+the English default.
+
+See the [Internationalization guide](/docs/getting-started/i18n) for the shared conventions.
