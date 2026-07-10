@@ -6,22 +6,6 @@ export type DateRange = { from: Date | null; to: Date | null };
 /** Predicate marking individual days as disabled. */
 export type DatePredicate = (date: Date) => boolean;
 
-export const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-export const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 export function startOfDay(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -65,15 +49,15 @@ export function buildGrid(viewDate: Date, weekStartsOn: number): Date[] {
   );
 }
 
-export function fmtDate(d: Date): string {
-  return `${MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()}, ${d.getFullYear()}`;
+export function fmtDate(d: Date, locale?: string): string {
+  return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }
-export function fmtValue(mode: "single" | "range", v: Date | DateRange | null): string {
+export function fmtValue(mode: "single" | "range", v: Date | DateRange | null, locale?: string): string {
   if (!v) return "";
-  if (mode === "single") return fmtDate(v as Date);
+  if (mode === "single") return fmtDate(v as Date, locale);
   const r = v as DateRange;
-  if (r.from && r.to) return `${fmtDate(r.from)} – ${fmtDate(r.to)}`;
-  if (r.from) return `${fmtDate(r.from)} – …`;
+  if (r.from && r.to) return `${fmtDate(r.from, locale)} – ${fmtDate(r.to, locale)}`;
+  if (r.from) return `${fmtDate(r.from, locale)} – …`;
   return "";
 }
 

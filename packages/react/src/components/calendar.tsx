@@ -11,6 +11,9 @@ function startOfDay(d: Date) {
 function sameDay(a?: Date | null, b?: Date | null) {
   return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
+function addDays(d: Date, n: number) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+}
 function addMonths(d: Date, n: number) {
   return new Date(d.getFullYear(), d.getMonth() + n, 1);
 }
@@ -31,8 +34,6 @@ function inRange(d: Date, from?: Date | null, to?: Date | null) {
   return t > startOfDay(from).getTime() && t < startOfDay(to).getTime();
 }
 
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /** Build the 6×7 grid of dates for the month containing `viewDate`. */
 function buildGrid(viewDate: Date, weekStartsOn: number) {
@@ -59,8 +60,8 @@ export interface CalendarProps {
   disabled?: (date: Date) => boolean;
   /** 0 = Sunday, 1 = Monday. Default 1. */
   weekStartsOn?: 0 | 1;
-  /** Shape of the day highlight: "circle" (default) or "rounded" (squircle). */
-  dayShape?: "circle" | "rounded";
+  /** Shape of the day highlight: "circle" (default) or "square" (rounded-corner square). */
+  dayShape?: "circle" | "square";
   /** How many months to show side by side. Default 1. */
   numberOfMonths?: number;
   /** Header style: "buttons" (prev/next only) or "dropdown" (month + year menus). */
@@ -68,13 +69,47 @@ export interface CalendarProps {
   /** Year-dropdown range. Default: 100 years back to 10 years ahead. */
   fromYear?: number;
   toYear?: number;
+  /** BCP 47 locale for month/weekday names + date formatting (e.g. "de-DE", "ar"). */
+  locale?: string;
+  /** Override the control labels (screen-reader text) for i18n. */
+  messages?: CalendarMessages;
   className?: string;
 }
+
+export interface CalendarMessages {
+  calendar?: string;
+  previousMonth?: string;
+  nextMonth?: string;
+  month?: string;
+  year?: string;
+  /** Clear button on the DatePicker trigger. */
+  clear?: string;
+  /** DatePicker `confirm` footer — discard the draft. */
+  cancel?: string;
+  /** DatePicker `confirm` footer — commit the draft. */
+  apply?: string;
+}
+
+const DEFAULT_CALENDAR_MESSAGES = {
+  calendar: "Calendar",
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  month: "Month",
+  year: "Year",
+  clear: "Clear",
+  cancel: "Cancel",
+  apply: "Apply",
+};
+
+// Aug 1 2021 is a Sunday → index 0 = Sunday for weekday names.
+const SUNDAY_2021 = new Date(2021, 7, 1);
 
 /**
  * Month calendar built on native dates — single date or a range, with month/year
  * navigation, min/max and per-day `disabled`, today + selection highlights, and
- * keyboard support (arrows move, Enter selects, PageUp/Down change month).
+ * a full WAI-ARIA grid: roving focus moves real DOM focus to the active day so
+ * screen readers announce it. Keyboard: arrows move (RTL-aware), Home/End jump to
+ * the week edges, PageUp/Down change month, Enter/Space selects.
  */
 export function Calendar({
   mode = "single",
@@ -90,8 +125,37 @@ export function Calendar({
   captionLayout = "buttons",
   fromYear,
   toYear,
+  locale,
+  messages,
   className,
 }: CalendarProps) {
+  const t = { ...DEFAULT_CALENDAR_MESSAGES, ...messages };
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  // locale-driven names + formatting (no hard-coded English)
+  const monthNames = React.useMemo(() => {
+    const f = new Intl.DateTimeFormat(locale, { month: "long" });
+    return Array.from({ length: 12 }, (_, m) => f.format(new Date(2021, m, 1)));
+  }, [locale]);
+  const weekdayNames = React.useMemo(() => {
+    const f = new Intl.DateTimeFormat(locale, { weekday: "short" });
+    return Array.from({ length: 7 }, (_, i) =>
+      f.format(new Date(SUNDAY_2021.getFullYear(), SUNDAY_2021.getMonth(), 1 + i)),
+    );
+  }, [locale]);
+  const weekdayLongNames = React.useMemo(() => {
+    const f = new Intl.DateTimeFormat(locale, { weekday: "long" });
+    return Array.from({ length: 7 }, (_, i) =>
+      f.format(new Date(SUNDAY_2021.getFullYear(), SUNDAY_2021.getMonth(), 1 + i)),
+    );
+  }, [locale]);
+  const dayLabelFmt = React.useMemo(
+    () => new Intl.DateTimeFormat(locale, { dateStyle: "long" }),
+    [locale],
+  );
+  const captionFmt = React.useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
+    [locale],
+  );
   const round = dayShape === "circle" ? "rounded-full" : "rounded-lg";
   const months = Math.max(1, numberOfMonths);
   const nowYear = new Date().getFullYear();
@@ -121,12 +185,40 @@ export function Calendar({
 
   const today = startOfDay(new Date());
   const headers = React.useMemo(
-    () => Array.from({ length: 7 }, (_, i) => WEEKDAYS[(weekStartsOn + i) % 7]),
-    [weekStartsOn],
+    () => Array.from({ length: 7 }, (_, i) => weekdayNames[(weekStartsOn + i) % 7]),
+    [weekStartsOn, weekdayNames],
+  );
+  const longHeaders = React.useMemo(
+    () => Array.from({ length: 7 }, (_, i) => weekdayLongNames[(weekStartsOn + i) % 7]),
+    [weekStartsOn, weekdayLongNames],
   );
 
   const isDisabled = (d: Date) =>
     (min && isBefore(d, min)) || (max && isAfter(d, max)) || (disabled?.(d) ?? false);
+
+  // keep the visible month + roving focus in sync with the selection when it is
+  // changed externally (presets, a controlled parent, or a click).
+  const anchor = mode === "single" ? single : range.from;
+  const anchorKey = anchor ? `${anchor.getFullYear()}-${anchor.getMonth()}-${anchor.getDate()}` : "";
+  React.useEffect(() => {
+    if (!anchor) return;
+    const y = anchor.getFullYear();
+    const m = anchor.getMonth();
+    setView((v) => (v.getFullYear() === y && v.getMonth() === m ? v : new Date(y, m, 1)));
+    setFocused(startOfDay(anchor));
+    // anchorKey encodes the anchor's y/m/d; re-run only when the day changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anchorKey]);
+
+  // roving focus: move real DOM focus onto the active day so AT announces it —
+  // but only when focus already lives inside the calendar (never steal it).
+  React.useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !root.contains(document.activeElement)) return;
+    root
+      .querySelector<HTMLButtonElement>(`[data-day="${focused.getTime()}"]`)
+      ?.focus();
+  }, [focused, view]);
 
   const goMonth = (n: number) => setView((v) => addMonths(v, n));
   // set a given panel (index) to a year/month; the shared `view` shifts so that
@@ -135,7 +227,7 @@ export function Calendar({
     setView(new Date(year, month - index, 1));
 
   const selectCls =
-    "cursor-pointer appearance-none rounded-md bg-transparent py-1 pl-2 pr-6 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "cursor-pointer appearance-none rounded-md bg-transparent py-1 ps-2 pe-6 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   const select = (d: Date) => {
     if (isDisabled(d)) return;
@@ -154,18 +246,46 @@ export function Calendar({
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // let the month/year dropdowns (and any other native control) keep their keys
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === "SELECT" || tag === "OPTION" || tag === "INPUT") return;
+    // arrows follow the visual layout, so they flip under RTL
+    const rtl = getComputedStyle(e.currentTarget as HTMLElement).direction === "rtl";
+    const dow = (focused.getDay() - weekStartsOn + 7) % 7; // column within the row
     let next: Date;
-    if (e.key === "ArrowLeft") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() - 1);
-    else if (e.key === "ArrowRight") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() + 1);
-    else if (e.key === "ArrowUp") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() - 7);
-    else if (e.key === "ArrowDown") next = new Date(focused.getFullYear(), focused.getMonth(), focused.getDate() + 7);
-    else if (e.key === "PageUp") next = addMonths(focused, -1);
-    else if (e.key === "PageDown") next = addMonths(focused, 1);
-    else if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      select(focused);
-      return;
-    } else return;
+    switch (e.key) {
+      case "ArrowLeft":
+        next = addDays(focused, rtl ? 1 : -1);
+        break;
+      case "ArrowRight":
+        next = addDays(focused, rtl ? -1 : 1);
+        break;
+      case "ArrowUp":
+        next = addDays(focused, -7);
+        break;
+      case "ArrowDown":
+        next = addDays(focused, 7);
+        break;
+      case "Home":
+        next = addDays(focused, -dow);
+        break;
+      case "End":
+        next = addDays(focused, 6 - dow);
+        break;
+      case "PageUp":
+        next = addMonths(focused, -1);
+        break;
+      case "PageDown":
+        next = addMonths(focused, 1);
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        select(focused);
+        return;
+      default:
+        return;
+    }
     e.preventDefault();
     const clamped = clampDay(next, min, max);
     setFocused(clamped);
@@ -182,45 +302,55 @@ export function Calendar({
   const isInRange = (d: Date) =>
     mode === "range" && inRange(d, range.from, previewTo);
 
-  const renderMonth = (monthDate: Date, index: number) => {
-    const grid = buildGrid(monthDate, weekStartsOn);
+  // the grid dates only depend on the visible month(s) + week start, so build them
+  // once per view — not on every hover/focus/selection re-render.
+  const monthGrids = React.useMemo(
+    () =>
+      Array.from({ length: months }, (_, i) => {
+        const monthDate = addMonths(view, i);
+        return { monthDate, grid: buildGrid(monthDate, weekStartsOn) };
+      }),
+    [view, months, weekStartsOn],
+  );
+
+  const renderMonth = ({ monthDate, grid }: { monthDate: Date; grid: Date[] }, index: number) => {
     const isFirst = index === 0;
     const isLast = index === months - 1;
     return (
       <div key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`} className="w-[17rem]">
-        {/* header: nav (ends only) + month/year */}
+        {/* header — kept OUTSIDE role="grid" so its nav + selects aren't grid rows */}
         <div className="mb-2 flex items-center justify-between px-1">
           <button
             type="button"
-            aria-label="Previous month"
+            aria-label={t.previousMonth}
             onClick={() => goMonth(-1)}
             className={cn(
               "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4",
               !isFirst && "invisible",
             )}
           >
-            <ChevronLeft />
+            <ChevronLeft className="rtl:-scale-x-100" aria-hidden="true" />
           </button>
           {captionLayout === "dropdown" ? (
             <div className="flex items-center gap-1">
               <div className="relative inline-flex items-center">
                 <select
-                  aria-label="Month"
+                  aria-label={t.month}
                   value={monthDate.getMonth()}
                   onChange={(e) => setPanel(index, monthDate.getFullYear(), Number(e.target.value))}
                   className={selectCls}
                 >
-                  {MONTHS.map((m, mi) => (
+                  {monthNames.map((m, mi) => (
                     <option key={m} value={mi}>
                       {m}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-1.5 size-3.5 text-muted-foreground" />
+                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="relative inline-flex items-center">
                 <select
-                  aria-label="Year"
+                  aria-label={t.year}
                   value={monthDate.getFullYear()}
                   onChange={(e) => setPanel(index, Number(e.target.value), monthDate.getMonth())}
                   className={selectCls}
@@ -231,70 +361,84 @@ export function Calendar({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-1.5 size-3.5 text-muted-foreground" />
+                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true" />
               </div>
             </div>
           ) : (
             <span className="text-sm font-semibold tabular-nums">
-              {MONTHS[monthDate.getMonth()]} {monthDate.getFullYear()}
+              {captionFmt.format(monthDate)}
             </span>
           )}
           <button
             type="button"
-            aria-label="Next month"
+            aria-label={t.nextMonth}
             onClick={() => goMonth(1)}
             className={cn(
               "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4",
               !isLast && "invisible",
             )}
           >
-            <ChevronRight />
+            <ChevronRight className="rtl:-scale-x-100" aria-hidden="true" />
           </button>
         </div>
 
-        {/* weekday row */}
-        <div className="grid grid-cols-7 gap-0.5">
-          {headers.map((w) => (
-            <div key={w} className="grid h-8 place-items-center text-xs font-medium text-muted-foreground">
-              {w}
-            </div>
-          ))}
-        </div>
-
-        {/* day grid */}
-        <div className="grid grid-cols-7 gap-y-0.5">
-          {grid.map((d) => {
-            const outside = d.getMonth() !== monthDate.getMonth();
-            const selected = isSelected(d);
-            const disabledDay = isDisabled(d);
-            const rangeMid = isInRange(d);
-            const isToday = sameDay(d, today);
-            const isFocused = sameDay(d, focused);
-            const rangeStart = mode === "range" && sameDay(range.from, d) && (range.to || previewTo);
-            const rangeEnd = mode === "range" && sameDay(range.to ?? previewTo, d) && range.from && !sameDay(range.from, d);
-
-            return (
+        {/* the grid: weekday header row + week rows are its only (direct) children */}
+        <div
+          role="grid"
+          aria-label={captionFmt.format(monthDate)}
+          aria-multiselectable={mode === "range" ? true : undefined}
+          onKeyDown={onKeyDown}
+          className="flex flex-col gap-0.5 outline-none"
+        >
+          <div role="row" className="grid grid-cols-7">
+            {headers.map((w, i) => (
               <div
-                key={d.getTime()}
-                className={cn(
-                  "relative grid place-items-center",
-                  // soft range-band background spanning the row
-                  (rangeMid || rangeStart || rangeEnd) && "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)]",
-                  rangeStart && (dayShape === "circle" ? "rounded-l-full" : "rounded-l-lg"),
-                  rangeEnd && (dayShape === "circle" ? "rounded-r-full" : "rounded-r-lg"),
-                )}
+                key={i}
+                role="columnheader"
+                aria-label={longHeaders[i]}
+                className="grid h-8 place-items-center text-xs font-medium text-muted-foreground"
               >
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  disabled={disabledDay}
-                  onClick={() => select(d)}
-                  onMouseEnter={() => setHover(d)}
-                  onMouseLeave={() => setHover(null)}
-                  aria-selected={selected}
-                  aria-current={isToday ? "date" : undefined}
-                  className={cn(
-                    "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none",
+                {w}
+              </div>
+            ))}
+          </div>
+          {Array.from({ length: 6 }, (_, wk) => (
+            <div key={wk} role="row" className="grid grid-cols-7">
+              {grid.slice(wk * 7, wk * 7 + 7).map((d) => {
+                const outside = d.getMonth() !== monthDate.getMonth();
+                const selected = isSelected(d);
+                const disabledDay = isDisabled(d);
+                const rangeMid = isInRange(d);
+                const isToday = sameDay(d, today);
+                const isFocused = sameDay(d, focused);
+                const rangeStart = mode === "range" && sameDay(range.from, d) && (range.to || previewTo);
+                const rangeEnd = mode === "range" && sameDay(range.to ?? previewTo, d) && range.from && !sameDay(range.from, d);
+
+                return (
+                  <div
+                    key={d.getTime()}
+                    role="gridcell"
+                    aria-selected={selected}
+                    className={cn(
+                      "relative grid place-items-center",
+                      // soft range-band background spanning the row
+                      (rangeMid || rangeStart || rangeEnd) && "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)]",
+                      rangeStart && (dayShape === "circle" ? "rounded-s-full" : "rounded-s-lg"),
+                      rangeEnd && (dayShape === "circle" ? "rounded-e-full" : "rounded-e-lg"),
+                    )}
+                  >
+                    <button
+                      type="button"
+                      data-day={d.getTime()}
+                      tabIndex={isFocused ? 0 : -1}
+                      disabled={disabledDay}
+                      onClick={() => select(d)}
+                      onMouseEnter={mode === "range" ? () => setHover(d) : undefined}
+                      onMouseLeave={mode === "range" ? () => setHover(null) : undefined}
+                      aria-label={dayLabelFmt.format(d)}
+                      aria-current={isToday ? "date" : undefined}
+                      className={cn(
+                    "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                     round,
                     "hover:bg-muted active:scale-90",
                     outside && "text-muted-foreground/40",
@@ -302,15 +446,16 @@ export function Calendar({
                     isToday && !selected && "font-semibold text-primary",
                     selected &&
                       "bg-primary font-semibold text-primary-foreground hover:bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
-                    isFocused && !selected && "ring-2 ring-ring ring-offset-1 ring-offset-background",
                     disabledDay && "pointer-events-none text-muted-foreground/30 line-through",
                   )}
-                >
-                  {d.getDate()}
-                </button>
-              </div>
-            );
-          })}
+                    >
+                      {d.getDate()}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -318,30 +463,29 @@ export function Calendar({
 
   return (
     <div
-      role="grid"
-      aria-label="Calendar"
-      tabIndex={0}
-      onKeyDown={onKeyDown}
+      ref={rootRef}
+      role="group"
+      aria-label={t.calendar}
       className={cn(
-        "flex w-fit select-none gap-5 rounded-[var(--radius)] p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "flex w-fit select-none gap-5 rounded-[var(--radius)] p-3",
         className,
       )}
     >
-      {Array.from({ length: months }, (_, i) => renderMonth(addMonths(view, i), i))}
+      {monthGrids.map((m, i) => renderMonth(m, i))}
     </div>
   );
 }
 
 // ── DatePicker (trigger + popover calendar) ──────────────────────────────────
-function fmt(d: Date) {
-  return `${MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()}, ${d.getFullYear()}`;
+function fmt(d: Date, locale?: string) {
+  return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }
-function fmtValue(mode: "single" | "range", v: Date | DateRange | null): string {
+function fmtValue(mode: "single" | "range", v: Date | DateRange | null, locale?: string): string {
   if (!v) return "";
-  if (mode === "single") return fmt(v as Date);
+  if (mode === "single") return fmt(v as Date, locale);
   const r = v as DateRange;
-  if (r.from && r.to) return `${fmt(r.from)} – ${fmt(r.to)}`;
-  if (r.from) return `${fmt(r.from)} – …`;
+  if (r.from && r.to) return `${fmt(r.from, locale)} – ${fmt(r.to, locale)}`;
+  if (r.from) return `${fmt(r.from, locale)} – …`;
   return "";
 }
 
@@ -396,7 +540,14 @@ export interface DatePickerProps extends Omit<CalendarProps, "className"> {
   placeholder?: string;
   /** Show a clear (×) button when a value is set. Default true. */
   clearable?: boolean;
+  /** Disable the whole trigger (distinct from `disabled`, which filters days). */
   disabledInput?: boolean;
+  /**
+   * Buffer the selection and only commit on **Apply**. Adds a Cancel/Apply
+   * footer; Cancel, Escape and outside-click discard the draft. Default false
+   * (pick commits immediately).
+   */
+  confirm?: boolean;
   /** aria-invalid styling on the trigger. */
   invalid?: boolean;
   id?: string;
@@ -405,10 +556,14 @@ export interface DatePickerProps extends Omit<CalendarProps, "className"> {
   contentClassName?: string;
 }
 
+const rangeComplete = (v: Date | DateRange | null, mode: "single" | "range") =>
+  mode === "single" ? !!v : !!((v as DateRange | null)?.from && (v as DateRange | null)?.to);
+
 /**
  * Date (or range) picker — a trigger showing the formatted value that opens a
- * `Calendar` in a popover. Single mode closes on pick; range mode closes once both
- * ends are chosen. Controlled or uncontrolled, clearable, min/max + disabled days.
+ * `Calendar` in a popover. Without `confirm`, single mode closes on pick and range
+ * closes once both ends are chosen. With `confirm`, the selection is buffered and
+ * only committed on Apply. Controlled or uncontrolled, clearable, min/max + disabled days.
  */
 export function DatePicker({
   mode = "single",
@@ -418,6 +573,7 @@ export function DatePicker({
   placeholder = "Pick a date",
   clearable = true,
   disabledInput = false,
+  confirm = false,
   invalid = false,
   id,
   className,
@@ -434,93 +590,129 @@ export function DatePicker({
     defaultValue,
     onChange,
   );
+  // in confirm mode the popover edits a draft; nothing is committed until Apply
+  const [draft, setDraft] = React.useState<Date | DateRange | null>(value);
 
-  const handleChange = (v: Date | DateRange | null) => {
+  const handleOpenChange = (o: boolean) => {
+    if (o && confirm) setDraft(value); // seed the draft from the committed value
+    setOpen(o);
+  };
+
+  // commit + auto-close (non-confirm), else just update the draft
+  const commit = (v: Date | DateRange | null) => {
     setValue(v);
     if (mode === "single") setOpen(false);
     else if (v && (v as DateRange).from && (v as DateRange).to) setOpen(false);
   };
+  const pick = confirm ? setDraft : commit;
 
-  const text = fmtValue(mode, value);
+  const cancel = () => setOpen(false); // draft is discarded (re-seeded on next open)
+  const apply = () => {
+    setValue(draft);
+    setOpen(false);
+  };
+
+  const calValue = confirm ? draft : value;
+  const text = fmtValue(mode, value, calendarProps.locale);
   const hasValue = mode === "single" ? !!value : !!(value as DateRange | null)?.from;
+  const showClear = clearable && hasValue && !disabledInput;
+  const messages = calendarProps.messages;
+
+  const calendar = (
+    <Calendar
+      mode={mode}
+      value={calValue}
+      onChange={pick}
+      numberOfMonths={monthsToShow}
+      {...calendarProps}
+    />
+  );
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-      align="start"
-      className={cn("w-auto p-0", contentClassName)}
-      trigger={
+    <div className="relative w-full">
+      <Popover
+        open={open}
+        onOpenChange={handleOpenChange}
+        align="start"
+        className={cn("w-auto p-0", contentClassName)}
+        trigger={
+          <button
+            type="button"
+            id={id}
+            disabled={disabledInput}
+            aria-invalid={invalid || undefined}
+            className={cn(
+              "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-input bg-background ps-3 text-start text-sm transition-colors hover:border-ring/60 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+              showClear ? "pe-9" : "pe-3",
+              className,
+            )}
+          >
+            <CalendarDays className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <span className={cn("flex-1 truncate", !hasValue && "text-muted-foreground")}>
+              {text || placeholder}
+            </span>
+          </button>
+        }
+      >
+        <div className="flex flex-col">
+          {mode === "range" && presets && presets.length > 0 ? (
+            <div className="flex flex-col sm:flex-row">
+              <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-border p-2 sm:max-w-[9rem] sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-b-0 sm:border-e">
+                {presets.map((p) => {
+                  const r = calValue as DateRange | null;
+                  const pr = p.range();
+                  const active = !!r && sameDay(r.from, pr.from) && sameDay(r.to, pr.to);
+                  return (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => pick(p.range())}
+                      className={cn(
+                        "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
+                      )}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {calendar}
+            </div>
+          ) : (
+            calendar
+          )}
+          {confirm && (
+            <div className="flex items-center justify-end gap-2 border-t border-border p-2">
+              <button
+                type="button"
+                onClick={cancel}
+                className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {messages?.cancel ?? "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={apply}
+                disabled={!rangeComplete(draft, mode)}
+                className="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {messages?.apply ?? "Apply"}
+              </button>
+            </div>
+          )}
+        </div>
+      </Popover>
+      {showClear && (
         <button
           type="button"
-          id={id}
-          disabled={disabledInput}
-          aria-invalid={invalid || undefined}
-          className={cn(
-            "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-input bg-background px-3 text-left text-sm transition-colors hover:border-ring/60 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
-            className,
-          )}
+          aria-label={messages?.clear ?? "Clear"}
+          onClick={() => commit(mode === "single" ? null : { from: null, to: null })}
+          className="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
         >
-          <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
-          <span className={cn("flex-1 truncate", !hasValue && "text-muted-foreground")}>
-            {text || placeholder}
-          </span>
-          {clearable && hasValue && !disabledInput && (
-            <span
-              role="button"
-              tabIndex={-1}
-              aria-label="Clear"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleChange(mode === "single" ? null : { from: null, to: null });
-              }}
-              className="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground [&_svg]:size-3.5"
-            >
-              <X />
-            </span>
-          )}
+          <X aria-hidden="true" />
         </button>
-      }
-    >
-      {mode === "range" && presets && presets.length > 0 ? (
-        <div className="flex flex-col sm:flex-row">
-          <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-border p-2 sm:max-w-[9rem] sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-b-0 sm:border-r">
-            {presets.map((p) => {
-              const r = value as DateRange | null;
-              const pr = p.range();
-              const active = !!r && sameDay(r.from, pr.from) && sameDay(r.to, pr.to);
-              return (
-                <button
-                  key={p.label}
-                  type="button"
-                  onClick={() => handleChange(p.range())}
-                  className={cn(
-                    "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
-          <Calendar
-            mode={mode}
-            value={value}
-            onChange={handleChange}
-            numberOfMonths={monthsToShow}
-            {...calendarProps}
-          />
-        </div>
-      ) : (
-        <Calendar
-          mode={mode}
-          value={value}
-          onChange={handleChange}
-          numberOfMonths={monthsToShow}
-          {...calendarProps}
-        />
       )}
-    </Popover>
+    </div>
   );
 }

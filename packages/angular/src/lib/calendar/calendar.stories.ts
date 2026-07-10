@@ -34,7 +34,7 @@ const meta: Meta<BpdmDatePicker> = {
   tags: ["autodocs"],
   argTypes: {
     mode: { control: "inline-radio", options: ["single", "range"] },
-    dayShape: { control: "inline-radio", options: ["circle", "rounded"] },
+    dayShape: { control: "inline-radio", options: ["circle", "square"] },
     captionLayout: { control: "inline-radio", options: ["buttons", "dropdown"] },
     weekStartsOn: { control: "inline-radio", options: [0, 1] },
     clearable: { control: "boolean" },
@@ -203,6 +203,48 @@ export class DatePresetsComponent {
   },
 };
 
+// buffer the selection; commit only on Apply (Cancel/Escape/outside discard the draft)
+export const Confirm: Story = {
+  render: () => ({
+    template: `<div class="w-96">
+  <bpdm-date-picker
+    mode="range"
+    [(value)]="range"
+    [presets]="presets"
+    confirm
+    placeholder="Pick a date range"
+  />
+</div>`,
+    props: { range: { from: null, to: null }, presets: defaultRangePresets },
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmDatePicker, defaultRangePresets, type DateRange, type DateRangePreset } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-date-confirm',
+  imports: [BpdmDatePicker],
+  template: \`
+    <bpdm-date-picker
+      mode="range"
+      [(value)]="range"
+      [presets]="presets"
+      confirm
+      placeholder="Pick a date range"
+    />
+  \`,
+})
+export class DateConfirmComponent {
+  presets: DateRangePreset[] = defaultRangePresets;
+  range: DateRange = { from: null, to: null };
+}`,
+      },
+    },
+  },
+};
+
 // only future dates selectable; weekends disabled
 export const Constraints: Story = {
   tags: ["!dev"],
@@ -324,12 +366,12 @@ export class CalendarDropdownComponent {
   },
 };
 
-// squircle day highlight instead of a circle
-export const RoundedDays: Story = {
+// rounded-corner square day highlight instead of a circle
+export const SquareDays: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
-  <bpdm-calendar [(value)]="date" dayShape="rounded" />
+  <bpdm-calendar [(value)]="date" dayShape="square" />
 </div>`,
     props: { date: null },
   }),
@@ -340,15 +382,15 @@ export const RoundedDays: Story = {
 import { BpdmCalendar } from '@bpdm/ng';
 
 @Component({
-  selector: 'app-calendar-rounded',
+  selector: 'app-calendar-square',
   imports: [BpdmCalendar],
   template: \`
     <div class="w-fit rounded-lg border bg-card shadow-sm">
-      <bpdm-calendar [(value)]="date" dayShape="rounded" />
+      <bpdm-calendar [(value)]="date" dayShape="square" />
     </div>
   \`,
 })
-export class CalendarRoundedComponent {
+export class CalendarSquareComponent {
   date: Date | null = null;
 }`,
       },
