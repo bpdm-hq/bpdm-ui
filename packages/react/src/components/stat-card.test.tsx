@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { StatCard } from "./stat-card";
 
 describe("StatCard", () => {
@@ -57,5 +57,46 @@ describe("StatCard", () => {
     expect(container.firstElementChild).toHaveAttribute("aria-busy", "true");
     expect(container.textContent).not.toContain("8,420");
     expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+  });
+
+  it("exposes the card as a labelled group", () => {
+    const { container } = render(<StatCard label="Active users" value="8,420" />);
+    expect(within(container).getByRole("group", { name: "Active users" })).toBeTruthy();
+  });
+
+  it("gives the delta a screen-reader direction (not colour-only)", () => {
+    expect(
+      render(<StatCard label="A" value="1" delta={12.5} />).container.querySelector(
+        '[aria-label="Increased 12.5%"]',
+      ),
+    ).toBeTruthy();
+    expect(
+      render(<StatCard label="B" value="1" delta={-3.2} />).container.querySelector(
+        '[aria-label="Decreased 3.2%"]',
+      ),
+    ).toBeTruthy();
+    expect(
+      render(<StatCard label="C" value="1" delta={0} />).container.querySelector(
+        '[aria-label="No change"]',
+      ),
+    ).toBeTruthy();
+  });
+
+  it("translates SR + loading text via messages", () => {
+    expect(
+      render(
+        <StatCard label="Anmeldungen" value="1.294" delta={12.5} messages={{ increased: "Gestiegen" }} />,
+      ).container.querySelector('[aria-label="Gestiegen 12.5%"]'),
+    ).toBeTruthy();
+    const { container } = render(
+      <StatCard label="Nutzer" value="8" loading messages={{ loading: "wird geladen" }} />,
+    );
+    expect(within(container).getByRole("group", { name: "Nutzer wird geladen" })).toBeTruthy();
+  });
+
+  it("formats the delta number for the locale", () => {
+    const { container } = render(<StatCard label="X" value="1" delta={12.5} locale="de-DE" />);
+    expect(container.querySelector('[aria-label="Increased 12,5%"]')).toBeTruthy();
+    expect(container.textContent).toContain("12,5%");
   });
 });

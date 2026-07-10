@@ -1,12 +1,34 @@
 import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from "@angular/core";
 import { cn } from "@bpdm/variants";
 
+export interface StatCardMessages {
+  /** Screen-reader word for a positive delta. Default "Increased". */
+  increased: string;
+  /** Screen-reader word for a negative delta. Default "Decreased". */
+  decreased: string;
+  /** Screen-reader text for a zero delta. Default "No change". */
+  noChange: string;
+  /** Appended to the label while `loading`. Default "loading". */
+  loading: string;
+}
+
+export const DEFAULT_STAT_CARD_MESSAGES: StatCardMessages = {
+  increased: "Increased",
+  decreased: "Decreased",
+  noChange: "No change",
+  loading: "loading",
+};
+
+let statCardUid = 0;
+
 /**
  * `<bpdm-stat-card>` — a dashboard KPI card: a label, a big value, an optional
  * percentage delta (green/red by whether the change is good — set
  * `[positiveIsGood]="false"` for metrics where up is bad, e.g. churn), and an
  * optional icon badge (`bpdmStatCardIcon`). Pass `accent` (any CSS color) to tint
- * the card + badge. Same look as the React stat card.
+ * the card + badge. The card is a labelled `role="group"` and the delta carries a
+ * screen-reader text alternative (direction is not colour-only). Same look as the
+ * React stat card.
  *
  * ```html
  * <bpdm-stat-card label="Active users" value="8,420" [delta]="3.1" deltaLabel="vs last week">
@@ -20,7 +42,11 @@ import { cn } from "@bpdm/variants";
   host: {
     "[class]": "cardClass()",
     "[style.background-color]": "cardBg()",
+    "[attr.role]": "'group'",
     "[attr.aria-busy]": "loading() ? 'true' : null",
+    "[attr.aria-live]": "loading() ? 'polite' : null",
+    "[attr.aria-label]": "loading() ? label() + ' ' + t().loading : null",
+    "[attr.aria-labelledby]": "loading() ? null : labelId",
   },
   template: `
     @if (loading()) {
@@ -32,11 +58,11 @@ import { cn } from "@bpdm/variants";
       <div class="size-12 shrink-0 animate-pulse rounded-full bg-muted"></div>
     } @else {
     <div class="min-w-0">
-      <p class="truncate text-sm text-muted-foreground">{{ label() }}</p>
+      <p [id]="labelId" class="truncate text-sm text-muted-foreground">{{ label() }}</p>
       <p class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
       @if (hasDelta()) {
         <div class="mt-1.5 flex items-center gap-1.5 text-sm">
-          <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()">
+          <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()" [attr.aria-label]="deltaSr()">
             @if (!neutral()) {
               <svg viewBox="0 0 12 12" fill="none" class="size-3" aria-hidden="true">
                 <path
@@ -48,7 +74,7 @@ import { cn } from "@bpdm/variants";
                 />
               </svg>
             }
-            {{ neutral() ? "0" : deltaAbs() }}%
+            <span aria-hidden="true">{{ neutral() ? "0" : deltaNum() }}%</span>
           </span>
           @if (deltaLabel()) {
             <span class="text-muted-foreground">{{ deltaLabel() }}</span>
@@ -58,6 +84,7 @@ import { cn } from "@bpdm/variants";
     </div>
 
     <span
+      aria-hidden="true"
       [style.background-color]="badgeBg()"
       [style.color]="accent() || null"
       class="grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5 empty:hidden"
@@ -83,7 +110,18 @@ export class BpdmStatCard {
   readonly accent = input<string>();
   /** Show a shimmering skeleton in place of the content (data still loading). */
   readonly loading = input(false, { transform: booleanAttribute });
+  /** BCP 47 locale for formatting the delta number (decimal separator). */
+  readonly locale = input<string>();
+  /** Override screen-reader / loading text for i18n. */
+  readonly messages = input<Partial<StatCardMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
+
+  protected readonly labelId = `bpdm-stat-${++statCardUid}`;
+
+  protected readonly t = computed<StatCardMessages>(() => ({
+    ...DEFAULT_STAT_CARD_MESSAGES,
+    ...this.messages(),
+  }));
 
   protected readonly hasDelta = computed(() => {
     const d = this.delta();
@@ -91,7 +129,13 @@ export class BpdmStatCard {
   });
   protected readonly up = computed(() => (this.delta() ?? 0) > 0);
   protected readonly neutral = computed(() => (this.delta() ?? 0) === 0);
-  protected readonly deltaAbs = computed(() => Math.abs(this.delta() ?? 0));
+  protected readonly deltaNum = computed(() =>
+    new Intl.NumberFormat(this.locale()).format(Math.abs(this.delta() ?? 0)),
+  );
+  protected readonly deltaSr = computed(() => {
+    if (this.neutral()) return this.t().noChange;
+    return `${this.up() ? this.t().increased : this.t().decreased} ${this.deltaNum()}%`;
+  });
   protected readonly deltaColor = computed(() => {
     if (this.neutral()) return "text-muted-foreground";
     const good = this.positiveIsGood() ? this.up() : !this.up();

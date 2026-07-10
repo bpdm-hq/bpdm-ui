@@ -107,3 +107,21 @@ export function StatCardDashboardDemo() {
     </div>
   );
 }
+
+const de = { increased: 'Gestiegen', decreased: 'Gesunken', noChange: 'Keine Änderung', loading: 'wird geladen' };
+
+export function StatCardI18nDemo() {
+  return (
+    <div className="w-full max-w-xs">
+      <StatCard
+        label="Aktive Nutzer"
+        value="8.420"
+        delta={3.1}
+        deltaLabel="ggü. letzter Woche"
+        locale="de-DE"
+        messages={de}
+        icon={<Users />}
+      />
+    </div>
+  );
+}
