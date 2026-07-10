@@ -1,6 +1,24 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+export interface StatCardMessages {
+  /** Screen-reader word for a positive delta. Default "Increased". */
+  increased: string;
+  /** Screen-reader word for a negative delta. Default "Decreased". */
+  decreased: string;
+  /** Screen-reader text for a zero delta. Default "No change". */
+  noChange: string;
+  /** Appended to the label while `loading`. Default "loading". */
+  loading: string;
+}
+
+export const DEFAULT_STAT_CARD_MESSAGES: StatCardMessages = {
+  increased: "Increased",
+  decreased: "Decreased",
+  noChange: "No change",
+  loading: "loading",
+};
+
 export interface StatCardProps {
   label: string;
   /** Pre-formatted value (e.g. "$124,592" or a node). */
@@ -16,12 +34,16 @@ export interface StatCardProps {
   accent?: string;
   /** Show a shimmering skeleton in place of the content (data still loading). */
   loading?: boolean;
+  /** BCP 47 locale for formatting the delta number (decimal separator). */
+  locale?: string;
+  /** Override screen-reader / loading text for i18n. */
+  messages?: Partial<StatCardMessages>;
   className?: string;
 }
 
 function Arrow({ up }: { up: boolean }) {
   return (
-    <svg viewBox="0 0 12 12" fill="none" className="size-3" aria-hidden>
+    <svg viewBox="0 0 12 12" fill="none" className="size-3" aria-hidden="true">
       <path
         d={up ? "M6 9.5v-7M3 5.5L6 2.5l3 3" : "M6 2.5v7M3 6.5L6 9.5l3-3"}
         stroke="currentColor"
@@ -37,7 +59,8 @@ function Arrow({ up }: { up: boolean }) {
  * Dashboard KPI / stat card: label, big value, optional percentage delta
  * (green/red by whether the change is good — set `positiveIsGood={false}` for
  * metrics where up is bad, e.g. churn), and an optional icon badge. Pass `accent`
- * (any CSS color) to tint the card + badge.
+ * (any CSS color) to tint the card + badge. The card is a labelled `role="group"`
+ * and the delta carries a screen-reader text alternative (direction is not colour-only).
  */
 export function StatCard({
   label,
@@ -48,14 +71,20 @@ export function StatCard({
   icon,
   accent,
   loading = false,
+  locale,
+  messages,
   className,
 }: StatCardProps) {
+  const t = { ...DEFAULT_STAT_CARD_MESSAGES, ...messages };
+  const labelId = React.useId();
+
   if (loading) {
     return (
       <div
+        role="group"
         aria-busy="true"
         aria-live="polite"
-        aria-label={`${label} loading`}
+        aria-label={`${label} ${t.loading}`}
         className={cn(
           "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm",
           className,
@@ -80,6 +109,11 @@ export function StatCard({
     : good
       ? "text-success"
       : "text-destructive";
+  const deltaNum = hasDelta ? new Intl.NumberFormat(locale).format(Math.abs(delta as number)) : "";
+  // screen-reader alternative: convey the DIRECTION that the arrow/colour show visually
+  const deltaSr = neutral
+    ? t.noChange
+    : `${up ? t.increased : t.decreased} ${deltaNum}%`;
 
   // soft tint background, NO coloured border (the tint is the only fill)
   const cardStyle: React.CSSProperties = accent
@@ -91,6 +125,8 @@ export function StatCard({
 
   return (
     <div
+      role="group"
+      aria-labelledby={labelId}
       style={cardStyle}
       className={cn(
         "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
@@ -99,15 +135,20 @@ export function StatCard({
       )}
     >
       <div className="min-w-0">
-        <p className="truncate text-sm text-muted-foreground">{label}</p>
+        <p id={labelId} className="truncate text-sm text-muted-foreground">
+          {label}
+        </p>
         <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">
           {value}
         </p>
         {hasDelta && (
           <div className="mt-1.5 flex items-center gap-1.5 text-sm">
-            <span className={cn("inline-flex items-center gap-0.5 font-medium", deltaColor)}>
+            <span
+              aria-label={deltaSr}
+              className={cn("inline-flex items-center gap-0.5 font-medium", deltaColor)}
+            >
               {!neutral && <Arrow up={up} />}
-              {neutral ? "0" : Math.abs(delta as number)}%
+              <span aria-hidden="true">{neutral ? "0" : deltaNum}%</span>
             </span>
             {deltaLabel && <span className="text-muted-foreground">{deltaLabel}</span>}
           </div>
@@ -116,6 +157,7 @@ export function StatCard({
 
       {icon && (
         <span
+          aria-hidden="true"
           style={badgeStyle}
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5",

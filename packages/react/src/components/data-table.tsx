@@ -1115,6 +1115,290 @@ function CursorFooter({
   );
 }
 
+// Desktop body row — extracted + memoized so toggling one row's
+// selection/expansion (or a drag target moving) re-renders only that row, not
+// every visible row. All props are either primitives or stable references
+// (memoized arrays / useCallback handlers), so the default shallow-equal
+// React.memo comparator is precise: a row re-renders exactly when something it
+// actually shows changes.
+interface DataTableRowProps<T> {
+  row: T;
+  rowIndex: number;
+  rowKeyValue: React.Key;
+  isLast: boolean;
+  selected: boolean;
+  expanded: boolean;
+  canExpand: boolean;
+  isDropBefore: boolean;
+  isDropAfter: boolean;
+  isDragging: boolean;
+  rowSelectLabel: string;
+  columns: DataTableColumn<T>[];
+  padCls: string;
+  bordered: boolean;
+  striped: boolean;
+  divided: boolean;
+  frame: boolean;
+  hoverable: boolean;
+  clickable: boolean;
+  rowSpacing?: number;
+  selectable: boolean;
+  selectionMode: "multiple" | "single";
+  expandable: boolean;
+  reorderableRows: boolean;
+  hasPinned: boolean;
+  hasLeftPin: boolean;
+  pinnedBg: string;
+  lastLeftId?: string;
+  firstRightId?: string;
+  expanderLeft?: number;
+  selectionLeft?: number;
+  colCount: number;
+  cellClassName?: string;
+  rowClassNameValue?: string;
+  panelId: (key: React.Key) => string;
+  pinStyleFor: (col: DataTableColumn<T>) => React.CSSProperties;
+  toggleRow: (key: React.Key) => void;
+  toggleExpand: (key: React.Key) => void;
+  onRowClick?: (row: T, index: number) => void;
+  renderExpanded?: (row: T, index: number) => React.ReactNode;
+  onRowDragOver: (e: React.DragEvent, key: React.Key) => void;
+  onRowDrop: () => void;
+  setDragRowKey: (k: React.Key | null) => void;
+  setDropTarget: (v: { key: React.Key; pos: "before" | "after" } | null) => void;
+  t: DataTableMessages;
+}
+
+function DataTableRowInner<T>({
+  row,
+  rowIndex,
+  rowKeyValue: key,
+  isLast,
+  selected,
+  expanded,
+  canExpand,
+  isDropBefore,
+  isDropAfter,
+  isDragging,
+  rowSelectLabel,
+  columns,
+  padCls,
+  bordered,
+  striped,
+  divided,
+  frame,
+  hoverable,
+  clickable,
+  rowSpacing,
+  selectable,
+  selectionMode,
+  expandable,
+  reorderableRows,
+  hasPinned,
+  hasLeftPin,
+  pinnedBg,
+  lastLeftId,
+  firstRightId,
+  expanderLeft,
+  selectionLeft,
+  colCount,
+  cellClassName,
+  rowClassNameValue,
+  panelId,
+  pinStyleFor,
+  toggleRow,
+  toggleExpand,
+  onRowClick,
+  renderExpanded,
+  onRowDragOver,
+  onRowDrop,
+  setDragRowKey,
+  setDropTarget,
+  t,
+}: DataTableRowProps<T>) {
+  return (
+    <>
+      <tr
+        data-selected={selected || undefined}
+        data-expanded={expanded || undefined}
+        onDragOver={reorderableRows ? (e) => onRowDragOver(e, key) : undefined}
+        onDrop={reorderableRows ? onRowDrop : undefined}
+        onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        onKeyDown={
+          clickable
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowClick!(row, rowIndex);
+                }
+              }
+            : undefined
+        }
+        className={cn(
+          "transition-colors",
+          // `group` lets pinned cells mirror the row's hover/selected state
+          hasPinned && "group",
+          divided && !rowSpacing && "border-t border-border",
+          // borderless tables get a closing rule under the last row
+          // (framed tables are closed by the container border)
+          divided && !rowSpacing && !frame && isLast && "border-b border-border",
+          rowSpacing &&
+            "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
+          striped && "even:bg-muted/40",
+          // bpdm signature: a warm amber focus language — soft amber hover,
+          // and selected rows get an amber tint + a left accent bar
+          hoverable && "hover:bg-primary/[0.04]",
+          selected &&
+            "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
+          hoverable && selected && "hover:bg-primary/[0.14]",
+          // insertion line while reordering rows
+          isDropBefore && "shadow-[inset_0_2px_0_var(--primary)]",
+          isDropAfter && "shadow-[inset_0_-2px_0_var(--primary)]",
+          clickable &&
+            "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          rowClassNameValue,
+        )}
+      >
+        {reorderableRows && (
+          <td
+            className={cn(padCls, "w-[1%]", bordered && "border-e border-border", cellClassName)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              draggable
+              onDragStart={() => setDragRowKey(key)}
+              onDragEnd={() => {
+                setDragRowKey(null);
+                setDropTarget(null);
+              }}
+              aria-label={t.dragToReorder}
+              className={cn(
+                "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing",
+                isDragging && "opacity-40",
+              )}
+            >
+              <GripGlyph />
+            </div>
+          </td>
+        )}
+        {expandable && (
+          <td
+            style={
+              hasLeftPin
+                ? { position: "sticky", insetInlineStart: expanderLeft }
+                : undefined
+            }
+            className={cn(
+              padCls,
+              "w-[1%]",
+              bordered && "border-e border-border",
+              hasLeftPin && `z-10 ${pinnedBg}`,
+              cellClassName,
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {canExpand && (
+              <button
+                type="button"
+                aria-label={expanded ? t.collapseRow : t.expandRow}
+                aria-expanded={expanded}
+                aria-controls={panelId(key)}
+                onClick={() => toggleExpand(key)}
+                className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  className={cn("size-4 transition-transform", expanded && "rotate-90")}
+                  fill="none"
+                  aria-hidden
+                >
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+          </td>
+        )}
+        {selectable && (
+          <td
+            style={
+              hasLeftPin
+                ? { position: "sticky", insetInlineStart: selectionLeft }
+                : undefined
+            }
+            className={cn(
+              padCls,
+              "w-[1%]",
+              bordered && "border-e border-border",
+              hasLeftPin && `z-10 ${pinnedBg}`,
+              cellClassName,
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center">
+              {selectionMode === "single" ? (
+                <RowRadio
+                  checked={selected}
+                  onSelect={() => toggleRow(key)}
+                  label={rowSelectLabel}
+                />
+              ) : (
+                <Checkbox
+                  size="sm"
+                  aria-label={rowSelectLabel}
+                  checked={selected}
+                  onCheckedChange={() => toggleRow(key)}
+                />
+              )}
+            </div>
+          </td>
+        )}
+        {columns.map((col) => {
+          const align = col.align ?? (col.numeric ? "right" : "left");
+          return (
+            <td
+              key={col.id}
+              style={col.pin ? pinStyleFor(col) : undefined}
+              className={cn(
+                padCls,
+                alignClass[align],
+                col.numeric && "tabular-nums",
+                bordered && "border-e border-border/55 last:border-e-0",
+                col.pin && `z-10 ${pinnedBg}`,
+                col.id === lastLeftId && "border-e border-border",
+                col.id === firstRightId && "border-s border-border",
+                cellClassName,
+                col.className,
+              )}
+            >
+              {col.cell
+                ? col.cell(row, rowIndex)
+                : col.accessor
+                  ? col.accessor(row)
+                  : null}
+            </td>
+          );
+        })}
+      </tr>
+      {expanded && (
+        <tr id={panelId(key)} role="region" className={cn("bg-muted/30", divided && "border-t border-border")}>
+          <td colSpan={colCount} className="p-0">
+            {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
+            <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+              <div className="overflow-hidden">
+                <div className={padCls}>{renderExpanded!(row, rowIndex)}</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+// `React.memo` drops the generic call signature — cast back so JSX keeps inferring T.
+const DataTableRow = React.memo(DataTableRowInner) as typeof DataTableRowInner;
+
 /**
  * Data-driven table. Describe `columns` and pass `data`; everything else
  * (density, striping, borders, sticky header, vertical/horizontal scroll, empty
@@ -1181,7 +1465,12 @@ export function DataTable<T>({
   getRowLabel,
   className,
 }: DataTableProps<T>) {
-  const t = { ...DEFAULT_DATA_TABLE_MESSAGES, ...messages };
+  const t = React.useMemo(
+    () => ({ ...DEFAULT_DATA_TABLE_MESSAGES, ...messages }),
+    [messages],
+  );
+  // Density padding class — stable per `size` (avoids re-running cva per cell).
+  const padCls = React.useMemo(() => cellPad({ size }), [size]);
   const clickable = typeof onRowClick === "function";
   const isControlled = sort !== undefined;
 
@@ -1190,7 +1479,48 @@ export function DataTable<T>({
 
   // stable id per expandable row so the toggle can `aria-controls` its panel
   const baseId = React.useId();
-  const panelId = (key: React.Key) => `${baseId}-panel-${String(key)}`;
+  const panelId = React.useCallback(
+    (key: React.Key) => `${baseId}-panel-${String(key)}`,
+    [baseId],
+  );
+
+  // Latest-values ref: lets hot callbacks (toggle/sort/drag) keep a *stable*
+  // identity across renders — so memoized rows aren't invalidated — while still
+  // reading current state at call time (no stale closures). Populated at the end
+  // of render, before any event handler can fire.
+  type Latest = {
+    selectionMode: "multiple" | "single";
+    isSelectionControlled: boolean;
+    selectionArr: React.Key[];
+    selectedSet: Set<React.Key>;
+    onSelectionChange?: (keys: React.Key[], rows: T[]) => void;
+    sortedRows: T[];
+    keyOf: (row: T, index: number) => React.Key;
+    allSelected: boolean;
+    allKeys: React.Key[];
+    expandMode: "single" | "multiple";
+    isExpandControlled: boolean;
+    expandedArr: React.Key[];
+    expandedSet: Set<React.Key>;
+    onExpandedChange?: (keys: React.Key[]) => void;
+    sortState: DataTableSort[];
+    colById: Map<string, DataTableColumn<T>>;
+    t: DataTableMessages;
+    multiSort: boolean;
+    isControlled: boolean;
+    onSortChange?: (sort: DataTableSort[]) => void;
+    onRowClick?: (row: T, index: number) => void;
+    dropTarget: { key: React.Key; pos: "before" | "after" } | null;
+    dragRowKey: React.Key | null;
+    rowOrder: React.Key[];
+    data: T[];
+    rowKey?: (row: T, index: number) => React.Key;
+    onRowReorder?: (rows: T[]) => void;
+    columnOrder: string[];
+    columns: DataTableColumn<T>[];
+    onColumnOrderChange?: (order: string[]) => void;
+  };
+  const latest = React.useRef<Latest>(null as unknown as Latest);
 
   const [internalSort, setInternalSort] = React.useState<DataTableSort[]>(
     defaultSort ?? [],
@@ -1245,9 +1575,10 @@ export function DataTable<T>({
       (a, b) => (idx.get(a.id) ?? 0) - (idx.get(b.id) ?? 0),
     );
   }, [columns, reorderableColumns, columnOrder]);
-  const moveColumn = (dragId: string | null, overId: string) => {
+  const moveColumn = React.useCallback((dragId: string | null, overId: string) => {
     if (!dragId || dragId === overId) return;
-    const base = columnOrder.length ? columnOrder : columns.map((c) => c.id);
+    const l = latest.current;
+    const base = l.columnOrder.length ? l.columnOrder : l.columns.map((c) => c.id);
     const from = base.indexOf(dragId);
     const to = base.indexOf(overId);
     if (from === -1 || to === -1) return;
@@ -1256,8 +1587,8 @@ export function DataTable<T>({
     next.splice(from, 1);
     next.splice(to, 0, dragId);
     setColumnOrder(next);
-    onColumnOrderChange?.(next);
-  };
+    l.onColumnOrderChange?.(next);
+  }, []);
 
   const effectiveColumns = React.useMemo(
     () =>
@@ -1273,26 +1604,28 @@ export function DataTable<T>({
     return m;
   }, [effectiveColumns]);
 
-  const applySort = (next: DataTableSort[]) => {
-    if (!isControlled) setInternalSort(next);
-    onSortChange?.(next);
-  };
+  const applySort = React.useCallback((next: DataTableSort[]) => {
+    const l = latest.current;
+    if (!l.isControlled) setInternalSort(next);
+    l.onSortChange?.(next);
+  }, []);
 
-  const handleSort = (colId: string, additive: boolean) => {
-    const current = sortState.find((s) => s.id === colId)?.dir;
+  const handleSort = React.useCallback((colId: string, additive: boolean) => {
+    const l = latest.current;
+    const current = l.sortState.find((s) => s.id === colId)?.dir;
     const dir = nextDirection(current);
 
-    const col = colById.get(colId);
+    const col = l.colById.get(colId);
     const columnLabel = typeof col?.header === "string" ? col.header : colId;
-    setLiveMessage(t.announceSort(columnLabel, dir ?? "none"));
+    setLiveMessage(l.t.announceSort(columnLabel, dir ?? "none"));
 
-    if (multiSort && additive) {
-      const without = sortState.filter((s) => s.id !== colId);
+    if (l.multiSort && additive) {
+      const without = l.sortState.filter((s) => s.id !== colId);
       applySort(dir ? [...without, { id: colId, dir }] : without);
     } else {
       applySort(dir ? [{ id: colId, dir }] : []);
     }
-  };
+  }, [applySort]);
 
   // Only sort internally in the uncontrolled case — a controlled parent owns order.
   // global search filters rows across every column's comparable value (the same
@@ -1312,24 +1645,44 @@ export function DataTable<T>({
       (a, b) => (pos.get(rowKey(a, 0)) ?? 0) - (pos.get(rowKey(b, 0)) ?? 0),
     );
   }, [data, reorderableRows, rowOrder, rowKey]);
-  const moveRow = (
+  const moveRow = React.useCallback((
     dragKey: React.Key | null,
     overKey: React.Key,
     pos: "before" | "after",
   ) => {
-    if (!rowKey || dragKey == null || dragKey === overKey) return;
-    const base = rowOrder.length ? rowOrder : data.map((r) => rowKey(r, 0));
+    const l = latest.current;
+    const rk = l.rowKey;
+    if (!rk || dragKey == null || dragKey === overKey) return;
+    const base = l.rowOrder.length ? l.rowOrder : l.data.map((r) => rk(r, 0));
     if (base.indexOf(dragKey) === -1 || base.indexOf(overKey) === -1) return;
     const next = base.filter((k) => k !== dragKey);
     // insert relative to the target's position AFTER removing the dragged row
     const insert = next.indexOf(overKey) + (pos === "after" ? 1 : 0);
     next.splice(insert, 0, dragKey);
     setRowOrder(next);
-    if (onRowReorder) {
-      const map = new Map(data.map((r) => [rowKey(r, 0), r]));
-      onRowReorder(next.map((k) => map.get(k)).filter(Boolean) as T[]);
+    if (l.onRowReorder) {
+      const map = new Map(l.data.map((r) => [rk(r, 0), r]));
+      l.onRowReorder(next.map((k) => map.get(k)).filter(Boolean) as T[]);
     }
-  };
+  }, []);
+
+  // stable per-row drag handlers (read live drop state via the ref)
+  const handleRowDragOver = React.useCallback(
+    (e: React.DragEvent, key: React.Key) => {
+      e.preventDefault();
+      const r = e.currentTarget.getBoundingClientRect();
+      const pos = e.clientY < r.top + r.height / 2 ? "before" : "after";
+      const dt = latest.current.dropTarget;
+      if (dt?.key !== key || dt?.pos !== pos) setDropTarget({ key, pos });
+    },
+    [],
+  );
+  const handleRowDrop = React.useCallback(() => {
+    const l = latest.current;
+    if (l.dropTarget) moveRow(l.dragRowKey, l.dropTarget.key, l.dropTarget.pos);
+    setDragRowKey(null);
+    setDropTarget(null);
+  }, [moveRow]);
 
   const filteredData = React.useMemo(() => {
     // when a dimension is controlled the parent already applied it (server-side),
@@ -1516,8 +1869,10 @@ export function DataTable<T>({
     : 0;
 
   // --- selection (keyed by rowKey so it survives sorting) ---
-  const keyOf = (row: T, index: number): React.Key =>
-    rowKey ? rowKey(row, index) : index;
+  const keyOf = React.useCallback(
+    (row: T, index: number): React.Key => (rowKey ? rowKey(row, index) : index),
+    [rowKey],
+  );
 
   const isSelectionControlled = selectedKeys !== undefined;
   const [internalSelection, setInternalSelection] = React.useState<React.Key[]>(
@@ -1539,29 +1894,34 @@ export function DataTable<T>({
       ? "indeterminate"
       : false;
 
-  const applySelection = (nextKeys: React.Key[]) => {
-    if (!isSelectionControlled) setInternalSelection(nextKeys);
+  const applySelection = React.useCallback((nextKeys: React.Key[]) => {
+    const l = latest.current;
+    if (!l.isSelectionControlled) setInternalSelection(nextKeys);
     const set = new Set(nextKeys);
     // resolve against all rows (not just the current page) so cross-page
     // selections are reported in full
-    onSelectionChange?.(
+    l.onSelectionChange?.(
       nextKeys,
-      sortedRows.filter((r, i) => set.has(keyOf(r, i))),
+      l.sortedRows.filter((r, i) => set.has(l.keyOf(r, i))),
     );
-  };
+  }, []);
 
-  const toggleRow = (key: React.Key) => {
-    if (selectionMode === "single") {
+  const toggleRow = React.useCallback((key: React.Key) => {
+    const l = latest.current;
+    if (l.selectionMode === "single") {
       applySelection([key]);
       return;
     }
-    const next = selectedSet.has(key)
-      ? selectionArr.filter((k) => k !== key)
-      : [...selectionArr, key];
+    const next = l.selectedSet.has(key)
+      ? l.selectionArr.filter((k) => k !== key)
+      : [...l.selectionArr, key];
     applySelection(next);
-  };
+  }, [applySelection]);
 
-  const toggleAll = () => applySelection(allSelected ? [] : allKeys);
+  const toggleAll = React.useCallback(
+    () => applySelection(latest.current.allSelected ? [] : latest.current.allKeys),
+    [applySelection],
+  );
 
   // --- expandable rows (keyed by rowKey, like selection) ---
   const expandable = typeof renderExpanded === "function";
@@ -1572,21 +1932,23 @@ export function DataTable<T>({
   const expandedArr = isExpandControlled ? expandedKeys! : internalExpanded;
   const expandedSet = React.useMemo(() => new Set(expandedArr), [expandedArr]);
 
-  const applyExpanded = (nextKeys: React.Key[]) => {
-    if (!isExpandControlled) setInternalExpanded(nextKeys);
-    onExpandedChange?.(nextKeys);
-  };
-  const toggleExpand = (key: React.Key) => {
-    if (expandMode === "single") {
-      applyExpanded(expandedSet.has(key) ? [] : [key]);
+  const applyExpanded = React.useCallback((nextKeys: React.Key[]) => {
+    const l = latest.current;
+    if (!l.isExpandControlled) setInternalExpanded(nextKeys);
+    l.onExpandedChange?.(nextKeys);
+  }, []);
+  const toggleExpand = React.useCallback((key: React.Key) => {
+    const l = latest.current;
+    if (l.expandMode === "single") {
+      applyExpanded(l.expandedSet.has(key) ? [] : [key]);
       return;
     }
     applyExpanded(
-      expandedSet.has(key)
-        ? expandedArr.filter((k) => k !== key)
-        : [...expandedArr, key],
+      l.expandedSet.has(key)
+        ? l.expandedArr.filter((k) => k !== key)
+        : [...l.expandedArr, key],
     );
-  };
+  }, [applyExpanded]);
 
   // --- column visibility (toggle) ---
   const [hiddenIds, setHiddenIds] = React.useState<Set<string>>(new Set());
@@ -1672,18 +2034,29 @@ export function DataTable<T>({
   // let the scrolling cells show through). Base card + opaque color-mix tints for
   // hover/selected, reflected from the row via `group`. Raw tokens (not --color-*)
   // so they resolve under @theme inline.
-  const pinnedBg = cn(
-    "bg-card",
-    hoverable && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
-    "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
+  const pinnedBg = React.useMemo(
+    () =>
+      cn(
+        "bg-card",
+        hoverable && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
+        "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
+      ),
+    [hoverable],
   );
 
-  // sticky positioning for a data column (used by both th and td)
-  const pinStyleFor = (col: DataTableColumn<T>): React.CSSProperties => {
-    if (col.pin === "left") return { position: "sticky", insetInlineStart: pinPx.left[col.id] };
-    if (col.pin === "right") return { position: "sticky", insetInlineEnd: pinPx.right[col.id] };
-    return {};
-  };
+  // sticky positioning for a data column (used by both th and td). Depends on the
+  // measured offsets, so its identity changes only when those change — which is
+  // exactly when memoized rows must re-render to pick up the new offsets.
+  const pinStyleFor = React.useCallback(
+    (col: DataTableColumn<T>): React.CSSProperties => {
+      if (col.pin === "left")
+        return { position: "sticky", insetInlineStart: pinPx.left[col.id] };
+      if (col.pin === "right")
+        return { position: "sticky", insetInlineEnd: pinPx.right[col.id] };
+      return {};
+    },
+    [pinPx],
+  );
 
   const toggleable = columns.filter((c) => c.hideable !== false);
   const visibleToggleIds = toggleable
@@ -1721,8 +2094,11 @@ export function DataTable<T>({
   }, [data, selectFilterCols]);
 
   const isMobile = useMediaQuery("(max-width: 639px)", responsive);
-  const renderCell = (col: DataTableColumn<T>, row: T, i: number) =>
-    col.cell ? col.cell(row, i) : col.accessor ? col.accessor(row) : null;
+  const renderCell = React.useCallback(
+    (col: DataTableColumn<T>, row: T, i: number) =>
+      col.cell ? col.cell(row, i) : col.accessor ? col.accessor(row) : null,
+    [],
+  );
 
   const hasFilterableCols = effectiveColumns.some((c) => c.filterable);
   const hasActiveFilters = Object.values(filters).some((f) =>
@@ -1734,6 +2110,42 @@ export function DataTable<T>({
     hasFilterableCols ||
     orderChanged ||
     (columnToggle && toggleable.length > 0);
+
+  // Publish current values for the stable callbacks above. Runs during render,
+  // before commit/events — so handlers always read fresh state without closing
+  // over it (which would churn their identity and defeat row memoization).
+  latest.current = {
+    selectionMode,
+    isSelectionControlled,
+    selectionArr,
+    selectedSet,
+    onSelectionChange,
+    sortedRows,
+    keyOf,
+    allSelected,
+    allKeys,
+    expandMode,
+    isExpandControlled,
+    expandedArr,
+    expandedSet,
+    onExpandedChange,
+    sortState,
+    colById,
+    t,
+    multiSort,
+    isControlled,
+    onSortChange,
+    onRowClick,
+    dropTarget,
+    dragRowKey,
+    rowOrder,
+    data,
+    rowKey,
+    onRowReorder,
+    columnOrder,
+    columns,
+    onColumnOrderChange,
+  };
 
   return (
     <div className="w-full">
@@ -1939,7 +2351,7 @@ export function DataTable<T>({
                 scope="col"
                 aria-label={t.reorder}
                 className={cn(
-                  cellPad({ size }),
+                  padCls,
                   "w-[1%]",
                   frame || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
@@ -1958,7 +2370,7 @@ export function DataTable<T>({
                   ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                 }}
                 className={cn(
-                  cellPad({ size }),
+                  padCls,
                   "w-[1%]",
                   frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
@@ -1977,7 +2389,7 @@ export function DataTable<T>({
                   ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                 }}
                 className={cn(
-                  cellPad({ size }),
+                  padCls,
                   "w-[1%]",
                   "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
                   frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
@@ -2041,7 +2453,7 @@ export function DataTable<T>({
                     ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                   }}
                   className={cn(
-                    cellPad({ size }),
+                    padCls,
                     alignClass[align],
                     // strong, readable header — confident dark sentence-case label
                     // (size inherited from density), distinct from the body weight
@@ -2124,7 +2536,7 @@ export function DataTable<T>({
               <td
                 colSpan={colCount}
                 className={cn(
-                  cellPad({ size }),
+                  padCls,
                   "text-center text-muted-foreground",
                 )}
               >
@@ -2144,214 +2556,65 @@ export function DataTable<T>({
             ).map((rowIndex) => {
               const row = rows[rowIndex];
               const key = keyOf(row, rowIndex);
-              const isLast = rowIndex === rows.length - 1;
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
-              const canExpand = expandable && (!rowExpandable || rowExpandable(row));
-              const rowSelectLabel = getRowLabel
-                ? `${t.selectRow}: ${getRowLabel(row, rowIndex)}`
-                : t.selectRow;
               return (
-              <React.Fragment key={key}>
-              <tr
-                data-selected={selected || undefined}
-                data-expanded={expanded || undefined}
-                onDragOver={
-                  reorderableRows
-                    ? (e) => {
-                        e.preventDefault();
-                        const r = e.currentTarget.getBoundingClientRect();
-                        const pos = e.clientY < r.top + r.height / 2 ? "before" : "after";
-                        if (dropTarget?.key !== key || dropTarget?.pos !== pos)
-                          setDropTarget({ key, pos });
-                      }
-                    : undefined
-                }
-                onDrop={
-                  reorderableRows
-                    ? () => {
-                        if (dropTarget) moveRow(dragRowKey, dropTarget.key, dropTarget.pos);
-                        setDragRowKey(null);
-                        setDropTarget(null);
-                      }
-                    : undefined
-                }
-                onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
-                tabIndex={clickable ? 0 : undefined}
-                onKeyDown={
-                  clickable
-                    ? (e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onRowClick!(row, rowIndex);
-                        }
-                      }
-                    : undefined
-                }
-                className={cn(
-                  "transition-colors",
-                  // `group` lets pinned cells mirror the row's hover/selected state
-                  hasPinned && "group",
-                  divided && !rowSpacing && "border-t border-border",
-                  // borderless tables get a closing rule under the last row
-                  // (framed tables are closed by the container border)
-                  divided && !rowSpacing && !frame && isLast && "border-b border-border",
-                  rowSpacing &&
-                    "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
-                  striped && "even:bg-muted/40",
-                  // bpdm signature: a warm amber focus language — soft amber hover,
-                  // and selected rows get an amber tint + a left accent bar
-                  hoverable && "hover:bg-primary/[0.04]",
-                  selected &&
-                    "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
-                  hoverable && selected && "hover:bg-primary/[0.14]",
-                  // insertion line while reordering rows
-                  dropTarget?.key === key &&
-                    dropTarget.pos === "before" &&
-                    "shadow-[inset_0_2px_0_var(--primary)]",
-                  dropTarget?.key === key &&
-                    dropTarget.pos === "after" &&
-                    "shadow-[inset_0_-2px_0_var(--primary)]",
-                  clickable &&
-                    "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                  typeof rowClassName === "function"
-                    ? rowClassName(row, rowIndex)
-                    : rowClassName,
-                )}
-              >
-                {reorderableRows && (
-                  <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-e border-border", cellClassName)}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div
-                      draggable
-                      onDragStart={() => setDragRowKey(key)}
-                      onDragEnd={() => {
-                        setDragRowKey(null);
-                        setDropTarget(null);
-                      }}
-                      aria-label={t.dragToReorder}
-                      className={cn(
-                        "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing",
-                        dragRowKey === key && "opacity-40",
-                      )}
-                    >
-                      <GripGlyph />
-                    </div>
-                  </td>
-                )}
-                {expandable && (
-                  <td
-                    style={
-                      hasLeftPin
-                        ? { position: "sticky", insetInlineStart: expanderLeft }
-                        : undefined
-                    }
-                    className={cn(
-                      cellPad({ size }),
-                      "w-[1%]",
-                      bordered && "border-e border-border",
-                      hasLeftPin && `z-10 ${pinnedBg}`,
-                      cellClassName,
-                    )}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {canExpand && (
-                      <button
-                        type="button"
-                        aria-label={expanded ? t.collapseRow : t.expandRow}
-                        aria-expanded={expanded}
-                        aria-controls={panelId(key)}
-                        onClick={() => toggleExpand(key)}
-                        className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                      >
-                        <svg
-                          viewBox="0 0 16 16"
-                          className={cn("size-4 transition-transform", expanded && "rotate-90")}
-                          fill="none"
-                          aria-hidden
-                        >
-                          <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </button>
-                    )}
-                  </td>
-                )}
-                {selectable && (
-                  <td
-                    style={
-                      hasLeftPin
-                        ? { position: "sticky", insetInlineStart: selectionLeft }
-                        : undefined
-                    }
-                    className={cn(
-                      cellPad({ size }),
-                      "w-[1%]",
-                      bordered && "border-e border-border",
-                      hasLeftPin && `z-10 ${pinnedBg}`,
-                      cellClassName,
-                    )}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex justify-center">
-                      {selectionMode === "single" ? (
-                        <RowRadio
-                          checked={selected}
-                          onSelect={() => toggleRow(key)}
-                          label={rowSelectLabel}
-                        />
-                      ) : (
-                        <Checkbox
-                          size="sm"
-                          aria-label={rowSelectLabel}
-                          checked={selected}
-                          onCheckedChange={() => toggleRow(key)}
-                        />
-                      )}
-                    </div>
-                  </td>
-                )}
-                {orderedColumns.map((col) => {
-                  const align = col.align ?? (col.numeric ? "right" : "left");
-                  return (
-                    <td
-                      key={col.id}
-                      style={col.pin ? pinStyleFor(col) : undefined}
-                      className={cn(
-                        cellPad({ size }),
-                        alignClass[align],
-                        col.numeric && "tabular-nums",
-                        bordered && "border-e border-border/55 last:border-e-0",
-                        col.pin && `z-10 ${pinnedBg}`,
-                        col.id === lastLeftId && "border-e border-border",
-                        col.id === firstRightId && "border-s border-border",
-                        cellClassName,
-                        col.className,
-                      )}
-                    >
-                      {col.cell
-                        ? col.cell(row, rowIndex)
-                        : col.accessor
-                          ? col.accessor(row)
-                          : null}
-                    </td>
-                  );
-                })}
-              </tr>
-              {expanded && (
-                <tr id={panelId(key)} role="region" className={cn("bg-muted/30", divided && "border-t border-border")}>
-                  <td colSpan={colCount} className="p-0">
-                    {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
-                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
-                      <div className="overflow-hidden">
-                        <div className={cellPad({ size })}>{renderExpanded!(row, rowIndex)}</div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-              </React.Fragment>
+                <DataTableRow
+                  key={key}
+                  row={row}
+                  rowIndex={rowIndex}
+                  rowKeyValue={key}
+                  isLast={rowIndex === rows.length - 1}
+                  selected={selected}
+                  expanded={expanded}
+                  canExpand={expandable && (!rowExpandable || rowExpandable(row))}
+                  isDropBefore={dropTarget?.key === key && dropTarget.pos === "before"}
+                  isDropAfter={dropTarget?.key === key && dropTarget.pos === "after"}
+                  isDragging={dragRowKey === key}
+                  rowSelectLabel={
+                    getRowLabel
+                      ? `${t.selectRow}: ${getRowLabel(row, rowIndex)}`
+                      : t.selectRow
+                  }
+                  columns={orderedColumns}
+                  padCls={padCls}
+                  bordered={bordered}
+                  striped={striped}
+                  divided={divided}
+                  frame={frame}
+                  hoverable={hoverable}
+                  clickable={clickable}
+                  rowSpacing={rowSpacing}
+                  selectable={selectable}
+                  selectionMode={selectionMode}
+                  expandable={expandable}
+                  reorderableRows={reorderableRows}
+                  hasPinned={hasPinned}
+                  hasLeftPin={hasLeftPin}
+                  pinnedBg={pinnedBg}
+                  lastLeftId={lastLeftId}
+                  firstRightId={firstRightId}
+                  expanderLeft={expanderLeft}
+                  selectionLeft={selectionLeft}
+                  colCount={colCount}
+                  cellClassName={cellClassName}
+                  rowClassNameValue={
+                    typeof rowClassName === "function"
+                      ? rowClassName(row, rowIndex)
+                      : rowClassName
+                  }
+                  panelId={panelId}
+                  pinStyleFor={pinStyleFor}
+                  toggleRow={toggleRow}
+                  toggleExpand={toggleExpand}
+                  onRowClick={onRowClick}
+                  renderExpanded={renderExpanded}
+                  onRowDragOver={handleRowDragOver}
+                  onRowDrop={handleRowDrop}
+                  setDragRowKey={setDragRowKey}
+                  setDropTarget={setDropTarget}
+                  t={t}
+                />
               );
             })}
             {virtualized && padBottom > 0 && (
@@ -2366,7 +2629,7 @@ export function DataTable<T>({
           <tfoot>
             <tr>
               {reorderableRows && (
-                <td className={cn(cellPad({ size }), "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0")} />
+                <td className={cn(padCls, "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0")} />
               )}
               {expandable && (
                 <td
@@ -2376,7 +2639,7 @@ export function DataTable<T>({
                       : undefined
                   }
                   className={cn(
-                    cellPad({ size }),
+                    padCls,
                     "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
                     bordered && "border-e border-border",
                     hasLeftPin ? "sticky z-20" : "sticky",
@@ -2392,7 +2655,7 @@ export function DataTable<T>({
                       : undefined
                   }
                   className={cn(
-                    cellPad({ size }),
+                    padCls,
                     "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
                     bordered && "border-e border-border",
                     "sticky bottom-0",
@@ -2409,7 +2672,7 @@ export function DataTable<T>({
                     key={col.id}
                     style={col.pin ? pinStyleFor(col) : undefined}
                     className={cn(
-                      cellPad({ size }),
+                      padCls,
                       alignClass[align],
                       col.numeric && "tabular-nums",
                       "sticky bottom-0 bg-muted font-medium text-foreground",

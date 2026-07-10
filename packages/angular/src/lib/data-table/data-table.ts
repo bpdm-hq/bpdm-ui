@@ -61,6 +61,28 @@ interface RenderRow<T> {
   row: T;
   index: number;
   key: Key;
+  /**
+   * Stable per-row template context (`{ $implicit, row, index }`). Built once in
+   * `pageRows()` and reused across change-detection passes so `*ngTemplateOutlet`
+   * never sees a fresh context object (which would re-instantiate embedded views).
+   */
+  ctx: CellContext<T>;
+}
+
+/** One body cell's precomputed view-model (column + its resolved class string). */
+interface RenderCell<T> {
+  col: DataTableColumn<T>;
+  class: string;
+}
+
+/**
+ * A body row enriched with everything the template needs to render without
+ * calling class-builder methods per change-detection pass: the row's class
+ * string and, per visible column, the cell's class string.
+ */
+interface BodyRow<T> extends RenderRow<T> {
+  rowClass: string;
+  cells: RenderCell<T>[];
 }
 
 /**
@@ -170,7 +192,7 @@ interface RenderRow<T> {
                   <dt class="truncate text-muted-foreground">{{ col.header ?? col.id }}</dt>
                   <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-end ' + (col.numeric ? 'tabular-nums' : '')">
                     @if (col.cell) {
-                      <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="cellCtx(rr)" />
+                      <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="rr.ctx" />
                     } @else {
                       {{ col.accessor ? col.accessor(rr.row) : null }}
                     }
@@ -181,7 +203,7 @@ interface RenderRow<T> {
                 <div [attr.id]="rowPanelId(rr.key)" class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
                   <div class="overflow-hidden">
                     <div class="mt-3 border-t border-border pt-3">
-                      <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                      <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="rr.ctx" />
                     </div>
                   </div>
                 </div>
@@ -287,7 +309,7 @@ interface RenderRow<T> {
                 @if (virtualized() && padTop() > 0) {
                   <tr [style.height.px]="padTop()"><td [attr.colspan]="colCount()"></td></tr>
                 }
-                @for (rr of rows; track rr.key; let last = $last) {
+                @for (rr of renderRows(); track rr.key) {
                   <tr
                     [attr.data-selected]="selectedSet().has(rr.key) ? '' : null"
                     [attr.data-expanded]="expandedSet().has(rr.key) ? '' : null"
@@ -296,7 +318,7 @@ interface RenderRow<T> {
                     (click)="clickable() ? onRowClick()!(rr.row, rr.index) : null"
                     [attr.tabindex]="clickable() ? 0 : null"
                     (keydown)="onRowKey($event, rr)"
-                    [class]="rowClass(rr, last)"
+                    [class]="rr.rowClass"
                   >
                     @if (reorderableRows()) {
                       <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-e border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
@@ -333,17 +355,17 @@ interface RenderRow<T> {
                         </div>
                       </td>
                     }
-                    @for (col of cols; track col.id) {
+                    @for (cell of rr.cells; track cell.col.id) {
                       <td
-                        [style.position]="col.pin ? 'sticky' : null"
-                        [style.inset-inline-start.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
-                        [style.inset-inline-end.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
-                        [class]="bodyCellClass(col)"
+                        [style.position]="cell.col.pin ? 'sticky' : null"
+                        [style.inset-inline-start.px]="cell.col.pin === 'left' ? pinPx().left[cell.col.id] : null"
+                        [style.inset-inline-end.px]="cell.col.pin === 'right' ? pinPx().right[cell.col.id] : null"
+                        [class]="cell.class"
                       >
-                        @if (col.cell) {
-                          <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="cellCtx(rr)" />
+                        @if (cell.col.cell) {
+                          <ng-container [ngTemplateOutlet]="cell.col.cell" [ngTemplateOutletContext]="rr.ctx" />
                         } @else {
-                          {{ col.accessor ? col.accessor(rr.row) : null }}
+                          {{ cell.col.accessor ? cell.col.accessor(rr.row) : null }}
                         }
                       </td>
                     }
@@ -355,7 +377,7 @@ interface RenderRow<T> {
                         <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
                           <div class="overflow-hidden">
                             <div [class]="cellPad()">
-                              <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="cellCtx(rr)" />
+                              <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="rr.ctx" />
                             </div>
                           </div>
                         </div>
@@ -683,9 +705,6 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
 
   // ---- helpers exposed to the template ----
   protected readonly isTemplate = (v: unknown): v is TemplateRef<unknown> => v instanceof TemplateRef;
-  protected cellCtx(rr: RenderRow<T>): CellContext<T> {
-    return { $implicit: rr.row, row: rr.row, index: rr.index };
-  }
   protected cellPad(): string {
     return CELL_PAD[this.size()];
   }
@@ -1041,10 +1060,37 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       slice = sorted.slice(w.start, w.end);
       return slice.map((row, i) => {
         const index = w.start + i;
-        return { row, index, key: this.keyOf(row, index) };
+        return { row, index, key: this.keyOf(row, index), ctx: { $implicit: row, row, index } };
       });
     }
-    return slice.map((row, index) => ({ row, index, key: this.keyOf(row, index) }));
+    return slice.map((row, index) => ({
+      row,
+      index,
+      key: this.keyOf(row, index),
+      ctx: { $implicit: row, row, index },
+    }));
+  });
+
+  // ---- body view-model ----
+  // Precompute per-row + per-cell class strings (and reuse the stable per-row
+  // ctx) so the template reads plain values instead of re-running `cn()` for
+  // every visible cell on every change-detection pass. This computed only
+  // re-runs when a class-affecting signal actually changes (selection, drag
+  // target, density, pinning, …), NOT on arbitrary CD; and it reuses each row's
+  // `ctx` object identity from `pageRows()` (which does not depend on those
+  // signals), so `ngTemplateOutletContext` stays referentially stable per row.
+  protected readonly renderRows = computed<BodyRow<T>[]>(() => {
+    const rows = this.pageRows();
+    const cols = this.orderedColumns();
+    const lastIdx = rows.length - 1;
+    // The body cell class is row-independent, so resolve it once per column and
+    // share the resulting string across every row.
+    const cellClass = cols.map((col) => this.bodyCellClass(col));
+    return rows.map((rr, i) => ({
+      ...rr,
+      rowClass: this.rowClass(rr, i === lastIdx),
+      cells: cols.map((col, ci) => ({ col, class: cellClass[ci] })),
+    }));
   });
 
   // ---- virtualization ----
@@ -1256,9 +1302,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
     ),
   );
-  protected leadBodyClass(): string {
-    return cn(this.cellPad(), "w-[1%]", this.bordered() && "border-e border-border", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName());
-  }
+  protected readonly leadBodyClass = computed(() =>
+    cn(this.cellPad(), "w-[1%]", this.bordered() && "border-e border-border", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName()),
+  );
   protected bodyCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
     return cn(

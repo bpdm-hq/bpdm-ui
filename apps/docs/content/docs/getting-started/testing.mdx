@@ -722,6 +722,43 @@ fixture.detectChanges();
   </Tab>
 </Tabs>
 
+### Stat Card
+
+The card is a **`role="group"` named by its `label`** (`aria-labelledby`); the delta
+exposes a **screen-reader text alternative** ("Increased 12.5%" / "Decreased 3.2%" /
+"No change"), so query the group by name and assert the delta's accessible label —
+never the red/green colour.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { StatCard } from '@bpdm/ui/stat-card';
+
+render(<StatCard label="Active users" value="8,420" delta={3.1} deltaLabel="vs last week" />);
+
+// the card is a labelled group
+screen.getByRole('group', { name: 'Active users' });
+
+// the delta's direction is announced (not colour-only)
+screen.getByLabelText('Increased 3.1%');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+const card = el.querySelector('bpdm-stat-card') as HTMLElement;
+
+expect(card.getAttribute('role')).toBe('group');       // named by label via aria-labelledby
+el.querySelector('[aria-label="Increased 3.1%"]');     // delta direction for screen readers
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and

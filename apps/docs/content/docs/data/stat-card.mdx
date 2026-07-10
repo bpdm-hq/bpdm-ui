@@ -11,6 +11,7 @@ import {
   StatCardNoDeltaDemo,
   StatCardLoadingDemo,
   StatCardDashboardDemo,
+  StatCardI18nDemo,
 } from '@/components/stat-card-demos';
 import { Preview } from '@/components/preview';
 
@@ -262,6 +263,9 @@ Stat Cards are just tiles — drop them in a responsive grid for a KPI row.
   <StatCardDashboardDemo />
 </Preview>
 
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
 ```tsx title="dashboard.tsx"
 import { StatCard } from '@bpdm/ui/stat-card';
 import { Users, UserPlus, TrendingDown, Clock } from 'lucide-react';
@@ -278,6 +282,31 @@ export function Dashboard() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="dashboard.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard } from '@bpdm/ng';
+
+@Component({
+  selector: 'dashboard',
+  imports: [BpdmStatCard],
+  template: `
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <bpdm-stat-card label="Active users" value="8,420" [delta]="3.1" deltaLabel="vs last week" />
+      <bpdm-stat-card label="New signups" value="1,294" [delta]="12.5" deltaLabel="vs last month" />
+      <bpdm-stat-card label="Bounce rate" value="2.4%" [delta]="0.6" [positiveIsGood]="false" deltaLabel="vs last month" />
+      <bpdm-stat-card label="Avg. session" value="4m 12s" [delta]="-1.8" deltaLabel="vs last month" />
+    </div>
+  `,
+})
+export class Dashboard {}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatCard` / `<bpdm-stat-card>`
@@ -292,12 +321,96 @@ export function Dashboard() {
 | `icon` | `ReactNode` (Angular `bpdmStatCardIcon`) | — | Icon shown in the badge. |
 | `accent` | `string` | — | Any CSS colour — tints the card + icon badge. |
 | `loading` | `boolean` | `false` | Show a shimmering skeleton (sets `aria-busy`) while data loads. |
+| `locale` | `string` (BCP 47) | runtime default | Formats the delta number (decimal separator). |
+| `messages` | `Partial<StatCardMessages>` | English | Override the screen-reader / loading text for i18n (see below). |
 | `className` | `string` (Angular `class`) | — | Extra classes on the card. |
+
+`StatCardMessages`: `{ increased, decreased, noChange, loading }`.
 
 ## Accessibility
 
-- The `label` and `value` are plain text, announced in reading order.
-- The delta never relies on colour alone — an **arrow + sign** convey direction and
-  `deltaLabel` gives it context, so it reads clearly without perceiving red/green.
-- The icon is decorative — the `label` carries the meaning.
+- The card is a **`role="group"` labelled by its `label`** (`aria-labelledby`), so a
+  screen reader announces it as one named unit, then reads the value and delta.
+- The delta **never relies on colour or the arrow alone**: the arrow is decorative
+  (`aria-hidden`) and the delta carries a **text alternative** — "Increased 12.5%" /
+  "Decreased 3.2%" / "No change" — so direction is announced, not just shown in
+  red/green. `deltaLabel` follows for context ("vs last month"). The direction words
+  are translatable via `messages`.
+- The icon badge is decorative (`aria-hidden`) — the `label` carries the meaning.
+- While `loading`, the card sets `aria-busy` + `aria-live="polite"` and is labelled
+  `<label> <loading>` (the metric name plus a "loading" suffix) so assistive tech
+  knows the value is pending.
 - `accent` only tints backgrounds; text keeps accessible contrast against the card.
+
+## Internationalization
+
+Two knobs make the card locale-ready:
+
+- **`locale`** — a BCP 47 tag that formats the delta number's decimal separator via
+  `Intl.NumberFormat` (e.g. `12,5%` in `de-DE`).
+- **`messages`** — override the screen-reader / loading strings (`increased`,
+  `decreased`, `noChange`, `loading`); English defaults ship built-in, override any subset.
+
+The visible `label`, `value` and `deltaLabel` are always your own content, so they're
+translated by you at the call site. Layout is direction-agnostic (flexbox + logical
+`gap`), so the card mirrors correctly under `dir="rtl"` with no configuration.
+
+<Preview>
+  <StatCardI18nDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-i18n.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+
+const de = { increased: 'Gestiegen', decreased: 'Gesunken', noChange: 'Keine Änderung', loading: 'wird geladen' };
+
+export function AktiveNutzer() {
+  return (
+    <StatCard
+      label="Aktive Nutzer"
+      value="8.420"
+      delta={3.1}
+      deltaLabel="ggü. letzter Woche"
+      locale="de-DE"
+      messages={de}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-i18n.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard, type StatCardMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'aktive-nutzer',
+  imports: [BpdmStatCard],
+  template: `
+    <bpdm-stat-card
+      label="Aktive Nutzer"
+      value="8.420"
+      [delta]="3.1"
+      deltaLabel="ggü. letzter Woche"
+      locale="de-DE"
+      [messages]="de"
+    />
+  `,
+})
+export class AktiveNutzer {
+  de: Partial<StatCardMessages> = {
+    increased: 'Gestiegen',
+    decreased: 'Gesunken',
+    noChange: 'Keine Änderung',
+    loading: 'wird geladen',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
