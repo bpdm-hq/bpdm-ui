@@ -14,6 +14,8 @@ import { BpdmCheckbox } from "../checkbox/checkbox";
 import { BpdmPopover } from "../popover/popover";
 import {
   type ColumnFilter,
+  DEFAULT_DATA_TABLE_MESSAGES,
+  type DataTableMessages,
   type FilterOperator,
   NUM_OPS,
   TEXT_OPS,
@@ -31,7 +33,7 @@ const FILTER_FIELD =
   template: `
     <button
       type="button"
-      aria-label="Filter column"
+      [attr.aria-label]="messages().filterColumn"
       [bpdmPopover]="panel"
       [(bpdmPopoverOpen)]="open"
       bpdmPopoverAlign="start"
@@ -57,12 +59,12 @@ const FILTER_FIELD =
                 <span class="truncate">{{ o.label }}</span>
               </label>
             } @empty {
-              <p class="px-2 py-1.5 text-sm text-muted-foreground">No values</p>
+              <p class="px-2 py-1.5 text-sm text-muted-foreground">{{ messages().noValues }}</p>
             }
           </div>
           <div class="flex items-center justify-between border-t border-border pt-2">
-            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="doClear(close)">Clear</button>
-            <button bpdmButton size="sm" (click)="applySelect(close)">Apply</button>
+            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="doClear(close)">{{ messages().clear }}</button>
+            <button bpdmButton size="sm" (click)="applySelect(close)">{{ messages().apply }}</button>
           </div>
         </div>
       } @else {
@@ -72,12 +74,12 @@ const FILTER_FIELD =
               <select
                 [value]="draft().matchMode"
                 (change)="setMatchMode($any($event.target).value)"
-                [class]="cn(filterField, 'cursor-pointer appearance-none pr-8 font-medium')"
+                [class]="cn(filterField, 'cursor-pointer appearance-none pe-8 font-medium')"
               >
-                <option value="all">Match all</option>
-                <option value="any">Match any</option>
+                <option value="all">{{ messages().matchAll }}</option>
+                <option value="any">{{ messages().matchAny }}</option>
               </select>
-              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
                 <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -88,20 +90,20 @@ const FILTER_FIELD =
                 <select
                   [value]="rule.op"
                   (change)="setOp(i, $any($event.target).value)"
-                  [class]="cn(filterField, 'cursor-pointer appearance-none pr-8')"
+                  [class]="cn(filterField, 'cursor-pointer appearance-none pe-8')"
                 >
                   @for (o of ops(); track o.value) {
-                    <option [value]="o.value">{{ o.label }}</option>
+                    <option [value]="o.value">{{ opLabel(o.value) }}</option>
                   }
                 </select>
-                <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
                   <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
               <input
                 [type]="type() === 'number' ? 'number' : 'text'"
                 [value]="rule.value"
-                placeholder="Value"
+                [attr.placeholder]="messages().filterValue"
                 (input)="setValue(i, $any($event.target).value)"
                 [class]="filterField"
               />
@@ -114,7 +116,7 @@ const FILTER_FIELD =
                   <svg viewBox="0 0 16 16" fill="none" class="size-3.5" aria-hidden="true">
                     <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                  Remove rule
+                  {{ messages().removeRule }}
                 </button>
               }
               @if (i < draft().rules.length - 1) {
@@ -127,11 +129,11 @@ const FILTER_FIELD =
             (click)="addRule()"
             class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] border border-dashed border-border py-1.5 text-sm text-primary transition-colors hover:bg-primary/5"
           >
-            + Add rule
+            + {{ messages().addRule }}
           </button>
           <div class="flex items-center justify-between pt-0.5">
-            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="doClear(close)">Clear</button>
-            <button bpdmButton size="sm" (click)="applyDraft(close)">Apply</button>
+            <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="doClear(close)">{{ messages().clear }}</button>
+            <button bpdmButton size="sm" (click)="applyDraft(close)">{{ messages().apply }}</button>
           </div>
         </div>
       }
@@ -144,11 +146,22 @@ export class BpdmColumnFilterMenu {
   readonly filter = input<ColumnFilter | undefined>(undefined);
   readonly apply = output<ColumnFilter>();
   readonly clear = output<void>();
+  /** Resolved i18n strings from the parent table. */
+  readonly messages = input<DataTableMessages>(DEFAULT_DATA_TABLE_MESSAGES);
 
   protected readonly cn = cn;
   protected readonly filterField = FILTER_FIELD;
   protected readonly open = signal(false);
   protected readonly ops = computed(() => (this.type() === "number" ? NUM_OPS : TEXT_OPS));
+
+  // numeric "=" / "≠" stay symbols (universal); every other label is translatable
+  protected opLabel(op: FilterOperator): string {
+    if (this.type() === "number") {
+      if (op === "equals") return "=";
+      if (op === "notEquals") return "≠";
+    }
+    return this.messages().operators[op];
+  }
 
   protected readonly draft = signal<ColumnFilter>({ matchMode: "all", rules: [] });
   protected readonly selected = signal<string[]>([]);

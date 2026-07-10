@@ -79,6 +79,113 @@ export type DataTablePagination =
   | CursorPagination;
 
 /**
+ * All user-facing strings the table renders. Pass `messages` to translate them;
+ * anything you omit falls back to the English defaults. The nested `operators`
+ * object and the function-valued keys are replaced wholesale (shallow merge), so
+ * override the whole `operators` object if you translate any operator label.
+ */
+export interface DataTableMessages {
+  search: string;
+  noResults: string;
+  columns: string;
+  resetColumns: string;
+  selectAllRows: string;
+  selectRow: string;
+  expand: string;
+  collapse: string;
+  expandRow: string;
+  collapseRow: string;
+  reorder: string;
+  dragToReorder: string;
+  columnOptions: string;
+  pinLeft: string;
+  pinRight: string;
+  unpin: string;
+  filterColumn: string;
+  matchAll: string;
+  matchAny: string;
+  filterValue: string;
+  addRule: string;
+  removeRule: string;
+  clear: string;
+  apply: string;
+  noValues: string;
+  previousPage: string;
+  nextPage: string;
+  prev: string;
+  next: string;
+  rowsPerPage: string;
+  pagination: string;
+  operators: {
+    contains: string;
+    startsWith: string;
+    endsWith: string;
+    equals: string;
+    notEquals: string;
+    gt: string;
+    gte: string;
+    lt: string;
+    lte: string;
+  };
+  goToPage: (page: number) => string;
+  range: (from: number, to: number, total: number) => string;
+  announceSort: (column: string, direction: "asc" | "desc" | "none") => string;
+  announceResults: (count: number) => string;
+}
+
+export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
+  search: "Search",
+  noResults: "No results",
+  columns: "Columns",
+  resetColumns: "Reset columns",
+  selectAllRows: "Select all rows",
+  selectRow: "Select row",
+  expand: "Expand",
+  collapse: "Collapse",
+  expandRow: "Expand row",
+  collapseRow: "Collapse row",
+  reorder: "Reorder",
+  dragToReorder: "Drag to reorder",
+  columnOptions: "Column options",
+  pinLeft: "Pin left",
+  pinRight: "Pin right",
+  unpin: "Unpin",
+  filterColumn: "Filter column",
+  matchAll: "Match all",
+  matchAny: "Match any",
+  filterValue: "Value",
+  addRule: "Add rule",
+  removeRule: "Remove rule",
+  clear: "Clear",
+  apply: "Apply",
+  noValues: "No values",
+  previousPage: "Previous page",
+  nextPage: "Next page",
+  prev: "Prev",
+  next: "Next",
+  rowsPerPage: "Rows",
+  pagination: "Pagination",
+  operators: {
+    contains: "Contains",
+    startsWith: "Starts with",
+    endsWith: "Ends with",
+    equals: "Equals",
+    notEquals: "Not equals",
+    gt: ">",
+    gte: "≥",
+    lt: "<",
+    lte: "≤",
+  },
+  goToPage: (page) => `Go to page ${page}`,
+  range: (from, to, total) => `Showing ${from}–${to} of ${total}`,
+  announceSort: (column, direction) =>
+    direction === "none"
+      ? `Cleared sort on ${column}`
+      : `Sorted by ${column} ${direction === "asc" ? "ascending" : "descending"}`,
+  announceResults: (count) => `${count} ${count === 1 ? "result" : "results"}`,
+};
+
+/**
  * A single column definition. The table is fully data-driven: you describe the
  * columns once and pass an array of rows — no markup per cell.
  */
@@ -245,6 +352,13 @@ export interface DataTableProps<T> {
   onRowReorder?: (rows: T[]) => void;
   /** Accessible name for the table (maps to `aria-label`). */
   label?: string;
+  /** Translate the table's built-in strings; omitted keys fall back to English. */
+  messages?: Partial<DataTableMessages>;
+  /**
+   * Accessible name for a row's selection control — appended after `selectRow`,
+   * e.g. `"Select row: Ada Lovelace"`. Falls back to a plain `selectRow` label.
+   */
+  getRowLabel?: (row: T, index: number) => string;
   className?: string;
 }
 
@@ -262,9 +376,9 @@ const cellPad = cva("", {
 });
 
 const alignClass = {
-  left: "text-left",
+  left: "text-start",
   center: "text-center",
-  right: "text-right",
+  right: "text-end",
 } as const;
 
 const justifyClass = {
@@ -378,7 +492,7 @@ function TrashGlyph() {
 
 function PinArrow({ side }: { side: "left" | "right" }) {
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5 text-muted-foreground" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden>
       <path
         d={side === "left" ? "M10 4 6 8l4 4" : "M6 4l4 4-4 4"}
         stroke="currentColor"
@@ -397,16 +511,18 @@ const pinMenuItem =
 function ColumnPinMenu({
   pin,
   onPin,
+  t,
 }: {
   pin?: "left" | "right";
   onPin: (p: "left" | "right" | undefined) => void;
+  t: DataTableMessages;
 }) {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
-          aria-label="Column options"
+          aria-label={t.columnOptions}
           onClick={(e) => e.stopPropagation()}
           className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -420,13 +536,13 @@ function ColumnPinMenu({
           className="z-50 min-w-[9rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md outline-none animate-[bpdm-pop-in_120ms_ease-out]"
         >
           <DropdownMenu.Item className={pinMenuItem} disabled={pin === "left"} onSelect={() => onPin("left")}>
-            <PinArrow side="left" /> Pin left
+            <PinArrow side="left" /> {t.pinLeft}
           </DropdownMenu.Item>
           <DropdownMenu.Item className={pinMenuItem} disabled={pin === "right"} onSelect={() => onPin("right")}>
-            <PinArrow side="right" /> Pin right
+            <PinArrow side="right" /> {t.pinRight}
           </DropdownMenu.Item>
           <DropdownMenu.Item className={pinMenuItem} disabled={!pin} onSelect={() => onPin(undefined)}>
-            <span className="size-3.5" /> Unpin
+            <span className="size-3.5" /> {t.unpin}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
@@ -451,20 +567,23 @@ export interface ColumnFilter {
   rules: { op: FilterOperator; value: string }[];
 }
 
-const TEXT_OPS: { value: FilterOperator; label: string }[] = [
-  { value: "contains", label: "Contains" },
-  { value: "startsWith", label: "Starts with" },
-  { value: "endsWith", label: "Ends with" },
-  { value: "equals", label: "Equals" },
-  { value: "notEquals", label: "Not equals" },
+// Operator label sets are derived from `messages` so they translate. Text-mode
+// labels all come from `t.operators`; numeric mode keeps "=" / "≠" as symbols and
+// sources the comparison labels (>, ≥, <, ≤) from `t.operators`.
+const textOps = (t: DataTableMessages): { value: FilterOperator; label: string }[] => [
+  { value: "contains", label: t.operators.contains },
+  { value: "startsWith", label: t.operators.startsWith },
+  { value: "endsWith", label: t.operators.endsWith },
+  { value: "equals", label: t.operators.equals },
+  { value: "notEquals", label: t.operators.notEquals },
 ];
-const NUM_OPS: { value: FilterOperator; label: string }[] = [
+const numOps = (t: DataTableMessages): { value: FilterOperator; label: string }[] => [
   { value: "equals", label: "=" },
   { value: "notEquals", label: "≠" },
-  { value: "gt", label: ">" },
-  { value: "gte", label: "≥" },
-  { value: "lt", label: "<" },
-  { value: "lte", label: "≤" },
+  { value: "gt", label: t.operators.gt },
+  { value: "gte", label: t.operators.gte },
+  { value: "lt", label: t.operators.lt },
+  { value: "lte", label: t.operators.lte },
 ];
 
 function evalRule(
@@ -520,14 +639,14 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={cn(filterField, "cursor-pointer appearance-none pr-8", className)}
+        className={cn(filterField, "cursor-pointer appearance-none pe-8", className)}
       >
         {children}
       </select>
       <svg
         viewBox="0 0 16 16"
         fill="none"
-        className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
         aria-hidden
       >
         <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -542,14 +661,16 @@ function ColumnFilterMenu({
   filter,
   onApply,
   onClear,
+  t,
 }: {
   type: "text" | "number" | "select";
   options?: { value: string; label: string }[];
   filter?: ColumnFilter;
   onApply: (f: ColumnFilter) => void;
   onClear: () => void;
+  t: DataTableMessages;
 }) {
-  const ops = type === "number" ? NUM_OPS : TEXT_OPS;
+  const ops = type === "number" ? numOps(t) : textOps(t);
   const emptyDraft = (): ColumnFilter => ({
     matchMode: "all",
     rules: [{ op: ops[0].value, value: "" }],
@@ -577,7 +698,7 @@ function ColumnFilterMenu({
       trigger={
         <button
           type="button"
-          aria-label="Filter column"
+          aria-label={t.filterColumn}
           onClick={(e) => e.stopPropagation()}
           className={cn(
             "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -612,7 +733,7 @@ function ColumnFilterMenu({
               );
             })}
             {(options ?? []).length === 0 && (
-              <p className="px-2 py-1.5 text-sm text-muted-foreground">No values</p>
+              <p className="px-2 py-1.5 text-sm text-muted-foreground">{t.noValues}</p>
             )}
           </div>
           <div className="flex items-center justify-between border-t border-border pt-2">
@@ -624,7 +745,7 @@ function ColumnFilterMenu({
                 setOpen(false);
               }}
             >
-              Clear
+              {t.clear}
             </Button>
             <Button
               size="sm"
@@ -636,7 +757,7 @@ function ColumnFilterMenu({
                 setOpen(false);
               }}
             >
-              Apply
+              {t.apply}
             </Button>
           </div>
         </div>
@@ -648,8 +769,8 @@ function ColumnFilterMenu({
             onChange={(v) => setDraft((d) => ({ ...d, matchMode: v as "all" | "any" }))}
             className="font-medium"
           >
-            <option value="all">Match all</option>
-            <option value="any">Match any</option>
+            <option value="all">{t.matchAll}</option>
+            <option value="any">{t.matchAny}</option>
           </FilterSelect>
         )}
         {draft.rules.map((rule, i) => (
@@ -673,7 +794,7 @@ function ColumnFilterMenu({
             <input
               type={type === "number" ? "number" : "text"}
               value={rule.value}
-              placeholder="Value"
+              placeholder={t.filterValue}
               onChange={(e) =>
                 setDraft((d) => {
                   const rules = [...d.rules];
@@ -695,7 +816,7 @@ function ColumnFilterMenu({
                 className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] py-1.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
               >
                 <TrashGlyph />
-                Remove rule
+                {t.removeRule}
               </button>
             )}
             {i < draft.rules.length - 1 && (
@@ -713,7 +834,7 @@ function ColumnFilterMenu({
           }
           className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] border border-dashed border-border py-1.5 text-sm text-primary transition-colors hover:bg-primary/5"
         >
-          + Add rule
+          + {t.addRule}
         </button>
         <div className="flex items-center justify-between pt-0.5">
           <Button
@@ -724,7 +845,7 @@ function ColumnFilterMenu({
               setOpen(false);
             }}
           >
-            Clear
+            {t.clear}
           </Button>
           <Button
             size="sm"
@@ -733,7 +854,7 @@ function ColumnFilterMenu({
               setOpen(false);
             }}
           >
-            Apply
+            {t.apply}
           </Button>
         </div>
       </div>
@@ -828,7 +949,7 @@ function ChevronButton({
 }) {
   const path = dir === "left" ? "M9.5 3.5 5 8l4.5 4.5" : "M6.5 3.5 11 8l-4.5 4.5";
   const icon = (
-    <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 rtl:-scale-x-100" fill="none" aria-hidden>
       <path d={path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -851,19 +972,21 @@ function PageSizeSelect({
   value,
   options,
   onChange,
+  t,
 }: {
   value: number;
   options: number[];
   onChange: (n: number) => void;
+  t: DataTableMessages;
 }) {
   return (
     <label className="flex items-center gap-2 text-muted-foreground">
-      <span>Rows</span>
+      <span>{t.rowsPerPage}</span>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background pl-2.5 pr-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background ps-2.5 pe-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {options.map((o) => (
             <option key={o} value={o}>
@@ -874,7 +997,7 @@ function PageSizeSelect({
         <svg
           viewBox="0 0 16 16"
           fill="none"
-          className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          className="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
           aria-hidden
         >
           <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -896,6 +1019,7 @@ function NumberedFooter({
   onSize,
   align,
   attached,
+  t,
 }: {
   page: number;
   pageCount: number;
@@ -908,21 +1032,22 @@ function NumberedFooter({
   onSize?: (n: number) => void;
   align: PaginationAlign;
   attached: boolean;
+  t: DataTableMessages;
 }) {
   return (
     <div className={footerClass(align, attached)}>
       <span className="text-muted-foreground">
-        {total === 0 ? "No results" : `Showing ${rangeFrom}–${rangeTo} of ${total}`}
+        {total === 0 ? t.noResults : t.range(rangeFrom, rangeTo, total)}
       </span>
       <div className="flex items-center gap-3">
         {sizeOptions && onSize && (
-          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} />
+          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} t={t} />
         )}
-        <div className="flex items-center gap-1">
-          <ChevronButton dir="left" label="Previous page" disabled={page <= 1} onClick={() => onPage(page - 1)} />
+        <nav aria-label={t.pagination} className="flex items-center gap-1">
+          <ChevronButton dir="left" label={t.previousPage} disabled={page <= 1} onClick={() => onPage(page - 1)} />
           {pageList(page, pageCount).map((p, i) =>
             p === "ellipsis" ? (
-              <span key={`e${i}`} className="px-1 text-muted-foreground">
+              <span key={`e${i}`} className="px-1 text-muted-foreground" aria-hidden="true">
                 …
               </span>
             ) : (
@@ -931,6 +1056,7 @@ function NumberedFooter({
                 variant={p === page ? "primary" : "secondary"}
                 appearance={p === page ? "solid" : "ghost"}
                 size="sm"
+                aria-label={t.goToPage(p)}
                 aria-current={p === page ? "page" : undefined}
                 onClick={() => onPage(p)}
                 className="min-w-8 px-2.5"
@@ -939,8 +1065,8 @@ function NumberedFooter({
               </Button>
             ),
           )}
-          <ChevronButton dir="right" label="Next page" disabled={page >= pageCount} onClick={() => onPage(page + 1)} />
-        </div>
+          <ChevronButton dir="right" label={t.nextPage} disabled={page >= pageCount} onClick={() => onPage(page + 1)} />
+        </nav>
       </div>
     </div>
   );
@@ -957,6 +1083,7 @@ function CursorFooter({
   sizeOptions,
   pageSize,
   onSize,
+  t,
 }: {
   hasPrev: boolean;
   hasNext: boolean;
@@ -968,6 +1095,7 @@ function CursorFooter({
   sizeOptions?: number[];
   pageSize?: number;
   onSize?: (n: number) => void;
+  t: DataTableMessages;
 }) {
   return (
     <div className={footerClass(align, attached)}>
@@ -976,13 +1104,13 @@ function CursorFooter({
       ) : align === "between" ? (
         <span />
       ) : null}
-      <div className="flex items-center gap-2">
-        <ChevronButton dir="left" label="Previous page" text="Prev" disabled={!hasPrev} onClick={onPrev} />
-        <ChevronButton dir="right" label="Next page" text="Next" disabled={!hasNext} onClick={onNext} />
+      <nav aria-label={t.pagination} className="flex items-center gap-2">
+        <ChevronButton dir="left" label={t.previousPage} text={t.prev} disabled={!hasPrev} onClick={onPrev} />
+        <ChevronButton dir="right" label={t.nextPage} text={t.next} disabled={!hasNext} onClick={onNext} />
         {sizeOptions && onSize && pageSize !== undefined && (
-          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} />
+          <PageSizeSelect value={pageSize} options={sizeOptions} onChange={onSize} t={t} />
         )}
-      </div>
+      </nav>
     </div>
   );
 }
@@ -1049,10 +1177,20 @@ export function DataTable<T>({
   reorderableRows = false,
   onRowReorder,
   label,
+  messages,
+  getRowLabel,
   className,
 }: DataTableProps<T>) {
+  const t = { ...DEFAULT_DATA_TABLE_MESSAGES, ...messages };
   const clickable = typeof onRowClick === "function";
   const isControlled = sort !== undefined;
+
+  // polite screen-reader announcements for sort changes + result-count changes
+  const [liveMessage, setLiveMessage] = React.useState("");
+
+  // stable id per expandable row so the toggle can `aria-controls` its panel
+  const baseId = React.useId();
+  const panelId = (key: React.Key) => `${baseId}-panel-${String(key)}`;
 
   const [internalSort, setInternalSort] = React.useState<DataTableSort[]>(
     defaultSort ?? [],
@@ -1144,6 +1282,10 @@ export function DataTable<T>({
     const current = sortState.find((s) => s.id === colId)?.dir;
     const dir = nextDirection(current);
 
+    const col = colById.get(colId);
+    const columnLabel = typeof col?.header === "string" ? col.header : colId;
+    setLiveMessage(t.announceSort(columnLabel, dir ?? "none"));
+
     if (multiSort && additive) {
       const without = sortState.filter((s) => s.id !== colId);
       applySort(dir ? [...without, { id: colId, dir }] : without);
@@ -1225,6 +1367,18 @@ export function DataTable<T>({
     });
   }, [dataOrdered, query, filters, effectiveColumns, colById, isQueryControlled, isFiltersControlled]);
 
+  // announce the filtered/searched result count when it changes (skip first mount)
+  const filteredCount = filteredData.length;
+  const didMountRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    setLiveMessage(t.announceResults(filteredCount));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredCount]);
+
   const sortedRows = React.useMemo(() => {
     if (isControlled || sortState.length === 0) return filteredData;
     // resolve the active sort columns once
@@ -1299,6 +1453,7 @@ export function DataTable<T>({
         onSize={pg.pageSizeOptions ? setSize : undefined}
         align={pg.align ?? "between"}
         attached={frame}
+        t={t}
       />
     );
   } else if (pMode === "server") {
@@ -1317,6 +1472,7 @@ export function DataTable<T>({
         onSize={pg.onPageSizeChange}
         align={pg.align ?? "between"}
         attached={frame}
+        t={t}
       />
     );
   } else if (pMode === "cursor") {
@@ -1333,6 +1489,7 @@ export function DataTable<T>({
         sizeOptions={pg.pageSizeOptions}
         pageSize={pg.pageSize}
         onSize={pg.onPageSizeChange}
+        t={t}
       />
     );
   }
@@ -1523,8 +1680,8 @@ export function DataTable<T>({
 
   // sticky positioning for a data column (used by both th and td)
   const pinStyleFor = (col: DataTableColumn<T>): React.CSSProperties => {
-    if (col.pin === "left") return { position: "sticky", left: pinPx.left[col.id] };
-    if (col.pin === "right") return { position: "sticky", right: pinPx.right[col.id] };
+    if (col.pin === "left") return { position: "sticky", insetInlineStart: pinPx.left[col.id] };
+    if (col.pin === "right") return { position: "sticky", insetInlineEnd: pinPx.right[col.id] };
     return {};
   };
 
@@ -1533,21 +1690,35 @@ export function DataTable<T>({
     .filter((c) => !hiddenIds.has(c.id))
     .map((c) => c.id);
 
-  // distinct values for a "select" filter (derived from data unless provided)
-  const getFilterOptions = (col: DataTableColumn<T>) => {
-    const seen = new Set<string>();
-    const out: { value: string; label: string }[] = [];
-    for (const row of data) {
-      const v = getSortValue(col, row);
-      if (v == null || v === "") continue;
-      const s = String(v);
-      if (!seen.has(s)) {
-        seen.add(s);
-        out.push({ value: s, label: s });
+  // distinct values for every "select" filter (derived from data unless the
+  // column provides its own `filterOptions`). Precomputed once per data change
+  // instead of re-scanning all rows on every render inside the header map.
+  const selectFilterCols = React.useMemo(
+    () =>
+      effectiveColumns.filter(
+        (c) => c.filterable && c.filterType === "select" && !c.filterOptions,
+      ),
+    [effectiveColumns],
+  );
+  const filterOptionsMap = React.useMemo(() => {
+    const map = new Map<string, { value: string; label: string }[]>();
+    for (const col of selectFilterCols) {
+      const seen = new Set<string>();
+      const out: { value: string; label: string }[] = [];
+      for (const row of data) {
+        const v = getSortValue(col, row);
+        if (v == null || v === "") continue;
+        const s = String(v);
+        if (!seen.has(s)) {
+          seen.add(s);
+          out.push({ value: s, label: s });
+        }
       }
+      out.sort((a, b) => a.label.localeCompare(b.label));
+      map.set(col.id, out);
     }
-    return out.sort((a, b) => a.label.localeCompare(b.label));
-  };
+    return map;
+  }, [data, selectFilterCols]);
 
   const isMobile = useMediaQuery("(max-width: 639px)", responsive);
   const renderCell = (col: DataTableColumn<T>, row: T, i: number) =>
@@ -1566,6 +1737,9 @@ export function DataTable<T>({
 
   return (
     <div className="w-full">
+      <div aria-live="polite" role="status" className="sr-only">
+        {liveMessage}
+      </div>
       {showToolbar && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -1580,7 +1754,7 @@ export function DataTable<T>({
                 }}
               >
                 <FunnelGlyph />
-                Clear
+                {t.clear}
               </Button>
             )}
             {orderChanged && (
@@ -1592,7 +1766,7 @@ export function DataTable<T>({
                   onColumnOrderChange?.([]);
                 }}
               >
-                Reset columns
+                {t.resetColumns}
               </Button>
             )}
           </div>
@@ -1604,7 +1778,7 @@ export function DataTable<T>({
                   maxDisplay={0}
                   selectAll={false}
                   searchable
-                  placeholder="Columns"
+                  placeholder={t.columns}
                   options={toggleable.map((c) => ({
                     value: c.id,
                     label: typeof c.header === "string" ? c.header : c.id,
@@ -1622,14 +1796,14 @@ export function DataTable<T>({
             )}
             {searchable && (
               <div className="relative">
-                <SearchGlyph className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <SearchGlyph className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={searchPlaceholder}
-                  aria-label="Search"
-                  className="h-9 w-56 rounded-[var(--radius)] border border-input bg-background pl-8 pr-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                  aria-label={t.search}
+                  className="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
             )}
@@ -1648,6 +1822,9 @@ export function DataTable<T>({
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
               const canExpand = expandable && (!rowExpandable || rowExpandable(row));
+              const rowSelectLabel = getRowLabel
+                ? `${t.selectRow}: ${getRowLabel(row, rowIndex)}`
+                : t.selectRow;
               return (
                 <div
                   key={key}
@@ -1669,9 +1846,9 @@ export function DataTable<T>({
                     >
                       {selectable ? (
                         selectionMode === "single" ? (
-                          <RowRadio checked={selected} onSelect={() => toggleRow(key)} label="Select row" />
+                          <RowRadio checked={selected} onSelect={() => toggleRow(key)} label={rowSelectLabel} />
                         ) : (
-                          <Checkbox size="sm" aria-label="Select row" checked={selected} onCheckedChange={() => toggleRow(key)} />
+                          <Checkbox size="sm" aria-label={rowSelectLabel} checked={selected} onCheckedChange={() => toggleRow(key)} />
                         )
                       ) : (
                         <span />
@@ -1679,8 +1856,9 @@ export function DataTable<T>({
                       {canExpand && (
                         <button
                           type="button"
-                          aria-label={expanded ? "Collapse" : "Expand"}
+                          aria-label={expanded ? t.collapse : t.expand}
                           aria-expanded={expanded}
+                          aria-controls={panelId(key)}
                           onClick={() => toggleExpand(key)}
                           className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
@@ -1697,14 +1875,18 @@ export function DataTable<T>({
                         <dt className="truncate text-muted-foreground">
                           {col.header ?? col.id}
                         </dt>
-                        <dd className={cn("flex min-w-0 items-center justify-end gap-2 text-right", col.numeric && "tabular-nums")}>
+                        <dd className={cn("flex min-w-0 items-center justify-end gap-2 text-end", col.numeric && "tabular-nums")}>
                           {renderCell(col, row, rowIndex)}
                         </dd>
                       </React.Fragment>
                     ))}
                   </dl>
                   {expanded && (
-                    <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
+                    <div
+                      id={panelId(key)}
+                      role="region"
+                      className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]"
+                    >
                       <div className="overflow-hidden">
                         <div className="mt-3 border-t border-border pt-3">
                           {renderExpanded!(row, rowIndex)}
@@ -1755,7 +1937,7 @@ export function DataTable<T>({
             {reorderableRows && (
               <th
                 scope="col"
-                aria-label="Reorder"
+                aria-label={t.reorder}
                 className={cn(
                   cellPad({ size }),
                   "w-[1%]",
@@ -1769,10 +1951,10 @@ export function DataTable<T>({
             {expandable && (
               <th
                 scope="col"
-                aria-label="Expand"
+                aria-label={t.expand}
                 data-pin-id="__lead_expand"
                 style={{
-                  ...(hasLeftPin ? { position: "sticky", left: expanderLeft } : {}),
+                  ...(hasLeftPin ? { position: "sticky", insetInlineStart: expanderLeft } : {}),
                   ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                 }}
                 className={cn(
@@ -1780,7 +1962,7 @@ export function DataTable<T>({
                   "w-[1%]",
                   frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
                   "shadow-[inset_0_-1px_0_var(--border)]",
-                  bordered && "border-r border-border",
+                  bordered && "border-e border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
                 )}
@@ -1791,7 +1973,7 @@ export function DataTable<T>({
                 scope="col"
                 data-pin-id="__lead_select"
                 style={{
-                  ...(hasLeftPin ? { position: "sticky", left: selectionLeft } : {}),
+                  ...(hasLeftPin ? { position: "sticky", insetInlineStart: selectionLeft } : {}),
                   ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                 }}
                 className={cn(
@@ -1799,7 +1981,7 @@ export function DataTable<T>({
                   "w-[1%]",
                   "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
                   frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
-                  bordered && "border-r border-border",
+                  bordered && "border-e border-border",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
                 )}
@@ -1808,7 +1990,7 @@ export function DataTable<T>({
                   <div className="flex justify-center">
                     <Checkbox
                       size="sm"
-                      aria-label="Select all rows"
+                      aria-label={t.selectAllRows}
                       checked={headerChecked}
                       onCheckedChange={toggleAll}
                     />
@@ -1872,10 +2054,10 @@ export function DataTable<T>({
                     frame || col.pin || stickyHeader ? "bg-card" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
                     "shadow-[inset_0_-1px_0_var(--border)]",
-                    bordered && "border-r border-border/55 last:border-r-0",
+                    bordered && "border-e border-border/55 last:border-e-0",
                     col.pin ? "z-20" : stickyHeader && "z-10",
-                    col.id === lastLeftId && "border-r border-border",
-                    col.id === firstRightId && "border-l border-border",
+                    col.id === lastLeftId && "border-e border-border",
+                    col.id === firstRightId && "border-s border-border",
                     headerClassName,
                     col.className,
                   )}
@@ -1911,7 +2093,7 @@ export function DataTable<T>({
                         type={col.filterType ?? (col.numeric ? "number" : "text")}
                         options={
                           col.filterType === "select"
-                            ? col.filterOptions ?? getFilterOptions(col)
+                            ? col.filterOptions ?? filterOptionsMap.get(col.id) ?? []
                             : undefined
                         }
                         filter={filters[col.id]}
@@ -1923,10 +2105,11 @@ export function DataTable<T>({
                             return next;
                           })
                         }
+                        t={t}
                       />
                     )}
                     {pinnable && !col.disablePinning && (
-                      <ColumnPinMenu pin={col.pin} onPin={(p) => setPin(col.id, p)} />
+                      <ColumnPinMenu pin={col.pin} onPin={(p) => setPin(col.id, p)} t={t} />
                     )}
                   </div>
                 </th>
@@ -1965,6 +2148,9 @@ export function DataTable<T>({
               const selected = selectedSet.has(key);
               const expanded = expandable && expandedSet.has(key);
               const canExpand = expandable && (!rowExpandable || rowExpandable(row));
+              const rowSelectLabel = getRowLabel
+                ? `${t.selectRow}: ${getRowLabel(row, rowIndex)}`
+                : t.selectRow;
               return (
               <React.Fragment key={key}>
               <tr
@@ -2016,7 +2202,8 @@ export function DataTable<T>({
                   // bpdm signature: a warm amber focus language — soft amber hover,
                   // and selected rows get an amber tint + a left accent bar
                   hoverable && "hover:bg-primary/[0.04]",
-                  selected && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)]",
+                  selected &&
+                    "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
                   hoverable && selected && "hover:bg-primary/[0.14]",
                   // insertion line while reordering rows
                   dropTarget?.key === key &&
@@ -2034,7 +2221,7 @@ export function DataTable<T>({
               >
                 {reorderableRows && (
                   <td
-                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-r border-border", cellClassName)}
+                    className={cn(cellPad({ size }), "w-[1%]", bordered && "border-e border-border", cellClassName)}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div
@@ -2044,7 +2231,7 @@ export function DataTable<T>({
                         setDragRowKey(null);
                         setDropTarget(null);
                       }}
-                      aria-label="Drag to reorder"
+                      aria-label={t.dragToReorder}
                       className={cn(
                         "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing",
                         dragRowKey === key && "opacity-40",
@@ -2058,13 +2245,13 @@ export function DataTable<T>({
                   <td
                     style={
                       hasLeftPin
-                        ? { position: "sticky", left: expanderLeft }
+                        ? { position: "sticky", insetInlineStart: expanderLeft }
                         : undefined
                     }
                     className={cn(
                       cellPad({ size }),
                       "w-[1%]",
-                      bordered && "border-r border-border",
+                      bordered && "border-e border-border",
                       hasLeftPin && `z-10 ${pinnedBg}`,
                       cellClassName,
                     )}
@@ -2073,8 +2260,9 @@ export function DataTable<T>({
                     {canExpand && (
                       <button
                         type="button"
-                        aria-label={expanded ? "Collapse row" : "Expand row"}
+                        aria-label={expanded ? t.collapseRow : t.expandRow}
                         aria-expanded={expanded}
+                        aria-controls={panelId(key)}
                         onClick={() => toggleExpand(key)}
                         className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
@@ -2094,13 +2282,13 @@ export function DataTable<T>({
                   <td
                     style={
                       hasLeftPin
-                        ? { position: "sticky", left: selectionLeft }
+                        ? { position: "sticky", insetInlineStart: selectionLeft }
                         : undefined
                     }
                     className={cn(
                       cellPad({ size }),
                       "w-[1%]",
-                      bordered && "border-r border-border",
+                      bordered && "border-e border-border",
                       hasLeftPin && `z-10 ${pinnedBg}`,
                       cellClassName,
                     )}
@@ -2111,12 +2299,12 @@ export function DataTable<T>({
                         <RowRadio
                           checked={selected}
                           onSelect={() => toggleRow(key)}
-                          label="Select row"
+                          label={rowSelectLabel}
                         />
                       ) : (
                         <Checkbox
                           size="sm"
-                          aria-label="Select row"
+                          aria-label={rowSelectLabel}
                           checked={selected}
                           onCheckedChange={() => toggleRow(key)}
                         />
@@ -2134,10 +2322,10 @@ export function DataTable<T>({
                         cellPad({ size }),
                         alignClass[align],
                         col.numeric && "tabular-nums",
-                        bordered && "border-r border-border/55 last:border-r-0",
+                        bordered && "border-e border-border/55 last:border-e-0",
                         col.pin && `z-10 ${pinnedBg}`,
-                        col.id === lastLeftId && "border-r border-border",
-                        col.id === firstRightId && "border-l border-border",
+                        col.id === lastLeftId && "border-e border-border",
+                        col.id === firstRightId && "border-s border-border",
                         cellClassName,
                         col.className,
                       )}
@@ -2152,7 +2340,7 @@ export function DataTable<T>({
                 })}
               </tr>
               {expanded && (
-                <tr className={cn("bg-muted/30", divided && "border-t border-border")}>
+                <tr id={panelId(key)} role="region" className={cn("bg-muted/30", divided && "border-t border-border")}>
                   <td colSpan={colCount} className="p-0">
                     {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
                     <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
@@ -2184,13 +2372,13 @@ export function DataTable<T>({
                 <td
                   style={
                     hasLeftPin
-                      ? { position: "sticky", left: pinPx.left["__lead_expand"] }
+                      ? { position: "sticky", insetInlineStart: pinPx.left["__lead_expand"] }
                       : undefined
                   }
                   className={cn(
                     cellPad({ size }),
                     "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
-                    bordered && "border-r border-border",
+                    bordered && "border-e border-border",
                     hasLeftPin ? "sticky z-20" : "sticky",
                     "bottom-0",
                   )}
@@ -2200,13 +2388,13 @@ export function DataTable<T>({
                 <td
                   style={
                     hasLeftPin
-                      ? { position: "sticky", left: pinPx.left["__lead_select"] }
+                      ? { position: "sticky", insetInlineStart: pinPx.left["__lead_select"] }
                       : undefined
                   }
                   className={cn(
                     cellPad({ size }),
                     "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
-                    bordered && "border-r border-border",
+                    bordered && "border-e border-border",
                     "sticky bottom-0",
                     hasLeftPin && "z-20",
                   )}
@@ -2226,10 +2414,10 @@ export function DataTable<T>({
                       col.numeric && "tabular-nums",
                       "sticky bottom-0 bg-muted font-medium text-foreground",
                       "shadow-[inset_0_1px_0_var(--border)]",
-                      bordered && "border-r border-border/55 last:border-r-0",
+                      bordered && "border-e border-border/55 last:border-e-0",
                       col.pin ? "z-20" : "z-10",
-                      col.id === lastLeftId && "border-r border-border",
-                      col.id === firstRightId && "border-l border-border",
+                      col.id === lastLeftId && "border-e border-border",
+                      col.id === firstRightId && "border-s border-border",
                       col.className,
                     )}
                   >

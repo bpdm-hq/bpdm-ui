@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { type Key, type ReactNode, useState } from 'react';
 import {
   DataTable,
   type DataTableColumn,
@@ -471,8 +471,8 @@ export function DataTableSortDemo() {
 }
 
 export function DataTableSelectionDemo() {
-  const [multi, setMulti] = useState<React.Key[]>([]);
-  const [single, setSingle] = useState<React.Key[]>([]);
+  const [multi, setMulti] = useState<Key[]>([]);
+  const [single, setSingle] = useState<Key[]>([]);
   return (
     <Tabs
       className="w-full self-start"

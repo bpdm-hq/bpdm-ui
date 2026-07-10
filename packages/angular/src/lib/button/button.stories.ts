@@ -417,3 +417,70 @@ export class ButtonPillComponent {}`,
     },
   },
 };
+
+/** Loading: a spinner + `aria-busy`; interaction is blocked while busy. */
+export const Loading: Story = {
+  tags: ["!dev"],
+  render: () => ({
+    template: `<div class="flex flex-wrap items-center gap-3">
+  <button bpdmButton loading>Save changes</button>
+  <button bpdmButton loading variant="secondary" appearance="outline">Please wait</button>
+  <button bpdmButton loading size="icon" aria-label="Loading"></button>
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, signal } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-button-loading',
+  imports: [BpdmButton],
+  template: \`
+    <button bpdmButton [loading]="saving()" (click)="save()">
+      {{ saving() ? 'Saving…' : 'Save changes' }}
+    </button>
+  \`,
+})
+export class ButtonLoadingComponent {
+  readonly saving = signal(false);
+  save() {
+    this.saving.set(true);
+    setTimeout(() => this.saving.set(false), 1600);
+  }
+}`,
+      },
+    },
+  },
+};
+
+/** Disabled: native `disabled` — dimmed, unfocusable, non-interactive. */
+export const Disabled: Story = {
+  tags: ["!dev"],
+  render: () => ({
+    template: `<div class="flex flex-wrap items-center gap-3">
+  <button bpdmButton disabled>Disabled</button>
+  <button bpdmButton disabled appearance="outline">Disabled</button>
+  <button bpdmButton disabled variant="secondary">Disabled</button>
+</div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-button-disabled',
+  imports: [BpdmButton],
+  template: \`
+    <button bpdmButton disabled>Disabled</button>
+    <button bpdmButton disabled appearance="outline">Disabled</button>
+  \`,
+})
+export class ButtonDisabledComponent {}`,
+      },
+    },
+  },
+};

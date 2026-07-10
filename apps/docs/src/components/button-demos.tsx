@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps, ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import {
   ArrowRight,
   Bell,
@@ -165,6 +165,25 @@ export function ButtonDisabledDemo() {
       <Button disabled appearance="outline">
         Disabled
       </Button>
+    </Row>
+  );
+}
+
+export function ButtonLoadingDemo() {
+  const [saving, setSaving] = useState(false);
+  const save = () => {
+    setSaving(true);
+    setTimeout(() => setSaving(false), 1600);
+  };
+  return (
+    <Row>
+      <Button loading={saving} onClick={save}>
+        {saving ? 'Saving…' : 'Save changes'}
+      </Button>
+      <Button loading variant="secondary" appearance="outline">
+        Please wait
+      </Button>
+      <Button loading size="icon" aria-label="Loading" />
     </Row>
   );
 }

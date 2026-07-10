@@ -148,6 +148,193 @@ export class MembersTable {
   </Tab>
 </Tabs>
 
+## Sizes
+
+Set the `size` prop for cell density — `sm`, `md` (default) or `lg`. The preview
+switches between them with our own [`Tabs`](/docs/panel/tabs) — a neat way to
+compare densities, and a small example of composing two components.
+
+<Preview>
+  <DataTableSizesDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-sizes.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Tabs } from '@bpdm/ui/tabs';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function SizedTables() {
+  return (
+    <Tabs
+      defaultValue="md"
+      items={[
+        { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" /> },
+        { value: 'md', label: 'Medium', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="md" /> },
+        { value: 'lg', label: 'Large', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="lg" /> },
+      ]}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-sizes.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'sized-tables',
+  imports: [BpdmDataTable, BpdmTabs],
+  templateUrl: './sized-tables.html',
+})
+export class SizedTables {
+  readonly sm = viewChild.required<TemplateRef<unknown>>('sm');
+  readonly md = viewChild.required<TemplateRef<unknown>>('md');
+  readonly lg = viewChild.required<TemplateRef<unknown>>('lg');
+
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+
+  readonly tabs = computed<TabItem[]>(() => [
+    { value: 'sm', label: 'Small', content: this.sm() },
+    { value: 'md', label: 'Medium', content: this.md() },
+    { value: 'lg', label: 'Large', content: this.lg() },
+  ]);
+}
+```
+
+```html title="sized-tables.html"
+<bpdm-tabs [items]="tabs()" defaultValue="md" />
+
+<ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
+<ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
+<ng-template #lg><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="lg" /></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Borders & striping
+
+The table is **borderless by default** — just a clean header rule and soft row
+dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
+into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
+The preview toggles the three looks with our `Tabs`.
+
+<Preview>
+  <DataTableStripedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-borders.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+import { Tabs } from '@bpdm/ui/tabs';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name },
+  { id: 'role', header: 'Role', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+];
+
+export function BorderTables() {
+  return (
+    <Tabs
+      defaultValue="borderless"
+      items={[
+        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} /> },
+        { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped /> },
+        { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered /> },
+      ]}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-borders.ts"
+import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
+import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'border-tables',
+  imports: [BpdmDataTable, BpdmTabs],
+  templateUrl: './border-tables.html',
+})
+export class BorderTables {
+  readonly borderless = viewChild.required<TemplateRef<unknown>>('borderless');
+  readonly striped = viewChild.required<TemplateRef<unknown>>('striped');
+  readonly outlined = viewChild.required<TemplateRef<unknown>>('outlined');
+
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    { id: 'role', header: 'Role', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
+  ];
+
+  readonly tabs = computed<TabItem[]>(() => [
+    { value: 'borderless', label: 'Borderless', content: this.borderless() },
+    { value: 'striped', label: 'Striped', content: this.striped() },
+    { value: 'outlined', label: 'Outlined', content: this.outlined() },
+  ]);
+}
+```
+
+```html title="border-tables.html"
+<bpdm-tabs [items]="tabs()" defaultValue="borderless" />
+
+<ng-template #borderless><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" /></ng-template>
+<ng-template #striped><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped /></ng-template>
+<ng-template #outlined><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered /></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
 ## Sorting
 
 Mark a column `sortable`; clicking its header cycles asc → desc → none, with a live
@@ -801,7 +988,7 @@ toolbar (bulk actions, a "clear" button, …).
   <Tab value="React">
 
 ```tsx title="data-table-selection.tsx"
-import { useState } from 'react';
+import { useState, type Key } from 'react';
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
 
 type Member = { id: string; name: string; role: string; tasks: number };
@@ -817,7 +1004,7 @@ const columns: DataTableColumn<Member>[] = [
 ];
 
 export function SelectableTable() {
-  const [keys, setKeys] = useState<React.Key[]>([]);
+  const [keys, setKeys] = useState<Key[]>([]);
   return (
     <>
       {keys.length > 0 && <p>{keys.length} selected</p>}
@@ -1751,193 +1938,6 @@ export class CustomStyledTable {
   </Tab>
 </Tabs>
 
-## Borders & striping
-
-The table is **borderless by default** — just a clean header rule and soft row
-dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
-into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
-The preview toggles the three looks with our `Tabs`.
-
-<Preview>
-  <DataTableStripedDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-borders.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-import { Tabs } from '@bpdm/ui/tabs';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function BorderTables() {
-  return (
-    <Tabs
-      defaultValue="borderless"
-      items={[
-        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} /> },
-        { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped /> },
-        { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered /> },
-      ]}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-borders.ts"
-import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
-import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'border-tables',
-  imports: [BpdmDataTable, BpdmTabs],
-  templateUrl: './border-tables.html',
-})
-export class BorderTables {
-  readonly borderless = viewChild.required<TemplateRef<unknown>>('borderless');
-  readonly striped = viewChild.required<TemplateRef<unknown>>('striped');
-  readonly outlined = viewChild.required<TemplateRef<unknown>>('outlined');
-
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-
-  readonly tabs = computed<TabItem[]>(() => [
-    { value: 'borderless', label: 'Borderless', content: this.borderless() },
-    { value: 'striped', label: 'Striped', content: this.striped() },
-    { value: 'outlined', label: 'Outlined', content: this.outlined() },
-  ]);
-}
-```
-
-```html title="border-tables.html"
-<bpdm-tabs [items]="tabs()" defaultValue="borderless" />
-
-<ng-template #borderless><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" /></ng-template>
-<ng-template #striped><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped /></ng-template>
-<ng-template #outlined><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered /></ng-template>
-```
-
-  </Tab>
-</Tabs>
-
-## Sizes
-
-Set the `size` prop for cell density — `sm`, `md` (default) or `lg`. The preview
-switches between them with our own [`Tabs`](/docs/panel/tabs) — a neat way to
-compare densities, and a small example of composing two components.
-
-<Preview>
-  <DataTableSizesDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="data-table-sizes.tsx"
-import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
-import { Tabs } from '@bpdm/ui/tabs';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-const members: Member[] = [
-  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
-  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-];
-const columns: DataTableColumn<Member>[] = [
-  { id: 'name', header: 'Name', accessor: (r) => r.name },
-  { id: 'role', header: 'Role', accessor: (r) => r.role },
-  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-];
-
-export function SizedTables() {
-  return (
-    <Tabs
-      defaultValue="md"
-      items={[
-        { value: 'sm', label: 'Small', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="sm" /> },
-        { value: 'md', label: 'Medium', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="md" /> },
-        { value: 'lg', label: 'Large', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} size="lg" /> },
-      ]}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="data-table-sizes.ts"
-import { Component, viewChild, computed, type TemplateRef } from '@angular/core';
-import { BpdmDataTable, BpdmTabs, type DataTableColumn, type TabItem } from '@bpdm/ng';
-
-type Member = { id: string; name: string; role: string; tasks: number };
-
-@Component({
-  selector: 'sized-tables',
-  imports: [BpdmDataTable, BpdmTabs],
-  templateUrl: './sized-tables.html',
-})
-export class SizedTables {
-  readonly sm = viewChild.required<TemplateRef<unknown>>('sm');
-  readonly md = viewChild.required<TemplateRef<unknown>>('md');
-  readonly lg = viewChild.required<TemplateRef<unknown>>('lg');
-
-  readonly rowKey = (r: Member) => r.id;
-  readonly members: Member[] = [
-    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
-    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
-    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
-  ];
-  readonly columns: DataTableColumn<Member>[] = [
-    { id: 'name', header: 'Name', accessor: (r) => r.name },
-    { id: 'role', header: 'Role', accessor: (r) => r.role },
-    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
-  ];
-
-  readonly tabs = computed<TabItem[]>(() => [
-    { value: 'sm', label: 'Small', content: this.sm() },
-    { value: 'md', label: 'Medium', content: this.md() },
-    { value: 'lg', label: 'Large', content: this.lg() },
-  ]);
-}
-```
-
-```html title="sized-tables.html"
-<bpdm-tabs [items]="tabs()" defaultValue="md" />
-
-<ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
-<ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
-<ng-template #lg><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="lg" /></ng-template>
-```
-
-  </Tab>
-</Tabs>
-
 ## Virtualized
 
 For very large datasets, `virtualized` renders only the visible rows (uses
@@ -2181,8 +2181,16 @@ export class ResponsiveTable {
 
 <ng-template #actionsCell let-row>
   <div class="flex justify-end gap-0.5">
-    <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" [attr.aria-label]="'Edit ' + row.name"><!-- edit icon --></button>
-    <button bpdmButton variant="destructive" appearance="ghost" size="iconSm" [attr.aria-label]="'Remove ' + row.name"><!-- trash icon --></button>
+    <button bpdmButton variant="secondary" appearance="ghost" size="iconSm" [attr.aria-label]="'Edit ' + row.name">
+      <svg viewBox="0 0 16 16" class="size-4" fill="none" aria-hidden="true">
+        <path d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button bpdmButton variant="destructive" appearance="ghost" size="iconSm" [attr.aria-label]="'Remove ' + row.name">
+      <svg viewBox="0 0 16 16" class="size-4" fill="none" aria-hidden="true">
+        <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
   </div>
 </ng-template>
 ```
@@ -2256,34 +2264,127 @@ export class EmptyTable {
 
 ### `DataTable` / `<bpdm-data-table>`
 
+The API is identical in both frameworks. React callbacks (`onXxx`) map to Angular
+outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific name.
+
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `columns` | `DataTableColumn<T>[]` | — | **Required.** Column definitions. |
 | `data` | `T[]` | — | **Required.** Row data. |
 | `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
-| `size` | `sm \| md \| lg` | `md` | Cell density. |
-| `striped` / `bordered` / `frame` / `divided` | `boolean` | `false` / `false` / `false` / `true` | Zebra rows / column gridlines / outlined card / row dividers. Borderless by default. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Cell density. |
+| `striped` | `boolean` | `false` | Zebra striping on alternate rows. |
+| `bordered` | `boolean` | `false` | Vertical dividers between columns. |
+| `frame` | `boolean` | `false` | Outer border + rounded container (outlined card). |
+| `divided` | `boolean` | `true` | Horizontal dividers between rows. |
 | `elevated` | `boolean` | `true` | Soft drop shadow so the table gently floats. Set `false` for a flat, flush table (e.g. nested inside your own card). |
 | `hoverable` | `boolean` | `true` | Highlight the hovered row. |
-| `headerClassName` / `cellClassName` / `rowClassName` | `string` / `string` / `string \| (row, i) => string` | — | Custom styling: header cells / body cells / per-row (conditional). See [Custom styling](#custom-styling). |
-| `stickyHeader` + `maxHeight` | `boolean` + `number \| string` | — | Pin the header while the body scrolls. |
-| `onRowClick` | `(row, i) => void` | — | Make rows clickable. |
-| `multiSort` / `sort` / `defaultSort` / `onSortChange` | — | — | Sorting (per-column `sortable`). |
-| `selectable` / `selectionMode` / `selectedKeys` / `onSelectionChange` | — | — | Row selection (`multiple` \| `single`). Angular `(selectionChange)` emits `{ keys, rows }`. |
-| `pagination` | `client \| server \| cursor` | — | Paging config. |
-| `renderExpanded` (Angular `expandedTemplate`) / `expandMode` / `expandedKeys` | — | — | Expandable detail rows. |
-| `pinnable` / `columnToggle` / `searchable` / `responsive` / `virtualized` | `boolean` | — | Opt-in features. |
-| `filters` / `onFiltersChange` | `Record<string, ColumnFilter>` / `(filters) => void` | — | Controlled column filters — set for **server-side** filtering (table stops filtering itself). Angular `[filters]` + `(filtersChange)`. |
-| `searchValue` / `onSearchChange` | `string` / `(value) => void` | — | Controlled global search — set for **server-side** search. Angular `[searchValue]` + `(searchChange)`. |
-| `reorderableColumns` / `reorderableRows` | `boolean` | — | Drag to reorder columns / rows. |
-| `emptyContent` | `ReactNode` (Angular `string`) | `No data` | Empty-state content. |
+| `headerClassName` | `string` | — | Classes on every header cell. |
+| `cellClassName` | `string` | — | Classes on every body cell. |
+| `rowClassName` | `string \| (row, i) => string` | — | Per-row classes — string or a function for conditional styling. See [Custom styling](#custom-styling). |
+| `rowSpacing` | `number` | — | Vertical gap (px) between rows — renders rows as separated, rounded filled blocks (no dividers). |
+| `stickyHeader` | `boolean` | `false` | Keep the header visible while the body scrolls (pair with `maxHeight`). |
+| `maxHeight` | `number \| string` | — | Cap the height → the body scrolls vertically inside the table. |
+| `emptyContent` | `ReactNode` (Angular `string`) | `'No data'` | Shown when `data` is empty. |
+| `onRowClick` | `(row, i) => void` | — | Make rows clickable (adds pointer cursor + hover). |
+| `label` | `string` | — | Accessible name for the table (maps to `aria-label`). |
+| `multiSort` | `boolean` | `false` | Allow sorting by several columns (Shift+click appends). |
+| `sort` | `DataTableSort[]` | — | Controlled sort state (server-side ordering). |
+| `defaultSort` | `DataTableSort[]` | — | Initial sort (uncontrolled). |
+| `onSortChange` | `(sort) => void` | — | Fired when the sort changes. Angular `(sortChange)`. |
+| `selectable` | `boolean` | `false` | Show a selection column. |
+| `selectionMode` | `'multiple' \| 'single'` | `'multiple'` | Checkboxes + select-all, or radios. |
+| `selectedKeys` | `Key[]` | — | Controlled selected row keys. |
+| `defaultSelectedKeys` | `Key[]` | — | Initial selection (uncontrolled). |
+| `onSelectionChange` | `(keys, rows) => void` | — | Fired when the selection changes. Angular `(selectionChange)` emits `{ keys, rows }`. |
+| `pagination` | `ClientPagination \| ServerPagination \| CursorPagination` | — | Paging config — see [below](#pagination-config). |
+| `renderExpanded` | `(row, i) => ReactNode` | — | Render an expandable detail panel under a row. Angular: `[expandedTemplate]` (an `<ng-template>`). |
+| `expandMode` | `'single' \| 'multiple'` | `'multiple'` | Only one row open at a time, or many. |
+| `rowExpandable` | `(row) => boolean` | — | Hide the expander for rows where this returns `false`. |
+| `expandedKeys` | `Key[]` | — | Controlled expanded row keys. |
+| `defaultExpandedKeys` | `Key[]` | — | Initial expanded rows (uncontrolled). |
+| `onExpandedChange` | `(keys) => void` | — | Fired when the expanded set changes. Angular `(expandedChange)`. |
+| `pinnable` | `boolean` | `false` | Per-column header menu to pin/unpin at runtime. |
+| `onColumnPinChange` | `(id, pin) => void` | — | Fired when a column is pinned/unpinned. Angular `(columnPinChange)` emits `{ id, pin }`. |
+| `columnToggle` | `boolean` | `false` | Show a "Columns" control to show/hide columns. |
+| `filters` | `Record<string, ColumnFilter>` | — | Controlled column filters — set for **server-side** filtering (table stops filtering itself). Angular `[filters]`. |
+| `onFiltersChange` | `(filters) => void` | — | Fired when a column filter changes. Angular `(filtersChange)`. |
+| `searchable` | `boolean` | `false` | Show a global search box across all columns. |
+| `searchPlaceholder` | `string` | `'Search…'` | Placeholder text for the search box. |
+| `searchValue` | `string` | — | Controlled search value — set for **server-side** search. Angular `[searchValue]`. |
+| `onSearchChange` | `(value) => void` | — | Fired when the search value changes. Angular `(searchChange)`. |
+| `responsive` | `boolean` | `false` | On narrow screens, stack each row into a label/value card. |
+| `virtualized` | `boolean` | `false` | Render only visible rows (uses `maxHeight`, default 440); ignores pagination. |
+| `reorderableColumns` | `boolean` | `false` | Let users drag column headers to reorder columns. |
+| `onColumnOrderChange` | `(order) => void` | — | Fired with the new column-id order. Angular `(columnOrderChange)`. |
+| `reorderableRows` | `boolean` | `false` | Let users drag a row handle to reorder rows (requires `rowKey`). |
+| `onRowReorder` | `(rows) => void` | — | Fired with the reordered data. Angular `(rowReorder)`. |
+| `messages` | `Partial<DataTableMessages>` | English | Translate the table's built-in strings; omitted keys fall back to English. See [Internationalization](#internationalization). |
+| `getRowLabel` | `(row, i) => string` | — | Accessible name for a row's selection control — appended after `selectRow`, e.g. `"Select row: Ada Lovelace"`. |
+| `className` | `string` | — | Classes on the outer table wrapper. Angular: `class`. |
+
+### Pagination config
+
+`pagination` takes one of three shapes. `align` (`'between' \| 'center' \| 'end'`,
+default `'between'`) is shared by all three.
+
+**`ClientPagination`** — the table slices `data` itself:
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `'client'` | `'client'` | Optional — client is the default. |
+| `pageSize` | `number` | `10` | Rows per page. |
+| `pageSizeOptions` | `number[]` | — | Offer these sizes in a selector (omit to hide it). |
+| `page` | `number` | — | Controlled current page (1-based). |
+| `defaultPage` | `number` | `1` | Initial page (uncontrolled). |
+| `onPageChange` | `(page) => void` | — | Fired when the page changes. |
+| `onPageSizeChange` | `(size) => void` | — | Fired when the page size changes. |
+
+**`ServerPagination`** — `data` is already the current page:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mode` | `'server'` | **Required.** |
+| `page` | `number` | **Required.** Current page (1-based). |
+| `pageSize` | `number` | **Required.** Rows per page. |
+| `total` | `number` | **Required.** Total rows on the server (drives the page count). |
+| `onPageChange` | `(page) => void` | **Required.** Fetch the requested page. |
+| `pageSizeOptions` | `number[]` | Optional page-size selector. |
+| `onPageSizeChange` | `(size) => void` | Fired when the page size changes. |
+
+**`CursorPagination`** — prev/next only (no page numbers):
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mode` | `'cursor'` | **Required.** |
+| `hasNextPage` / `hasPreviousPage` | `boolean` | **Required.** Enable/disable the buttons. |
+| `onNextPage` / `onPreviousPage` | `() => void` | **Required.** Advance / go back. |
+| `rangeLabel` | `ReactNode` (Angular `string`) | Optional label beside the buttons, e.g. "Showing 20 results". |
+| `pageSize` | `number` | Optional current page size (for the selector). |
+| `pageSizeOptions` | `number[]` | Optional page-size selector. |
+| `onPageSizeChange` | `(size) => void` | Fired when the page size changes. |
 
 ### `DataTableColumn<T>`
 
-`id`, `header`, `accessor`, `cell` (React node / Angular `<ng-template>`),
-`footer` (React node or `(rows) => node`; Angular `string` or `(rows) => string`),
-`align`, `width`, `numeric`, `pin`, `hideable`, `filterable`, `filterType`,
-`filterOptions`, `sortable`, `sortAccessor`, `className`.
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | — | **Required.** Unique id — the row key and (with no `header`) the default label. |
+| `header` | `ReactNode` (Angular `string`) | `id` | Header label / node. |
+| `accessor` | `(row) => ReactNode` (Angular `SortValue`) | — | Read a plain value from the row (used when `cell` is not given). |
+| `cell` | `(row, i) => ReactNode` (Angular `TemplateRef`) | — | Custom cell renderer — overrides `accessor`. Angular uses an `<ng-template>`. |
+| `footer` | `ReactNode \| (rows) => ReactNode` (Angular `string \| (rows) => string \| TemplateRef`) | — | Footer/summary cell; a function receives the filtered rows to compute an aggregate. |
+| `align` | `'left' \| 'center' \| 'right'` | `'left'` | Horizontal alignment of header + cells. |
+| `width` | `number \| string` | — | Fixed column width, e.g. `120` or `'20%'`. |
+| `numeric` | `boolean` | `false` | Right-align + tabular figures (money / counts). |
+| `pin` | `'left' \| 'right'` | — | Freeze the column to an edge while the table scrolls horizontally. |
+| `disablePinning` | `boolean` | `false` | Hide the per-column pin menu for this column even when `pinnable` is on. |
+| `hideable` | `boolean` | `true` | Set `false` to keep the column always visible (excluded from the toggle). |
+| `filterable` | `boolean` | `false` | Show a filter menu on this column's header. |
+| `filterType` | `'text' \| 'number' \| 'select'` | numeric → `number`, else `text` | Filter UI kind. |
+| `filterOptions` | `{ value, label }[]` | derived | Options for a `select` filter (omit to derive distinct values from the data). |
+| `sortable` | `boolean` | `false` | Allow clicking the header to sort by this column. |
+| `sortAccessor` | `(row) => SortValue` | — | Comparable value used when sorting (needed when `cell`/`accessor` returns a node). |
+| `className` | `string` | — | Extra classes applied to every cell (and the header) in this column. |
 
 ## Accessibility
 
@@ -2296,14 +2397,159 @@ export class EmptyTable {
   (`none` / `ascending` / `descending`). Clickable rows (`onRowClick`) are
   focusable and activate on **Enter / Space**.
 - Selection checkboxes/radios are labelled; **select-all** is a labelled header
-  checkbox with an indeterminate state. Pagination controls are labelled buttons
-  and the current page carries **`aria-current`**. Decorative icons are `aria-hidden`.
+  checkbox with an indeterminate state. Pass **`getRowLabel`** to give each row's
+  control a **unique** accessible name (e.g. `"Select row: Ada Lovelace"`) instead
+  of a repeated generic "Select row".
+- A polite **`aria-live` region** announces changes as they happen: the active sort
+  (e.g. "Sorted by Name ascending") and the result count after searching or filtering
+  (e.g. "3 results"). Both messages are overridable via `messages.announceSort` /
+  `messages.announceResults`.
+- Pagination is wrapped in a **`<nav>`** with an `aria-label` (default "Pagination");
+  its controls are labelled buttons, and the current page carries **`aria-current="page"`**.
+  Decorative icons are `aria-hidden`.
 - Sticky header + horizontal scroll keep headers associated with their cells, and
   pinned columns stay reachable. On narrow screens, `responsive` stacks each row
   into a **labelled label/value card** (the `header` becomes each field's label).
+- Every built-in label, operator, and pagination string is translatable via the
+  **`messages`** prop — see [Internationalization](#internationalization).
 
 <Callout type="info">
   This is a semantic **table**, not a custom ARIA **grid** — it does not implement
   arrow-key cell-to-cell navigation (`role="grid"`). That fits the vast majority of
   data tables; reach for a grid only if you need spreadsheet-style cell navigation.
 </Callout>
+
+## Internationalization
+
+- **Every built-in string is overridable** via the `messages` prop — a
+  `Partial<DataTableMessages>` merged over the English defaults, so you translate
+  only the subset you need. It covers the search box, the "no results" and range
+  text, the columns / pin / filter menus, the filter **operators**, the pagination
+  labels, and the `aria-live` announcements (`announceSort`, `announceResults`).
+  Function-valued keys (`range`, `goToPage`, `announceSort`, `announceResults`) let
+  you localize number order and grammar.
+- **`getRowLabel`** gives each row's selection checkbox a unique accessible name
+  (appended after the `selectRow` label), so screen-reader users can tell rows apart.
+- **RTL-safe**: layout uses logical properties throughout — cells align with
+  `text-start`, pinned columns use `inset-inline-start/end`, and the chevrons, pin
+  arrows and sort icons mirror under `dir="rtl"` — so the whole table flips correctly
+  right-to-left. See the [Internationalization guide](/docs/getting-started/i18n).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-i18n.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+const members: Member[] = [
+  { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+  { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+  { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+];
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', sortable: true, filterable: true, accessor: (r) => r.name },
+  { id: 'role', header: 'Rolle', filterable: true, filterType: 'select', accessor: (r) => r.role },
+  { id: 'tasks', header: 'Aufgaben', numeric: true, filterable: true, accessor: (r) => r.tasks },
+];
+
+// German overrides — pass any subset; the rest fall back to English
+export function GermanTable() {
+  return (
+    <DataTable
+      columns={columns}
+      data={members}
+      rowKey={(r) => r.id}
+      selectable
+      searchable
+      searchPlaceholder="Suchen…"
+      pagination={{ pageSize: 2, pageSizeOptions: [2, 4, 8] }}
+      getRowLabel={(row) => row.name}
+      messages={{
+        search: 'Suchen',
+        noResults: 'Keine Ergebnisse',
+        columns: 'Spalten',
+        rowsPerPage: 'Zeilen',
+        operators: {
+          contains: 'Enthält',
+          startsWith: 'Beginnt mit',
+          endsWith: 'Endet mit',
+          equals: 'Gleich',
+          notEquals: 'Ungleich',
+          gt: '>',
+          gte: '≥',
+          lt: '<',
+          lte: '≤',
+        },
+        range: (from, to, total) => `${from}–${to} von ${total}`,
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-i18n.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn, type DataTableMessages } from '@bpdm/ng';
+
+type Member = { id: string; name: string; role: string; tasks: number };
+
+@Component({
+  selector: 'german-table',
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table
+      [columns]="columns"
+      [data]="members"
+      [rowKey]="rowKey"
+      selectable
+      searchable
+      searchPlaceholder="Suchen…"
+      [pagination]="pagination"
+      [getRowLabel]="rowLabel"
+      [messages]="messages" />
+  `,
+})
+export class GermanTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly rowLabel = (r: Member) => r.name;
+  readonly members: Member[] = [
+    { id: 'm1', name: 'Milo Lindberg', role: 'Owner', tasks: 128 },
+    { id: 'm2', name: 'Sara Kovac', role: 'Editor', tasks: 86 },
+    { id: 'm3', name: 'Noah Bauer', role: 'Viewer', tasks: 12 },
+  ];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', sortable: true, filterable: true, accessor: (r) => r.name },
+    { id: 'role', header: 'Rolle', filterable: true, filterType: 'select', accessor: (r) => r.role },
+    { id: 'tasks', header: 'Aufgaben', numeric: true, filterable: true, accessor: (r) => r.tasks },
+  ];
+
+  readonly pagination = { pageSize: 2, pageSizeOptions: [2, 4, 8] };
+
+  // German overrides — pass any subset; the rest fall back to English
+  readonly messages: Partial<DataTableMessages> = {
+    search: 'Suchen',
+    noResults: 'Keine Ergebnisse',
+    columns: 'Spalten',
+    rowsPerPage: 'Zeilen',
+    operators: {
+      contains: 'Enthält',
+      startsWith: 'Beginnt mit',
+      endsWith: 'Endet mit',
+      equals: 'Gleich',
+      notEquals: 'Ungleich',
+      gt: '>',
+      gte: '≥',
+      lt: '<',
+      lte: '≤',
+    },
+    range: (from, to, total) => `${from}–${to} von ${total}`,
+  };
+}
+```
+
+  </Tab>
+</Tabs>

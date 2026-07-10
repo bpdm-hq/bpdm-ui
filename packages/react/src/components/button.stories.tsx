@@ -6,6 +6,7 @@ import {
   Stories,
   Title,
 } from "@storybook/addon-docs/blocks";
+import { useState } from "react";
 import { ArrowRight, Bell, Check, Download, Heart, Mail, Plus, Search, Star, Trash2 } from "lucide-react";
 import { Button } from "./button";
 
@@ -417,6 +418,85 @@ export function Example() {
           {v}
         </Button>
       ))}
+    </div>
+  ),
+};
+
+// Loading: a spinner + `aria-busy`; interaction is blocked while busy.
+export const Loading: Story = {
+  tags: ["!dev"],
+  parameters: {
+    docs: {
+      source: {
+        code: `import { useState } from "react";
+import { Button } from "@bpdm/ui";
+
+export function Example() {
+  const [saving, setSaving] = useState(false);
+  const save = () => {
+    setSaving(true);
+    setTimeout(() => setSaving(false), 1600);
+  };
+  return (
+    <>
+      <Button loading={saving} onClick={save}>{saving ? "Saving…" : "Save changes"}</Button>
+      <Button loading variant="secondary" appearance="outline">Please wait</Button>
+      <Button loading size="icon" aria-label="Loading" />
+    </>
+  );
+}`,
+      },
+    },
+  },
+  render: function LoadingStory() {
+    const [saving, setSaving] = useState(false);
+    const save = () => {
+      setSaving(true);
+      setTimeout(() => setSaving(false), 1600);
+    };
+    return (
+      <div className="flex flex-wrap items-center gap-3">
+        <Button loading={saving} onClick={save}>
+          {saving ? "Saving…" : "Save changes"}
+        </Button>
+        <Button loading variant="secondary" appearance="outline">
+          Please wait
+        </Button>
+        <Button loading size="icon" aria-label="Loading" />
+      </div>
+    );
+  },
+};
+
+// Disabled: native `disabled` — dimmed, unfocusable, non-interactive.
+export const Disabled: Story = {
+  tags: ["!dev"],
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Button } from "@bpdm/ui";
+
+export function Example() {
+  return (
+    <>
+      <Button disabled>Disabled</Button>
+      <Button disabled appearance="outline">Disabled</Button>
+      <Button disabled variant="secondary">Disabled</Button>
+    </>
+  );
+}`,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button disabled>Disabled</Button>
+      <Button disabled appearance="outline">
+        Disabled
+      </Button>
+      <Button disabled variant="secondary">
+        Disabled
+      </Button>
     </div>
   ),
 };

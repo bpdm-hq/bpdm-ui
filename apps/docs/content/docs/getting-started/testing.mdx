@@ -119,6 +119,51 @@ fixture.debugElement.query(By.css('[data-testid="status"]'));
   </Tab>
 </Tabs>
 
+### Button
+
+The **Button** is a native `<button>` (React) or `bpdmButton` on a
+`<button>`/`<a>` (Angular) — the canonical **role + accessible name** query.
+Assert `disabled` / `aria-busy` for state, and a variant class if you pin styling.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="button.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { Button } from '@bpdm/ui/button';
+
+render(
+  <Button variant="destructive" disabled>
+    Delete
+  </Button>,
+);
+
+// query by role + accessible name (most robust)
+const btn = screen.getByRole('button', { name: 'Delete' });
+expect(btn).toBeDisabled();
+expect(btn).toHaveClass('bg-destructive');
+expect(btn).toHaveAttribute('type', 'button'); // safe default — never auto-submits
+
+// a loading button is announced busy
+render(<Button loading>Save</Button>);
+expect(screen.getByRole('button', { name: /Save/ })).toHaveAttribute('aria-busy', 'true');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="button.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+const btn = el.querySelector('button') as HTMLButtonElement;
+
+expect(btn.textContent).toContain('Delete');
+expect(btn.classList.contains('bg-destructive')).toBe(true);
+expect(btn.getAttribute('type')).toBe('button'); // safe default — never auto-submits
+```
+
+  </Tab>
+</Tabs>
+
 ### Number Input
 
 The **Number Input** is a `role="group"` wrapping a `textbox` and two labelled stepper
@@ -533,17 +578,23 @@ fixture.detectChanges();
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —
 no test ids needed. Rows are `row`, headers are `columnheader`, cells are `cell`,
 sortable headers are `button`s (with `aria-sort` on the header), selection controls
-are `checkbox`/`radio`, and the pagination controls are labelled buttons. Pass
-`label` for an accessible table name (`getByRole('table', { name })`).
+are `checkbox`/`radio`, and pagination sits in a `navigation` landmark
+(`<nav aria-label="Pagination">`) of labelled buttons. Pass `label` for an accessible
+table name (`getByRole('table', { name })`).
+
+The example below assumes a **sortable + selectable + paginated** `MembersTable`
+(the `MembersTable` from [Usage](/docs/data/data-table#usage) plus `sortable` on a
+column and the `selectable` / `pagination` props) — that's what makes the sort,
+checkbox, and pagination queries resolve.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
 ```tsx title="members-table.test.tsx"
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-render(<MembersTable label="Members" />);
+render(<MembersTable label="Members" />); // sortable + selectable + paginated
 
 // the table, its rows, and a specific cell — all by role/text
 screen.getByRole('table', { name: 'Members' });
@@ -556,6 +607,10 @@ expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute('aria
 
 // selection controls are checkboxes ([0] is select-all)
 await userEvent.click(screen.getAllByRole('checkbox')[1]);
+
+// pagination is a labelled navigation landmark
+const pager = screen.getByRole('navigation', { name: /pagination/i });
+await userEvent.click(within(pager).getByRole('button', { name: /next page/i }));
 ```
 
   </Tab>
@@ -565,10 +620,11 @@ await userEvent.click(screen.getAllByRole('checkbox')[1]);
 const el = fixture.nativeElement as HTMLElement;
 
 // query by role/tag — no test ids needed on a semantic table
-el.querySelectorAll('tbody tr');                 // body rows
-el.querySelector('thead th button');             // a sortable header
-el.querySelectorAll('[role="checkbox"]');        // [0] = select-all
-el.querySelector('input[aria-label="Search"]');  // the search box
+el.querySelectorAll('tbody tr');                       // body rows
+el.querySelector('thead th button');                   // a sortable header
+el.querySelectorAll('[role="checkbox"]');              // [0] = select-all
+el.querySelector('input[aria-label="Search"]');        // the search box
+el.querySelector('nav[aria-label="Pagination"]');      // the pagination landmark
 ```
 
   </Tab>
