@@ -275,6 +275,72 @@ export function Example() {
   },
 };
 
+// translate every screen-reader string via the `messages` prop
+export const Internationalized: Story = {
+  tags: ["!dev"],
+  render: () => {
+    const [items, setItems] = useState(["Analyse", "Compilation", "Tests", "Déploiement"]);
+    return (
+      <div className="w-80">
+        <OrderList
+          value={items}
+          onChange={setItems}
+          itemKey={(w) => w}
+          renderItem={(w) => w}
+          header="Étapes du pipeline"
+          messages={{
+            reorderGroup: "Réorganiser",
+            moveUp: "Monter",
+            moveToTop: "Placer en haut",
+            moveDown: "Descendre",
+            moveToBottom: "Placer en bas",
+            movedUp: "Déplacé vers le haut",
+            movedToTop: "Placé en haut",
+            movedDown: "Déplacé vers le bas",
+            movedToBottom: "Placé en bas",
+            empty: "Aucun élément",
+            listLabel: "Liste ordonnable",
+          }}
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `import { useState } from "react";
+import { OrderList } from "@bpdm/ui";
+
+export function Example() {
+  const [items, setItems] = useState(["Analyse", "Compilation", "Tests", "Déploiement"]);
+  return (
+    <OrderList
+      value={items}
+      onChange={setItems}
+      itemKey={(w) => w}
+      renderItem={(w) => w}
+      header="Étapes du pipeline"
+      messages={{
+        reorderGroup: "Réorganiser",
+        moveUp: "Monter",
+        moveToTop: "Placer en haut",
+        moveDown: "Descendre",
+        moveToBottom: "Placer en bas",
+        movedUp: "Déplacé vers le haut",
+        movedToTop: "Placé en haut",
+        movedDown: "Déplacé vers le bas",
+        movedToBottom: "Placé en bas",
+        empty: "Aucun élément",
+        listLabel: "Liste ordonnable",
+      }}
+    />
+  );
+}`,
+      },
+    },
+  },
+};
+
 // drag-and-drop is on by default; set dragdrop={false} to disable
 export const NoDragDrop: Story = {
   tags: ["!dev"],

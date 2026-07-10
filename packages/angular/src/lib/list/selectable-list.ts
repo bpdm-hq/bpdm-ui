@@ -65,7 +65,7 @@ import {
         (focus)="onFocus()"
         (blur)="focused.set(false)"
         (keydown)="onListKey($event)"
-        class="min-h-0 flex-1 overflow-y-auto p-1 outline-none"
+        class="group/lb min-h-0 flex-1 overflow-y-auto p-1 outline-none"
         [style.max-height]="scrollHeight()"
       >
         @if (shown().length === 0) {
@@ -187,7 +187,12 @@ export class BpdmSelectableList<T = unknown> {
     const disabled = this.isDisabled(item);
     const isSel = this.selected().has(key);
     const isActive = this.activeKey() === key;
-    const showAccent = !disabled && (isSel || (this.focused() && isActive) || this.isOver(key));
+    const over = this.isOver(key);
+    // selection + drop-target keep the bar always; the keyboard-active bar shows
+    // ONLY while the list is keyboard-focused (:focus-visible), so a mouse
+    // click/deselect never leaves a lingering accent on a non-selected row.
+    const solidAccent = !disabled && (isSel || over);
+    const kbdAccent = !disabled && isActive && !isSel && !over;
     return cn(
       "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
       // gentle settle-in when an item is added / transferred into this list
@@ -203,7 +208,9 @@ export class BpdmSelectableList<T = unknown> {
               ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
               : "text-foreground hover:bg-muted",
           ),
-      showAccent ? "before:opacity-100" : "before:opacity-0",
+      solidAccent ? "before:opacity-100" : "before:opacity-0",
+      // keyboard-active accent: only when the listbox itself is focus-visible
+      kbdAccent && "group-focus-visible/lb:before:opacity-100",
       this.dragKey() === key && "opacity-50",
     );
   }

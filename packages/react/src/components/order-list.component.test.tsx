@@ -44,6 +44,32 @@ describe("OrderList (component)", () => {
     expect(optionTexts()).toEqual(["Type-check", "Lint", "Unit tests", "Build", "Deploy"]);
   });
 
+  it("moves the selected item up with the control column", async () => {
+    const onChange = setup();
+    await userEvent.click(screen.getByText("Type-check"));
+    await userEvent.click(btn("Move up"));
+    expect(onChange).toHaveBeenLastCalledWith(["Type-check", "Lint", "Unit tests", "Build", "Deploy"]);
+  });
+
+  it("moves the selected item to the top", async () => {
+    const onChange = setup();
+    await userEvent.click(screen.getByText("Build"));
+    await userEvent.click(btn("Move to top"));
+    expect(onChange).toHaveBeenLastCalledWith(["Build", "Lint", "Type-check", "Unit tests", "Deploy"]);
+  });
+
+  it("moves the selected item to the bottom", async () => {
+    const onChange = setup();
+    await userEvent.click(screen.getByText("Lint"));
+    await userEvent.click(btn("Move to bottom"));
+    expect(onChange).toHaveBeenLastCalledWith(["Type-check", "Unit tests", "Build", "Deploy", "Lint"]);
+  });
+
+  it("groups the reorder controls under a labelled group", () => {
+    setup();
+    expect(screen.getByRole("group", { name: "Reorder" })).toBeTruthy();
+  });
+
   it("disables every control while nothing is selected", () => {
     setup();
     ["Move up", "Move to top", "Move down", "Move to bottom"].forEach((name) =>
@@ -115,5 +141,33 @@ describe("OrderList (component)", () => {
     await userEvent.click(lint);
     expect(lint).toHaveAttribute("aria-selected", "false");
     expect(btn("Move down")).toBeDisabled(); // nothing selected
+  });
+
+  it("shows the empty-state text when there are no items", () => {
+    setup({ defaultValue: [], messages: { empty: "Nothing to order" } });
+    expect(screen.getByText("Nothing to order")).toBeTruthy();
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
+  });
+
+  it("routes every string through the messages prop for i18n", async () => {
+    setup({
+      messages: {
+        reorderGroup: "Réorganiser",
+        moveDown: "Descendre",
+        movedDown: "Déplacé vers le bas",
+      },
+    });
+    // group + button labels are translated
+    expect(screen.getByRole("group", { name: "Réorganiser" })).toBeTruthy();
+    const down = btn("Descendre");
+    // the live-region announcement is translated too
+    await userEvent.click(screen.getByText("Lint"));
+    await userEvent.click(down);
+    expect(screen.getByRole("status").textContent?.trim()).toBe("Déplacé vers le bas");
+  });
+
+  it("names the listbox from a translated ariaLabel when there is no header", () => {
+    setup({ header: undefined, ariaLabel: undefined, messages: { listLabel: "Étapes" } });
+    expect(screen.getByRole("listbox", { name: "Étapes" })).toBeTruthy();
   });
 });

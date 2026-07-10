@@ -117,3 +117,31 @@ export function PickListLockedDemo() {
     </Stage>
   );
 }
+
+// German labels + RTL container: every string comes from `messages`, and the
+// transfer arrows flip so "toward target" still points at the target pane.
+export function PickListI18nDemo() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        sourceHeader="Verfügbar"
+        targetHeader="Aktiviert"
+        messages={{
+          transferGroup: 'Zwischen Listen verschieben',
+          moveToTarget: 'Zum Ziel verschieben',
+          moveAllToTarget: 'Alle zum Ziel verschieben',
+          moveToSource: 'Zur Quelle verschieben',
+          moveAllToSource: 'Alle zur Quelle verschieben',
+          targetEmpty: 'Noch nichts hier',
+          filterPlaceholder: 'Filtern',
+          transferAnnouncement: (count, list) => `${count} nach ${list} verschoben`,
+        }}
+      />
+    </Stage>
+  );
+}

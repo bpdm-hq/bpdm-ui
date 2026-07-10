@@ -79,3 +79,34 @@ export function OrderListControlsDemo() {
     </div>
   );
 }
+
+// German labels + announcements via the `messages` prop
+const STUFEN = ['Analyse', 'Erstellung', 'Tests', 'Bereitstellung'];
+
+export function OrderListI18nDemo() {
+  const [items, setItems] = useState(STUFEN);
+  return (
+    <div className="w-full max-w-md">
+      <OrderList
+        value={items}
+        onChange={setItems}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        header="Pipeline-Phasen"
+        messages={{
+          reorderGroup: 'Neu ordnen',
+          moveUp: 'Nach oben',
+          moveToTop: 'Ganz nach oben',
+          moveDown: 'Nach unten',
+          moveToBottom: 'Ganz nach unten',
+          movedUp: 'Nach oben verschoben',
+          movedToTop: 'Ganz nach oben verschoben',
+          movedDown: 'Nach unten verschoben',
+          movedToBottom: 'Ganz nach unten verschoben',
+          empty: 'Keine Einträge',
+          listLabel: 'Sortierbare Liste',
+        }}
+      />
+    </div>
+  );
+}

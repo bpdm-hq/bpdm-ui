@@ -10,6 +10,7 @@ import {
   PickListFilterDemo,
   PickListTransferDemo,
   PickListLockedDemo,
+  PickListI18nDemo,
 } from '@/components/pick-list-demos';
 import { Preview } from '@/components/preview';
 
@@ -420,6 +421,113 @@ export class Features {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+Every user-facing and screen-reader string — the transfer-button labels, the
+control-group label, the empty-state text, the filter placeholder, and the
+live-region transfer announcement — routes through a single `messages` object.
+Pass a `Partial<PickListMessages>`; anything you omit falls back to the English
+default. The component is also fully **RTL-aware**: it uses logical layout
+classes throughout, and the horizontal transfer arrows flip under `dir="rtl"` so
+"toward the target" always points at the target pane.
+
+<Preview>
+  <PickListI18nDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-i18n.tsx"
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+
+const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      sourceHeader="Verfügbar"
+      targetHeader="Aktiviert"
+      messages={{
+        transferGroup: 'Zwischen Listen verschieben',
+        moveToTarget: 'Zum Ziel verschieben',
+        moveAllToTarget: 'Alle zum Ziel verschieben',
+        moveToSource: 'Zur Quelle verschieben',
+        moveAllToSource: 'Alle zur Quelle verschieben',
+        targetEmpty: 'Noch nichts hier',
+        filterPlaceholder: 'Filtern',
+        transferAnnouncement: (count, list) => `${count} nach ${list} verschoben`,
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list-i18n.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList, type PickListMessages, type PickListValue } from '@bpdm/ng';
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList],
+  template: `
+    <bpdm-pick-list
+      [(value)]="value"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      sourceHeader="Verfügbar"
+      targetHeader="Aktiviert"
+      [messages]="messages"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (s: string) => s;
+  readonly value = signal<PickListValue<string>>({
+    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'],
+    target: [],
+  });
+  readonly messages: Partial<PickListMessages> = {
+    transferGroup: 'Zwischen Listen verschieben',
+    moveToTarget: 'Zum Ziel verschieben',
+    moveAllToTarget: 'Alle zum Ziel verschieben',
+    moveToSource: 'Zur Quelle verschieben',
+    moveAllToSource: 'Alle zur Quelle verschieben',
+    targetEmpty: 'Noch nichts hier',
+    filterPlaceholder: 'Filtern',
+    transferAnnouncement: (count, list) => `${count} nach ${list} verschoben`,
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
+### `PickListMessages`
+
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| `transferGroup` | `string` | `Transfer between lists` | `aria-label` for the middle control group. |
+| `moveToTarget` | `string` | `Move to target` | Move-selected → target button. |
+| `moveAllToTarget` | `string` | `Move all to target` | Move-all ⇒ target button. |
+| `moveToSource` | `string` | `Move to source` | Move-selected ← source button. |
+| `moveAllToSource` | `string` | `Move all to source` | Move-all ⇐ source button. |
+| `sourceEmpty` / `targetEmpty` | `string` | `No items` / `Nothing here yet` | Empty-state text per list. |
+| `filterPlaceholder` | `string` | `Filter` | Filter-box placeholder + aria-label. |
+| `sourceLabel` / `targetLabel` | `string` | `source list` / `target list` | Fallback accessible name for a list with no visible header. |
+| `transferAnnouncement` | `(count, listLabel) => string` | `"{count} item(s) moved to {listLabel}"` | Polite live-region text after a transfer. |
+
 ## API
 
 ### `PickList` / `<bpdm-pick-list>`
@@ -433,23 +541,31 @@ export class Features {
 | `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box on both lists. |
 | `reorder` | `boolean` | `true` | Show per-list reorder controls + within-list drag. |
 | `scrollHeight` | `string` | `18rem` | Max body height before a list scrolls. |
-| `sourceEmptyText` / `targetEmptyText` | `string` | `No items` / `Nothing here yet` | Empty-state text per list. |
+| `sourceEmptyText` / `targetEmptyText` | `string` | — | Empty-state text per list. Overrides `messages.sourceEmpty` / `targetEmpty`. |
 | `isItemDisabled` | `(item) => boolean` | — | Lock items — not selectable, transferable, or draggable; kept in place on move-all. |
 | `onTransfer` (Angular `transfer`) | `(moved, to) => void` / `{ moved, to }` | — | Fires after a transfer with the moved items and destination (`"source"` \| `"target"`). |
+| `messages` | `Partial<PickListMessages>` | — | Override any user-facing / screen-reader string — see [Internationalization](#internationalization). |
 | `className` | `string` (Angular `class`) | — | Extra classes. |
+
+`filterPlaceholder` likewise overrides `messages.filterPlaceholder` when set.
 
 ## Accessibility
 
-- The transfer controls (**move / move-all, each direction**) are real `<button>`s
-  with accessible labels, and disable when there's nothing to move.
-- Items are keyboard-selectable and expose their selected state; the current
-  selection is what the controls transfer.
 - Drag is an enhancement — every transfer and reorder is reachable with the
   buttons, so keyboard-only users can operate both lists fully.
-- Give each list a `sourceHeader` / `targetHeader` so its purpose is announced.
 - Each list is a WAI-ARIA **`listbox`** (single tab stop, roving `aria-activedescendant`,
-  ↑/↓/Home/End + Enter/Space), named by its header.
+  ↑/↓/Home/End to move, Enter/Space to select), with `aria-multiselectable` and
+  per-option `aria-selected`.
+- Each pane is named for screen readers: by its `sourceHeader` / `targetHeader`
+  when present, otherwise by a distinct fallback (`source list` / `target list`)
+  so the two panes never share a name.
+- The transfer controls are a labelled `group` of real `<button>`s, each with an
+  `aria-label`; they disable when there's nothing to move. Decorative arrow icons
+  are `aria-hidden`.
 - Every transfer is announced through a polite live region (e.g. "2 items moved to
   Enabled"), and focus is kept inside the transfer group if a button disables.
 - Locked items (`isItemDisabled`) expose `aria-disabled` and are skipped by keyboard
   navigation, so they never trap focus or appear selectable.
+- **RTL:** layout uses logical classes and the horizontal transfer arrows flip
+  under `dir="rtl"`, so direction stays correct in right-to-left locales.
+- All labels and the announcement are overridable via [`messages`](#internationalization).
