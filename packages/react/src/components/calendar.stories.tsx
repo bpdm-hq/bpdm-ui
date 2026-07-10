@@ -65,7 +65,7 @@ const meta: Meta<typeof DatePicker> = {
   },
   argTypes: {
     mode: { control: "inline-radio", options: ["single", "range"] },
-    dayShape: { control: "inline-radio", options: ["circle", "rounded"] },
+    dayShape: { control: "inline-radio", options: ["circle", "square"] },
     captionLayout: { control: "inline-radio", options: ["buttons", "dropdown"] },
     weekStartsOn: { control: "inline-radio", options: [0, 1] },
     clearable: { control: "boolean" },
@@ -223,6 +223,47 @@ export function Example() {
   },
 };
 
+// buffer the selection; commit only on Apply (Cancel/Escape/outside discard the draft)
+export const Confirm: Story = {
+  render: () => {
+    const [range, setRange] = useState<DateRange | null>(null);
+    return (
+      <div className="w-96">
+        <DatePicker
+          mode="range"
+          value={range}
+          onChange={(v) => setRange(v as DateRange | null)}
+          presets={defaultRangePresets}
+          confirm
+          placeholder="Pick a date range"
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `import { useState } from "react";
+import { DatePicker, defaultRangePresets, type DateRange } from "@bpdm/ui";
+
+export function Example() {
+  const [range, setRange] = useState<DateRange | null>(null);
+  return (
+    <DatePicker
+      mode="range"
+      value={range}
+      onChange={(v) => setRange(v as DateRange | null)}
+      presets={defaultRangePresets}
+      confirm // buffer the selection; commit only on Apply
+      placeholder="Pick a date range"
+    />
+  );
+}`,
+      },
+    },
+  },
+};
+
 // only future dates selectable; weekends disabled
 export const Constraints: Story = {
   tags: ["!dev"],
@@ -340,13 +381,13 @@ export function Example() {
 };
 
 // squircle day highlight instead of a circle
-export const RoundedDays: Story = {
+export const SquareDays: Story = {
   tags: ["!dev"],
   render: () => {
     const [date, setDate] = useState<Date | null>(null);
     return (
       <div className="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
-        <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="rounded" />
+        <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="square" />
       </div>
     );
   },
@@ -360,7 +401,7 @@ export function Example() {
   const [date, setDate] = useState<Date | null>(null);
   return (
     <div className="w-fit rounded-lg border bg-card shadow-sm">
-      <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="rounded" />
+      <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="square" />
     </div>
   );
 }`,

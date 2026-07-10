@@ -485,6 +485,49 @@ expect(s.getAttribute('aria-checked')).toBe('true');
   </Tab>
 </Tabs>
 
+### Calendar
+
+The **Calendar** wraps its months in a `role="group"` named `Calendar`; each month is a
+`role="grid"` named by its caption (e.g. "January 2026") with `role="gridcell"`s and
+`role="columnheader"` weekday headers. Each day is a `button` whose accessible name is the
+**full, locale-formatted date** (e.g. "January 15, 2026"), so query days by that name — not by the
+bare number. Only the focused day is tabbable (roving `tabindex`).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="calendar.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<Calendar defaultValue={new Date(2026, 0, 15)} />);
+
+screen.getByRole('group', { name: 'Calendar' });        // the wrapper
+screen.getByRole('grid', { name: /January 2026/ });     // the month
+expect(screen.getAllByRole('columnheader')).toHaveLength(7);
+
+// pick a day by its full accessible name
+await userEvent.click(screen.getByRole('button', { name: /January 20, 2026/ }));
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="calendar.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+el.querySelector('[role="grid"]');
+el.querySelectorAll('[role="columnheader"]');           // 7
+// days live in gridcells; the button's aria-label is the full date
+const day = Array.from(el.querySelectorAll('[role="gridcell"] button'))
+  .find((b) => b.textContent?.trim() === '20') as HTMLButtonElement;
+day.click();
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
 ### Data Table
 
 The **Data Table** renders a real semantic `<table>`, so query it by ARIA role —

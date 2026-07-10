@@ -7,9 +7,16 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import {
   CalendarUsageDemo,
   CalendarRangeDemo,
+  CalendarPresetsDemo,
   CalendarInlineDemo,
   CalendarConstraintsDemo,
   CalendarCaptionDemo,
+  CalendarSundayFirstDemo,
+  CalendarInvalidDemo,
+  CalendarShowcaseDemo,
+  CalendarSquareDemo,
+  CalendarConfirmDemo,
+  CalendarInlineConfirmDemo,
 } from '@/components/calendar-demos';
 import { Preview } from '@/components/preview';
 
@@ -65,8 +72,8 @@ export class DateComponent {
 
 ## Date range
 
-Set `mode="range"` for a from–to selection (it shows two months and closes once both ends are
-picked). Pass `presets` for quick ranges — `defaultRangePresets` covers the common dashboard ones.
+Set `mode="range"` for a from–to selection — it shows two months and closes once both ends are
+picked.
 
 <Preview>
   <CalendarRangeDemo />
@@ -77,7 +84,7 @@ picked). Pass `presets` for quick ranges — `defaultRangePresets` covers the co
 
 ```tsx title="range.tsx"
 import { useState } from 'react';
-import { DatePicker, defaultRangePresets, type DateRange } from '@bpdm/ui/calendar';
+import { DatePicker, type DateRange } from '@bpdm/ui/calendar';
 
 export function PickRange() {
   const [range, setRange] = useState<DateRange | null>(null);
@@ -86,8 +93,7 @@ export function PickRange() {
       mode="range"
       value={range}
       onChange={(v) => setRange(v as DateRange | null)}
-      presets={defaultRangePresets}
-      placeholder="Pick a range"
+      placeholder="Pick a date range"
     />
   );
 }
@@ -98,10 +104,82 @@ export function PickRange() {
 
 ```ts title="range.component.ts"
 import { Component } from '@angular/core';
-import { BpdmDatePicker, defaultRangePresets, type DateRange } from '@bpdm/ng';
+import { BpdmDatePicker, type DateRange } from '@bpdm/ng';
 
 @Component({
   selector: 'app-range',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `<bpdm-date-picker mode="range" [(value)]="range" placeholder="Pick a date range" />`,
+})
+export class RangeComponent {
+  range: DateRange | null = null;
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Range with presets
+
+Pass `presets` for quick ranges — `defaultRangePresets` covers the common dashboard ones, or supply
+your own `{ label, range() }` list (the range is computed at click time). Pair with
+`captionLayout="dropdown"` to jump across months and years fast.
+
+<Preview>
+  <CalendarPresetsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="range-presets.tsx"
+import { useState } from 'react';
+import { DatePicker, defaultRangePresets, type DateRange } from '@bpdm/ui/calendar';
+
+// presets are just { label, range() } — configure any you want
+const presets = [
+  {
+    label: 'Year to date',
+    range: () => {
+      const n = new Date();
+      return { from: new Date(n.getFullYear(), 0, 1), to: n };
+    },
+  },
+  {
+    label: 'Last quarter',
+    range: () => {
+      const n = new Date();
+      return { from: new Date(n.getFullYear(), n.getMonth() - 3, 1), to: n };
+    },
+  },
+  ...defaultRangePresets, // Last 7 days, Last 30 days, This month, This year, Previous year
+];
+
+export function RangeWithPresets() {
+  const [range, setRange] = useState<DateRange | null>(null);
+  return (
+    <DatePicker
+      mode="range"
+      value={range}
+      onChange={(v) => setRange(v as DateRange | null)}
+      presets={presets}
+      captionLayout="dropdown"
+      placeholder="Pick a date range"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="range-presets.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker, defaultRangePresets, type DateRange } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-range-presets',
   standalone: true,
   imports: [BpdmDatePicker],
   template: `
@@ -109,13 +187,95 @@ import { BpdmDatePicker, defaultRangePresets, type DateRange } from '@bpdm/ng';
       mode="range"
       [(value)]="range"
       [presets]="presets"
-      placeholder="Pick a range"
+      captionLayout="dropdown"
+      placeholder="Pick a date range"
     />
   `,
 })
-export class RangeComponent {
+export class RangePresetsComponent {
   range: DateRange | null = null;
-  presets = defaultRangePresets;
+  presets = [
+    {
+      label: 'Year to date',
+      range: () => {
+        const n = new Date();
+        return { from: new Date(n.getFullYear(), 0, 1), to: n };
+      },
+    },
+    {
+      label: 'Last quarter',
+      range: () => {
+        const n = new Date();
+        return { from: new Date(n.getFullYear(), n.getMonth() - 3, 1), to: n };
+      },
+    },
+    ...defaultRangePresets,
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Min, max & disabled days
+
+Clamp the selectable window with `min` / `max`, and block specific days with a `disabled` predicate
+— here, only weekdays in the next three months are pickable.
+
+<Preview>
+  <CalendarConstraintsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="constraints.tsx"
+import { useState } from 'react';
+import { DatePicker } from '@bpdm/ui/calendar';
+
+export function Constraints() {
+  const [date, setDate] = useState<Date | null>(null);
+  const today = new Date();
+  const inThreeMonths = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
+
+  return (
+    <DatePicker
+      value={date}
+      onChange={(v) => setDate(v as Date | null)}
+      min={today}
+      max={inThreeMonths}
+      disabled={(d) => d.getDay() === 0 || d.getDay() === 6}
+      placeholder="Weekday in next 3 months"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="constraints.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-constraints',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `
+    <bpdm-date-picker
+      [(value)]="date"
+      [min]="today"
+      [max]="inThreeMonths"
+      [disabled]="isWeekend"
+      placeholder="Weekday in next 3 months" />
+  `,
+})
+export class ConstraintsComponent {
+  date: Date | null = null;
+  today = new Date();
+  inThreeMonths = new Date(this.today.getFullYear(), this.today.getMonth() + 3, this.today.getDate());
+  isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
 }
 ```
 
@@ -164,59 +324,6 @@ export class InlineComponent {
   </Tab>
 </Tabs>
 
-## Min, max & disabled days
-
-Clamp the selectable window with `min` / `max`, and block specific days with a `disabled` predicate
-— here, weekends.
-
-<Preview>
-  <CalendarConstraintsDemo />
-</Preview>
-
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
-
-```tsx title="constraints.tsx"
-import { DatePicker } from '@bpdm/ui/calendar';
-
-const isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
-
-export function Constraints() {
-  return (
-    <DatePicker
-      min={new Date(2026, 5, 1)}
-      max={new Date(2026, 5, 30)}
-      disabled={isWeekend}
-    />
-  );
-}
-```
-
-  </Tab>
-  <Tab value="Angular">
-
-```ts title="constraints.component.ts"
-import { Component } from '@angular/core';
-import { BpdmDatePicker } from '@bpdm/ng';
-
-@Component({
-  selector: 'app-constraints',
-  standalone: true,
-  imports: [BpdmDatePicker],
-  template: `
-    <bpdm-date-picker [min]="min" [max]="max" [disabled]="isWeekend" />
-  `,
-})
-export class ConstraintsComponent {
-  min = new Date(2026, 5, 1);
-  max = new Date(2026, 5, 30);
-  isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
-}
-```
-
-  </Tab>
-</Tabs>
-
 ## Dropdown caption
 
 `captionLayout="dropdown"` swaps the prev/next header for month + year menus — handy for jumping
@@ -252,6 +359,469 @@ import { BpdmCalendar } from '@bpdm/ng';
   template: `<bpdm-calendar captionLayout="dropdown" />`,
 })
 export class CaptionComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Square days
+
+`dayShape="square"` swaps the circular day highlight for a rounded-corner square.
+
+<Preview>
+  <CalendarSquareDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="square.tsx"
+import { Calendar } from '@bpdm/ui/calendar';
+
+export function Square() {
+  return <Calendar dayShape="square" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="square.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCalendar } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-square',
+  standalone: true,
+  imports: [BpdmCalendar],
+  template: `<bpdm-calendar dayShape="square" />`,
+})
+export class SquareComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Week starts on Sunday
+
+`weekStartsOn={0}` starts the week on Sunday instead of Monday (locale conventions differ).
+
+<Preview>
+  <CalendarSundayFirstDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="sunday-first.tsx"
+import { DatePicker } from '@bpdm/ui/calendar';
+
+export function SundayFirst() {
+  return <DatePicker weekStartsOn={0} placeholder="Pick a date" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="sunday-first.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-sunday-first',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `<bpdm-date-picker [weekStartsOn]="0" placeholder="Pick a date" />`,
+})
+export class SundayFirstComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Invalid
+
+Mark the picker `invalid` for a destructive border, and pair it with an error message.
+
+<Preview>
+  <CalendarInvalidDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="invalid.tsx"
+import { DatePicker } from '@bpdm/ui/calendar';
+
+export function Invalid() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <DatePicker invalid placeholder="Required" />
+      <p className="text-sm text-destructive">Please choose a date.</p>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="invalid.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-invalid',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `
+    <div class="flex flex-col gap-1.5">
+      <bpdm-date-picker invalid placeholder="Required" />
+      <p class="text-sm text-destructive">Please choose a date.</p>
+    </div>
+  `,
+})
+export class InvalidComponent {}
+```
+
+  </Tab>
+</Tabs>
+
+## Confirm before applying
+
+By default a pick commits immediately. Pass `confirm` to **buffer** the selection and
+commit only on **Apply** — Cancel, Escape and outside-click discard the draft. Ideal when
+applying triggers an expensive action (dashboards, reports, saved filters).
+
+<Preview>
+  <CalendarConfirmDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="confirm.tsx"
+import { DatePicker, defaultRangePresets } from '@bpdm/ui/calendar';
+
+export function Confirm() {
+  return (
+    <DatePicker
+      mode="range"
+      presets={defaultRangePresets}
+      confirm
+      placeholder="Pick a date range"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="confirm.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker, defaultRangePresets, type DateRangePreset } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-confirm',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `
+    <bpdm-date-picker
+      mode="range"
+      [presets]="presets"
+      confirm
+      placeholder="Pick a date range"
+    />
+  `,
+})
+export class ConfirmComponent {
+  presets: DateRangePreset[] = defaultRangePresets;
+}
+```
+
+  </Tab>
+</Tabs>
+
+### Inline, with your own actions
+
+`Calendar` is fully controlled, so an inline (non-popover) Apply/Cancel flow needs no extra
+props — hold a **draft** in your own state, render your own buttons, and commit on Apply.
+
+<Preview>
+  <CalendarInlineConfirmDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="inline-confirm.tsx"
+import { useState } from 'react';
+import { Calendar } from '@bpdm/ui/calendar';
+import { Button } from '@bpdm/ui/button';
+
+export function InlineConfirm() {
+  const [committed, setCommitted] = useState<Date | null>(null);
+  const [draft, setDraft] = useState<Date | null>(null);
+  return (
+    <div className="w-fit">
+      <Calendar value={draft} onChange={(v) => setDraft(v as Date | null)} />
+      <div className="mt-2 flex justify-end gap-2">
+        <Button variant="secondary" onClick={() => setDraft(committed)}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={() => setCommitted(draft)}>
+          Apply
+        </Button>
+      </div>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="inline-confirm.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCalendar, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-inline-confirm',
+  standalone: true,
+  imports: [BpdmCalendar, BpdmButton],
+  template: `
+    <div class="w-fit">
+      <bpdm-calendar [(value)]="draft" />
+      <div class="mt-2 flex justify-end gap-2">
+        <button bpdmButton variant="secondary" (click)="draft = committed">Cancel</button>
+        <button bpdmButton variant="primary" (click)="committed = draft">Apply</button>
+      </div>
+    </div>
+  `,
+})
+export class InlineConfirmComponent {
+  committed: Date | null = null;
+  draft: Date | null = null;
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Complete example
+
+Everything on this page composed into one control: a range `DatePicker` with
+quick-pick presets, a dropdown month/year caption, a Monday-first week, square
+day cells, and weekends disabled.
+
+<Preview>
+  <CalendarShowcaseDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="booking.tsx"
+import { DatePicker, defaultRangePresets } from '@bpdm/ui/calendar';
+
+const isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
+
+const presets = [
+  {
+    label: 'Year to date',
+    range: () => ({ from: new Date(new Date().getFullYear(), 0, 1), to: new Date() }),
+  },
+  {
+    label: 'Last quarter',
+    range: () => {
+      const now = new Date();
+      return { from: new Date(now.getFullYear(), now.getMonth() - 3, 1), to: now };
+    },
+  },
+  ...defaultRangePresets,
+];
+
+export function Booking() {
+  return (
+    <DatePicker
+      mode="range"
+      presets={presets}
+      captionLayout="dropdown"
+      weekStartsOn={1}
+      dayShape="square"
+      disabled={isWeekend}
+      placeholder="Book a stay"
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="booking.component.ts"
+import { Component } from '@angular/core';
+import { BpdmDatePicker, defaultRangePresets, type DateRangePreset } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-booking',
+  standalone: true,
+  imports: [BpdmDatePicker],
+  template: `
+    <bpdm-date-picker
+      mode="range"
+      [presets]="presets"
+      captionLayout="dropdown"
+      [weekStartsOn]="1"
+      dayShape="square"
+      [disabled]="isWeekend"
+      placeholder="Book a stay"
+    />
+  `,
+})
+export class BookingComponent {
+  isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6;
+
+  presets: DateRangePreset[] = [
+    {
+      label: 'Year to date',
+      range: () => ({ from: new Date(new Date().getFullYear(), 0, 1), to: new Date() }),
+    },
+    {
+      label: 'Last quarter',
+      range: () => {
+        const now = new Date();
+        return { from: new Date(now.getFullYear(), now.getMonth() - 3, 1), to: now };
+      },
+    },
+    ...defaultRangePresets,
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## API
+
+`Calendar` (React) / `<bpdm-calendar>` renders the month grid; `DatePicker` /
+`<bpdm-date-picker>` wraps it in a popover trigger and adds the props in the second block.
+
+### `Calendar` / `bpdm-calendar`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `single \| range` | `single` | Pick a `Date` or a `{ from, to }` range. |
+| `value` / `defaultValue` | `Date \| DateRange \| null` | — | Controlled / uncontrolled selection. |
+| `onChange` *(React)* | `(value) => void` | — | Fires on selection. Angular uses two-way `[(value)]`. |
+| `min` / `max` | `Date` | — | Selectable bounds (out-of-range days are disabled). |
+| `disabled` | `(date: Date) => boolean` | — | Disable specific days (e.g. weekends). |
+| `weekStartsOn` | `0 \| 1` | `1` | First column — `0` Sunday, `1` Monday. |
+| `dayShape` | `circle \| square` | `circle` | Day highlight shape. |
+| `numberOfMonths` | `number` | `1` | Months shown side by side. |
+| `captionLayout` | `buttons \| dropdown` | `buttons` | Header: prev/next only, or month + year menus. |
+| `fromYear` / `toYear` | `number` | −100y / +10y | Year-dropdown range. |
+| `locale` | `string` (BCP 47) | runtime default | Month / weekday names + date formatting. |
+| `messages` | `{ calendar, previousMonth, nextMonth, month, year, clear, cancel, apply }` | English | Override control labels for i18n. |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes. |
+
+### `DatePicker` / `bpdm-date-picker` — adds
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `presets` | `DateRangePreset[]` | — | Range-mode quick presets (e.g. `defaultRangePresets`). |
+| `placeholder` | `string` | `Pick a date` | Trigger text when empty. |
+| `clearable` | `boolean` | `true` | Show a clear (×) button when a value is set. |
+| `confirm` | `boolean` | `false` | Buffer the selection; commit only on **Apply** (adds a Cancel/Apply footer). |
+| `disabledInput` | `boolean` | `false` | Disable the whole trigger. **Not** the same as `disabled` (which filters days). |
+| `invalid` | `boolean` | `false` | `aria-invalid` styling on the trigger. |
+| `id` | `string` | — | Trigger id (for `<label>` association). |
+| `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the trigger. |
+| `contentClassName` | `string` | — | Extra classes on the popover panel. |
+
+<Callout title="`disabled` vs `disabledInput`">
+  `disabled` is the per-day predicate inherited from `Calendar` — `(date) => boolean` — used to grey
+  out individual days. To disable the whole picker trigger, use **`disabledInput`**.
+</Callout>
+
+## Accessibility
+
+- Each month is a WAI-ARIA **grid**: `role="grid"` → `role="row"` per week → `role="gridcell"`, with
+  the weekday headers as `role="columnheader"`. Each day button has a **full, locale-formatted
+  accessible name** (e.g. "January 15, 2026", not just "15"), today carries `aria-current="date"`,
+  the selected day's cell is `aria-selected`, and range mode sets `aria-multiselectable`.
+- **Roving focus**: real DOM focus moves onto the active day as you navigate, so a screen reader
+  **announces each date** — only the focused day is tabbable (roving `tabindex`).
+- **Keyboard**: arrows move day-by-day and across weeks (**RTL-aware** — they follow the visual
+  layout), **Home/End** jump to the first/last day of the week, **PageUp/PageDown** change month,
+  **Enter/Space** select. The month/year dropdowns keep their own keys (they sit outside the grid),
+  and nav buttons + dropdowns are labelled.
+- The `DatePicker` trigger shows the formatted value and opens the grid in a popover; the clear
+  control is a real, keyboard-reachable labelled button.
+
+## Internationalization
+
+- **Locale-aware by design**: `locale` drives month + weekday names and the day/trigger date
+  formatting through `Intl.DateTimeFormat` — no hard-coded English. Set `weekStartsOn` for the
+  first day of the week. The fixed control labels (prev/next month, month, year, clear) are
+  overridable via `messages`.
+- **RTL-safe**: the day grid mirrors under `dir="rtl"` (CSS grid follows writing direction), the
+  prev/next chevrons flip, and the range band uses logical rounding (`rounded-s`/`rounded-e`).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="calendar-i18n.tsx"
+import { Calendar } from '@bpdm/ui/calendar';
+
+const de = {
+  calendar: 'Kalender',
+  previousMonth: 'Voriger Monat',
+  nextMonth: 'Nächster Monat',
+  month: 'Monat',
+  year: 'Jahr',
+  clear: 'Löschen',
+};
+
+export function GermanCalendar() {
+  return (
+    <Calendar locale="de-DE" weekStartsOn={1} captionLayout="dropdown" messages={de} />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="calendar-i18n.component.ts"
+import { Component } from '@angular/core';
+import { BpdmCalendar } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-german-calendar',
+  standalone: true,
+  imports: [BpdmCalendar],
+  template: `
+    <bpdm-calendar
+      locale="de-DE"
+      [weekStartsOn]="1"
+      captionLayout="dropdown"
+      [messages]="de"
+    />
+  `,
+})
+export class GermanCalendarComponent {
+  de = {
+    calendar: 'Kalender',
+    previousMonth: 'Voriger Monat',
+    nextMonth: 'Nächster Monat',
+    month: 'Monat',
+    year: 'Jahr',
+    clear: 'Löschen',
+  };
+}
 ```
 
   </Tab>
