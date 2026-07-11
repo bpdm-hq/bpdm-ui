@@ -12,15 +12,18 @@ export const cardVariants = cva(
   {
     variants: {
       variant: {
-        // shadow only — floats off the page, no visible border
-        elevated: "border border-transparent shadow-md",
+        // floats off the page: a hairline edge (so the top never dissolves into a
+        // light page) + a layered soft shadow (tight contact + wide ambient) for depth
+        elevated:
+          "border border-border/60 shadow-[0_1px_2px_rgba(15,17,21,0.05),0_10px_26px_-6px_rgba(15,17,21,0.14),0_2px_6px_-2px_rgba(15,17,21,0.08)]",
         // border only — flat, no shadow
         outlined: "border border-border shadow-none",
         // filled muted surface — no border, no shadow
         soft: "border border-transparent bg-muted/60 shadow-none",
       },
       hoverable: {
-        true: "hover:-translate-y-1.5 hover:shadow-xl hover:border-border",
+        // stronger lift + a fuller shadow + a crisper edge on hover
+        true: "hover:-translate-y-1.5 hover:border-border hover:shadow-[0_2px_6px_rgba(15,17,21,0.08),0_22px_48px_-10px_rgba(15,17,21,0.22),0_6px_14px_-6px_rgba(15,17,21,0.12)]",
         false: "",
       },
       interactive: {
