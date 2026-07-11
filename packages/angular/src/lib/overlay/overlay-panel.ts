@@ -45,7 +45,7 @@ import { cn } from "@bpdm/variants";
           {{ title() || fallbackTitle() }}
         </h2>
         @if (description()) {
-          <p [attr.id]="descId()" class="text-sm text-muted-foreground">{{ description() }}</p>
+          <p [attr.id]="descId()" class="m-0 text-sm text-muted-foreground">{{ description() }}</p>
         }
       </div>
       @if (body()) {

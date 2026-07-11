@@ -1,6 +1,6 @@
 import { Component, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmCard, BpdmCardFooter } from "./card";
+import { BpdmCard, BpdmCardFooter, BpdmCardTitle } from "./card";
 
 @Component({
   imports: [BpdmCard],
@@ -21,6 +21,14 @@ class HoverableHost {}
 class FooterHost {
   readonly divider = signal(false);
 }
+
+// bpdmCardTitle is a directive applied to whatever heading element you choose,
+// so the document-outline level is yours (the Angular equivalent of React's `as`).
+@Component({
+  imports: [BpdmCardTitle],
+  template: `<h2 bpdmCardTitle>Deployment</h2>`,
+})
+class TitleHost {}
 
 describe("BpdmCard", () => {
   it("applies the requested surface variant", () => {
@@ -47,5 +55,21 @@ describe("BpdmCard", () => {
     fixture.componentInstance.divider.set(true);
     fixture.detectChanges();
     expect(footer.classList.contains("border-t")).toBe(true);
+  });
+
+  it("styles the title at the heading level you choose, self-contained (m-0)", () => {
+    const fixture = TestBed.createComponent(TitleHost);
+    fixture.detectChanges();
+    const h = fixture.nativeElement.querySelector("h2") as HTMLElement;
+    expect(h).toBeTruthy(); // level is the consumer's (here <h2>) — correct outline
+    expect(h.classList.contains("text-lg")).toBe(true);
+    expect(h.classList.contains("m-0")).toBe(true); // resets ambient host heading margin
+  });
+
+  it("keeps the card free of a host link underline (self-contained)", () => {
+    const fixture = TestBed.createComponent(CardHost);
+    fixture.detectChanges();
+    const card = fixture.nativeElement.querySelector("bpdm-card") as HTMLElement;
+    expect(card.classList.contains("no-underline")).toBe(true);
   });
 });

@@ -157,7 +157,7 @@ export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayPro
         {...props}
       >
         <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} label={label ?? "Loading"} />
-        {label && <p className="text-sm font-medium text-muted-foreground">{label}</p>}
+        {label && <p className="m-0 text-sm font-medium text-muted-foreground">{label}</p>}
         {children}
       </div>
     );

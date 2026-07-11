@@ -59,7 +59,7 @@ const FILTER_FIELD =
                 <span class="truncate">{{ o.label }}</span>
               </label>
             } @empty {
-              <p class="px-2 py-1.5 text-sm text-muted-foreground">{{ messages().noValues }}</p>
+              <p class="m-0 px-2 py-1.5 text-sm text-muted-foreground">{{ messages().noValues }}</p>
             }
           </div>
           <div class="flex items-center justify-between border-t border-border pt-2">

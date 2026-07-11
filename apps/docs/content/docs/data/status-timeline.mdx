@@ -650,6 +650,79 @@ export class Onboarding {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+Every step renders a **visually-hidden status label** so screen-reader users hear
+its state (see [Accessibility](#accessibility)). Those four strings — and only those
+— are translatable via `messages`, a `Partial<StatusTimelineMessages>` merged over
+the English defaults, so you localize just the subset you need. Everything visible
+(`title`, `timestamp`, `description`, `opposite`) is your own content, translated at
+the call site.
+
+The layout uses **logical CSS properties** throughout, so the timeline mirrors
+automatically under `dir="rtl"` — no prop needed.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="status-timeline-i18n.tsx"
+import { StatusTimeline, type StatusTimelineMessages, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+// German overrides — pass any subset; the rest fall back to English
+const de: Partial<StatusTimelineMessages> = {
+  complete: 'Abgeschlossen',
+  current: 'In Bearbeitung',
+  pending: 'Ausstehend',
+  failed: 'Fehlgeschlagen',
+};
+
+const steps: TimelineItem[] = [
+  { title: 'Nach main gepusht', status: 'complete', timestamp: '09:41' },
+  { title: 'CI-Prüfungen bestanden', status: 'complete', timestamp: '09:46' },
+  { title: 'Wird auf Staging bereitgestellt', status: 'current', timestamp: '09:47' },
+  { title: 'Für Produktion freigeben', status: 'pending' },
+];
+
+export function DeployTimeline() {
+  return <StatusTimeline items={steps} label="Bereitstellungsverlauf" messages={de} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="status-timeline-i18n.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type StatusTimelineMessages, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'deploy-timeline',
+  imports: [BpdmStatusTimeline],
+  template: `
+    <bpdm-status-timeline [items]="steps" label="Bereitstellungsverlauf" [messages]="de" />
+  `,
+})
+export class DeployTimeline {
+  // German overrides — pass any subset; the rest fall back to English
+  readonly de: Partial<StatusTimelineMessages> = {
+    complete: 'Abgeschlossen',
+    current: 'In Bearbeitung',
+    pending: 'Ausstehend',
+    failed: 'Fehlgeschlagen',
+  };
+
+  readonly steps: TimelineItem[] = [
+    { title: 'Nach main gepusht', status: 'complete', timestamp: '09:41' },
+    { title: 'CI-Prüfungen bestanden', status: 'complete', timestamp: '09:46' },
+    { title: 'Wird auf Staging bereitgestellt', status: 'current', timestamp: '09:47' },
+    { title: 'Für Produktion freigeben', status: 'pending' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatusTimeline` / `<bpdm-status-timeline>`
@@ -664,7 +737,20 @@ export class Onboarding {
 | `renderMarker` (Angular `markerTemplate`) | `(item, status) => ReactNode` / `TemplateRef` | — | Render the whole marker yourself (any size/shape). |
 | `renderContent` (Angular `contentTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole content cell yourself (a rich card, etc.). |
 | `renderOpposite` (Angular `oppositeTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole opposite cell yourself (vertical layouts). |
+| `messages` | `Partial<StatusTimelineMessages>` | — | Override the visually-hidden status labels announced to screen readers (i18n). |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
+
+### `StatusTimelineMessages`
+
+The visually-hidden status text announced for each step (screen readers), merged
+over the English defaults — override any subset.
+
+| Key | Default |
+| --- | --- |
+| `complete` | `"Completed"` |
+| `current` | `"In progress"` |
+| `pending` | `"Not started"` |
+| `failed` | `"Failed"` |
 
 ### `TimelineItem`
 
@@ -683,10 +769,15 @@ export class Onboarding {
 
 - Renders an ordered list (`<ol>` / `<li>`) — steps are announced in sequence.
   Pass `label` to name the list, and the **current** step carries `aria-current="step"`.
-- Status is **never colour-only**: each state has a distinct marker/icon
-  (✓ complete, a filled pulsing dot for current, a hollow ring for pending, ✗ failed)
-  and the `title` describes the step.
+- Status is **never conveyed by colour or glyph alone**: the marker (✓ complete, a
+  filled pulsing dot for current, a hollow ring for pending, ✗ failed) is decorative
+  (`aria-hidden`), so each step also renders a **visually-hidden status label** —
+  "Completed" / "In progress" / "Not started" / "Failed" — that screen-reader users
+  hear alongside the `title`. Those four strings are translatable via `messages` (see
+  [Internationalization](#internationalization)).
 - The `current` step's pulse respects reduced-motion preferences.
 - `timestamp` and `description` are plain text, read alongside the step title.
 - Interactive steps (`onItemClick` / `interactive`) expose `role="button"`, are
   focusable, and respond to **Enter / Space** — fully keyboard-operable.
+- Layout uses **logical CSS properties**, so the timeline mirrors correctly under
+  `dir="rtl"` with no extra configuration.

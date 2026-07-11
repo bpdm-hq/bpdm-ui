@@ -4,8 +4,11 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type AccordionVariant = "default" | "separated" | "borderless";
+/** Heading level for each item's header (correct document outline). */
+export type AccordionHeadingLevel = 2 | 3 | 4 | 5 | 6;
 
 const VariantContext = React.createContext<AccordionVariant>("default");
+const HeadingLevelContext = React.createContext<AccordionHeadingLevel>(3);
 
 // --- composable primitives ---
 export const AccordionItem = React.forwardRef<
@@ -37,24 +40,35 @@ export const AccordionTrigger = React.forwardRef<
   }
 >(({ className, children, icon, ...props }, ref) => {
   const variant = React.useContext(VariantContext);
+  const level = React.useContext(HeadingLevelContext);
+  const trigger = (
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        // `text-start` (logical) so the header aligns correctly under `dir="rtl"`
+        "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
+        // open header stands out; closed is calmer — the "active" emphasis
+        variant === "borderless"
+          ? "px-0 py-4 font-medium text-muted-foreground hover:text-foreground data-[state=open]:text-foreground"
+          : "px-4 py-3.5 font-medium text-foreground hover:bg-muted/50",
+        className,
+      )}
+      {...props}
+    >
+      {icon}
+      <span className="flex-1">{children}</span>
+      <ChevronDown className="shrink-0 text-muted-foreground transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground" />
+    </AccordionPrimitive.Trigger>
+  );
+  // WAI-ARIA APG accordion header: "an element with role heading" at the right
+  // aria-level. Using role=heading (not a native <h2>–<h6> tag) keeps the component
+  // self-contained — it never inherits a host page's global heading typography — and
+  // mirrors the Angular twin exactly.
   return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(
-          "group flex flex-1 cursor-pointer items-center gap-3 text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
-          // open header stands out; closed is calmer — the "active" emphasis
-          variant === "borderless"
-            ? "px-0 py-4 font-medium text-muted-foreground hover:text-foreground data-[state=open]:text-foreground"
-            : "px-4 py-3.5 font-medium text-foreground hover:bg-muted/50",
-          className,
-        )}
-        {...props}
-      >
-        {icon}
-        <span className="flex-1">{children}</span>
-        <ChevronDown className="shrink-0 text-muted-foreground transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground" />
-      </AccordionPrimitive.Trigger>
+    <AccordionPrimitive.Header asChild>
+      <div role="heading" aria-level={level} className="flex">
+        {trigger}
+      </div>
     </AccordionPrimitive.Header>
   );
 });
@@ -98,6 +112,8 @@ export type AccordionProps = {
   items: AccordionItemData[];
   /** "default" (bordered list) or "separated" (each item a card). */
   variant?: AccordionVariant;
+  /** Heading level for each item's header, for correct document outline. Default 3. */
+  headingLevel?: AccordionHeadingLevel;
   className?: string;
 } & (
   | {
@@ -123,7 +139,7 @@ export type AccordionProps = {
  * `AccordionItem` / `AccordionTrigger` / `AccordionContent`.
  */
 export function Accordion(props: AccordionProps) {
-  const { items, variant = "default", className } = props;
+  const { items, variant = "default", headingLevel = 3, className } = props;
   const single = (props.type ?? "single") === "single";
 
   // forward only the value/controlled props (never spread the bare discriminant)
@@ -144,24 +160,26 @@ export function Accordion(props: AccordionProps) {
 
   return (
     <VariantContext.Provider value={variant}>
-      <AccordionPrimitive.Root
-        {...(rootProps as React.ComponentProps<typeof AccordionPrimitive.Root>)}
-        className={cn(
-          variant === "separated"
-            ? "flex flex-col gap-2"
-            : variant === "borderless"
-              ? ""
-              : "overflow-hidden rounded-[var(--radius)] border border-border",
-          className,
-        )}
-      >
-        {items.map((item) => (
-          <AccordionItem key={item.value} value={item.value} disabled={item.disabled}>
-            <AccordionTrigger icon={item.icon}>{item.title}</AccordionTrigger>
-            <AccordionContent>{item.content}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </AccordionPrimitive.Root>
+      <HeadingLevelContext.Provider value={headingLevel}>
+        <AccordionPrimitive.Root
+          {...(rootProps as React.ComponentProps<typeof AccordionPrimitive.Root>)}
+          className={cn(
+            variant === "separated"
+              ? "flex flex-col gap-2"
+              : variant === "borderless"
+                ? ""
+                : "overflow-hidden rounded-[var(--radius)] border border-border",
+            className,
+          )}
+        >
+          {items.map((item) => (
+            <AccordionItem key={item.value} value={item.value} disabled={item.disabled}>
+              <AccordionTrigger icon={item.icon}>{item.title}</AccordionTrigger>
+              <AccordionContent>{item.content}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </AccordionPrimitive.Root>
+      </HeadingLevelContext.Provider>
     </VariantContext.Provider>
   );
 }

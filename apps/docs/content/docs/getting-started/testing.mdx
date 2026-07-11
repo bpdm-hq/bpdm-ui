@@ -683,7 +683,10 @@ fixture.detectChanges();
 
 The timeline renders a semantic **`list`** (named by `label`), each step is a
 `listitem`, the **current** step carries `aria-current="step"`, and interactive
-steps / custom markers are labelled `button`s — so query by role, no test ids.
+steps / custom markers are labelled `button`s — so query by role, no test ids. Each
+step also carries a **visually-hidden status label** ("Completed" / "In progress" /
+"Not started" / "Failed"), so assert state by text — never the marker colour — and
+remember it's overridable via `messages`.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
@@ -702,6 +705,10 @@ screen.getAllByRole('listitem');                       // one per step
 const current = screen.getByText('Deploying').closest('li');
 expect(current).toHaveAttribute('aria-current', 'step');
 
+// status is announced, not colour-only — assert the sr-only label
+expect(current).toHaveTextContent('In progress');
+screen.getByText('Completed');                         // a complete step's status
+
 // interactive steps / custom markers are labelled buttons
 await userEvent.click(screen.getByRole('button', { name: /complete step 2/i }));
 ```
@@ -714,7 +721,8 @@ const el = fixture.nativeElement as HTMLElement;
 
 el.querySelector('[aria-label="Deploy pipeline"]');       // the list
 el.querySelectorAll('li');                                // steps
-el.querySelector('[aria-current="step"]');                // the current step
+const current = el.querySelector('[aria-current="step"]'); // the current step
+expect(current?.textContent).toContain('In progress');    // sr-only status, not colour
 el.querySelector<HTMLButtonElement>('button[aria-label="Complete step 2"]')?.click();
 fixture.detectChanges();
 ```
@@ -754,6 +762,132 @@ const card = el.querySelector('bpdm-stat-card') as HTMLElement;
 
 expect(card.getAttribute('role')).toBe('group');       // named by label via aria-labelledby
 el.querySelector('[aria-label="Increased 3.1%"]');     // delta direction for screen readers
+```
+
+  </Tab>
+</Tabs>
+
+### Accordion
+
+Each header is a `button` carrying `aria-expanded` + `aria-controls`, and each panel
+is a `role="region"` labelled by its trigger (`aria-labelledby`) — so drive it entirely
+by role, no test ids. Toggle a header and assert `aria-expanded`; a **collapsed panel is
+out of the tab order and hidden from assistive tech** (React unmounts it, so it's no
+longer a queryable `region`; Angular keeps it in the DOM but marks it `inert`).
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="accordion.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Accordion, type AccordionItemData } from '@bpdm/ui/accordion';
+
+const items: AccordionItemData[] = [
+  { value: 'deploys', title: 'How are deploys triggered?', content: 'Every push to main runs CI.' },
+  { value: 'logs', title: 'Where are build logs stored?', content: 'Logs are kept for 30 days.' },
+];
+
+render(<Accordion type="single" collapsible items={items} />);
+
+// each header is a button carrying aria-expanded
+const trigger = screen.getByRole('button', { name: 'How are deploys triggered?' });
+expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+// open it — the panel becomes a region labelled by its trigger
+await userEvent.click(trigger);
+expect(trigger).toHaveAttribute('aria-expanded', 'true');
+expect(screen.getByRole('region', { name: 'How are deploys triggered?' })).toBeVisible();
+
+// a collapsed panel is hidden from assistive tech (no region) + out of the tab order
+expect(screen.queryByRole('region', { name: 'Where are build logs stored?' })).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="accordion.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const triggers = el.querySelectorAll<HTMLButtonElement>('button[aria-controls]');
+const panels = el.querySelectorAll<HTMLElement>('[role="region"]');
+
+// each panel is labelled by its trigger
+expect(panels[0].getAttribute('aria-labelledby')).toBe(triggers[0].id);
+
+// toggle the first header
+expect(triggers[0].getAttribute('aria-expanded')).toBe('false');
+triggers[0].click();
+fixture.detectChanges();
+expect(triggers[0].getAttribute('aria-expanded')).toBe('true');
+
+// a collapsed panel is inert — out of the tab order + hidden from AT
+expect(panels[1].hasAttribute('inert')).toBe(true);
+```
+
+  </Tab>
+</Tabs>
+
+### Card
+
+The **Card** is compositional and renders plain markup, so target it by **role** and
+**text** — no test ids. `CardTitle` is a real heading (`getByRole('heading')`; its
+level follows the React `as` prop / the Angular tag). A fully-clickable card is a
+real `<a>`/`<button>` (via `asChild` in React), so query it with
+`getByRole('link')`. Pin the surface with a `variant` / `hoverable` class only if you
+rely on it, and assert the footer's `divider` by its `border-t` class.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="card.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@bpdm/ui/card';
+
+render(
+  <Card variant="outlined" hoverable asChild>
+    <a href="/reports">
+      <CardHeader>
+        <CardTitle as="h2">Weekly report</CardTitle>
+      </CardHeader>
+      <CardContent>Deploys, reviews, and open tasks.</CardContent>
+      <CardFooter divider>
+        <span>Footer</span>
+      </CardFooter>
+    </a>
+  </Card>,
+);
+
+// the title is a real heading at the level you set
+const heading = screen.getByRole('heading', { level: 2, name: 'Weekly report' });
+
+// asChild makes the whole card one link
+const link = screen.getByRole('link', { name: /Weekly report/ });
+expect(link).toHaveClass('border-border'); // outlined surface
+
+// the divider is a class on the footer
+expect(screen.getByText('Footer').closest('div')).toHaveClass('border-t');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="card.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// the title is a real heading — the tag you chose sets the level
+const heading = el.querySelector('h2') as HTMLHeadingElement;
+expect(heading.textContent).toContain('Weekly report');
+
+// a clickable card is your own <a>/<button> wrapping the card
+el.querySelector('a')!;
+
+// the surface variant lands on the card host element
+const card = el.querySelector('bpdm-card') as HTMLElement;
+expect(card.classList.contains('border-border')).toBe(true); // outlined
+
+// the footer's divider is a class toggled by [divider]
+expect(el.querySelector('[bpdmCardFooter]')!.classList.contains('border-t')).toBe(true);
 ```
 
   </Tab>

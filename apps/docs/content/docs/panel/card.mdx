@@ -17,8 +17,8 @@ import { Preview } from '@/components/preview';
 The **Card** is a composable surface — compose `CardHeader` / `CardTitle` /
 `CardDescription` / `CardContent` / `CardFooter`, plus an optional edge-to-edge
 `CardMedia`. Three surface variants, an optional hover-lift, and a fully-clickable
-`interactive` mode. In Angular the parts are directives (`bpdmCardTitle`, …) on your
-own elements.
+`interactive` mode. In Angular the parts are directives (`bpdmCardTitle`, …) you
+apply to your own elements.
 
 ## Usage
 
@@ -61,13 +61,20 @@ The parts are directives on your own elements; the card + header are components.
 ```ts title="card-usage.ts"
 import { Component } from '@angular/core';
 import {
-  BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter,
+  BpdmCard,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+  BpdmCardFooter,
+  BpdmButton,
 } from '@bpdm/ng';
-import { BpdmButton } from '@bpdm/ng';
 
 @Component({
   selector: 'report-card',
-  imports: [BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter, BpdmButton],
+  imports: [
+    BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter, BpdmButton,
+  ],
   template: `
     <bpdm-card>
       <bpdm-card-header>
@@ -88,50 +95,62 @@ export class ReportCard {}
   </Tab>
 </Tabs>
 
-## Media & action
+## Heading level
 
-`CardMedia` is an edge-to-edge band at the top (it zooms on card hover). The header
-takes a right-aligned `action` slot — a badge, an icon button, a menu.
-
-<Preview>
-  <CardMediaDemo />
-</Preview>
+`CardTitle` renders a **real heading** (with its margin reset so it doesn't inherit
+your page's heading spacing). Set its level so the card sits correctly in the
+document outline — don't skip levels. In **React** pass `as` (`"h1"`…`"h6"`, default
+`"h3"`); in **Angular** apply the `bpdmCardTitle` directive to whatever heading tag
+you choose.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="card-media.tsx"
-<Card hoverable>
-  <CardMedia src="/cover.jpg" alt="Release cover" aspect="video" />
-  <CardHeader action={<Badge variant="success" appearance="soft" dot>Live</Badge>}>
-    <CardTitle>Release 2.4</CardTitle>
-    <CardDescription>Shipped 3 hours ago</CardDescription>
-  </CardHeader>
-  <CardContent>Dark mode, faster search, and a dozen fixes.</CardContent>
-  <CardFooter divider>
-    <Button size="sm" variant="secondary" appearance="outline">Changelog</Button>
-  </CardFooter>
-</Card>
+```tsx title="heading-level.tsx"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@bpdm/ui/card';
+
+export function SectionCard() {
+  return (
+    <Card>
+      <CardHeader>
+        {/* sits under an <h1> page title → use h2 */}
+        <CardTitle as="h2">Billing</CardTitle>
+        <CardDescription>Plans, invoices, and usage.</CardDescription>
+      </CardHeader>
+      <CardContent>Your current plan renews on the 1st.</CardContent>
+    </Card>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-The action is any element marked `bpdmCardAction` inside the header.
+```ts title="heading-level.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCard,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+} from '@bpdm/ng';
 
-```html title="card-media.html"
-<bpdm-card [hoverable]="true">
-  <bpdm-card-media src="/cover.jpg" alt="Release cover" aspect="video" />
-  <bpdm-card-header>
-    <h3 bpdmCardTitle>Release 2.4</h3>
-    <p bpdmCardDescription>Shipped 3 hours ago</p>
-    <bpdm-badge bpdmCardAction variant="success" appearance="soft" dot>Live</bpdm-badge>
-  </bpdm-card-header>
-  <div bpdmCardContent>Dark mode, faster search, and a dozen fixes.</div>
-  <div bpdmCardFooter [divider]="true">
-    <button bpdmButton size="sm" variant="secondary" appearance="outline">Changelog</button>
-  </div>
-</bpdm-card>
+@Component({
+  selector: 'section-card',
+  imports: [BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent],
+  template: `
+    <bpdm-card>
+      <bpdm-card-header>
+        <!-- sits under an <h1> page title → use h2 -->
+        <h2 bpdmCardTitle>Billing</h2>
+        <p bpdmCardDescription>Plans, invoices, and usage.</p>
+      </bpdm-card-header>
+      <div bpdmCardContent>Your current plan renews on the 1st.</div>
+    </bpdm-card>
+  `,
+})
+export class SectionCard {}
 ```
 
   </Tab>
@@ -140,7 +159,8 @@ The action is any element marked `bpdmCardAction` inside the header.
 ## Variants
 
 `variant` sets the surface: **elevated** (soft shadow, default), **outlined** (a
-hairline border), or **soft** (a muted fill). The preview toggles them with our `Tabs`.
+hairline border), or **soft** (a muted fill). The preview toggles them with our
+[Tabs](/docs/panel/tabs).
 
 <Preview>
   <CardVariantsDemo />
@@ -150,25 +170,68 @@ hairline border), or **soft** (a muted fill). The preview toggles them with our 
   <Tab value="React">
 
 ```tsx title="variants.tsx"
-<Card variant="outlined">…</Card>
-<Card variant="soft">…</Card>
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@bpdm/ui/card';
+
+const VARIANTS = ['elevated', 'outlined', 'soft'] as const;
+
+export function Variants() {
+  return (
+    <div className="flex flex-col gap-4">
+      {VARIANTS.map((variant) => (
+        <Card key={variant} variant={variant}>
+          <CardHeader>
+            <CardTitle className="capitalize">{variant}</CardTitle>
+            <CardDescription>Surface style: {variant}.</CardDescription>
+          </CardHeader>
+          <CardContent>The same card in the {variant} look.</CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-```html title="variants.html"
-<bpdm-card variant="outlined">…</bpdm-card>
-<bpdm-card variant="soft">…</bpdm-card>
+```ts title="variants.ts"
+import { Component } from '@angular/core';
+import { BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent } from '@bpdm/ng';
+
+type CardVariant = 'elevated' | 'outlined' | 'soft';
+
+@Component({
+  selector: 'variants',
+  imports: [BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent],
+  template: `
+    @for (variant of variants; track variant) {
+      <bpdm-card [variant]="variant" class="mb-4 block">
+        <bpdm-card-header>
+          <h3 bpdmCardTitle class="capitalize">{{ variant }}</h3>
+          <p bpdmCardDescription>Surface style: {{ variant }}.</p>
+        </bpdm-card-header>
+        <div bpdmCardContent>The same card in the {{ variant }} look.</div>
+      </bpdm-card>
+    }
+  `,
+})
+export class Variants {
+  readonly variants: CardVariant[] = ['elevated', 'outlined', 'soft'];
+}
 ```
 
   </Tab>
 </Tabs>
 
-## Interactive (clickable card)
+## Hoverable & clickable
 
 Add `hoverable` for a lift on hover, and `interactive` for a focusable, pressable
-card. With `asChild` (React), the whole card becomes a single `<a>` — one big link.
+card (a pointer cursor, a focus ring, and an active-press). To make the **whole card
+a single control**, render it as a real `<a>` or `<button>`: in **React** set
+`asChild` and provide the element as the child; in **Angular** wrap the card in your
+own `<a>`/`<button>` (or router link). `interactive` only supplies the visuals — the
+keyboard and screen-reader behaviour come from that real element (see
+[Accessibility](#accessibility)).
 
 <Preview>
   <CardInteractiveDemo />
@@ -177,28 +240,136 @@ card. With `asChild` (React), the whole card becomes a single `<a>` — one big 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-```tsx title="interactive.tsx"
-<Card hoverable interactive asChild>
-  <a href="/dashboard">
-    <CardHeader>
-      <CardTitle>Open the dashboard</CardTitle>
-      <CardDescription>The whole card is one link.</CardDescription>
-    </CardHeader>
-  </a>
-</Card>
+```tsx title="clickable-card.tsx"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@bpdm/ui/card';
+
+export function DashboardTile() {
+  return (
+    <Card hoverable interactive asChild>
+      <a href="/dashboard">
+        <CardHeader>
+          <CardTitle>Open the dashboard</CardTitle>
+          <CardDescription>The whole card is a single link — hover and focus it.</CardDescription>
+        </CardHeader>
+        <CardContent>Great for tiles that navigate on click.</CardContent>
+      </a>
+    </Card>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
 
-Wrap the card in your own `<a>`, or set `interactive` and handle `(click)`.
+Wrap the card in your own `<a>` (or `routerLink`); set `interactive` for the visuals.
 
-```html title="interactive.html"
-<a routerLink="/dashboard">
-  <bpdm-card [hoverable]="true" [interactive]="true">
-    <bpdm-card-header><h3 bpdmCardTitle>Open the dashboard</h3></bpdm-card-header>
-  </bpdm-card>
-</a>
+```ts title="clickable-card.ts"
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  BpdmCard,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'dashboard-tile',
+  imports: [RouterLink, BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent],
+  template: `
+    <a routerLink="/dashboard" class="block no-underline">
+      <bpdm-card [hoverable]="true" [interactive]="true">
+        <bpdm-card-header>
+          <h3 bpdmCardTitle>Open the dashboard</h3>
+          <p bpdmCardDescription>The whole card is a single link — hover and focus it.</p>
+        </bpdm-card-header>
+        <div bpdmCardContent>Great for tiles that navigate on click.</div>
+      </bpdm-card>
+    </a>
+  `,
+})
+export class DashboardTile {}
+```
+
+  </Tab>
+</Tabs>
+
+## Media & header action
+
+`CardMedia` is an edge-to-edge band at the top (the image zooms on card hover). The
+header takes a trailing action — a badge, an icon button, a menu — pinned to the
+inline-end edge. In **React** pass it via the `action` prop; in **Angular** project a
+trailing element marked `bpdmCardAction` inside the header.
+
+<Preview>
+  <CardMediaDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="release-card.tsx"
+import { Card, CardMedia, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@bpdm/ui/card';
+import { Button } from '@bpdm/ui/button';
+import { Badge } from '@bpdm/ui/badge';
+
+export function ReleaseCard() {
+  return (
+    <Card hoverable>
+      <CardMedia src="/cover.jpg" alt="Release 2.4 cover" aspect="video" />
+      <CardHeader action={<Badge variant="success" appearance="soft" dot>Live</Badge>}>
+        <CardTitle>Release 2.4</CardTitle>
+        <CardDescription>Shipped 3 hours ago</CardDescription>
+      </CardHeader>
+      <CardContent>Dark mode, faster search, and a dozen fixes.</CardContent>
+      <CardFooter divider>
+        <Button size="sm" variant="secondary" appearance="outline">Changelog</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="release-card.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCard,
+  BpdmCardMedia,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+  BpdmCardFooter,
+  BpdmButton,
+  BpdmBadge,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'release-card',
+  imports: [
+    BpdmCard, BpdmCardMedia, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription,
+    BpdmCardContent, BpdmCardFooter, BpdmButton, BpdmBadge,
+  ],
+  template: `
+    <bpdm-card [hoverable]="true">
+      <bpdm-card-media src="/cover.jpg" alt="Release 2.4 cover" aspect="video" />
+      <bpdm-card-header>
+        <h3 bpdmCardTitle>Release 2.4</h3>
+        <p bpdmCardDescription>Shipped 3 hours ago</p>
+        <bpdm-badge bpdmCardAction variant="success" appearance="soft" dot>Live</bpdm-badge>
+      </bpdm-card-header>
+      <div bpdmCardContent>Dark mode, faster search, and a dozen fixes.</div>
+      <div bpdmCardFooter [divider]="true">
+        <button bpdmButton size="sm" variant="secondary" appearance="outline">Changelog</button>
+      </div>
+    </bpdm-card>
+  `,
+})
+export class ReleaseCard {}
 ```
 
   </Tab>
@@ -212,18 +383,63 @@ Set the card to `flex-row` and put the media on the side for a list/row layout.
   <CardHorizontalDemo />
 </Preview>
 
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
 ```tsx title="horizontal.tsx"
-<Card hoverable className="flex-row">
-  <CardMedia src="/thumb.jpg" alt="" className="w-28 shrink-0" />
-  <div className="min-w-0 flex-1">
-    <CardHeader>
-      <CardTitle>Design tokens</CardTitle>
-      <CardDescription>Guide · 6 min read</CardDescription>
-    </CardHeader>
-    <CardContent>How the theme is generated from one token set.</CardContent>
-  </div>
-</Card>
+import { Card, CardMedia, CardHeader, CardTitle, CardDescription, CardContent } from '@bpdm/ui/card';
+
+export function GuideRow() {
+  return (
+    <Card hoverable className="flex-row">
+      <CardMedia src="/thumb.jpg" alt="" className="w-28 shrink-0" />
+      <div className="min-w-0 flex-1">
+        <CardHeader>
+          <CardTitle>Design tokens</CardTitle>
+          <CardDescription>Guide · 6 min read</CardDescription>
+        </CardHeader>
+        <CardContent>How the theme is generated from one token set.</CardContent>
+      </div>
+    </Card>
+  );
+}
 ```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="horizontal.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCard,
+  BpdmCardMedia,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'guide-row',
+  imports: [BpdmCard, BpdmCardMedia, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent],
+  template: `
+    <bpdm-card [hoverable]="true" class="flex-row">
+      <bpdm-card-media src="/thumb.jpg" alt="" class="w-28 shrink-0" />
+      <div class="min-w-0 flex-1">
+        <bpdm-card-header>
+          <h3 bpdmCardTitle>Design tokens</h3>
+          <p bpdmCardDescription>Guide · 6 min read</p>
+        </bpdm-card-header>
+        <div bpdmCardContent>How the theme is generated from one token set.</div>
+      </div>
+    </bpdm-card>
+  `,
+})
+export class GuideRow {}
+```
+
+  </Tab>
+</Tabs>
 
 ## Responsive grid
 
@@ -233,16 +449,164 @@ Cards are plain blocks — drop them in a grid.
   <CardGridDemo />
 </Preview>
 
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
 ```tsx title="grid.tsx"
-<div className="grid gap-4 sm:grid-cols-3">
-  {items.map((it) => (
-    <Card key={it.title} hoverable>
-      <CardHeader><CardTitle>{it.title}</CardTitle></CardHeader>
-      <CardContent>{it.body}</CardContent>
-    </Card>
-  ))}
-</div>
+import { Card, CardHeader, CardTitle, CardContent } from '@bpdm/ui/card';
+
+const ITEMS = [
+  { title: 'Analytics', body: 'Traffic, funnels, retention.' },
+  { title: 'Billing', body: 'Plans, invoices, usage.' },
+  { title: 'Team', body: 'Members, roles, invites.' },
+];
+
+export function CardGrid() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {ITEMS.map((it) => (
+        <Card key={it.title} hoverable>
+          <CardHeader>
+            <CardTitle>{it.title}</CardTitle>
+          </CardHeader>
+          <CardContent>{it.body}</CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 ```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="grid.ts"
+import { Component } from '@angular/core';
+import { BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardContent } from '@bpdm/ng';
+
+interface CardItem { title: string; body: string; }
+
+@Component({
+  selector: 'card-grid',
+  imports: [BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardContent],
+  template: `
+    <div class="grid gap-4 sm:grid-cols-3">
+      @for (it of items; track it.title) {
+        <bpdm-card [hoverable]="true">
+          <bpdm-card-header>
+            <h3 bpdmCardTitle>{{ it.title }}</h3>
+          </bpdm-card-header>
+          <div bpdmCardContent>{{ it.body }}</div>
+        </bpdm-card>
+      }
+    </div>
+  `,
+})
+export class CardGrid {
+  readonly items: CardItem[] = [
+    { title: 'Analytics', body: 'Traffic, funnels, retention.' },
+    { title: 'Billing', body: 'Plans, invoices, usage.' },
+    { title: 'Team', body: 'Members, roles, invites.' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Anatomy
+
+Every part is optional — compose only what you need. A card can be as small as a
+title, or as rich as media + header + content + footer.
+
+| Part | React | Angular | Role |
+| --- | --- | --- | --- |
+| Root | `<Card>` | `<bpdm-card>` | The surface (variant, hover, interactive). |
+| Media | `<CardMedia>` | `<bpdm-card-media>` | Edge-to-edge image/content band. |
+| Header | `<CardHeader>` | `<bpdm-card-header>` | Title/description row + a trailing action. |
+| Title | `<CardTitle>` | `[bpdmCardTitle]` | The heading (level configurable). |
+| Description | `<CardDescription>` | `[bpdmCardDescription]` | Muted subtitle under the title. |
+| Content | `<CardContent>` | `[bpdmCardContent]` | The body. |
+| Footer | `<CardFooter>` | `[bpdmCardFooter]` | Actions row (`divider` adds a hairline above). |
+
+## Internationalization
+
+The Card renders **no copy of its own** — there is no `messages` prop, and there's
+nothing to translate inside the component. Every string is content you supply: the
+`CardTitle`, `CardDescription`, `CardContent`, footer actions, and the media `alt`.
+Localize a card by translating the **data** you pass in, exactly as you would any
+other content in your app.
+
+For right-to-left, the card needs no configuration. It uses only symmetric padding,
+flex layout, and start-aligned text, so it mirrors automatically under `dir="rtl"` —
+the header action moves to the inline-end edge and text aligns to the start.
+
+The example below is a German (`de-DE`) deployment card — all copy is translated at
+the call site.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="card-i18n.tsx"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@bpdm/ui/card';
+import { Button } from '@bpdm/ui/button';
+
+export function BereitstellungCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Bereitstellung</CardTitle>
+        <CardDescription>Vor 2 Minuten ausgelöst.</CardDescription>
+      </CardHeader>
+      <CardContent>Build 482 wird in die Produktion ausgerollt.</CardContent>
+      <CardFooter divider>
+        <Button size="sm">Protokolle anzeigen</Button>
+        <Button size="sm" variant="secondary" appearance="ghost">Verwerfen</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="card-i18n.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCard,
+  BpdmCardHeader,
+  BpdmCardTitle,
+  BpdmCardDescription,
+  BpdmCardContent,
+  BpdmCardFooter,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'bereitstellung-card',
+  imports: [
+    BpdmCard, BpdmCardHeader, BpdmCardTitle, BpdmCardDescription, BpdmCardContent, BpdmCardFooter, BpdmButton,
+  ],
+  template: `
+    <bpdm-card>
+      <bpdm-card-header>
+        <h3 bpdmCardTitle>Bereitstellung</h3>
+        <p bpdmCardDescription>Vor 2 Minuten ausgelöst.</p>
+      </bpdm-card-header>
+      <div bpdmCardContent>Build 482 wird in die Produktion ausgerollt.</div>
+      <div bpdmCardFooter [divider]="true">
+        <button bpdmButton size="sm">Protokolle anzeigen</button>
+        <button bpdmButton size="sm" variant="secondary" appearance="ghost">Verwerfen</button>
+      </div>
+    </bpdm-card>
+  `,
+})
+export class BereitstellungCard {}
+```
+
+  </Tab>
+</Tabs>
 
 ## API
 
@@ -250,28 +614,71 @@ Cards are plain blocks — drop them in a grid.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `elevated \| outlined \| soft` | `elevated` | Surface style. |
+| `variant` | `elevated \| outlined \| soft` | `elevated` | Surface style — shadow, border, or muted fill. |
 | `hoverable` | `boolean` | `false` | Lift + deepen the shadow on hover. |
-| `interactive` | `boolean` | `false` | Focusable + pressable (for clickable cards). |
-| `asChild` (React) | `boolean` | `false` | Render as the child element, e.g. an `<a>`. |
-| `className` | `string` (Angular `class`) | — | Extra classes. |
+| `interactive` | `boolean` | `false` | Pointer cursor, focus ring, and active-press visuals (for clickable cards). |
+| `asChild` *(React)* | `boolean` | `false` | Render as the child element instead of a `<div>` — e.g. an `<a>`/`<button>`. |
+| `className` *(Angular `class`)* | `string` | — | Extra classes, merged with the variant classes. |
 
-### Parts
+### `CardMedia` / `<bpdm-card-media>`
 
-| Part | React | Angular | Notes |
+| Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| Media | `<CardMedia src alt aspect overlay />` | `<bpdm-card-media …>` | Edge-to-edge band; zooms on hover. |
-| Header | `<CardHeader action={…}>` | `<bpdm-card-header>` + `bpdmCardAction` | Title/description + a right-aligned action slot. |
-| Title | `<CardTitle>` | `[bpdmCardTitle]` | |
-| Description | `<CardDescription>` | `[bpdmCardDescription]` | |
-| Content | `<CardContent>` | `[bpdmCardContent]` | |
-| Footer | `<CardFooter divider>` | `[bpdmCardFooter] [divider]` | `divider` adds a hairline above. |
+| `src` | `string` | — | Image URL; omit to project your own content into the band. |
+| `alt` | `string` | `""` | Image alt text. Empty = decorative (see [Accessibility](#accessibility)). |
+| `aspect` | `video \| square \| wide \| auto` | `video` | Aspect ratio of the band (`video` = 16:9, `wide` = 21:9, `auto` = intrinsic). |
+| `overlay` | `boolean` | `false` | Bottom gradient scrim, for text/badges placed over the media. |
+
+### `CardHeader` / `<bpdm-card-header>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `action` *(React)* | `ReactNode` | — | Trailing slot at the inline-end edge (icon button, badge, menu). |
+| `bpdmCardAction` *(Angular)* | projected element | — | Mark a trailing element inside the header as the action slot. |
+
+### `CardTitle` / `[bpdmCardTitle]`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `as` *(React)* | `h1 \| h2 \| h3 \| h4 \| h5 \| h6` | `h3` | Heading element to render. |
+| *(Angular)* | — | — | Apply the `bpdmCardTitle` directive to the heading tag you choose (`<h2 bpdmCardTitle>`), the equivalent of React's `as`. |
+
+Both render a real heading with its margin reset (`m-0`) so it doesn't inherit the
+host page's heading spacing.
+
+### `CardDescription` / `[bpdmCardDescription]` · `CardContent` / `[bpdmCardContent]`
+
+Plain slots for the muted subtitle and the body — no props beyond `className` /
+`class`. In Angular these are directives applied to your own `<p>` / `<div>`.
+
+### `CardFooter` / `[bpdmCardFooter]`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `divider` | `boolean` | `false` | Add a hairline divider above the footer. |
 
 ## Accessibility
 
-- Card is a plain container — put a **heading** (`CardTitle` renders an `<h3>`) so
-  the section is announced; use the right level for your page.
-- For clickable cards, `interactive` adds a visible focus ring and pressed state,
-  and `asChild` on an `<a>`/`<button>` keeps it a real, keyboard-operable control
-  (rather than a click handler on a `<div>`).
-- `CardMedia` images take an `alt`; decorative bands can use `alt=""`.
+- **Clickable cards need a real control.** A fully-clickable card must be a genuine
+  `<a>` or `<button>`, not a `<div>` with a click handler — use React's `asChild`
+  with an `<a>`/`<button>` child, or (Angular) wrap the card in a native
+  `<a>`/`<button>`/`routerLink`. The `interactive` variant only supplies the hover,
+  focus-ring, and press **visuals**; keyboard operation (**Enter** for a link,
+  **Enter / Space** for a button) and the announced role come from that real element.
+- **Cards with their own buttons/links** should *not* make the whole container a
+  link or button — a link/button must never contain other interactive elements. Use
+  the **stretched-link** pattern instead: keep the card a plain container and give
+  one primary link a full-card hit area with a `after:absolute after:inset-0`
+  pseudo-element (the card is already positioned `relative`). The inner buttons/links
+  then remain separately clickable above it.
+- **Headings.** `CardTitle` is a real heading — set its level (React `as`, Angular
+  the tag you apply the directive to) so the card fits the document outline, and
+  don't skip levels.
+- **Media.** `CardMedia`'s `alt` defaults to empty, treating the image as decorative.
+  Give a meaningful `alt` whenever the image conveys information.
+- **Regions.** To expose a card as a labelled landmark, render it as (or wrap it in) a
+  `<section>` / `<article>` and point `aria-labelledby` at the `CardTitle`'s `id` — so
+  assistive tech announces the region by its title.
+- **Motion.** The hover-lift and active-press are short (≈280 ms) transform-based
+  transitions, kept subtle. If your app enforces a global reduced-motion rule, prefer
+  disabling the transform there.
