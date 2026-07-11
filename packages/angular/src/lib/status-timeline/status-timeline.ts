@@ -36,6 +36,31 @@ export interface TimelineSlotContext {
   status: TimelineStatus;
 }
 
+/**
+ * Every screen-reader status label the timeline renders — pass a partial to
+ * translate. Defaults are English; merged once with
+ * {@link DEFAULT_STATUS_TIMELINE_MESSAGES}. Each step renders its label
+ * visually hidden so the status (conveyed visually by colour/glyph) is also
+ * announced to assistive tech.
+ */
+export interface StatusTimelineMessages {
+  /** Announced for a `complete` step. */
+  complete: string;
+  /** Announced for the `current` step (which also carries `aria-current`). */
+  current: string;
+  /** Announced for a `pending` step. */
+  pending: string;
+  /** Announced for a `failed` step. */
+  failed: string;
+}
+
+export const DEFAULT_STATUS_TIMELINE_MESSAGES: StatusTimelineMessages = {
+  complete: "Completed",
+  current: "In progress",
+  pending: "Not started",
+  failed: "Failed",
+};
+
 interface TimelineRow {
   item: TimelineItem;
   index: number;
@@ -95,6 +120,7 @@ const INTERACTIVE =
           (click)="interactive() && itemClick.emit({ item: row.item, index: row.index })"
           (keydown)="onKey($event, row)"
         >
+          <span class="sr-only">{{ t()[row.status] }}</span>
           @if (!row.last) {
             <span [class]="row.lineClass" aria-hidden="true"></span>
           }
@@ -131,7 +157,7 @@ const INTERACTIVE =
                 <p [class]="row.titleClass">{{ row.title }}</p>
               </div>
               @if (row.timestamp) {
-                <p class="text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</p>
+                <p class="m-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</p>
               }
               @if (row.description) {
                 <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
@@ -171,6 +197,8 @@ export class BpdmStatusTimeline {
   readonly align = input<TimelineAlign | undefined>(undefined);
   /** Accessible name for the timeline (sets `aria-label` on the list). */
   readonly label = input<string>("");
+  /** Override the visually-hidden status labels announced to screen readers (i18n). */
+  readonly messages = input<Partial<StatusTimelineMessages>>({});
   /** Render the whole marker yourself (context: item + index + status). */
   readonly markerTemplate = input<TemplateRef<TimelineSlotContext> | undefined>(undefined);
   /** Render the whole content cell yourself (a rich card, etc.). */
@@ -183,6 +211,11 @@ export class BpdmStatusTimeline {
 
   readonly itemClick = output<{ item: TimelineItem; index: number }>();
 
+  /** Visually-hidden status labels (English defaults merged with `messages`). */
+  protected readonly t = computed<StatusTimelineMessages>(() => ({
+    ...DEFAULT_STATUS_TIMELINE_MESSAGES,
+    ...this.messages(),
+  }));
   protected readonly horizontal = computed(() => this.layout() === "horizontal");
   private readonly resolvedAlign = computed<TimelineAlign>(
     () => this.align() ?? (this.horizontal() ? "top" : "left"),
@@ -191,7 +224,10 @@ export class BpdmStatusTimeline {
     () => !!this.oppositeTemplate() || this.items().some((it) => it.opposite != null),
   );
   protected readonly rootClass = computed(() =>
-    cn(this.horizontal() ? "flex overflow-x-auto" : "relative", this.classInput()),
+    cn(
+      this.horizontal() ? "m-0 flex list-none overflow-x-auto p-0" : "relative m-0 list-none p-0",
+      this.classInput(),
+    ),
   );
 
   protected ctx(row: TimelineRow): TimelineSlotContext {
@@ -243,7 +279,8 @@ export class BpdmStatusTimeline {
             interactive && INTERACTIVE,
           ),
           lineClass: cn(
-            "absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2",
+            // logical `start-1/2` so the connector runs toward the next marker in LTR and RTL
+            "absolute start-1/2 top-1/2 h-px w-full -translate-y-1/2",
             status === "complete" ? "bg-success/40" : "bg-border",
           ),
           dotClass: cn(base.dotClass, "row-start-2"),
@@ -282,25 +319,26 @@ export class BpdmStatusTimeline {
           interactive && INTERACTIVE,
         ),
         lineClass: cn(
-          // extend past the box into the margin gap to reach the next dot
+          // extend past the box into the margin gap to reach the next dot;
+          // logical `start`/`end` insets so it mirrors correctly in RTL
           "absolute top-6 -bottom-8 w-px",
           centered
             ? "left-1/2 -translate-x-1/2"
             : align === "right"
-              ? "right-3 translate-x-1/2"
-              : "left-3 -translate-x-1/2",
+              ? "end-3 translate-x-1/2"
+              : "start-3 -translate-x-1/2",
           status === "complete" ? "bg-success/40" : "bg-border",
         ),
         dotClass: cn(base.dotClass, markerPlacement),
         markerWrapClass: cn(MARKER_WRAP, markerPlacement),
         contentPlacement,
-        contentClass: cn(contentPlacement, "min-h-10", !contentRight && "text-right"),
+        contentClass: cn(contentPlacement, "min-h-10", !contentRight && "text-end"),
         titleRowClass: cn("flex min-h-6 items-center justify-between gap-2", !contentRight && "flex-row-reverse"),
         oppositePlacement,
         oppositeClass: cn(
           oppositePlacement,
           "flex min-h-6 items-center text-sm text-muted-foreground",
-          contentRight ? "text-right" : "text-left",
+          contentRight ? "text-end" : "text-start",
         ),
       };
     });

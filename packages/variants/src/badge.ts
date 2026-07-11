@@ -78,7 +78,7 @@ export const badgeTone: Record<BadgeVariant, Record<"soft" | "solid" | "outline"
 
 /** Base shape + size (the tone is composed on top per variant × appearance). */
 export const badgeVariants = cva(
-  "inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-full border font-medium transition-[color,background-color,border-color,transform] duration-[var(--bpdm-duration-fast)] [&>svg]:size-3 [&>svg]:shrink-0",
+  "inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-full border font-medium no-underline transition-[color,background-color,border-color,transform] duration-[var(--bpdm-duration-fast)] [&>svg]:size-3 [&>svg]:shrink-0",
   {
     variants: {
       size: {

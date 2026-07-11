@@ -51,4 +51,43 @@ describe("Card", () => {
     const { container } = render(<Card hoverable>x</Card>);
     expect((container.firstElementChild as HTMLElement).className).toContain("hover:-translate-y");
   });
+
+  it("renders the title as an <h3> by default", () => {
+    render(
+      <Card>
+        <CardHeader>
+          <CardTitle>Report</CardTitle>
+        </CardHeader>
+      </Card>,
+    );
+    expect(screen.getByRole("heading", { level: 3, name: "Report" })).toBeTruthy();
+  });
+
+  it("sets the title heading level via `as` (document outline)", () => {
+    render(
+      <Card>
+        <CardHeader>
+          <CardTitle as="h2">Report</CardTitle>
+        </CardHeader>
+      </Card>,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Report" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { level: 3 })).toBeNull();
+  });
+
+  it("keeps the title self-contained — resets ambient heading margin (m-0)", () => {
+    render(
+      <Card>
+        <CardHeader>
+          <CardTitle>Report</CardTitle>
+        </CardHeader>
+      </Card>,
+    );
+    expect(screen.getByRole("heading", { name: "Report" }).className).toContain("m-0");
+  });
+
+  it("keeps a clickable/link card free of a host link underline", () => {
+    const { container } = render(<Card interactive>x</Card>);
+    expect((container.firstElementChild as HTMLElement).className).toContain("no-underline");
+  });
 });

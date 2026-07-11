@@ -50,7 +50,7 @@ export interface StepDialogStep {
     >
       <ng-template bpdmDialogBody>
         <div class="space-y-5">
-          <ol class="flex items-center gap-2">
+          <ol class="m-0 flex list-none items-center gap-2 p-0">
             @for (s of steps(); track $index) {
               <li class="flex shrink-0 items-center gap-2">
                 <span [class]="circleClass($index)">

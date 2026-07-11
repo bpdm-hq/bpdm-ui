@@ -135,7 +135,7 @@ export function StatCard({
       )}
     >
       <div className="min-w-0">
-        <p id={labelId} className="truncate text-sm text-muted-foreground">
+        <p id={labelId} className="m-0 truncate text-sm text-muted-foreground">
           {label}
         </p>
         <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">

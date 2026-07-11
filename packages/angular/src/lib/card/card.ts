@@ -115,14 +115,14 @@ export class BpdmCardHeader {}
 /** Card title — apply to a heading element. */
 @Directive({
   selector: "[bpdmCardTitle]",
-  host: { class: "text-lg font-semibold leading-tight tracking-tight" },
+  host: { class: "m-0 text-lg font-semibold leading-tight tracking-tight" },
 })
 export class BpdmCardTitle {}
 
 /** Card description — apply to a paragraph. */
 @Directive({
   selector: "[bpdmCardDescription]",
-  host: { class: "text-sm text-muted-foreground" },
+  host: { class: "m-0 text-sm text-muted-foreground" },
 })
 export class BpdmCardDescription {}
 

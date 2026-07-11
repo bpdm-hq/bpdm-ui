@@ -1,6 +1,11 @@
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./status-timeline";
+import {
+  BpdmStatusTimeline,
+  type StatusTimelineMessages,
+  type TimelineAlign,
+  type TimelineItem,
+} from "./status-timeline";
 
 @Component({
   imports: [BpdmStatusTimeline],
@@ -10,6 +15,7 @@ import { BpdmStatusTimeline, type TimelineAlign, type TimelineItem } from "./sta
       [layout]="layout"
       [align]="align"
       [interactive]="interactive"
+      [messages]="messages"
       (itemClick)="lastClick = $event"
     />
   `,
@@ -18,6 +24,7 @@ class Host {
   layout: "vertical" | "horizontal" = "vertical";
   align: TimelineAlign = "left";
   interactive = false;
+  messages: Partial<StatusTimelineMessages> = {};
   lastClick: { item: TimelineItem; index: number } | null = null;
   items: TimelineItem[] = [
     { title: "Build queued", status: "complete", timestamp: "09:41" },
@@ -152,5 +159,49 @@ describe("BpdmStatusTimeline", () => {
     expect(el.querySelector(".custom-marker")?.textContent).toContain("complete");
     // default glyph is bypassed by the marker template
     expect(el.querySelector('path[d="M3.5 8.5l3 3 6-7"]')).toBeNull();
+  });
+
+  it("announces each step's status to screen readers via an sr-only label", () => {
+    const fixture = create(); // items: complete / current / failed / pending
+    const srOnly = Array.from(fixture.nativeElement.querySelectorAll("li .sr-only")) as HTMLElement[];
+    expect(srOnly.length).toBe(4);
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain("Completed");
+    expect(text).toContain("In progress");
+    expect(text).toContain("Failed");
+    expect(text).toContain("Not started");
+  });
+
+  it("translates the status labels via messages (i18n)", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.messages = {
+      complete: "Abgeschlossen",
+      current: "In Bearbeitung",
+      pending: "Ausstehend",
+      failed: "Fehlgeschlagen",
+    };
+    fixture.detectChanges();
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain("Abgeschlossen");
+    expect(text).toContain("In Bearbeitung");
+    expect(text).toContain("Ausstehend");
+    expect(text).toContain("Fehlgeschlagen");
+    expect(text).not.toContain("Completed"); // English default overridden
+  });
+
+  it("only translates the keys provided, keeping English for the rest", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.messages = { failed: "Fehlgeschlagen" };
+    fixture.detectChanges();
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain("Fehlgeschlagen");
+    expect(text).toContain("Completed"); // untouched default
+  });
+
+  it("uses logical start/end insets on the connector for RTL", () => {
+    const fixture = create();
+    const line = fixture.nativeElement.querySelector('li [aria-hidden="true"].absolute.w-px') as HTMLElement;
+    expect(line.className).toContain("start-3"); // logical, not physical `left-3`
+    expect(line.className).not.toContain("left-3");
   });
 });

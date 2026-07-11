@@ -58,7 +58,7 @@ let statCardUid = 0;
       <div class="size-12 shrink-0 animate-pulse rounded-full bg-muted"></div>
     } @else {
     <div class="min-w-0">
-      <p [id]="labelId" class="truncate text-sm text-muted-foreground">{{ label() }}</p>
+      <p [id]="labelId" class="m-0 truncate text-sm text-muted-foreground">{{ label() }}</p>
       <p class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
       @if (hasDelta()) {
         <div class="mt-1.5 flex items-center gap-1.5 text-sm">

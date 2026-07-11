@@ -130,4 +130,49 @@ describe("StatusTimeline", () => {
     await userEvent.keyboard("{Enter}");
     expect(onItemClick).toHaveBeenLastCalledWith(ITEMS[2], 2);
   });
+
+  it("announces each step's status to screen readers (visually hidden)", () => {
+    const { container } = render(<StatusTimeline items={ITEMS} />);
+    // ITEMS covers complete / current / pending / failed
+    expect(screen.getByText("Completed")).toBeTruthy();
+    expect(screen.getByText("In progress")).toBeTruthy();
+    expect(screen.getByText("Not started")).toBeTruthy();
+    expect(screen.getByText("Failed")).toBeTruthy();
+    // the label is hidden from sighted users and sits inside the step
+    const label = screen.getByText("Completed");
+    expect(label).toHaveClass("sr-only");
+    expect(label.closest("li")).toBe(container.querySelector("li"));
+  });
+
+  it("translates the status labels via messages (i18n)", () => {
+    render(
+      <StatusTimeline
+        items={ITEMS}
+        messages={{
+          complete: "Abgeschlossen",
+          current: "In Bearbeitung",
+          pending: "Ausstehend",
+          failed: "Fehlgeschlagen",
+        }}
+      />,
+    );
+    expect(screen.getByText("Abgeschlossen")).toBeTruthy();
+    expect(screen.getByText("In Bearbeitung")).toBeTruthy();
+    expect(screen.getByText("Ausstehend")).toBeTruthy();
+    expect(screen.getByText("Fehlgeschlagen")).toBeTruthy();
+    expect(screen.queryByText("Completed")).toBeNull(); // English default overridden
+  });
+
+  it("only translates the keys provided, keeping English for the rest", () => {
+    render(<StatusTimeline items={ITEMS} messages={{ failed: "Fehlgeschlagen" }} />);
+    expect(screen.getByText("Fehlgeschlagen")).toBeTruthy();
+    expect(screen.getByText("Completed")).toBeTruthy(); // untouched default
+  });
+
+  it("uses logical start/end insets on the connector for RTL", () => {
+    const { container } = render(<StatusTimeline items={ITEMS} />);
+    const line = container.querySelector("li span.absolute.w-px") as HTMLElement;
+    expect(line.className).toContain("start-3"); // logical, not physical `left-3`
+    expect(line.className).not.toContain("left-3");
+  });
 });

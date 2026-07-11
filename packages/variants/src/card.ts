@@ -8,7 +8,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 export const cardVariants = cva(
   // one smooth transition for every card motion (lift, press, border) — a soft
   // easeOut so things float rather than snap; willChange keeps it buttery
-  "group/card relative flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card text-card-foreground transition-[transform,box-shadow,border-color] duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] [will-change:transform]",
+  "group/card relative flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card text-card-foreground no-underline transition-[transform,box-shadow,border-color] duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] [will-change:transform]",
   {
     variants: {
       variant: {

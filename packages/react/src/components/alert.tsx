@@ -89,7 +89,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
             </span>
           ))}
         <div className={cn("min-w-0 flex-1", onClose && "pr-6")}>
-          {title && <p className="text-sm font-semibold">{title}</p>}
+          {title && <p className="m-0 text-sm font-semibold">{title}</p>}
           {children != null && (
             <div className={cn("text-sm", solid ? "text-current/90" : "text-muted-foreground", title && "mt-1")}>
               {children}

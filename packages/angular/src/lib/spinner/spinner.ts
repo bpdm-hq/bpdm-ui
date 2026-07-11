@@ -115,7 +115,7 @@ export class BpdmSpinner {
   template: `
     <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [label]="label() ?? 'Loading'" />
     @if (label()) {
-      <p class="text-sm font-medium text-muted-foreground">{{ label() }}</p>
+      <p class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
     }
     <ng-content />
   `,

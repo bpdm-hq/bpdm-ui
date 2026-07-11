@@ -83,7 +83,7 @@ export class BpdmAlertActions {}
 
         <div class="min-w-0 flex-1" [class.pr-6]="dismissible()">
           @if (title()) {
-            <p class="text-sm font-semibold">{{ title() }}</p>
+            <p class="m-0 text-sm font-semibold">{{ title() }}</p>
           }
           <div class="text-sm empty:hidden" [class]="bodyClass()" [class.mt-1]="!!title()">
             <ng-content />

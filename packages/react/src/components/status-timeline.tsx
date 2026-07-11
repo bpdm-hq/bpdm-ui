@@ -22,6 +22,31 @@ export type TimelineItem = {
   color?: string;
 };
 
+/**
+ * Every screen-reader status label the timeline renders — pass a partial to
+ * translate. Defaults are English; merged once with
+ * {@link DEFAULT_STATUS_TIMELINE_MESSAGES}. Each step renders its label
+ * visually hidden so the status (conveyed visually by colour/glyph) is also
+ * announced to assistive tech.
+ */
+export interface StatusTimelineMessages {
+  /** Announced for a `complete` step. */
+  complete: string;
+  /** Announced for the `current` step (which also carries `aria-current`). */
+  current: string;
+  /** Announced for a `pending` step. */
+  pending: string;
+  /** Announced for a `failed` step. */
+  failed: string;
+}
+
+export const DEFAULT_STATUS_TIMELINE_MESSAGES: StatusTimelineMessages = {
+  complete: "Completed",
+  current: "In progress",
+  pending: "Not started",
+  failed: "Failed",
+};
+
 export interface StatusTimelineProps {
   items: TimelineItem[];
   /** Orientation — "vertical" (default) or "horizontal". */
@@ -33,6 +58,8 @@ export interface StatusTimelineProps {
   align?: TimelineAlign;
   /** Accessible name for the timeline (sets `aria-label` on the list). */
   label?: string;
+  /** Override the visually-hidden status labels announced to screen readers (i18n). */
+  messages?: Partial<StatusTimelineMessages>;
   /** Make each step interactive — fires with the item and its index. */
   onItemClick?: (item: TimelineItem, index: number) => void;
   /** Render the whole marker yourself (any size/shape); overrides icon/colour/glyph. */
@@ -110,6 +137,7 @@ export function StatusTimeline({
   layout = "vertical",
   align: alignProp,
   label,
+  messages,
   onItemClick,
   renderMarker,
   renderContent,
@@ -120,6 +148,15 @@ export function StatusTimeline({
   const align = alignProp ?? (horizontal ? "top" : "left");
   const alternate = align === "alternate";
   const interactive = !!onItemClick;
+  const t = React.useMemo(
+    () => (messages ? { ...DEFAULT_STATUS_TIMELINE_MESSAGES, ...messages } : DEFAULT_STATUS_TIMELINE_MESSAGES),
+    [messages],
+  );
+  // Visually-hidden status label so the state (otherwise conveyed only by the
+  // aria-hidden marker/colour) is announced to assistive tech, in reading order.
+  const statusLabel = (status: TimelineStatus) => (
+    <span className="sr-only">{t[status]}</span>
+  );
 
   const clickProps = (item: TimelineItem, i: number) =>
     interactive
@@ -148,7 +185,7 @@ export function StatusTimeline({
   // ── Horizontal ──────────────────────────────────────────────────────────────
   if (horizontal) {
     return (
-      <ol aria-label={label} className={cn("flex overflow-x-auto", className)}>
+      <ol aria-label={label} className={cn("m-0 flex list-none overflow-x-auto p-0", className)}>
         {items.map((item, i) => {
           const status = item.status ?? "pending";
           const last = i === items.length - 1;
@@ -165,10 +202,13 @@ export function StatusTimeline({
                 interactive && interactiveClasses,
               )}
             >
+              {statusLabel(status)}
               {!last && (
                 <span
                   className={cn(
-                    "absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2",
+                    // logical `start-1/2` so the connector runs toward the next
+                    // marker in both LTR and RTL
+                    "absolute start-1/2 top-1/2 h-px w-full -translate-y-1/2",
                     status === "complete" ? "bg-success/40" : "bg-border",
                   )}
                   aria-hidden
@@ -187,7 +227,7 @@ export function StatusTimeline({
                         {item.title}
                       </p>
                     </div>
-                    {item.timestamp && <p className="text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
+                    {item.timestamp && <p className="m-0 text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
                     {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
                   </>
                 )}
@@ -204,7 +244,7 @@ export function StatusTimeline({
   const centered = alternate || showOpposite; // center the line so both sides are usable
 
   return (
-    <ol aria-label={label} className={cn("relative", className)}>
+    <ol aria-label={label} className={cn("relative m-0 list-none p-0", className)}>
       {items.map((item, i) => {
         const status = item.status ?? "pending";
         const last = i === items.length - 1;
@@ -226,16 +266,18 @@ export function StatusTimeline({
               interactive && interactiveClasses,
             )}
           >
+            {statusLabel(status)}
             {!last && (
               <span
                 className={cn(
-                  // extend past the box into the margin gap to reach the next dot
+                  // extend past the box into the margin gap to reach the next dot;
+                  // logical `start`/`end` insets so it mirrors correctly in RTL
                   "absolute top-6 -bottom-8 w-px",
                   centered
                     ? "left-1/2 -translate-x-1/2"
                     : align === "right"
-                      ? "right-3 translate-x-1/2"
-                      : "left-3 -translate-x-1/2",
+                      ? "end-3 translate-x-1/2"
+                      : "start-3 -translate-x-1/2",
                   status === "complete" ? "bg-success/40" : "bg-border",
                 )}
                 aria-hidden
@@ -254,7 +296,7 @@ export function StatusTimeline({
                   : "flex-1",
                 // default-structure spacing/alignment (skipped for custom content)
                 !renderContent && "min-h-10",
-                !renderContent && !contentRight && "text-right",
+                !renderContent && !contentRight && "text-end",
               )}
             >
               {renderContent ? (
@@ -287,7 +329,7 @@ export function StatusTimeline({
                     ? "col-start-1 row-start-1 justify-self-end"
                     : "col-start-3 row-start-1 justify-self-start",
                   !renderOpposite && "flex min-h-6 items-center text-sm text-muted-foreground",
-                  !renderOpposite && (contentRight ? "text-right" : "text-left"),
+                  !renderOpposite && (contentRight ? "text-end" : "text-start"),
                 )}
               >
                 {renderOpposite ? renderOpposite(item, i) : item.opposite}

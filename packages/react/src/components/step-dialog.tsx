@@ -33,7 +33,7 @@ function CheckGlyph() {
 
 function Stepper({ steps, current }: { steps: StepDialogStep[]; current: number }) {
   return (
-    <ol className="flex items-center gap-2">
+    <ol className="m-0 flex list-none items-center gap-2 p-0">
       {steps.map((s, i) => {
         const done = i < current;
         const active = i === current;
