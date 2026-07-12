@@ -11,14 +11,16 @@ import {
 @Component({
   imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogClose, BpdmDialogBody, BpdmDialogFooter],
   template: `
-    <bpdm-dialog title="Edit project">
+    <bpdm-dialog title="Edit project" [messages]="messages">
       <button bpdmDialogTrigger>Open</button>
       <ng-template bpdmDialogBody><p>Body content</p></ng-template>
       <ng-template bpdmDialogFooter><button bpdmDialogClose>Close</button></ng-template>
     </bpdm-dialog>
   `,
 })
-class Host {}
+class Host {
+  messages: Partial<{ close: string; dialogLabel: string }> = {};
+}
 
 const macrotask = (ms = 0) => new Promise<void>((r) => setTimeout(r, ms));
 const getDialog = () => document.querySelector('[role="dialog"]') as HTMLElement | null;
@@ -46,6 +48,39 @@ describe("BpdmDialog", () => {
     expect(dialog?.getAttribute("aria-modal")).toBe("true");
     expect(dialog?.textContent).toContain("Edit project");
     expect(dialog?.textContent).toContain("Body content");
+  });
+
+  it("labels the dialog via aria-labelledby → the title", async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector("button") as HTMLElement).click();
+    await settle();
+
+    const dialog = getDialog()!;
+    const labelId = dialog.getAttribute("aria-labelledby");
+    expect(labelId).toBeTruthy();
+    expect(dialog.querySelector(`#${labelId}`)?.textContent).toContain("Edit project");
+  });
+
+  it("labels the close button 'Close' by default", async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector("button") as HTMLElement).click();
+    await settle();
+
+    expect(getDialog()!.querySelector('button[aria-label="Close"]')).toBeTruthy();
+  });
+
+  it("localizes the close button via [messages]", async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.messages = { close: "Schließen" };
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector("button") as HTMLElement).click();
+    await settle();
+
+    const dialog = getDialog()!;
+    expect(dialog.querySelector('button[aria-label="Schließen"]')).toBeTruthy();
+    expect(dialog.querySelector('button[aria-label="Close"]')).toBeNull();
   });
 
   it("closes via a bpdmDialogClose button", async () => {

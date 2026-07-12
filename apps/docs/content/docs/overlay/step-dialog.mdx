@@ -113,26 +113,205 @@ export class SetupWizard {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The step dialog carries a little navigation copy of its own — the **Back** /
+**Next** / **Finish** button labels, the screen-reader progress text, and the close
+button's accessible name. Set them once via a single `messages` object; it's a
+`Partial<StepDialogMessages>` merged over the English defaults, so override one key
+or all five:
+
+- **`back`** — Back button label. Default `"Back"`.
+- **`next`** — Next button label. Default `"Next"`.
+- **`finish`** — Finish button label. Default `"Finish"`. A per-instance
+  `finishText` prop still overrides this.
+- **`step`** — the visually-hidden progress text. Default `"Step {index} of {total}"`;
+  the `{index}` and `{total}` tokens are interpolated with the live position.
+- **`close`** — the inherited [Dialog](/docs/overlay/dialog) close (X) button's
+  accessible name (`aria-label`). Default `"Close"`.
+
+- **React** — pass `messages` to `<StepDialog messages={{ … }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-step-dialog>`.
+
+Being built on the [Dialog](/docs/overlay/dialog), it mirrors under `dir="rtl"` with
+no extra prop — the stepper, the footer buttons, and the close (X) button all flip
+to the inline-start side.
+
+The example below localises the built-in copy to German via `messages` — the
+Back / Next / Finish labels, the progress text, and the close button — while your
+own step content stays untouched:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="step-dialog-i18n.tsx"
+import { StepDialog, type StepDialogStep, type StepDialogMessages } from '@bpdm/ui/step-dialog';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+// German labels for the built-in Back / Next / Finish / progress / close copy.
+const messages: Partial<StepDialogMessages> = {
+  back: 'Zurück',
+  next: 'Weiter',
+  finish: 'Fertig',
+  step: 'Schritt {index} von {total}',
+  close: 'Schließen',
+};
+
+const steps: StepDialogStep[] = [
+  {
+    title: 'Account',
+    description: 'Your login details.',
+    content: <Input type="email" placeholder="you@company.com" aria-label="Email" />,
+  },
+  {
+    title: 'Profile',
+    description: 'Tell us about you.',
+    content: <Input placeholder="Display name" aria-label="Display name" />,
+  },
+  {
+    title: 'Done',
+    description: 'Review and finish.',
+    content: <p>Everything looks good — finish to complete setup.</p>,
+  },
+];
+
+export function SetupWizard() {
+  return (
+    <StepDialog
+      trigger={<Button>Get started</Button>}
+      title="Set up workspace"
+      steps={steps}
+      messages={messages}
+      onComplete={() => {
+        // save the result here
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="setup-wizard.ts"
+import { Component, computed, viewChild, type TemplateRef } from '@angular/core';
+import {
+  BpdmStepDialog,
+  BpdmStepDialogTrigger,
+  BpdmButton,
+  BpdmInput,
+  type StepDialogMessages,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'setup-wizard',
+  imports: [BpdmStepDialog, BpdmStepDialogTrigger, BpdmButton, BpdmInput],
+  templateUrl: './setup-wizard.html',
+})
+export class SetupWizard {
+  // German labels for the built-in Back / Next / Finish / progress / close copy.
+  readonly messages: Partial<StepDialogMessages> = {
+    back: 'Zurück',
+    next: 'Weiter',
+    finish: 'Fertig',
+    step: 'Schritt {index} von {total}',
+    close: 'Schließen',
+  };
+
+  private readonly accountTpl = viewChild.required<TemplateRef<unknown>>('accountTpl');
+  private readonly profileTpl = viewChild.required<TemplateRef<unknown>>('profileTpl');
+  private readonly doneTpl = viewChild.required<TemplateRef<unknown>>('doneTpl');
+
+  readonly steps = computed(() => [
+    { title: 'Account', description: 'Your login details.', content: this.accountTpl() },
+    { title: 'Profile', description: 'Tell us about you.', content: this.profileTpl() },
+    { title: 'Done', description: 'Review and finish.', content: this.doneTpl() },
+  ]);
+
+  onComplete() {
+    // save the result here
+  }
+}
+```
+
+```html title="setup-wizard.html"
+<bpdm-step-dialog
+  title="Set up workspace"
+  [steps]="steps()"
+  [messages]="messages"
+  (complete)="onComplete()"
+>
+  <button bpdmButton bpdmStepDialogTrigger>Get started</button>
+</bpdm-step-dialog>
+
+<ng-template #accountTpl>
+  <input bpdmInput type="email" placeholder="you@company.com" aria-label="Email" />
+</ng-template>
+<ng-template #profileTpl>
+  <input bpdmInput placeholder="Display name" aria-label="Display name" />
+</ng-template>
+<ng-template #doneTpl>
+  <p>Everything looks good — finish to complete setup.</p>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `steps` | `StepDialogStep[]` | — | **Required.** `{ title, description?, content }` per step. |
-| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: `[bpdmStepDialogTrigger]`. |
-| `title` | `ReactNode` | current step's title | Overall dialog heading. |
-| `size` | `sm \| md \| lg \| xl` | `md` | Panel width. |
-| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(open)]`. |
+| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: the `[bpdmStepDialogTrigger]` directive on your trigger. |
+| `title` | `ReactNode` | current step's title | Overall dialog heading. Angular: `[title]`. |
+| `size` | `sm \| md \| lg \| xl` | `md` | Panel width. Angular: `[size]`. |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: two-way `[(open)]`. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. Angular: covered by `[(open)]`. |
 | `onComplete` | `() => void` | — | **React** — fires on Finish. Angular: `(complete)`. |
-| `finishText` | `string` | `Finish` | Label of the last-step button. |
+| `finishText` | `string` | `Finish` | Label of the last-step button (overrides `messages.finish`). Angular: `[finishText]`. |
+| `messages` | `Partial<StepDialogMessages>` | English | Override the navigation / a11y strings for i18n (see below). Angular: `[messages]`. |
 
 `StepDialogStep`: `{ title: string; description?: string; content: ReactNode }`
 (React) / `content: TemplateRef` (Angular).
 
+### App-wide copy — `messages`
+
+Localise the navigation and accessibility strings in one place (see
+[Internationalization](#internationalization)). It's a `Partial<StepDialogMessages>`
+merged over the English defaults — override one key or all five.
+
+- **React** — the `messages` prop on `<StepDialog>`.
+- **Angular** — the `[messages]` input on `<bpdm-step-dialog>`.
+
+| `StepDialogMessages` key | Default | Description |
+| --- | --- | --- |
+| `back` | `Back` | Back button label. |
+| `next` | `Next` | Next button label. |
+| `finish` | `Finish` | Finish button label (per-instance `finishText` overrides). |
+| `step` | `Step {index} of {total}` | Visually-hidden progress text; `{index}` / `{total}` are interpolated. |
+| `close` | `Close` | Accessible name (`aria-label`) for the inherited Dialog close (X) button. |
+
 ## Accessibility
 
-- Built on the [Dialog](/docs/overlay/dialog) — focus trap, scroll lock,
-  `role="dialog"` + `aria-modal`, and labelling via the title / description.
-- The stepper is an ordered list (`<ol>`); completed steps show a check and the
-  current step is visually emphasised, so progress is clear at a glance.
-- Back / Next / Finish are real buttons — full keyboard and focus support; the
-  step content animates in but conveys no meaning through motion alone.
+- It's a modal built on the [Dialog](/docs/overlay/dialog) — `role="dialog"` +
+  `aria-modal="true"`, with a focus trap and scroll lock while it's open.
+- The dialog title — which defaults to the current step's `title` — is the
+  dialog's accessible name (`aria-labelledby`); the step's `description`, when set,
+  is linked via `aria-describedby`.
+- The progress stepper is an ordered list (`<ol>`): the active step carries
+  `aria-current="step"`, completed steps show a check, and a visually-hidden
+  "Step N of M" position (from `messages.step`) is announced via a polite live
+  region — so progress is conveyed to assistive tech, not by colour or the check
+  glyph alone.
+- Back / Next / Finish are real `button`s with full keyboard and focus support,
+  labelled by their (translatable) text (`messages.back` / `messages.next`, and
+  `finishText` or `messages.finish`).
+- The close (X) button carries an accessible name via `messages.close`
+  (default `"Close"`).
+- Focus moves into the dialog on open and returns to the element that opened it —
+  the trigger — on close; the step resets to the first step each time it reopens.
+- The per-step content animates in, but conveys no meaning through motion alone.
+- All copy — Back, Next, Finish, the progress text, and the close label — is
+  translatable via `messages`, and everything mirrors correctly under `dir="rtl"`.

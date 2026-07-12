@@ -893,6 +893,601 @@ expect(el.querySelector('[bpdmCardFooter]')!.classList.contains('border-t')).toB
   </Tab>
 </Tabs>
 
+### Tabs
+
+The **Tabs** are a WAI-ARIA tablist: the list is `role="tablist"`, each tab a
+`role="tab"` carrying `aria-selected`, and the active panel a `role="tabpanel"` — so
+drive it entirely by role, no test ids. Click a tab (or arrow to it) and assert
+`aria-selected` plus the panel that shows. Only the active tab is in the tab order
+(roving `tabindex`), and disabled tabs carry `disabled` / are skipped by arrow keys.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tabs.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Tabs, type TabItem } from '@bpdm/ui/tabs';
+
+const items: TabItem[] = [
+  { value: 'overview', label: 'Overview', content: 'Key metrics and recent activity.' },
+  { value: 'activity', label: 'Activity', content: 'Deploys, comments, and reviews.' },
+  { value: 'settings', label: 'Settings', disabled: true, content: 'Members and roles.' },
+];
+
+render(<Tabs items={items} defaultValue="overview" ariaLabel="Workspace sections" />);
+
+// the tablist is named; the first tab is selected
+screen.getByRole('tablist', { name: 'Workspace sections' });
+const overview = screen.getByRole('tab', { name: 'Overview' });
+expect(overview).toHaveAttribute('aria-selected', 'true');
+screen.getByRole('tabpanel', { name: 'Overview' });
+
+// clicking a tab switches selection + panel
+await userEvent.click(screen.getByRole('tab', { name: 'Activity' }));
+expect(screen.getByRole('tab', { name: 'Activity' })).toHaveAttribute('aria-selected', 'true');
+screen.getByRole('tabpanel', { name: 'Activity' });
+
+// arrow keys move between tabs (and skip the disabled one)
+overview.focus();
+await userEvent.keyboard('{ArrowRight}');
+expect(screen.getByRole('tab', { name: 'Activity' })).toHaveFocus();
+
+// a disabled tab is not selectable
+expect(screen.getByRole('tab', { name: 'Settings' })).toBeDisabled();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="tabs.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+const tabs = el.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+const panel = () => el.querySelector('[role="tabpanel"]');
+
+// the first tab is selected, its panel is labelled by it
+expect(tabs[0].getAttribute('aria-selected')).toBe('true');
+expect(panel()!.getAttribute('aria-labelledby')).toBe(tabs[0].id);
+
+// click a tab → selection + panel switch
+tabs[1].click();
+fixture.detectChanges();
+expect(tabs[1].getAttribute('aria-selected')).toBe('true');
+
+// only the active tab is tabbable (roving tabindex); disabled tabs carry `disabled`
+expect(tabs[1].getAttribute('tabindex')).toBe('0');
+// el.querySelector('[role="tab"][disabled]') for a disabled item
+```
+
+  </Tab>
+</Tabs>
+
+### Stepper
+
+The **Stepper**'s step list is a `role="tablist"`; each step is a `role="tab"`
+carrying `aria-selected` (and `aria-current="step"` on the active one), wired to its
+`role="tabpanel"`. Each step also carries a **visually-hidden status** ("Step 2 of 3,
+Current step"), and with `linear` a not-yet-reached step is `disabled` — so query by
+role, assert state by text, and drive the flow through the **Back / Next** buttons. No
+test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stepper.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+render(<LinearOnboarding />); // a linear Stepper with a Back/Next bar
+
+// the step list is a tablist; each step is a tab carrying aria-selected
+const steps = screen.getAllByRole('tab');
+expect(steps[0]).toHaveAttribute('aria-selected', 'true');
+
+// status is announced, not colour-only — via a visually-hidden per-step label
+expect(steps[0]).toHaveTextContent('Step 1 of 3');
+expect(steps[0]).toHaveTextContent('Current step');
+
+// with `linear`, a not-yet-reached step is disabled (skipped by keyboard + AT)
+expect(steps[2]).toBeDisabled();
+
+// Next (driven by useStepper) advances selection + swaps the panel
+await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+expect(screen.getAllByRole('tab')[1]).toHaveAttribute('aria-selected', 'true');
+screen.getByRole('tabpanel'); // the active panel
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stepper.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+const steps = () => el.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+
+// the first step is selected; its status is announced (sr-only), not colour-only
+expect(steps()[0].getAttribute('aria-selected')).toBe('true');
+expect(steps()[0].textContent).toContain('Current step');
+
+// with `linear`, a future step is disabled
+expect(steps()[2].disabled).toBe(true);
+
+// drive Next from the #s template ref → selection + panel switch
+const next = Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Next')!;
+next.click();
+fixture.detectChanges();
+expect(steps()[1].getAttribute('aria-selected')).toBe('true');
+el.querySelector('[role="tabpanel"]'); // the active panel
+```
+
+  </Tab>
+</Tabs>
+
+### Dialog
+
+The **Dialog** opens from its trigger into a `role="dialog"` (`aria-modal="true"`)
+named by its `title` (`aria-labelledby`) — so open it by clicking the trigger, then
+query the dialog by role + name. The close button is a labelled `button` (`Close`,
+or your `messages.close`), and `Esc` / a backdrop click closes it. Query by role,
+no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+render(
+  <Dialog
+    trigger={<Button>Edit profile</Button>}
+    title="Edit profile"
+    footer={<DialogClose asChild><Button>Save</Button></DialogClose>}
+  >
+    <p>Body</p>
+  </Dialog>,
+);
+
+// closed at rest — opens when the trigger is clicked
+expect(screen.queryByRole('dialog')).toBeNull();
+await userEvent.click(screen.getByRole('button', { name: 'Edit profile' }));
+
+// the open dialog is named by its title
+const dialog = screen.getByRole('dialog', { name: 'Edit profile' });
+
+// the close button carries an accessible name (messages.close)
+await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+expect(screen.queryByRole('dialog')).toBeNull();
+
+// Esc also closes it
+await userEvent.click(screen.getByRole('button', { name: 'Edit profile' }));
+await userEvent.keyboard('{Escape}');
+expect(screen.queryByRole('dialog')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="dialog.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// open via the trigger — the panel is portaled to the overlay container (document.body)
+el.querySelector<HTMLButtonElement>('button[bpdmDialogTrigger]')!.click();
+fixture.detectChanges();
+
+const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+expect(dialog.getAttribute('aria-modal')).toBe('true');
+// named by its title via aria-labelledby
+const titleId = dialog.getAttribute('aria-labelledby')!;
+expect(document.getElementById(titleId)!.textContent).toContain('Edit profile');
+
+// the close button is labelled (messages.close); clicking it dismisses
+document.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click();
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
+### Confirm Dialog
+
+The **Confirm Dialog** is imperative — a small host triggers `confirm({ … })`, which
+opens a `role="dialog"` named by its `title`, then resolves the awaited promise to
+`true` (Confirm) or `false` (Cancel / `Esc` / backdrop). Drive it by role: click the
+trigger, assert the dialog and its labelled **Confirm** / **Cancel** buttons, then
+assert the resolved boolean. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="confirm.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ConfirmProvider, useConfirm } from '@bpdm/ui/confirm-dialog';
+import { Button } from '@bpdm/ui/button';
+
+let lastResult: boolean | undefined;
+
+function DeleteButton() {
+  const confirm = useConfirm();
+  return (
+    <Button
+      onClick={async () => {
+        lastResult = await confirm({ title: 'Delete project?', confirmText: 'Delete', destructive: true });
+      }}
+    >
+      Delete project
+    </Button>
+  );
+}
+
+render(
+  <ConfirmProvider>
+    <DeleteButton />
+  </ConfirmProvider>,
+);
+
+// trigger the prompt — it opens a dialog named by its title
+await userEvent.click(screen.getByRole('button', { name: 'Delete project' }));
+screen.getByRole('dialog', { name: 'Delete project?' });
+
+// clicking Confirm (labelled by confirmText) resolves true
+await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+expect(lastResult).toBe(true);
+
+// re-open, then Cancel → resolves false
+await userEvent.click(screen.getByRole('button', { name: 'Delete project' }));
+await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+expect(lastResult).toBe(false);
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="confirm.spec.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm, BpdmButton } from '@bpdm/ng';
+
+// a small host injects BpdmConfirm and stores the resolved result
+@Component({
+  selector: 'delete-host',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="onDelete()">Delete project</button>`,
+})
+class DeleteHost {
+  private readonly confirm = inject(BpdmConfirm);
+  result?: boolean;
+  async onDelete() {
+    this.result = await this.confirm.confirm({ title: 'Delete project?', confirmText: 'Delete', destructive: true });
+  }
+}
+
+const el = fixture.nativeElement as HTMLElement;
+
+// trigger the prompt — the panel is portaled to the overlay container (document.body)
+el.querySelector('button')!.click();
+fixture.detectChanges();
+
+const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+const titleId = dialog.getAttribute('aria-labelledby')!;
+expect(document.getElementById(titleId)!.textContent).toContain('Delete project?');
+
+// click Confirm (labelled by confirmText); await the microtask, then result === true
+const confirmBtn = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Delete')!;
+confirmBtn.click();
+// a Cancel / Esc / backdrop click resolves fixture.componentInstance.result to false instead
+```
+
+  </Tab>
+</Tabs>
+
+### Dynamic Dialog
+
+The **Dynamic Dialog** opens imperatively — a host calls `dialog.open(content, { title })`
+(React `useDialog()` / Angular `BpdmDialogService`), rendering a `role="dialog"` named by
+its `title` with your content inside. Drive it by role: open it, assert the dialog and its
+content, then close via the `close` callback. Opening a second one from inside stacks two
+dialogs. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dynamic-dialog.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { DialogProvider, useDialog } from '@bpdm/ui/dynamic-dialog';
+import { Button } from '@bpdm/ui/button';
+
+function Host() {
+  const dialog = useDialog();
+  return (
+    <Button
+      onClick={() =>
+        dialog.open(
+          ({ close }) => (
+            <div>
+              <p>Rename your project.</p>
+              <Button onClick={close}>Save</Button>
+            </div>
+          ),
+          { title: 'Edit project' },
+        )
+      }
+    >
+      Edit project
+    </Button>
+  );
+}
+
+render(
+  <DialogProvider>
+    <Host />
+  </DialogProvider>,
+);
+
+// nothing open at rest — opens on the imperative call
+expect(screen.queryByRole('dialog')).toBeNull();
+await userEvent.click(screen.getByRole('button', { name: 'Edit project' }));
+
+// the dialog is named by its title and shows the content
+const dialog = screen.getByRole('dialog', { name: 'Edit project' });
+screen.getByText('Rename your project.');
+
+// the content's close callback dismisses it
+await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+expect(screen.queryByRole('dialog')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="dynamic-dialog.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// a host injects BpdmDialogService and opens a template with { title }
+el.querySelector('button')!.click(); // e.g. (click)="dialog.open(formTpl, { title: 'Edit project' })"
+fixture.detectChanges();
+
+// the panel is portaled to the overlay container (document.body)
+const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+expect(dialog.getAttribute('aria-modal')).toBe('true');
+const titleId = dialog.getAttribute('aria-labelledby')!;
+expect(document.getElementById(titleId)!.textContent).toContain('Edit project');
+
+// the close button (messages.close) or the template's d.close() dismisses it
+document.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click();
+fixture.detectChanges();
+
+// opening a second dialog from inside the first stacks two — assert both are present
+// expect(document.querySelectorAll('[role="dialog"]').length).toBe(2);
+```
+
+  </Tab>
+</Tabs>
+
+### Step Dialog
+
+The **Step Dialog** is a wizard built on the Dialog — open it from its trigger into
+a `role="dialog"` named by the current step's `title`, then drive it through the
+labelled **Next** / **Back** buttons. On the last step the primary button becomes
+**Finish** (or your `finishText`), whose click fires `onComplete` / `(complete)` and
+closes the dialog. Query by role, no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="step-dialog.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { StepDialog, type StepDialogStep } from '@bpdm/ui/step-dialog';
+import { Button } from '@bpdm/ui/button';
+
+const steps: StepDialogStep[] = [
+  { title: 'Account', content: <p>Step one</p> },
+  { title: 'Profile', content: <p>Step two</p> },
+  { title: 'Done', content: <p>Step three</p> },
+];
+
+const onComplete = jest.fn();
+
+render(
+  <StepDialog trigger={<Button>Get started</Button>} title="Set up workspace" steps={steps} onComplete={onComplete} />,
+);
+
+// open it — the panel is a dialog named by its title
+await userEvent.click(screen.getByRole('button', { name: 'Get started' }));
+const dialog = screen.getByRole('dialog', { name: 'Set up workspace' });
+
+// the first step shows; advance with the labelled Next button
+screen.getByText('Step one');
+await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+screen.getByText('Step two');
+
+// Back steps you one back
+await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+screen.getByText('Step one');
+
+// walk to the last step — the primary button becomes Finish
+await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+
+// Finish fires onComplete and closes the dialog
+await userEvent.click(screen.getByRole('button', { name: 'Finish' }));
+expect(onComplete).toHaveBeenCalledTimes(1);
+expect(screen.queryByRole('dialog')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="step-dialog.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// open via the trigger — the panel is portaled to the overlay container (document.body)
+el.querySelector<HTMLButtonElement>('button[bpdmStepDialogTrigger]')!.click();
+fixture.detectChanges();
+
+const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+const titleId = dialog.getAttribute('aria-labelledby')!;
+expect(document.getElementById(titleId)!.textContent).toContain('Set up workspace');
+
+// find footer buttons by their text and advance with Next
+const byText = (t: string) =>
+  Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === t)!;
+byText('Next').click();
+fixture.detectChanges();
+
+// on the last step the primary button reads Finish; clicking it emits (complete) + closes
+byText('Next').click();
+fixture.detectChanges();
+byText('Finish').click();
+fixture.detectChanges();
+// assert your (complete) handler ran, e.g. expect(component.onComplete).toHaveBeenCalled();
+```
+
+  </Tab>
+</Tabs>
+
+### Drawer
+
+The **Drawer** opens from its trigger into a `role="dialog"` (`aria-modal="true"`)
+named by its `title` (`aria-labelledby`) — so open it by clicking the trigger, then
+query the panel by role + name and assert its body. The close (X) button is a
+labelled `button` (`Close`, or your `messages.close`), and `Esc` / a backdrop click
+also dismiss it. Query by role, no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Drawer, DrawerClose } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+render(
+  <Drawer
+    trigger={<Button>Open settings</Button>}
+    title="Workspace settings"
+    footer={<DrawerClose asChild><Button>Save</Button></DrawerClose>}
+  >
+    <p>Your workspace preferences live here.</p>
+  </Drawer>,
+);
+
+// closed at rest — opens when the trigger is clicked
+expect(screen.queryByRole('dialog')).toBeNull();
+await userEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+// the open panel is a dialog named by its title, showing the body
+const drawer = screen.getByRole('dialog', { name: 'Workspace settings' });
+screen.getByText('Your workspace preferences live here.');
+
+// the close (X) button carries an accessible name (messages.close)
+await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+expect(screen.queryByRole('dialog')).toBeNull();
+
+// Esc also closes it
+await userEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+await userEvent.keyboard('{Escape}');
+expect(screen.queryByRole('dialog')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="drawer.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// open via the trigger — the panel is portaled to the overlay container (document.body)
+el.querySelector<HTMLButtonElement>('button[bpdmDrawerTrigger]')!.click();
+fixture.detectChanges();
+
+const drawer = document.querySelector('[role="dialog"]') as HTMLElement;
+expect(drawer.getAttribute('aria-modal')).toBe('true');
+// named by its title via aria-labelledby
+const titleId = drawer.getAttribute('aria-labelledby')!;
+expect(document.getElementById(titleId)!.textContent).toContain('Workspace settings');
+
+// the close (X) button is labelled (messages.close); clicking it dismisses
+document.querySelector<HTMLButtonElement>('button[aria-label="Close"]')!.click();
+fixture.detectChanges();
+```
+
+  </Tab>
+</Tabs>
+
+### Popover
+
+The **Popover** opens from its trigger into a `role="dialog"` panel; the trigger
+carries `aria-expanded` (`false` at rest, `true` when open) and `aria-haspopup="dialog"`.
+Open it by clicking the trigger, assert the content + `aria-expanded="true"`, then
+close via a `PopoverClose` / `bpdmPopoverClose` button (or `Esc`) and assert it's gone.
+Query by role, no test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Popover, PopoverClose } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+render(
+  <Popover trigger={<Button>Account</Button>}>
+    <p>Signed in as Aria</p>
+    <PopoverClose asChild>
+      <Button>Done</Button>
+    </PopoverClose>
+  </Popover>,
+);
+
+// closed at rest — the trigger reflects it via aria-expanded
+const trigger = screen.getByRole('button', { name: 'Account' });
+expect(trigger).toHaveAttribute('aria-expanded', 'false');
+expect(screen.queryByRole('dialog')).toBeNull();
+
+// open it — the panel is a dialog and the trigger flips to expanded
+await userEvent.click(trigger);
+screen.getByRole('dialog');
+expect(trigger).toHaveAttribute('aria-expanded', 'true');
+screen.getByText('Signed in as Aria');
+
+// a PopoverClose button dismisses it (Esc works too)
+await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+expect(screen.queryByRole('dialog')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="popover.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// the trigger reflects the closed state
+const trigger = el.querySelector<HTMLButtonElement>('[bpdmPopover]')!;
+expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+// open via the trigger — the panel is portaled to the overlay container (document.body)
+trigger.click();
+fixture.detectChanges();
+
+const panel = document.querySelector('[role="dialog"]') as HTMLElement;
+expect(trigger.getAttribute('aria-expanded')).toBe('true');
+expect(panel.textContent).toContain('Signed in as Aria');
+
+// a bpdmPopoverClose button dismisses it (Esc on the trigger works too)
+document.querySelector<HTMLButtonElement>('[bpdmPopoverClose]')!.click();
+fixture.detectChanges();
+// after the close animation the overlay is torn down → no [role="dialog"]
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and

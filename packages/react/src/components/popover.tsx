@@ -22,6 +22,12 @@ export interface PopoverProps {
   showArrow?: boolean;
   /** Draw a border around the panel. Default true; set false for a borderless panel. */
   bordered?: boolean;
+  /**
+   * Accessible name for the panel. A `role="dialog"` panel should carry an
+   * accessible name; supply a (translatable) one here when the content has no
+   * visible heading to name it. Optional — omit to leave the panel unnamed.
+   */
+  ariaLabel?: string;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -45,6 +51,7 @@ export function Popover({
   modal = false,
   showArrow = false,
   bordered = true,
+  ariaLabel,
   open,
   defaultOpen,
   onOpenChange,
@@ -70,6 +77,7 @@ export function Popover({
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
         <PopoverPrimitive.Content
+          aria-label={ariaLabel}
           side={side}
           align={align}
           sideOffset={sideOffset}

@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ComponentRef,
+  computed,
   contentChild,
   Directive,
   effect,
@@ -20,6 +21,16 @@ import { cn } from "@bpdm/variants";
 import { BpdmOverlayPanel } from "../overlay/overlay-panel";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl";
+
+// --- i18n ---
+export interface DialogMessages {
+  /** Close button aria-label. */
+  close: string;
+  /** Fallback screen-reader title when no `title` is set. */
+  dialogLabel: string;
+}
+
+export const DEFAULT_DIALOG_MESSAGES: DialogMessages = { close: "Close", dialogLabel: "Dialog" };
 
 let did = 0;
 
@@ -77,6 +88,13 @@ export class BpdmDialog implements OnDestroy {
   readonly size = input<DialogSize>("md");
   /** Show the top-right close button. Default true. */
   readonly showClose = input(true, { transform: booleanAttribute });
+  /** Screen-reader strings (close button label, fallback title). */
+  readonly messages = input<Partial<DialogMessages>>({});
+
+  protected readonly t = computed<DialogMessages>(() => ({
+    ...DEFAULT_DIALOG_MESSAGES,
+    ...this.messages(),
+  }));
 
   private readonly body = contentChild(BpdmDialogBody, { read: TemplateRef });
   private readonly footer = contentChild(BpdmDialogFooter, { read: TemplateRef });
@@ -128,11 +146,12 @@ export class BpdmDialog implements OnDestroy {
     ref.setInput("title", this.title());
     ref.setInput("description", this.description());
     ref.setInput("showClose", this.showClose());
+    ref.setInput("closeLabel", this.t().close);
     ref.setInput("body", this.body() ?? null);
     ref.setInput("footer", this.footer() ?? null);
     ref.setInput("labelId", this.labelId);
     ref.setInput("descId", this.descId);
-    ref.setInput("fallbackTitle", "Dialog");
+    ref.setInput("fallbackTitle", this.t().dialogLabel);
     ref.setInput(
       "panelClass",
       cn(

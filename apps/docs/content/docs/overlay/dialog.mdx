@@ -10,6 +10,7 @@ import {
   DialogControlledDemo,
   DialogScrollableDemo,
   DialogDropdownDemo,
+  DialogStackedDemo,
   DialogCompositionDemo,
 } from '@/components/dialog-demos';
 import { Preview } from '@/components/preview';
@@ -421,6 +422,98 @@ export class ConfigureProject {
   </Tab>
 </Tabs>
 
+## Stacked dialogs
+
+Dialogs **stack** — open one from inside another and it layers on top. Focus-trap,
+scroll-lock, and Esc always apply to the topmost dialog, and closing it returns you to
+the one beneath. In React nest a `Dialog` in another's body; in Angular nest a
+`<bpdm-dialog>` inside the outer's `ng-template[bpdmDialogBody]`. (For opening stacks
+imperatively from anywhere, see the [Dynamic Dialog](/docs/overlay/dynamic-dialog).)
+
+<Preview>
+  <DialogStackedDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stacked.tsx"
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function StackedDialogs() {
+  return (
+    <Dialog
+      trigger={<Button>Open dialog</Button>}
+      title="First dialog"
+      description="Open another dialog from inside this one — they stack."
+      footer={
+        <DialogClose asChild>
+          <Button variant="secondary" appearance="ghost">Close</Button>
+        </DialogClose>
+      }
+    >
+      <Dialog
+        size="sm"
+        trigger={
+          <Button variant="secondary" appearance="outline" size="sm">Open second dialog</Button>
+        }
+        title="Second dialog"
+        description="This one opened on top of the first — they stack independently."
+        footer={
+          <DialogClose asChild>
+            <Button>Got it</Button>
+          </DialogClose>
+        }
+      >
+        Press Esc to close just this one.
+      </Dialog>
+    </Dialog>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stacked.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmDialog,
+  BpdmDialogTrigger,
+  BpdmDialogBody,
+  BpdmDialogFooter,
+  BpdmDialogClose,
+  BpdmButton,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'stacked-dialogs',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton],
+  template: `
+    <bpdm-dialog title="First dialog" description="Open another dialog from inside this one — they stack.">
+      <button bpdmButton bpdmDialogTrigger>Open dialog</button>
+      <ng-template bpdmDialogBody>
+        <bpdm-dialog size="sm" title="Second dialog" description="This one opened on top of the first — they stack independently.">
+          <button bpdmButton variant="secondary" appearance="outline" size="sm" bpdmDialogTrigger>Open second dialog</button>
+          <ng-template bpdmDialogBody>Press Esc to close just this one.</ng-template>
+          <ng-template bpdmDialogFooter>
+            <button bpdmButton bpdmDialogClose>Got it</button>
+          </ng-template>
+        </bpdm-dialog>
+      </ng-template>
+      <ng-template bpdmDialogFooter>
+        <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Close</button>
+      </ng-template>
+    </bpdm-dialog>
+  `,
+})
+export class StackedDialogs {}
+```
+
+  </Tab>
+</Tabs>
+
 ## Composition
 
 For full control over the layout, compose the primitives instead of the
@@ -514,6 +607,101 @@ export class Compose {}
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The dialog renders almost no copy of its own — the `title`, `description`, body and
+footer are entirely your content, so you translate them at the call site. That
+leaves just two accessibility strings to localise, both via the `messages` prop:
+
+- **`messages.close`** — the close button's accessible name (`aria-label`).
+  Default `"Close"`.
+- **`messages.dialogLabel`** — the visually-hidden fallback title, used **only**
+  when you pass no `title`, so a screen reader still announces the dialog. Default
+  `"Dialog"`. When you do provide a `title`, this is never shown.
+
+`messages` is a `Partial<DialogMessages>` merged over the English defaults, so you
+override either key or both. Everything mirrors under `dir="rtl"` with no prop: the
+close button sits at the inline-**end** corner, which becomes the top-left under RTL.
+
+The example below is German (`de-DE`) — translated `title` / `description` /
+buttons, plus localised `messages`.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dialog-i18n.tsx"
+import { Dialog, DialogClose } from '@bpdm/ui/dialog';
+import { Button } from '@bpdm/ui/button';
+
+export function ProjektBearbeiten() {
+  return (
+    <Dialog
+      trigger={<Button>Projekt bearbeiten</Button>}
+      title="Projekt bearbeiten"
+      description="Aktualisieren Sie die Details."
+      messages={{ close: 'Schließen', dialogLabel: 'Dialog' }}
+      footer={
+        <>
+          <DialogClose asChild>
+            <Button variant="secondary" appearance="ghost">Abbrechen</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button>Speichern</Button>
+          </DialogClose>
+        </>
+      }
+    >
+      <p>Ihr Projekt ist für alle im Arbeitsbereich sichtbar.</p>
+    </Dialog>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="dialog-i18n.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmDialog,
+  BpdmDialogTrigger,
+  BpdmDialogBody,
+  BpdmDialogFooter,
+  BpdmDialogClose,
+  BpdmButton,
+  type DialogMessages,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'projekt-bearbeiten',
+  imports: [BpdmDialog, BpdmDialogTrigger, BpdmDialogBody, BpdmDialogFooter, BpdmDialogClose, BpdmButton],
+  templateUrl: './dialog-i18n.html',
+})
+export class ProjektBearbeiten {
+  readonly de: Partial<DialogMessages> = { close: 'Schließen', dialogLabel: 'Dialog' };
+}
+```
+
+```html title="dialog-i18n.html"
+<bpdm-dialog
+  title="Projekt bearbeiten"
+  description="Aktualisieren Sie die Details."
+  [messages]="de"
+>
+  <button bpdmButton bpdmDialogTrigger>Projekt bearbeiten</button>
+  <ng-template bpdmDialogBody>
+    <p>Ihr Projekt ist für alle im Arbeitsbereich sichtbar.</p>
+  </ng-template>
+  <ng-template bpdmDialogFooter>
+    <button bpdmButton variant="secondary" appearance="ghost" bpdmDialogClose>Abbrechen</button>
+    <button bpdmButton bpdmDialogClose>Speichern</button>
+  </ng-template>
+</bpdm-dialog>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `Dialog` (convenience) / `<bpdm-dialog>`
@@ -528,18 +716,40 @@ export class Compose {}
 | `footer` | `ReactNode` | — | Footer area (React). Angular: `[bpdmDialogFooter]` template. |
 | `size` | `sm \| md \| lg \| xl` | `md` | Panel width. |
 | `showClose` | `boolean` | `true` | Show the top-right close button. |
+| `messages` | `Partial<DialogMessages>` | English | Override the a11y strings for i18n (see below). |
+| `className` | `string` (Angular `class`) | — | Extra classes on the dialog panel. |
+| `onInteractOutside` | `(e) => void` | — | **React** — fires on outside interaction; `e.preventDefault()` to keep it open. |
+| `onEscapeKeyDown` | `(e) => void` | — | **React** — fires on `Esc`; `e.preventDefault()` to keep it open. |
+
+`DialogMessages`:
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `close` | `"Close"` | The close button's accessible name (`aria-label`). |
+| `dialogLabel` | `"Dialog"` | Visually-hidden fallback title used only when no `title` is set. |
 
 **Primitives (React):** `DialogRoot`, `DialogTrigger`, `DialogClose`,
-`DialogContent` (`size`, `showClose`), `DialogHeader`, `DialogFooter`,
-`DialogTitle`, `DialogDescription`.
+`DialogOverlay`, `DialogContent` (`size`, `showClose`, `closeLabel`),
+`DialogHeader`, `DialogFooter`, `DialogTitle`, `DialogDescription`.
 
 ## Accessibility
 
-- Built on Radix Dialog: it's a focus **trap** (focus moves in on open, returns
-  to the trigger on close), the background is `inert`/scroll-locked, and `Esc`
-  or an outside click closes it.
-- Renders `role="dialog"` + `aria-modal`, wired to the **title** and
-  **description** via `aria-labelledby` / `aria-describedby`. Always provide a
-  `title` (the component adds a visually-hidden one if you don't).
-- The close button has an `aria-label`; the trigger keeps its own role and
-  keyboard behaviour.
+- **Modal semantics:** renders `role="dialog"` with `aria-modal="true"`, so
+  assistive tech treats everything behind it as inert while it's open.
+- **Focus is trapped and restored:** focus moves into the panel on open and stays
+  within it (Tab/Shift+Tab cycle inside), then returns to the element that opened
+  it — usually the trigger — on close.
+- **Scroll is locked:** the background page can't scroll while the dialog is open.
+- **`Esc` and backdrop click close it.** To keep it open — e.g. an unsaved-changes
+  guard — call `e.preventDefault()` in `onEscapeKeyDown` (Esc) or
+  `onInteractOutside` (backdrop click) in React; in Angular, drive `[(open)]`
+  yourself and skip the close.
+- **Accessible name and description:** the `title` is the accessible name via
+  `aria-labelledby`, and the `description` is linked via `aria-describedby`. When
+  you omit `title`, a visually-hidden fallback title is supplied so the dialog is
+  never unnamed — translate it with `messages.dialogLabel`.
+- **Close button:** the top-right close button carries an accessible name
+  (`messages.close`, default `"Close"`) and a visible focus-visible ring. Under
+  `dir="rtl"` it mirrors to the top-left (inline-end) corner.
+- The heading resets its own margin so it aligns regardless of surrounding
+  styles, and the trigger keeps its own role and keyboard behaviour.

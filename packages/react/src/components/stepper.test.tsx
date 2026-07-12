@@ -58,4 +58,49 @@ describe("Stepper", () => {
     render(<Wizard linear />);
     expect(screen.getByRole("tab", { name: /Workspace/ })).toBeDisabled();
   });
+
+  it("announces position + status per step (sr-only)", () => {
+    render(<Wizard />);
+    // active step 1 of 2 = current; step 2 = not completed
+    expect(screen.getByText("Step 1 of 2, Current step")).toBeTruthy();
+    expect(screen.getByText("Step 2 of 2, Not completed")).toBeTruthy();
+  });
+
+  it("gives the step list an accessible name + orientation", () => {
+    render(<Wizard />);
+    const list = screen.getByRole("tablist");
+    expect(list).toHaveAttribute("aria-label", "Progress");
+    expect(list).toHaveAttribute("aria-orientation", "horizontal");
+  });
+
+  it("wires each tab to its panel via aria-controls / aria-labelledby", () => {
+    render(<Wizard />);
+    const tab = screen.getByRole("tab", { name: /Account/ });
+    const panel = screen.getByRole("tabpanel");
+    expect(tab.getAttribute("aria-controls")).toBe(panel.getAttribute("id"));
+    expect(panel.getAttribute("aria-labelledby")).toBe(tab.getAttribute("id"));
+    expect(tab.getAttribute("id")).toBeTruthy();
+    expect(panel.getAttribute("id")).toBeTruthy();
+  });
+
+  it("localizes the aria-label + status words via messages", () => {
+    render(
+      <Stepper
+        defaultValue="1"
+        messages={{ ariaLabel: "Fortschritt", current: "Aktueller Schritt", upcoming: "Nicht abgeschlossen", step: "Schritt {index} von {total}" }}
+      >
+        <StepList>
+          <Step value="1">Konto</Step>
+          <Step value="2">Arbeitsbereich</Step>
+        </StepList>
+        <StepPanels>
+          <StepPanel value="1">Konto-Panel</StepPanel>
+          <StepPanel value="2">Arbeitsbereich-Panel</StepPanel>
+        </StepPanels>
+      </Stepper>,
+    );
+    expect(screen.getByRole("tablist")).toHaveAttribute("aria-label", "Fortschritt");
+    expect(screen.getByText("Schritt 1 von 2, Aktueller Schritt")).toBeTruthy();
+    expect(screen.getByText("Schritt 2 von 2, Nicht abgeschlossen")).toBeTruthy();
+  });
 });

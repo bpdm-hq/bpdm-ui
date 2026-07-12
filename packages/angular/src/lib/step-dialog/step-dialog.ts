@@ -22,6 +22,25 @@ export interface StepDialogStep {
   content: TemplateRef<unknown>;
 }
 
+// --- i18n ---
+export interface StepDialogMessages {
+  back: string;
+  next: string;
+  finish: string;
+  /** sr-only progress text. Tokens {index} and {total} are interpolated. */
+  step: string;
+  /** aria-label for the inherited close (X) button. */
+  close: string;
+}
+
+export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
+  back: "Back",
+  next: "Next",
+  finish: "Finish",
+  step: "Step {index} of {total}",
+  close: "Close",
+};
+
 /**
  * `<bpdm-step-dialog>` — a multi-step "wizard" dialog: a progress stepper, per-step
  * content, and Back / Next / Finish navigation. Built on `<bpdm-dialog>`. The step
@@ -47,12 +66,14 @@ export interface StepDialogStep {
       [size]="size()"
       [title]="dialogTitle()"
       [description]="currentDescription()"
+      [messages]="dialogMessages()"
     >
       <ng-template bpdmDialogBody>
-        <div class="space-y-5">
+        <div class="flex flex-col gap-8">
           <ol class="m-0 flex list-none items-center gap-2 p-0">
+            <li class="sr-only" aria-live="polite">{{ progressText() }}</li>
             @for (s of steps(); track $index) {
-              <li class="flex shrink-0 items-center gap-2">
+              <li class="flex shrink-0 items-center gap-2" [attr.aria-current]="$index === step() ? 'step' : null">
                 <span [class]="circleClass($index)">
                   @if ($index < step()) {
                     <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true">
@@ -85,12 +106,12 @@ export interface StepDialogStep {
       </ng-template>
       <ng-template bpdmDialogFooter>
         @if (step() > 0) {
-          <button bpdmButton variant="secondary" appearance="ghost" (click)="back()">Back</button>
+          <button bpdmButton variant="secondary" appearance="ghost" (click)="back()">{{ t().back }}</button>
         }
         @if (step() < last()) {
-          <button bpdmButton (click)="next()">Next</button>
+          <button bpdmButton (click)="next()">{{ t().next }}</button>
         } @else {
-          <button bpdmButton (click)="finish()">{{ finishText() }}</button>
+          <button bpdmButton (click)="finish()">{{ finishText() || t().finish }}</button>
         }
       </ng-template>
     </bpdm-dialog>
@@ -101,7 +122,9 @@ export class BpdmStepDialog {
   /** Overall dialog title (defaults to the current step's title). */
   readonly title = input("");
   readonly size = input<DialogSize>("md");
-  readonly finishText = input("Finish");
+  readonly finishText = input("");
+  /** Screen-reader / navigation strings (Back, Next, Finish, progress, close). */
+  readonly messages = input<Partial<StepDialogMessages>>({});
   /** Open state — two-way bindable via `[(open)]`. */
   readonly open = model(false);
   /** Fired when the last step's Finish is clicked. */
@@ -113,6 +136,16 @@ export class BpdmStepDialog {
   protected readonly currentContent = computed(() => this.currentStep()?.content ?? null);
   protected readonly currentDescription = computed(() => this.currentStep()?.description ?? "");
   protected readonly dialogTitle = computed(() => this.title() || this.currentStep()?.title || "");
+  protected readonly t = computed<StepDialogMessages>(() => ({
+    ...DEFAULT_STEP_DIALOG_MESSAGES,
+    ...this.messages(),
+  }));
+  protected readonly dialogMessages = computed(() => ({ close: this.t().close }));
+  protected readonly progressText = computed(() =>
+    this.t()
+      .step.replace("{index}", String(Math.min(this.step(), this.last()) + 1))
+      .replace("{total}", String(this.steps().length)),
+  );
 
   constructor() {
     // restart the wizard whenever the dialog is closed

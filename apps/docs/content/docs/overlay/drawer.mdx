@@ -145,15 +145,36 @@ The `size` prop sets the panel's width (left/right) or height (top/bottom):
   <Tab value="React">
 
 ```tsx title="drawer-sizes.tsx"
-<Drawer size="sm" trigger={<Button>SM</Button>} title="SM drawer" />
-<Drawer size="md" trigger={<Button>MD</Button>} title="MD drawer" />
-<Drawer size="lg" trigger={<Button>LG</Button>} title="LG drawer" />
-<Drawer size="xl" trigger={<Button>XL</Button>} title="XL drawer" />
-<Drawer size="full" trigger={<Button>Full</Button>} title="Full drawer" />
+import { Drawer } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+export function Sizes() {
+  return (
+    <>
+      <Drawer size="sm" trigger={<Button>SM</Button>} title="SM drawer" />
+      <Drawer size="md" trigger={<Button>MD</Button>} title="MD drawer" />
+      <Drawer size="lg" trigger={<Button>LG</Button>} title="LG drawer" />
+      <Drawer size="xl" trigger={<Button>XL</Button>} title="XL drawer" />
+      <Drawer size="full" trigger={<Button>Full</Button>} title="Full drawer" />
+    </>
+  );
+}
 ```
 
   </Tab>
   <Tab value="Angular">
+
+```ts title="drawer-sizes.ts"
+import { Component } from '@angular/core';
+import { BpdmDrawer, BpdmDrawerTrigger, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'drawer-sizes',
+  imports: [BpdmDrawer, BpdmDrawerTrigger, BpdmButton],
+  templateUrl: './drawer-sizes.html',
+})
+export class DrawerSizes {}
+```
 
 ```html title="drawer-sizes.html"
 <bpdm-drawer size="sm" title="SM drawer"><button bpdmButton bpdmDrawerTrigger>SM</button></bpdm-drawer>
@@ -307,29 +328,163 @@ export class Controlled {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The drawer carries a little copy of its own — the close (X) button's accessible
+name, and a screen-reader fallback title used when you don't pass a `title`. Set
+them via a single `messages` object; it's a `Partial<DrawerMessages>` merged over
+the English defaults, so override one key or both:
+
+- **`close`** — the close (X) button's accessible name (`aria-label`). Default
+  `"Close"`.
+- **`drawerLabel`** — the visually-hidden fallback title (the accessible name)
+  used only when no `title` is set. Default `"Drawer"`.
+
+- **React** — pass `messages` to `<Drawer messages={{ … }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-drawer>`.
+
+The drawer content, header, footer, and the close (X) button all mirror under
+`dir="rtl"` with no extra prop — the close (X) button, pinned to the inline-end
+corner, flips with everything else. The `side` prop stays a **physical** edge
+(`left` / `right` / `top` / `bottom`) that you choose explicitly, so pick the edge
+that suits your layout in each direction.
+
+The example below localises the built-in copy to German via `messages` — the close
+button and the fallback title — while the drawer's own title and body stay
+untouched:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="drawer-i18n.tsx"
+import { Drawer, DrawerClose, type DrawerMessages } from '@bpdm/ui/drawer';
+import { Button } from '@bpdm/ui/button';
+
+// German labels for the built-in close button + screen-reader fallback title.
+const messages: Partial<DrawerMessages> = {
+  close: 'Schließen',
+  drawerLabel: 'Seitenleiste',
+};
+
+export function WorkspaceSettings() {
+  return (
+    <Drawer
+      trigger={<Button>Open settings</Button>}
+      title="Workspace settings"
+      description="Manage members and defaults."
+      messages={messages}
+      footer={
+        <DrawerClose asChild>
+          <Button>Save</Button>
+        </DrawerClose>
+      }
+    >
+      <p>Your workspace preferences live here.</p>
+    </Drawer>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="workspace-settings.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmDrawer,
+  BpdmDrawerTrigger,
+  BpdmDrawerBody,
+  BpdmDrawerFooter,
+  BpdmDrawerClose,
+  BpdmButton,
+  type DrawerMessages,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'workspace-settings',
+  imports: [BpdmDrawer, BpdmDrawerTrigger, BpdmDrawerBody, BpdmDrawerFooter, BpdmDrawerClose, BpdmButton],
+  templateUrl: './workspace-settings.html',
+})
+export class WorkspaceSettings {
+  // German labels for the built-in close button + screen-reader fallback title.
+  readonly messages: Partial<DrawerMessages> = {
+    close: 'Schließen',
+    drawerLabel: 'Seitenleiste',
+  };
+}
+```
+
+```html title="workspace-settings.html"
+<bpdm-drawer title="Workspace settings" description="Manage members and defaults." [messages]="messages">
+  <button bpdmButton bpdmDrawerTrigger>Open settings</button>
+  <ng-template bpdmDrawerBody>
+    <p>Your workspace preferences live here.</p>
+  </ng-template>
+  <ng-template bpdmDrawerFooter>
+    <button bpdmButton bpdmDrawerClose>Save</button>
+  </ng-template>
+</bpdm-drawer>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `side` | `left \| right \| top \| bottom` | `right` | Edge to slide in from. |
-| `size` | `sm \| md \| lg \| xl \| full` | `md` | Width (left/right) or height (top/bottom). |
-| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(open)]`. |
-| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. |
-| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: `[bpdmDrawerTrigger]`. |
-| `title` / `description` | `ReactNode` | — | Heading + sub-heading (a hidden title is supplied if omitted). |
-| `footer` | `ReactNode` | — | Footer area (React). Angular: `[bpdmDrawerFooter]` template. |
-| `showClose` | `boolean` | `true` | Show the top-right close button. |
+| `side` | `left \| right \| top \| bottom` | `right` | Physical edge to slide in from. Angular: `[side]`. |
+| `size` | `sm \| md \| lg \| xl \| full` | `md` | Width (left/right) or height (top/bottom). Angular: `[size]`. |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: two-way `[(open)]`. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. Angular: covered by `[(open)]`. |
+| `trigger` | `ReactNode` | — | Element that opens it (React). Angular: the `[bpdmDrawerTrigger]` directive on your trigger. |
+| `title` | `ReactNode` | — | Heading (a visually-hidden fallback from `messages.drawerLabel` is used if omitted). Angular: `[title]`. |
+| `description` | `ReactNode` | — | Sub-heading under the title. Angular: `[description]`. |
+| `children` | `ReactNode` | — | Body content (React). Angular: the `ng-template[bpdmDrawerBody]`. |
+| `footer` | `ReactNode` | — | Footer area (React). Angular: the `ng-template[bpdmDrawerFooter]`. |
+| `showClose` | `boolean` | `true` | Show the top-right close (X) button. Angular: `[showClose]`. |
+| `className` | `string` | — | **React** — extra classes on the panel. |
+| `messages` | `Partial<DrawerMessages>` | English | Override the close label / SR fallback title for i18n (see below). Angular: `[messages]`. |
 
 **Primitives (React):** `DrawerRoot`, `DrawerTrigger`, `DrawerClose`,
 `DrawerContent` (`side`, `size`, `showClose`), `DrawerHeader`, `DrawerFooter`,
 `DrawerTitle`, `DrawerDescription`.
 
+**Directives (Angular):** `bpdmDrawerTrigger` (opens the drawer), `bpdmDrawerClose`
+(dismisses from inside), and the `ng-template[bpdmDrawerBody]` /
+`ng-template[bpdmDrawerFooter]` content markers.
+
+### App-wide copy — `messages`
+
+Localise the close button and the screen-reader fallback title in one place (see
+[Internationalization](#internationalization)). It's a `Partial<DrawerMessages>`
+merged over the English defaults — override one key or both.
+
+- **React** — the `messages` prop on `<Drawer>`.
+- **Angular** — the `[messages]` input on `<bpdm-drawer>`.
+
+| `DrawerMessages` key | Default | Description |
+| --- | --- | --- |
+| `close` | `Close` | Accessible name (`aria-label`) for the close (X) button. |
+| `drawerLabel` | `Drawer` | Visually-hidden fallback title (the accessible name) used only when no `title` is set. |
+
 ## Accessibility
 
-- Built on Radix Dialog — focus trap (focus moves in on open, returns to the
-  trigger on close), scroll-locked background, and `Esc` / outside-click to close.
-- Renders `role="dialog"` + `aria-modal`, wired to the title / description via
-  `aria-labelledby` / `aria-describedby`. Always provide a `title` (a
-  visually-hidden one is added if you don't).
-- The close button has an `aria-label`; the trigger keeps its own role and
-  keyboard behaviour.
+- It's a modal built on the [Dialog](/docs/overlay/dialog) machinery —
+  `role="dialog"` + `aria-modal="true"`, with a focus trap and scroll lock while
+  it's open.
+- The `title` is the drawer's accessible name (`aria-labelledby`); the
+  `description`, when set, is linked via `aria-describedby`.
+- When no `title` is given, a visually-hidden fallback name (from
+  `messages.drawerLabel`, default `"Drawer"`) is used, so the dialog always has an
+  accessible name.
+- The close (X) button carries an accessible name via `messages.close`
+  (default `"Close"`).
+- `Esc`, a backdrop click, and the close (X) button all dismiss the drawer; the
+  trigger keeps its own role and keyboard behaviour.
+- Focus moves into the panel on open and returns to the element that opened it —
+  the trigger — on close.
+- The panel slides in per edge, but conveys no meaning through motion alone.
+- All copy — the close label and the fallback title — is translatable via
+  `messages`, and the content, header, footer, and close (X) button all mirror
+  correctly under `dir="rtl"`.

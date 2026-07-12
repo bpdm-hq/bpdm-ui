@@ -11,6 +11,16 @@ import {
 } from "./dialog";
 import { OverlayClose as XIcon } from "./internal/overlay-icons";
 
+// --- i18n ---
+export interface DrawerMessages {
+  /** Close button aria-label. */
+  close: string;
+  /** Fallback screen-reader title when no `title` is set. */
+  drawerLabel: string;
+}
+
+export const DEFAULT_DRAWER_MESSAGES: DrawerMessages = { close: "Close", drawerLabel: "Drawer" };
+
 // re-export the shared pieces so a Drawer can be composed too
 export const DrawerRoot = DialogPrimitive.Root;
 export const DrawerTrigger = DialogPrimitive.Trigger;
@@ -61,12 +71,18 @@ export interface DrawerContentProps
     VariantProps<typeof drawerVariants> {
   size?: Size;
   showClose?: boolean;
+  /** aria-label for the close button. Default "Close". */
+  closeLabel?: string;
 }
 
 export const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DrawerContentProps
->(({ className, side = "right", size = "md", showClose = true, children, ...props }, ref) => (
+>(
+  (
+    { className, side = "right", size = "md", showClose = true, closeLabel = "Close", children, ...props },
+    ref,
+  ) => (
   <DialogPrimitive.Portal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -77,15 +93,16 @@ export const DrawerContent = React.forwardRef<
       {children}
       {showClose && (
         <DialogPrimitive.Close
-          aria-label="Close"
-          className="absolute right-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={closeLabel}
+          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <XIcon />
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
-));
+  ),
+);
 DrawerContent.displayName = "DrawerContent";
 
 export interface DrawerProps {
@@ -102,6 +119,8 @@ export interface DrawerProps {
   description?: React.ReactNode;
   footer?: React.ReactNode;
   showClose?: boolean;
+  /** Screen-reader strings (close button label, fallback title). */
+  messages?: Partial<DrawerMessages>;
   children?: React.ReactNode;
   className?: string;
 }
@@ -123,18 +142,27 @@ export function Drawer({
   description,
   footer,
   showClose = true,
+  messages,
   children,
   className,
 }: DrawerProps) {
+  const t = React.useMemo(() => ({ ...DEFAULT_DRAWER_MESSAGES, ...messages }), [messages]);
   return (
     <DrawerRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent side={side} size={size} showClose={showClose} className={className}>
+      <DrawerContent
+        side={side}
+        size={size}
+        showClose={showClose}
+        closeLabel={t.close}
+        className={className}
+      >
         <DialogHeader>
           {title ? (
             <DialogTitle>{title}</DialogTitle>
           ) : (
-            <DialogTitle className="sr-only">Drawer</DialogTitle>
+            // a11y: Radix requires a title — provide a hidden one if none given
+            <DialogTitle className="sr-only">{t.drawerLabel}</DialogTitle>
           )}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>

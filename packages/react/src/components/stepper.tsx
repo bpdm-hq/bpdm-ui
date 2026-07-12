@@ -5,12 +5,45 @@ import { useControllable } from "@/lib/use-controllable";
 
 export type StepperOrientation = "horizontal" | "vertical";
 
+/** Screen-reader labels + status words — override for i18n. */
+export interface StepperMessages {
+  /** Step list accessible name. */
+  ariaLabel: string;
+  /** Status word for a completed step. */
+  completed: string;
+  /** Status word for the active step. */
+  current: string;
+  /** Status word for a not-yet-reached step. */
+  upcoming: string;
+  /** Status word for a locked (linear, unreachable) step. */
+  locked: string;
+  /** Position template — `{index}`/`{total}` placeholders, e.g. "Step {index} of {total}". */
+  step: string;
+}
+
+export const DEFAULT_STEPPER_MESSAGES: StepperMessages = {
+  ariaLabel: "Progress",
+  completed: "Completed",
+  current: "Current step",
+  upcoming: "Not completed",
+  locked: "Locked",
+  step: "Step {index} of {total}",
+};
+
+// stable id bases so a step tab and its panel can reference each other
+const stepTabId = (uid: string, value: string) => `${uid}-tab-${value}`;
+const stepPanelId = (uid: string, value: string) => `${uid}-panel-${value}`;
+
 // ── state core ───────────────────────────────────────────────────────────────
 interface StepperContextValue {
   value: string;
   orientation: StepperOrientation;
   linear: boolean;
   lockIndicator: boolean;
+  /** Merged i18n labels. */
+  messages: StepperMessages;
+  /** Per-Stepper id base for tab ↔ panel wiring. */
+  uid: string;
   steps: string[];
   activeIndex: number;
   indexOf: (value: string) => number;
@@ -87,6 +120,8 @@ export interface StepperProps {
   linear?: boolean;
   /** Show a lock icon on steps that aren't reachable yet (with `linear`). */
   lockIndicator?: boolean;
+  /** Screen-reader labels + status words — override for i18n. */
+  messages?: Partial<StepperMessages>;
   className?: string;
 }
 
@@ -98,8 +133,14 @@ export function Stepper({
   orientation = "horizontal",
   linear = false,
   lockIndicator = false,
+  messages,
   className,
 }: StepperProps) {
+  const uid = React.useId();
+  const t = React.useMemo<StepperMessages>(
+    () => ({ ...DEFAULT_STEPPER_MESSAGES, ...messages }),
+    [messages],
+  );
   const steps = React.useMemo(() => collectStepValues(children), [children]);
   const first = steps[0] ?? "";
   const [value, setValue] = useControllable(
@@ -127,6 +168,8 @@ export function Stepper({
       orientation,
       linear,
       lockIndicator,
+      messages: t,
+      uid,
       steps,
       activeIndex: ai,
       indexOf: idx,
@@ -151,7 +194,7 @@ export function Stepper({
       isFirst: ai <= 0,
       isLast: ai === steps.length - 1,
     };
-  }, [value, orientation, linear, lockIndicator, steps, setValue, finished]);
+  }, [value, orientation, linear, lockIndicator, t, uid, steps, setValue, finished]);
 
   return (
     <StepperContext.Provider value={ctx}>
@@ -201,11 +244,21 @@ function Marker({
 export const StepList = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => (
-  <div ref={ref} role="tablist" className={cn("flex items-center", className)} {...props}>
-    {children}
-  </div>
-));
+>(({ className, children, ...props }, ref) => {
+  const ctx = useStepperContext("StepList");
+  return (
+    <div
+      ref={ref}
+      role="tablist"
+      aria-label={ctx.messages.ariaLabel}
+      aria-orientation={ctx.orientation}
+      className={cn("flex items-center", className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
 StepList.displayName = "StepList";
 
 export interface StepProps {
@@ -229,10 +282,25 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
   const isLast = index === ctx.steps.length - 1;
   const vertical = ctx.orientation === "vertical";
 
+  // sr-only status so the state (visual-only before) is announced: e.g.
+  // "Step 2 of 3, Current step"
+  const position = ctx.messages.step
+    .replace("{index}", String(index + 1))
+    .replace("{total}", String(ctx.steps.length));
+  const statusWord = completed
+    ? ctx.messages.completed
+    : active
+      ? ctx.messages.current
+      : locked
+        ? ctx.messages.locked
+        : ctx.messages.upcoming;
+
   const trigger = (
     <button
       type="button"
       role="tab"
+      id={stepTabId(ctx.uid, value)}
+      aria-controls={stepPanelId(ctx.uid, value)}
       aria-selected={active}
       aria-current={active ? "step" : undefined}
       disabled={disabled || (!clickable && !active)}
@@ -240,9 +308,10 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
       className={cn(
         "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         clickable && !active && "cursor-pointer",
-        // locked (linear future) or disabled steps read as not-allowed + dimmed
-        !clickable && !active && "cursor-not-allowed opacity-60",
-        disabled && "cursor-not-allowed opacity-50",
+        // locked (linear future) or disabled steps read as not-allowed + dimmed;
+        // `!` beats the host app's global `[role=tab]{cursor:pointer}`
+        !clickable && !active && "cursor-not-allowed! opacity-60",
+        disabled && "cursor-not-allowed! opacity-50",
         className,
       )}
     >
@@ -257,6 +326,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
           {children}
         </span>
       )}
+      <span className="sr-only">{`${position}, ${statusWord}`}</span>
     </button>
   );
 
@@ -272,7 +342,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
         <span aria-hidden className="relative mx-3 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
           <span
             className={cn(
-              "absolute inset-0 origin-left rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
+              "absolute inset-0 origin-left rtl:origin-right rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
               completed ? "scale-x-100" : "scale-x-0",
             )}
           />
@@ -311,6 +381,8 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
     return (
       <div
         role="tabpanel"
+        id={stepPanelId(ctx.uid, value)}
+        aria-labelledby={stepTabId(ctx.uid, value)}
         aria-hidden={!active}
         className={cn(
           "grid transition-[grid-template-rows,opacity] duration-[360ms] ease-[var(--bpdm-ease-out)]",
@@ -319,7 +391,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
         )}
       >
         <div className="overflow-hidden">
-          <div className={cn("ml-[2.75rem] pb-2 pt-1 text-sm text-foreground", className)}>
+          <div className={cn("ms-[2.75rem] pb-2 pt-1 text-sm text-foreground", className)}>
             {children}
           </div>
         </div>
@@ -332,6 +404,8 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
   return (
     <div
       role="tabpanel"
+      id={stepPanelId(ctx.uid, value)}
+      aria-labelledby={stepTabId(ctx.uid, value)}
       className={cn(
         "animate-[bpdm-step-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] pt-2 text-sm text-foreground",
         className,
@@ -363,7 +437,7 @@ function StepItemImpl({ value, children, className }: StepItemProps) {
           // track + a primary fill that grows top→bottom as the step completes
           <span
             aria-hidden
-            className="absolute left-4 top-9 bottom-0 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-border"
+            className="absolute start-4 top-9 bottom-0 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-border"
           >
             <span
               className={cn(

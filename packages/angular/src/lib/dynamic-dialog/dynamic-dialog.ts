@@ -1,10 +1,28 @@
-import { inject, Injectable, Injector, TemplateRef } from "@angular/core";
+import {
+  inject,
+  Injectable,
+  InjectionToken,
+  Injector,
+  type Provider,
+  TemplateRef,
+} from "@angular/core";
 import { Overlay } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
 import { BpdmOverlayPanel } from "../overlay/overlay-panel";
+import { DEFAULT_DIALOG_MESSAGES, type DialogMessages } from "../dialog/dialog";
 
 export type DynamicDialogSize = "sm" | "md" | "lg" | "xl";
+
+/** App-wide localizable strings (close button label, fallback title) for opened dialogs. */
+export const BPDM_DYNAMIC_DIALOG_MESSAGES = new InjectionToken<Partial<DialogMessages>>(
+  "BPDM_DYNAMIC_DIALOG_MESSAGES",
+);
+
+/** Provide app-wide dynamic-dialog message defaults. */
+export function provideBpdmDynamicDialogMessages(messages: Partial<DialogMessages>): Provider {
+  return { provide: BPDM_DYNAMIC_DIALOG_MESSAGES, useValue: messages };
+}
 
 export interface DynamicDialogOptions {
   title?: string;
@@ -55,6 +73,10 @@ export class BpdmDialogRef {
 export class BpdmDialogService {
   private readonly overlay = inject(Overlay);
   private readonly injector = inject(Injector);
+  private readonly t: DialogMessages = {
+    ...DEFAULT_DIALOG_MESSAGES,
+    ...(inject(BPDM_DYNAMIC_DIALOG_MESSAGES, { optional: true }) ?? {}),
+  };
 
   open(content: TemplateRef<unknown>, options: DynamicDialogOptions = {}): BpdmDialogRef {
     const overlayRef = this.overlay.create({
@@ -77,7 +99,8 @@ export class BpdmDialogService {
     panelRef.setInput("ctx", { $implicit: ref, close: () => ref.close() });
     panelRef.setInput("labelId", `bpdm-dynamic-title-${id}`);
     panelRef.setInput("descId", `bpdm-dynamic-desc-${id}`);
-    panelRef.setInput("fallbackTitle", "Dialog");
+    panelRef.setInput("closeLabel", this.t.close);
+    panelRef.setInput("fallbackTitle", this.t.dialogLabel);
     panelRef.setInput("panelClass", cn(
       "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none",
       SIZE[options.size ?? "md"],

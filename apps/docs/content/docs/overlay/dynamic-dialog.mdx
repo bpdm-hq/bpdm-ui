@@ -221,6 +221,122 @@ export class Stacked {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+Your dialogs carry almost no copy of their own — the `title`, `description`,
+content and footer are entirely your data, so you translate them at the call
+site (`open(content, { title })`). That leaves just two accessibility strings,
+shared with the [Dialog](/docs/overlay/dialog) it's built on:
+
+- **`close`** — the close button's accessible name (`aria-label`). Default
+  `"Close"`.
+- **`dialogLabel`** — the visually-hidden fallback title, used **only** when a
+  call passes no `title`, so a screen reader still announces the dialog. Default
+  `"Dialog"`. When you provide a `title`, this is never shown.
+
+Set them **once for the whole app** — every opened dialog inherits them:
+
+- **React** — pass `messages` to the provider (`<DialogProvider messages={{ … }}>`).
+  It's a `Partial<DialogMessages>` merged over the English defaults, so override
+  one key or both.
+- **Angular** — register `provideBpdmDynamicDialogMessages({ … })` in your app
+  providers (it configures the `BPDM_DYNAMIC_DIALOG_MESSAGES` injection token).
+
+Being built on the Dialog, it mirrors under `dir="rtl"` with no extra prop — the
+close button flips to the inline-**start** (top-left) corner.
+
+The example below is German (`de-DE`) — localised app-wide `messages` plus a
+translated per-call `open(..., { title: 'Projekt bearbeiten' })`.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="dynamic-dialog-i18n.tsx"
+import { DialogProvider, useDialog } from '@bpdm/ui/dynamic-dialog';
+import { Button } from '@bpdm/ui/button';
+import { Input } from '@bpdm/ui/input';
+
+// Set the a11y strings once, near the root — every opened dialog inherits them.
+export function App() {
+  return (
+    <DialogProvider messages={{ close: 'Schließen', dialogLabel: 'Dialog' }}>
+      <ProjektBearbeiten />
+    </DialogProvider>
+  );
+}
+
+function ProjektBearbeiten() {
+  const dialog = useDialog();
+
+  function openEditor() {
+    dialog.open(
+      ({ close }) => (
+        <div className="flex flex-col gap-3">
+          <Input defaultValue="Acme Website" aria-label="Projektname" />
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" appearance="ghost" onClick={close}>Abbrechen</Button>
+            <Button onClick={close}>Speichern</Button>
+          </div>
+        </div>
+      ),
+      { title: 'Projekt bearbeiten', description: 'Benennen Sie Ihr Projekt um.' },
+    );
+  }
+
+  return <Button onClick={openEditor}>Projekt bearbeiten</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="main.ts"
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideBpdmDynamicDialogMessages } from '@bpdm/ng';
+import { App } from './app';
+
+bootstrapApplication(App, {
+  providers: [
+    provideBpdmDynamicDialogMessages({ close: 'Schließen', dialogLabel: 'Dialog' }),
+  ],
+});
+```
+
+```ts title="projekt-bearbeiten.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmDialogService, BpdmButton, BpdmInput } from '@bpdm/ng';
+import type { TemplateRef } from '@angular/core';
+
+@Component({
+  selector: 'projekt-bearbeiten',
+  imports: [BpdmButton, BpdmInput],
+  templateUrl: './projekt-bearbeiten.html',
+})
+export class ProjektBearbeiten {
+  readonly dialog = inject(BpdmDialogService);
+  open(tpl: TemplateRef<unknown>) {
+    this.dialog.open(tpl, { title: 'Projekt bearbeiten', description: 'Benennen Sie Ihr Projekt um.' });
+  }
+}
+```
+
+```html title="projekt-bearbeiten.html"
+<button bpdmButton (click)="open(formTpl)">Projekt bearbeiten</button>
+
+<ng-template #formTpl let-d>
+  <div class="flex flex-col gap-3">
+    <input bpdmInput value="Acme Website" aria-label="Projektname" />
+    <div class="flex justify-end gap-2">
+      <button bpdmButton variant="secondary" appearance="ghost" (click)="d.close()">Abbrechen</button>
+      <button bpdmButton (click)="d.close()">Speichern</button>
+    </div>
+  </div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 `open(content, options)` → React: returns an id (`close(id)`); Angular: returns a
@@ -237,10 +353,38 @@ export class Stacked {
 `BpdmDialogService.open(templateRef, options)` → `BpdmDialogRef`; the template
 receives `{ close }` (`<ng-template let-d>` → `d.close()`).
 
+### App-wide copy — `messages`
+
+Two accessibility strings are shared with the [Dialog](/docs/overlay/dialog) and
+set once for the whole app (see [Internationalization](#internationalization));
+your per-call `title` / `description` / content always stays at the call site.
+
+- **React** — the `messages` prop on `DialogProvider` (`Partial<DialogMessages>`),
+  applied to every dialog opened through it.
+- **Angular** — `provideBpdmDynamicDialogMessages(Partial<DialogMessages>)` in the
+  app providers, backed by the `BPDM_DYNAMIC_DIALOG_MESSAGES` injection token.
+
+| `DialogMessages` key | Default | Description |
+| --- | --- | --- |
+| `close` | `"Close"` | The close button's accessible name (`aria-label`). |
+| `dialogLabel` | `"Dialog"` | Visually-hidden fallback title used only when a call omits `title`. |
+
 ## Accessibility
 
-- Each dialog inherits the [Dialog](/docs/overlay/dialog)'s focus trap, scroll
-  lock, `role="dialog"` + `aria-modal`, and `Esc` / outside-click to close.
-- Stacked dialogs trap focus in the topmost layer; closing it returns focus to
-  the one beneath.
-- Provide a `title` for every dialog so it has an accessible name.
+- **Inherits the [Dialog](/docs/overlay/dialog)'s a11y in full:** each opened
+  dialog renders `role="dialog"` + `aria-modal="true"`, traps focus and restores
+  it to the element focused before it opened, and locks background scroll while
+  it's open.
+- **Accessible name and description:** the `title` names the dialog via
+  `aria-labelledby` and the `description`, when set, is linked via
+  `aria-describedby`. Provide a `title` for every dialog; when you omit one, a
+  visually-hidden fallback (`messages.dialogLabel`, default `"Dialog"`) keeps it
+  named.
+- **Stacking:** only the **topmost** dialog is dismissable — `Esc` closes it, and
+  focus stays trapped within it; the dialogs beneath require an explicit action
+  (a button or the close control). Outside-click dismissal is blocked for the
+  whole stack, so closing the top never tears down the layers below. Closing the
+  top returns focus to the one beneath.
+- **Close button:** the close button carries an accessible name
+  (`messages.close`, default `"Close"`) and a focus-visible ring; under
+  `dir="rtl"` it mirrors to the inline-start (top-left) corner.
