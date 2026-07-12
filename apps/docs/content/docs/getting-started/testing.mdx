@@ -1488,6 +1488,118 @@ fixture.detectChanges();
   </Tab>
 </Tabs>
 
+### Alert
+
+The **Alert** renders its message in a `role="alert"` live region, so query it by
+role and assert its text — never the variant colour. A dismissible alert adds a
+labelled dismiss `button` (`Dismiss`, or your `messages.dismiss`); it collapses on
+click and fires `onClose` / `(closed)` once the collapse transition ends, so
+dispatch a `transitionend` (`propertyName: 'grid-template-rows'`) to complete it.
+No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert.test.tsx"
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Alert } from '@bpdm/ui/alert';
+
+const onClose = jest.fn();
+
+const { container } = render(
+  <Alert variant="success" title="Invite sent" onClose={onClose}>
+    Mara will get an email with a link to join.
+  </Alert>,
+);
+
+// the message is a live region — query by role, assert the text
+const alert = screen.getByRole('alert');
+expect(alert).toHaveTextContent('Invite sent');
+
+// the dismiss button is labelled (messages.dismiss, default "Dismiss")
+await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+
+// onClose fires after the collapse transition ends
+fireEvent.transitionEnd(container.firstChild as Element, { propertyName: 'grid-template-rows' });
+expect(onClose).toHaveBeenCalledTimes(1);
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert.spec.ts"
+const host = fixture.nativeElement as HTMLElement; // <bpdm-alert>
+
+// the message is a live region — query by role, assert the text
+const alert = host.querySelector('[role="alert"]') as HTMLElement;
+expect(alert.textContent).toContain('Invite sent');
+
+// the dismiss button is labelled (messages.dismiss, default "Dismiss")
+host.querySelector<HTMLButtonElement>('button[aria-label="Dismiss"]')!.click();
+fixture.detectChanges();
+
+// (closed) emits after the collapse transition ends
+host.dispatchEvent(Object.assign(new Event('transitionend'), { propertyName: 'grid-template-rows' }));
+fixture.detectChanges();
+// assert your (closed) handler ran, e.g. expect(component.onClosed).toHaveBeenCalled();
+```
+
+  </Tab>
+</Tabs>
+
+### Toast
+
+**Toast** is fired imperatively, so there's nothing to render at the callsite —
+mount the toaster (`<Toaster />` / `<bpdm-toaster />`), fire a toast, then query
+the live region by **role** and **text**. `error` toasts announce as `role="alert"`,
+every other variant as `role="status"`. Dismiss via the labelled close button
+(`Dismiss`, or your `messages.dismiss`). No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="toast.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Toaster, toast } from '@bpdm/ui/toast';
+
+render(<Toaster />);
+
+// fire a toast, then find it by role + text (status for non-error variants)
+toast.success('Invite sent');
+const status = await screen.findByRole('status');
+expect(status).toHaveTextContent('Invite sent');
+
+// the close button is labelled (messages.dismiss, default "Dismiss")
+await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+expect(screen.queryByText('Invite sent')).not.toBeInTheDocument();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast.spec.ts"
+// host template: <bpdm-toaster /> — inject the service, fire, then query the DOM
+const service = TestBed.inject(BpdmToast);
+const host = fixture.nativeElement as HTMLElement;
+
+service.show('Invite sent');
+fixture.detectChanges();
+
+// find the live region by role + text (status for non-error variants)
+const status = host.querySelector('[role="status"]') as HTMLElement;
+expect(status.textContent).toContain('Invite sent');
+
+// the close button is labelled (messages.dismiss, default "Dismiss")
+host.querySelector<HTMLButtonElement>('button[aria-label="Dismiss"]')!.click();
+fixture.detectChanges();
+expect(host.textContent).not.toContain('Invite sent');
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and

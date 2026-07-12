@@ -336,6 +336,18 @@ export function TitleOnly() {
   </Tab>
   <Tab value="Angular">
 
+```ts title="alert-title-only.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'title-only',
+  imports: [BpdmAlert],
+  templateUrl: './alert-title-only.html',
+})
+export class TitleOnly {}
+```
+
 ```html title="alert-title-only.html"
 <bpdm-alert variant="info" title="Your changes have been saved." />
 ```
@@ -369,10 +381,115 @@ export function NoIcon() {
   </Tab>
   <Tab value="Angular">
 
+```ts title="alert-no-icon.ts"
+import { Component } from '@angular/core';
+import { BpdmAlert } from '@bpdm/ng';
+
+@Component({
+  selector: 'no-icon',
+  imports: [BpdmAlert],
+  templateUrl: './alert-no-icon.html',
+})
+export class NoIcon {}
+```
+
 ```html title="alert-no-icon.html"
 <bpdm-alert variant="default" [showIcon]="false" title="Release notes">
   We've shipped a faster editor and a few bug fixes.
 </bpdm-alert>
+```
+
+  </Tab>
+</Tabs>
+
+## Internationalization
+
+The Alert has almost no built-in copy of its own — the `title`, the body, and any
+action labels are all **author-supplied**, so you translate them in your own app
+exactly like the rest of the content you pass in. The one string the component
+owns is the **dismiss (X) button's accessible name**, set via a single `messages`
+object — a `Partial<AlertMessages>` merged over the English default:
+
+- **`dismiss`** — the dismiss (X) button's accessible name (`aria-label`). Default
+  `"Dismiss"`.
+
+- **React** — pass `messages` to `<Alert messages={{ dismiss: '…' }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-alert>`.
+
+The `live` prop is localisation-adjacent: it controls how assertively a screen
+reader announces the alert — `"assertive"` (the default, `role="alert"`, right for
+errors and warnings), `"polite"` (`role="status"`, announced when the reader is
+idle, better for non-urgent info/success), or `"off"` (no live role). It changes
+announcement timing, not any text.
+
+The Alert mirrors under `dir="rtl"` with no extra prop — the dismiss (X) button
+moves to the inline-start corner and the reserved padding flips with it, while the
+icon and text order follow the writing direction.
+
+The example below localises only the built-in dismiss label to German via
+`messages` — the alert's own title and body stay in your app's content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="alert-i18n.tsx"
+import { useState } from 'react';
+import { Alert, type AlertMessages } from '@bpdm/ui/alert';
+
+// Only the built-in dismiss label is translated; your own copy stays as-is.
+const messages: Partial<AlertMessages> = {
+  dismiss: 'Schließen',
+};
+
+export function InviteAlert() {
+  const [open, setOpen] = useState(true);
+  if (!open) return null;
+  return (
+    <Alert
+      variant="success"
+      title="Invite sent"
+      messages={messages}
+      onClose={() => setOpen(false)}
+    >
+      Mara will get an email with a link to join.
+    </Alert>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="alert-i18n.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmAlert, type AlertMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'invite-alert',
+  imports: [BpdmAlert],
+  templateUrl: './alert-i18n.html',
+})
+export class InviteAlert {
+  readonly open = signal(true);
+  // Only the built-in dismiss label is translated; your own copy stays as-is.
+  readonly messages: Partial<AlertMessages> = {
+    dismiss: 'Schließen',
+  };
+}
+```
+
+```html title="alert-i18n.html"
+@if (open()) {
+  <bpdm-alert
+    variant="success"
+    title="Invite sent"
+    [messages]="messages"
+    dismissible
+    (closed)="open.set(false)"
+  >
+    Mara will get an email with a link to join.
+  </bpdm-alert>
+}
 ```
 
   </Tab>
@@ -390,17 +507,44 @@ export function NoIcon() {
 | `action` | `ReactNode` | — | **React** — buttons/links under the body. Angular projects `[bpdmAlertActions]`. |
 | `onClose` | `() => void` | — | **React** — show a dismiss button; fires after the collapse. Angular uses `dismissible` + `(closed)`. |
 | `dismissible` | `boolean` | `false` | **Angular** — show the dismiss button (emits `closed`). |
+| `messages` | `Partial<AlertMessages>` | English | Override the translatable strings — currently just the dismiss button's accessible name (see below). Angular: `[messages]`. |
+| `live` | `assertive \| polite \| off` | `assertive` | Live-region politeness — `assertive` (`role="alert"`), `polite` (`role="status"`), or `off` (no live role). Angular: `[live]`. |
 
 The body is `children` (React) / projected content (Angular). In React all native
-`<div>` attributes are forwarded onto the root.
+`<div>` attributes are forwarded onto the root. In Angular the actions row is the
+`[bpdmAlertActions]` directive, and `(closed)` is the output that fires once a
+dismissible alert has finished collapsing.
+
+### App-wide copy — `messages`
+
+Localise the one built-in string — the dismiss button's accessible name — in a
+single place (see [Internationalization](#internationalization)). It's a
+`Partial<AlertMessages>` merged over the English default.
+
+- **React** — the `messages` prop on `<Alert>`.
+- **Angular** — the `[messages]` input on `<bpdm-alert>`.
+
+| `AlertMessages` key | Default | Description |
+| --- | --- | --- |
+| `dismiss` | `Dismiss` | Accessible name (`aria-label`) for the dismiss (X) button. |
 
 ## Accessibility
 
-- The alert container has **`role="alert"`**, so assistive tech announces it when
-  it appears — use it for important, in-context messages.
-- The dismiss button has an `aria-label="Dismiss"` and is keyboard focusable; the
-  leading icon is decorative (`aria-hidden`), so meaning comes from the text.
-- Don't rely on colour alone — the `title`/body should read clearly on their own
-  (the per-variant icon reinforces, but doesn't replace, the wording).
+- The Alert is a **live region**: by default the container carries `role="alert"`,
+  so assistive tech announces it **assertively** the moment it appears or its text
+  changes — which suits errors and warnings.
+- For non-urgent info or success, set `live="polite"` (`role="status"`) so the
+  message is announced when the screen reader is idle instead of interrupting; use
+  `live="off"` to drop the live role entirely.
+- The leading icon is decorative (`aria-hidden`) — severity is conveyed by the
+  visible `title` and body text, never by colour or the icon alone, so the message
+  reads clearly on its own.
+- The dismiss control is a real `<button>` with a visible keyboard focus ring and
+  an accessible name from `messages.dismiss` (default `"Dismiss"`).
+- Action buttons are author-supplied — pass real `button` / link elements (e.g.
+  [Button](/docs/button/button)) so they stay fully keyboard-operable and
+  focusable.
+- Everything mirrors under `dir="rtl"` — the dismiss (X) button moves to the
+  inline-start corner and the icon / text order follows the writing direction.
 - For frequent, transient feedback prefer [Toast](/docs/messages/toast), whose
   live-region timing suits ephemeral messages better than a persistent alert.

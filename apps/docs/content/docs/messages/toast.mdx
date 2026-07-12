@@ -1,8 +1,9 @@
 ---
 title: Toast
-description: Transient notifications fired imperatively from anywhere — variants, descriptions, actions, promises, and six dock positions (@bpdm/ui).
+description: Transient notifications fired imperatively from anywhere — variants, descriptions, actions, promises, and six dock positions, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import {
   ToastBasicDemo,
   ToastVariantsDemo,
@@ -14,21 +15,23 @@ import {
 } from '@/components/toast-demos';
 import { Preview } from '@/components/preview';
 
-The **Toast** is a transient notification. Call `toast(...)` from anywhere — no
-provider or hook needed — and render `<Toaster />` once near your app root.
-Variants, an optional description and action, swipe-to-dismiss, six dock
-positions, and `toast.promise(...)` for async flows.
-
-<Callout type="info">
-  Toast is currently **React-only** (`@bpdm/ui`). `@bpdm/ng` doesn't ship a toast
-  yet — for Angular, use the [Alert](/docs/messages/alert) component for inline
-  messages until it lands.
-</Callout>
+The **Toast** is a transient notification. Fire one imperatively from anywhere —
+no wrapping the callsite in state — and render the toaster once near your app
+root. Variants, an optional description and action, swipe-to-dismiss, six dock
+positions, and a one-call `promise(...)` helper for async flows. In React you
+call `toast(...)` and render `<Toaster />`; in Angular you `inject(BpdmToast)`
+and render `<bpdm-toaster />`.
 
 ## Setup
 
-Mount a single `<Toaster />` near your app root — it listens to the global store
-and renders every toast. Everything else is just calling `toast(...)`.
+Render a single toaster near your app root — it listens to the global store and
+renders every toast. Everything else is just firing toasts from your code.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+Mount one `<Toaster />` near the root; then call `toast(...)` anywhere — no
+provider or hook needed.
 
 ```tsx title="app.tsx"
 import { Toaster } from '@bpdm/ui/toast';
@@ -43,11 +46,66 @@ export function App() {
 }
 ```
 
+```tsx title="save-button.tsx"
+import { toast } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+export function SaveButton() {
+  return <Button onClick={() => toast.success('Workspace settings updated')}>Save</Button>;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Render one `<bpdm-toaster />` in the root component template; then `inject(BpdmToast)`
+in any component or service and call its methods.
+
+```ts title="app.ts"
+import { Component } from '@angular/core';
+import { BpdmToaster } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-root',
+  imports: [BpdmToaster],
+  templateUrl: './app.html',
+})
+export class App {}
+```
+
+```html title="app.html"
+<your-app />
+<bpdm-toaster position="bottom-right" />
+```
+
+```ts title="save-button.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'save-button',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="save()">Save</button>`,
+})
+export class SaveButton {
+  private toast = inject(BpdmToast);
+  save() {
+    this.toast.success('Workspace settings updated');
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Usage
 
 <Preview>
   <ToastBasicDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-usage.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -58,14 +116,40 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-usage.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-usage',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="show()">Show toast</button>`,
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  show() {
+    this.toast.show('Workspace settings updated');
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Variants
 
-`toast.success`, `toast.error`, `toast.warning`, and `toast.info` each carry their
-own icon and accent colour; plain `toast()` is the neutral default.
+`success`, `error`, `warning`, and `info` each carry their own icon and accent
+colour; the plain default call is the neutral variant.
 
 <Preview>
   <ToastVariantsDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-variants.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -84,6 +168,49 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-variants.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-variants',
+  imports: [BpdmButton],
+  templateUrl: './toast-variants.html',
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  default() {
+    this.toast.show('Workspace updated');
+  }
+  success() {
+    this.toast.success('Invite sent');
+  }
+  error() {
+    this.toast.error('Couldn’t save changes');
+  }
+  warning() {
+    this.toast.warning('Storage almost full');
+  }
+  info() {
+    this.toast.info('Sync finished');
+  }
+}
+```
+
+```html title="toast-variants.html"
+<button bpdmButton (click)="default()">Default</button>
+<button bpdmButton (click)="success()">Success</button>
+<button bpdmButton (click)="error()">Error</button>
+<button bpdmButton (click)="warning()">Warning</button>
+<button bpdmButton (click)="info()">Info</button>
+```
+
+  </Tab>
+</Tabs>
+
 ## With description
 
 Pass a `description` for a secondary line under the title.
@@ -91,6 +218,9 @@ Pass a `description` for a secondary line under the title.
 <Preview>
   <ToastDescriptionDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-description.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -111,6 +241,31 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-description.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-description',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="deploy()">Deploy</button>`,
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  deploy() {
+    this.toast.success('Deployment complete', {
+      description: 'Build #482 is live in production.',
+    });
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## With action
 
 Add an `action` ({`label`, `onClick`}) for a one-tap follow-up — an Undo, a
@@ -119,6 +274,9 @@ Retry, a View.
 <Preview>
   <ToastActionDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-action.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -140,16 +298,45 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-action.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-action',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="remove()">Remove member</button>`,
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  remove() {
+    this.toast.show('Member removed', {
+      description: 'Jonas Weber no longer has access.',
+      action: { label: 'Undo', onClick: () => this.toast.success('Restored Jonas’s access') },
+    });
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Async flows
 
-Drive a toast through an async task with a **single call** — `toast.promise()`
-shows a loading toast, then **swaps it in place** to success or error when the
-promise settles (no manual add-then-clear). `success` / `error` take a string or
-a function of the resolved value / error.
+Drive a toast through an async task with a **single call** — `promise()` shows a
+loading toast, then **swaps it in place** to success or error when the promise
+settles (no manual add-then-clear). `success` / `error` take a string or a
+function of the resolved value / error.
 
 <Preview>
   <ToastPromiseDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-promise.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -173,9 +360,37 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-promise.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-promise',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="deploy()">Deploy</button>`,
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  deploy() {
+    const task = new Promise<void>((resolve) => setTimeout(resolve, 1800));
+    this.toast.promise(task, {
+      loading: 'Deploying…',
+      success: 'Deployment complete',
+      error: 'Deploy failed',
+    });
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## Duration & persistence
 
-Toasts auto-dismiss after `duration` ms (the `<Toaster>` default is 4000). Pass a
+Toasts auto-dismiss after `duration` ms (the toaster default is 4000). Pass a
 per-toast `duration`, or `Infinity` to keep it until the user dismisses it. A thin
 **countdown bar** tracks the remaining time and pauses while the pointer is over
 the toast, so it never vanishes mid-read.
@@ -183,6 +398,9 @@ the toast, so it never vanishes mid-read.
 <Preview>
   <ToastDurationDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-duration.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -207,14 +425,51 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-duration.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-duration',
+  imports: [BpdmButton],
+  templateUrl: './toast-duration.html',
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  short() {
+    this.toast.show('Saved', { duration: 1500 });
+  }
+  persistent() {
+    this.toast.info('Heads up', {
+      description: 'This stays until you dismiss it.',
+      duration: Infinity,
+    });
+  }
+}
+```
+
+```html title="toast-duration.html"
+<button bpdmButton (click)="short()">Short (1.5s)</button>
+<button bpdmButton (click)="persistent()">Persistent</button>
+```
+
+  </Tab>
+</Tabs>
+
 ## Dismiss
 
-`toast.dismiss(id)` closes one toast; `toast.dismiss()` clears them all. Reuse an
-`id` to update a toast in place instead of stacking a new one.
+`dismiss(id)` closes one toast; `dismiss()` clears them all. Reuse an `id` to
+update a toast in place instead of stacking a new one.
 
 <Preview>
   <ToastDismissDemo />
 </Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toast-dismiss.tsx"
 import { toast } from '@bpdm/ui/toast';
@@ -237,21 +492,68 @@ export function Example() {
 }
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-dismiss.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'toast-dismiss',
+  imports: [BpdmButton],
+  templateUrl: './toast-dismiss.html',
+})
+export class Example {
+  private toast = inject(BpdmToast);
+  showTwo() {
+    this.toast.info('First notification');
+    this.toast.success('Second notification');
+  }
+  dismissAll() {
+    this.toast.dismiss();
+  }
+}
+```
+
+```html title="toast-dismiss.html"
+<button bpdmButton (click)="showTwo()">Show two</button>
+<button bpdmButton (click)="dismissAll()">Dismiss all</button>
+```
+
+  </Tab>
+</Tabs>
+
 ## Positions
 
-The dock corner is set once on the `<Toaster>` via `position` — one of
-`top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, or
-`bottom-right`.
+The dock corner is set once on the toaster via `position` — one of `top-left`,
+`top-center`, `top-right`, `bottom-left`, `bottom-center`, or `bottom-right`.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```tsx title="toaster-position.tsx"
 import { Toaster } from '@bpdm/ui/toast';
 
 // every toast docks here
-<Toaster position="top-center" />;
+export function AppToaster() {
+  return <Toaster position="top-center" />;
+}
 ```
 
+  </Tab>
+  <Tab value="Angular">
+
+```html title="app.html"
+<!-- every toast docks here -->
+<bpdm-toaster position="top-center" />
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
-  In these docs the `<Toaster>` is docked **top-right**, so the toasts you trigger
+  In these docs the toaster is docked **top-right**, so the toasts you trigger
   above appear there.
 </Callout>
 
@@ -259,9 +561,12 @@ import { Toaster } from '@bpdm/ui/toast';
 
 To confirm an action _after_ a redirect — the **flash message** pattern (submit on
 one page, see the result on the next) — stash the message before navigating and
-fire it when the destination mounts. The `toast` store is global and `<Toaster>`
+fire it when the destination mounts. The toast store is global and the toaster
 lives at the app root, so for in-app client navigation a toast already persists
 across the route change; stashing also makes it survive a full page reload.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```ts title="flash.ts"
 // page A — before navigating
@@ -282,49 +587,220 @@ export function useFlash() {
 }
 ```
 
-<Callout type="info">
-  Angular has no toast — persist the same way (`sessionStorage` or router
-  `state`) and render a [`<bpdm-alert>`](/docs/messages/alert) on the destination.
-</Callout>
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="flash.ts"
+// page A — before navigating
+sessionStorage.setItem('flash', JSON.stringify({ type: 'success', message: 'Order placed' }));
+```
+
+```ts title="destination.ts"
+// page B — fire it once, on mount
+import { Component, OnInit, inject } from '@angular/core';
+import { BpdmToast } from '@bpdm/ng';
+
+@Component({
+  selector: 'destination-page',
+  template: `<!-- destination content -->`,
+})
+export class DestinationPage implements OnInit {
+  private toast = inject(BpdmToast);
+  ngOnInit() {
+    const raw = sessionStorage.getItem('flash');
+    if (!raw) return;
+    sessionStorage.removeItem('flash'); // clear so it only fires once
+    const { type, message } = JSON.parse(raw) as { type: 'success' | 'error'; message: string };
+    this.toast[type](message);
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Internationalization
+
+Toast has almost no built-in copy of its own — every title, description, action
+label, and `promise(...)` message is **author-supplied**, so you translate them in
+your own app exactly like the rest of the content you pass in. The one string the
+component owns is the **close (X) button's accessible name**, set via a single
+`messages` object — a `Partial<ToastMessages>` merged over the English default:
+
+- **`dismiss`** — the close (X) button's accessible name (`aria-label`). Default
+  `"Dismiss"`.
+
+- **React** — pass `messages` to `<Toaster messages={{ dismiss: '…' }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-toaster>`, or provide it app-wide with
+  `provideBpdmToastMessages({ dismiss: '…' })` (the `BPDM_TOAST_MESSAGES` token).
+
+Toasts mirror under `dir="rtl"` — the accent bar and countdown move to the
+inline-start edge and the close (X) to the inline-end; the six dock positions stay
+physical corners.
+
+The example below localises only the built-in dismiss label to German via
+`messages` — the toasts' own titles and descriptions stay in your app's content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="toast-i18n.tsx"
+import { Toaster, type ToastMessages } from '@bpdm/ui/toast';
+
+// Only the built-in dismiss label is translated; your own copy stays as-is.
+const messages: Partial<ToastMessages> = {
+  dismiss: 'Schließen',
+};
+
+export function AppToaster() {
+  return <Toaster position="bottom-right" messages={messages} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="app.ts"
+import { Component } from '@angular/core';
+import { BpdmToaster, type ToastMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-root',
+  imports: [BpdmToaster],
+  templateUrl: './app.html',
+})
+export class App {
+  // Only the built-in dismiss label is translated; your own copy stays as-is.
+  readonly messages: Partial<ToastMessages> = {
+    dismiss: 'Schließen',
+  };
+}
+```
+
+```html title="app.html"
+<bpdm-toaster position="bottom-right" [messages]="messages" />
+```
+
+  </Tab>
+</Tabs>
 
 ## API
 
-### `toast(title, options?)`
+### `toast(title, options?)` / `BpdmToast`
 
-Also `toast.success` / `toast.error` / `toast.warning` / `toast.info` (same
-signature), plus `toast.dismiss(id?)` and `toast.promise(promise, messages)`.
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+Import `{ toast }` from `@bpdm/ui/toast`. Call `toast(title, options?)` for the
+default variant, plus `toast.success` / `toast.error` / `toast.warning` /
+`toast.info` (same signature), `toast.dismiss(id?)`, and
+`toast.promise(promise, messages)`.
+
+| Method | Signature | Description |
+| --- | --- | --- |
+| `toast` | `(title, options?) => string` | Default variant; returns the toast `id`. |
+| `toast.success` / `.error` / `.warning` / `.info` | `(title, options?) => string` | Same signature, per-variant icon + accent. |
+| `toast.dismiss` | `(id?) => void` | Close one by `id`, or **all** if omitted. |
+| `toast.promise` | `(promise, { loading, success, error }) => Promise` | Loading toast that swaps in place on settle. |
+
+  </Tab>
+  <Tab value="Angular">
+
+`inject(BpdmToast)` — the injectable service is the Angular equivalent of React's
+callable `toast`. React's `toast(title)` maps to `this.toast.show(title)`; every
+other method matches by name.
+
+| Method | Signature | Description |
+| --- | --- | --- |
+| `show` | `(title, opts?) => string` | Default variant; returns the toast `id`. Same as React's `toast(...)`. |
+| `success` / `error` / `warning` / `info` | `(title, opts?) => string` | Same signature, per-variant icon + accent. |
+| `dismiss` | `(id?) => void` | Close one by `id`, or **all** if omitted. |
+| `promise` | `<T>(promise, { loading, success, error }) => Promise<T>` | Loading toast that swaps in place on settle. |
+
+  </Tab>
+</Tabs>
+
+`promise(promise, { loading, success, error })` — `success` / `error` may be a
+string or a function of the resolved value / error.
+
+### `ToastOptions`
+
+Both frameworks share the same options object.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `description` | `ReactNode` | — | Secondary line under the title. |
+| `description` | React `ReactNode` / Angular `string` | — | Secondary line under the title. |
 | `variant` | `default \| success \| error \| warning \| info` | `default` | Icon + accent colour. |
 | `duration` | `number` | `4000` | Auto-dismiss in ms; `Infinity` / `0` keeps it open. |
 | `action` | `{ label: string; onClick: () => void }` | — | Action button. |
-| `icon` | `ReactNode \| null` | variant icon | Override the leading icon; `null` hides it. |
+| `icon` | React `ReactNode \| null` / Angular `TemplateRef \| null` | variant icon | Override the leading icon; `null` hides it. |
 | `dismissible` | `boolean` | `true` | Show the close button. |
 | `onDismiss` | `() => void` | — | Fires when the toast closes. |
 | `id` | `string` | auto | Reuse to update an existing toast in place. |
 
-`toast.promise(promise, { loading, success, error })` — `success` / `error` may be
-a string or a function of the resolved value / error.
+### Toaster
 
-### `<Toaster>`
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+`<Toaster>` from `@bpdm/ui/toast` — render once near the app root.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `position` | `ToastPosition` | `bottom-right` | Dock corner (six options). |
 | `duration` | `number` | `4000` | Default auto-dismiss for all toasts. |
+| `messages` | `Partial<ToastMessages>` | English | Override the translatable strings (see below). |
 | `className` | `string` | — | Extra classes on the viewport. |
+
+  </Tab>
+  <Tab value="Angular">
+
+`<bpdm-toaster>` (`BpdmToaster`) — render once near the app root. No `className`
+input.
+
+| Input | Type | Default | Description |
+| --- | --- | --- | --- |
+| `[position]` | `ToastPosition` | `bottom-right` | Dock corner (six options). |
+| `[duration]` | `number` | `4000` | Default auto-dismiss for all toasts. |
+| `[messages]` | `Partial<ToastMessages>` | English | Override the translatable strings (see below). |
+
+  </Tab>
+</Tabs>
+
+### App-wide copy — `messages`
+
+Localise the one built-in string — the close (X) button's accessible name — in a
+single place (see [Internationalization](#internationalization)). It's a
+`Partial<ToastMessages>` merged over the English default.
+
+- **React** — the `messages` prop on `<Toaster>`.
+- **Angular** — the `[messages]` input on `<bpdm-toaster>`, or
+  `provideBpdmToastMessages({ dismiss: '…' })` (the `BPDM_TOAST_MESSAGES` token) to
+  set it app-wide.
+
+| `ToastMessages` key | Default | Description |
+| --- | --- | --- |
+| `dismiss` | `Dismiss` | Accessible name (`aria-label`) for the close (X) button. |
 
 ## Accessibility
 
-- Built on Radix Toast — toasts render into an `aria-live` region, so assistive
-  tech announces them without stealing focus.
-- The toast viewport is reachable with the **F8** hotkey; from there the close
-  button and any action button are keyboard focusable, and **Esc** / swipe
-  dismisses.
+- Each toast is a **live region** — `error` toasts announce **assertively**
+  (`role="alert"` / `aria-live="assertive"`), while every other variant is
+  **polite** (`role="status"`), so assistive tech announces them without stealing
+  focus.
+- The toast viewport is a **labelled region / list**, and the close and action
+  controls inside each toast are real focusable `<button>`s with a visible keyboard
+  focus ring.
+- The leading icon is decorative (`aria-hidden`) — the variant is conveyed by the
+  visible title and description text, never by colour or the icon alone.
+- Auto-dismiss **pauses on hover and focus**, so a toast never vanishes mid-read
+  while it's being pointed at or keyboard-focused.
+- Swipe-to-dismiss is a pointer affordance only — it never strands keyboard users,
+  who close a toast with its focusable close button.
 - Keep titles short and meaningful — they're what gets announced. Put detail in
   the `description`.
 - For messages the user must act on, set `duration: Infinity` so the toast doesn't
   disappear before it's read; never rely on a toast alone for critical,
   must-not-miss information.
+- Everything mirrors under `dir="rtl"` — the accent bar and countdown move to the
+  inline-start edge and the close (X) to the inline-end.

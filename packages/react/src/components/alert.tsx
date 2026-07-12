@@ -12,6 +12,14 @@ import { cn } from "@/lib/utils";
 
 export type { AlertVariant, AlertAppearance };
 
+// --- i18n ---
+export interface AlertMessages {
+  /** Dismiss (X) button aria-label. */
+  dismiss: string;
+}
+
+export const DEFAULT_ALERT_MESSAGES: AlertMessages = { dismiss: "Dismiss" };
+
 // per-variant leading icon — the colors (fg / accent / tint / solid / outline)
 // come from the shared `alertTones` so the React and Angular alerts match.
 const ICONS: Record<AlertVariant, React.ComponentType<{ className?: string }> | null> = {
@@ -37,6 +45,15 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   onClose?: () => void;
   /** Action buttons/links shown under the body. */
   action?: React.ReactNode;
+  /** Override the translatable strings (currently just the dismiss button label). */
+  messages?: Partial<AlertMessages>;
+  /**
+   * Live-region politeness. Defaults to today's behavior — `role="alert"`
+   * (assertive, interrupts the screen reader), right for urgent messages.
+   * Set `"polite"` for `role="status"` (announced when idle) on info/success,
+   * or `"off"` to render no live role.
+   */
+  live?: "assertive" | "polite" | "off";
 }
 
 /**
@@ -47,7 +64,7 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
  */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   (
-    { variant = "default", appearance = "soft", title, icon, onClose, action, className, children, ...props },
+    { variant = "default", appearance = "soft", title, icon, onClose, action, messages, live, className, children, ...props },
     ref,
   ) => {
     const tone = alertTones[variant];
@@ -56,11 +73,15 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const [closing, setClosing] = React.useState(false);
     const solid = appearance === "solid";
     const soft = appearance === "soft";
+    const t = React.useMemo(() => ({ ...DEFAULT_ALERT_MESSAGES, ...messages }), [messages]);
+    // undefined / "assertive" → role="alert"; "polite" → role="status"; "off" → no live role.
+    const liveRole =
+      live === undefined || live === "assertive" ? "alert" : live === "polite" ? "status" : undefined;
 
     const box = (
       <div
         ref={ref}
-        role="alert"
+        role={liveRole}
         className={cn(
           "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4",
           // soft = tinted inline-message surface (distinct from the white floating Toast)
@@ -88,7 +109,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
               {icon ?? (Icon ? <Icon className={cn("size-4", !solid && tone.fg)} /> : null)}
             </span>
           ))}
-        <div className={cn("min-w-0 flex-1", onClose && "pr-6")}>
+        <div className={cn("min-w-0 flex-1", onClose && "pe-6")}>
           {title && <p className="m-0 text-sm font-semibold">{title}</p>}
           {children != null && (
             <div className={cn("text-sm", solid ? "text-current/90" : "text-muted-foreground", title && "mt-1")}>
@@ -101,9 +122,9 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           <button
             type="button"
             onClick={() => setClosing(true)}
-            aria-label="Dismiss"
+            aria-label={t.dismiss}
             className={cn(
-              "absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               solid
                 ? "text-current/70 hover:bg-white/15 hover:text-current"
                 : "text-muted-foreground/70 hover:bg-muted hover:text-foreground",
