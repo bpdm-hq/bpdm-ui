@@ -12,6 +12,14 @@ import { cn } from "@/lib/utils";
 
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
 
+// --- i18n ---
+export interface ToastMessages {
+  /** Dismiss (X) button aria-label. */
+  dismiss: string;
+}
+
+export const DEFAULT_TOAST_MESSAGES: ToastMessages = { dismiss: "Dismiss" };
+
 export interface ToastAction {
   label: string;
   onClick: () => void;
@@ -203,6 +211,8 @@ export interface ToasterProps {
   position?: ToastPosition;
   /** Default auto-dismiss in ms. Default 4000. */
   duration?: number;
+  /** Override the translatable strings (currently just the dismiss button label). */
+  messages?: Partial<ToastMessages>;
   className?: string;
 }
 
@@ -210,6 +220,7 @@ export interface ToasterProps {
 export function Toaster({
   position = "bottom-right",
   duration = 4000,
+  messages,
   className,
 }: ToasterProps) {
   const [list, setList] = React.useState<ToastRecord[]>(records);
@@ -222,11 +233,18 @@ export function Toaster({
   }, []);
 
   const cfg = POSITIONS[position];
+  const dismissLabel = messages?.dismiss ?? DEFAULT_TOAST_MESSAGES.dismiss;
 
   return (
     <ToastPrimitive.Provider duration={duration} swipeDirection={cfg.swipe}>
       {list.map((t) => (
-        <ToastItem key={t.id} record={t} cfg={cfg} fallbackDuration={duration} />
+        <ToastItem
+          key={t.id}
+          record={t}
+          cfg={cfg}
+          fallbackDuration={duration}
+          dismissLabel={dismissLabel}
+        />
       ))}
       <ToastPrimitive.Viewport
         className={cn(
@@ -244,10 +262,12 @@ function ToastItem({
   record,
   cfg,
   fallbackDuration,
+  dismissLabel,
 }: {
   record: ToastRecord;
   cfg: (typeof POSITIONS)[ToastPosition];
   fallbackDuration: number;
+  dismissLabel: string;
 }) {
   const v = VARIANTS[record.variant ?? "default"];
   const sticky =
@@ -292,7 +312,7 @@ function ToastItem({
       className={cn(
         "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
         compact ? "items-center" : "items-start",
-        "before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-['']",
+        "before:absolute before:inset-y-0 before:start-0 before:w-1 before:content-['']",
         v.accent,
         !sticky && "before:opacity-40",
       )}
@@ -303,7 +323,7 @@ function ToastItem({
           aria-hidden
           style={{ animation: `bpdm-toast-countdown ${dur}ms linear forwards` }}
           className={cn(
-            "absolute inset-y-0 left-0 z-[1] w-1 origin-top group-hover:[animation-play-state:paused]",
+            "absolute inset-y-0 start-0 z-[1] w-1 origin-top group-hover:[animation-play-state:paused]",
             v.bar,
           )}
         />
@@ -333,8 +353,8 @@ function ToastItem({
       </div>
       {dismissible && (
         <ToastPrimitive.Close
-          aria-label="Dismiss"
-          className="absolute right-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+          aria-label={dismissLabel}
+          className="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
         >
           <X className="size-3.5" />
         </ToastPrimitive.Close>

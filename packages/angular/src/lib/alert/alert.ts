@@ -10,6 +10,14 @@ import {
 } from "@angular/core";
 import { type AlertAppearance, alertTones, cn, type AlertVariant } from "@bpdm/variants";
 
+// --- i18n ---
+export interface AlertMessages {
+  /** Dismiss (X) button aria-label. */
+  dismiss: string;
+}
+
+export const DEFAULT_ALERT_MESSAGES: AlertMessages = { dismiss: "Dismiss" };
+
 /** Actions row inside an alert — lays its buttons out with the right spacing. */
 @Directive({
   selector: "[bpdmAlertActions]",
@@ -47,7 +55,7 @@ export class BpdmAlertActions {}
   },
   template: `
     <div class="min-h-0 overflow-hidden">
-      <div role="alert" [class]="boxClass()">
+      <div [attr.role]="liveRole()" [class]="boxClass()">
         @if (showIcon()) {
           <span [class]="iconWrapClass()">
             <svg
@@ -81,7 +89,7 @@ export class BpdmAlertActions {}
           </span>
         }
 
-        <div class="min-w-0 flex-1" [class.pr-6]="dismissible()">
+        <div class="min-w-0 flex-1" [class.pe-6]="dismissible()">
           @if (title()) {
             <p class="m-0 text-sm font-semibold">{{ title() }}</p>
           }
@@ -95,8 +103,8 @@ export class BpdmAlertActions {}
           <button
             type="button"
             (click)="dismiss()"
-            aria-label="Dismiss"
-            class="absolute right-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            [attr.aria-label]="t().dismiss"
+            class="absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             [class]="closeClass()"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
@@ -119,9 +127,26 @@ export class BpdmAlert {
   readonly dismissible = input(false, { transform: booleanAttribute });
   /** Show the leading status icon. */
   readonly showIcon = input(true, { transform: booleanAttribute });
+  /** Override the translatable strings (currently just the dismiss button label). */
+  readonly messages = input<Partial<AlertMessages>>({});
+  /**
+   * Live-region politeness. Defaults to today's behavior — `role="alert"`
+   * (assertive, interrupts the screen reader), right for urgent messages.
+   * Set `"polite"` for `role="status"` (announced when idle) on info/success,
+   * or `"off"` to render no live role.
+   */
+  readonly live = input<"assertive" | "polite" | "off" | undefined>(undefined);
   /** Fired once the alert has finished collapsing after dismiss. */
   readonly closed = output<void>();
 
+  protected readonly t = computed(() => ({ ...DEFAULT_ALERT_MESSAGES, ...this.messages() }));
+  // undefined / "assertive" → role="alert"; "polite" → role="status"; "off" → no live role.
+  protected readonly liveRole = computed(() => {
+    const l = this.live();
+    if (l === undefined || l === "assertive") return "alert";
+    if (l === "polite") return "status";
+    return null;
+  });
   protected readonly closing = signal(false);
   protected readonly tone = computed(() => alertTones[this.variant()]);
   private readonly solid = computed(() => this.appearance() === "solid");
