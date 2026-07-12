@@ -1,6 +1,6 @@
 import { ApplicationRef } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmConfirm } from "./confirm-dialog";
+import { BpdmConfirm, provideBpdmConfirmMessages } from "./confirm-dialog";
 
 const macrotask = (ms = 0) => new Promise<void>((r) => setTimeout(r, ms));
 const getDialog = () => document.querySelector('[role="dialog"]') as HTMLElement | null;
@@ -42,5 +42,24 @@ describe("BpdmConfirm", () => {
     buttonWithText("Cancel").click();
 
     expect(await result).toBe(false);
+  });
+
+  it("localizes the default title and buttons via provideBpdmConfirmMessages", async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideBpdmConfirmMessages({ confirm: "Bestätigen", cancel: "Abbrechen", title: "Sicher?" }),
+      ],
+    });
+
+    const service = TestBed.inject(BpdmConfirm);
+    const result = service.confirm();
+    await settle();
+
+    expect(getDialog()?.textContent).toContain("Sicher?");
+    expect(buttonWithText("Bestätigen")).toBeTruthy();
+    expect(buttonWithText("Abbrechen")).toBeTruthy();
+
+    buttonWithText("Bestätigen").click();
+    expect(await result).toBe(true);
   });
 });

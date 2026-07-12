@@ -3,9 +3,11 @@ import {
   Component,
   inject,
   Injectable,
+  InjectionToken,
   Injector,
   input,
   output,
+  type Provider,
 } from "@angular/core";
 import { Overlay } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
@@ -19,6 +21,35 @@ export interface ConfirmOptions {
   cancelText?: string;
   /** Style the confirm button as destructive (red). */
   destructive?: boolean;
+}
+
+// --- i18n ---
+export interface ConfirmMessages {
+  /** Fallback title when a call omits `title`. */
+  title: string;
+  /** Confirm button text when a call omits `confirmText`. */
+  confirm: string;
+  /** Cancel button text when a call omits `cancelText`. */
+  cancel: string;
+  /** aria-label for the dialog's close button. */
+  close: string;
+}
+
+export const DEFAULT_CONFIRM_MESSAGES: ConfirmMessages = {
+  title: "Are you sure?",
+  confirm: "Confirm",
+  cancel: "Cancel",
+  close: "Close",
+};
+
+/** App-wide localizable defaults for `BpdmConfirm`; per-call options still win. */
+export const BPDM_CONFIRM_MESSAGES = new InjectionToken<Partial<ConfirmMessages>>(
+  "BPDM_CONFIRM_MESSAGES",
+);
+
+/** Provide app-wide confirm-dialog message defaults. */
+export function provideBpdmConfirmMessages(messages: Partial<ConfirmMessages>): Provider {
+  return { provide: BPDM_CONFIRM_MESSAGES, useValue: messages };
 }
 
 let cid = 0;
@@ -46,7 +77,8 @@ const EXIT = "animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in_forwards]"
       [panelClass]="panelClass"
       [enterAnim]="enterAnim"
       [exitAnim]="exitAnim"
-      fallbackTitle="Are you sure?"
+      [closeLabel]="closeLabel()"
+      [fallbackTitle]="fallbackTitle()"
       (dismiss)="cancel.emit()"
     />
     <ng-template #footerTpl>
@@ -67,6 +99,8 @@ class BpdmConfirmPanel {
   readonly confirmText = input("Confirm");
   readonly cancelText = input("Cancel");
   readonly destructive = input(false);
+  readonly closeLabel = input("Close");
+  readonly fallbackTitle = input("Are you sure?");
   readonly labelId = input("");
   readonly descId = input("");
   readonly closing = input(false);
@@ -99,8 +133,13 @@ class BpdmConfirmPanel {
 export class BpdmConfirm {
   private readonly overlay = inject(Overlay);
   private readonly injector = inject(Injector);
+  private readonly t: ConfirmMessages = {
+    ...DEFAULT_CONFIRM_MESSAGES,
+    ...(inject(BPDM_CONFIRM_MESSAGES, { optional: true }) ?? {}),
+  };
 
   confirm(options: ConfirmOptions = {}): Promise<boolean> {
+    const t = this.t;
     return new Promise<boolean>((resolve) => {
       const overlayRef = this.overlay.create({
         positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
@@ -114,11 +153,13 @@ export class BpdmConfirm {
       const panelRef = overlayRef.attach(
         new ComponentPortal(BpdmConfirmPanel, null, this.injector),
       );
-      panelRef.setInput("title", options.title ?? "");
+      panelRef.setInput("title", options.title ?? t.title);
       panelRef.setInput("description", options.description ?? "");
-      panelRef.setInput("confirmText", options.confirmText ?? "Confirm");
-      panelRef.setInput("cancelText", options.cancelText ?? "Cancel");
+      panelRef.setInput("confirmText", options.confirmText ?? t.confirm);
+      panelRef.setInput("cancelText", options.cancelText ?? t.cancel);
       panelRef.setInput("destructive", !!options.destructive);
+      panelRef.setInput("closeLabel", t.close);
+      panelRef.setInput("fallbackTitle", t.title);
       panelRef.setInput("labelId", `bpdm-confirm-title-${id}`);
       panelRef.setInput("descId", `bpdm-confirm-desc-${id}`);
 

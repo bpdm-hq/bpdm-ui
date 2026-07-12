@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ComponentRef,
+  computed,
   contentChild,
   Directive,
   effect,
@@ -25,6 +26,16 @@ import { BpdmOverlayPanel } from "../overlay/overlay-panel";
 
 export type DrawerSide = "left" | "right" | "top" | "bottom";
 export type DrawerSize = "sm" | "md" | "lg" | "xl" | "full";
+
+// --- i18n ---
+export interface DrawerMessages {
+  /** Close button aria-label. */
+  close: string;
+  /** Fallback screen-reader title when no `title` is set. */
+  drawerLabel: string;
+}
+
+export const DEFAULT_DRAWER_MESSAGES: DrawerMessages = { close: "Close", drawerLabel: "Drawer" };
 
 let dwid = 0;
 
@@ -104,6 +115,13 @@ export class BpdmDrawer implements OnDestroy {
   readonly description = input("");
   /** Show the top-right close button. Default true. */
   readonly showClose = input(true, { transform: booleanAttribute });
+  /** Screen-reader strings (close button label, fallback title). */
+  readonly messages = input<Partial<DrawerMessages>>({});
+
+  protected readonly t = computed<DrawerMessages>(() => ({
+    ...DEFAULT_DRAWER_MESSAGES,
+    ...this.messages(),
+  }));
 
   private readonly body = contentChild(BpdmDrawerBody, { read: TemplateRef });
   private readonly footer = contentChild(BpdmDrawerFooter, { read: TemplateRef });
@@ -120,6 +138,21 @@ export class BpdmDrawer implements OnDestroy {
     effect(() => {
       const want = this.open();
       untracked(() => (want ? this.attach() : this.beginClose()));
+    });
+
+    // propagate live message/title/description changes to an already-open panel
+    effect(() => {
+      const msgs = this.t();
+      const title = this.title();
+      const description = this.description();
+      untracked(() => {
+        const ref = this.panelRef;
+        if (!ref) return;
+        ref.setInput("closeLabel", msgs.close);
+        ref.setInput("fallbackTitle", msgs.drawerLabel);
+        ref.setInput("title", title);
+        ref.setInput("description", description);
+      });
     });
   }
 
@@ -168,11 +201,12 @@ export class BpdmDrawer implements OnDestroy {
     ref.setInput("title", this.title());
     ref.setInput("description", this.description());
     ref.setInput("showClose", this.showClose());
+    ref.setInput("closeLabel", this.t().close);
     ref.setInput("body", this.body() ?? null);
     ref.setInput("footer", this.footer() ?? null);
     ref.setInput("labelId", this.labelId);
     ref.setInput("descId", this.descId);
-    ref.setInput("fallbackTitle", "Drawer");
+    ref.setInput("fallbackTitle", this.t().drawerLabel);
     ref.setInput(
       "panelClass",
       cn(

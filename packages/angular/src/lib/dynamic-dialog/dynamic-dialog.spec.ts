@@ -1,6 +1,6 @@
 import { ApplicationRef, Component, TemplateRef, viewChild } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { BpdmDialogService } from "./dynamic-dialog";
+import { BpdmDialogService, provideBpdmDynamicDialogMessages } from "./dynamic-dialog";
 
 @Component({
   template: `<ng-template #tpl let-d
@@ -54,5 +54,22 @@ describe("BpdmDialogService", () => {
     TestBed.inject(ApplicationRef).tick();
 
     expect(getDialog()).toBeNull();
+  });
+
+  it("localizes the close-button aria-label via provideBpdmDynamicDialogMessages", async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideBpdmDynamicDialogMessages({ close: "Schließen" })],
+    });
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const service = TestBed.inject(BpdmDialogService);
+
+    service.open(fixture.componentInstance.tpl(), { title: "Edit" });
+    await settle();
+
+    const closeButton = document.querySelector('[aria-label="Schließen"]');
+    expect(closeButton).toBeTruthy();
   });
 });

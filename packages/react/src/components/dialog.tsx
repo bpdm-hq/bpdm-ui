@@ -4,6 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { OverlayClose as XIcon } from "./internal/overlay-icons";
 
+// --- i18n ---
+export interface DialogMessages {
+  /** Close button aria-label. */
+  close: string;
+  /** Fallback screen-reader title when no `title` is set. */
+  dialogLabel: string;
+}
+
+export const DEFAULT_DIALOG_MESSAGES: DialogMessages = { close: "Close", dialogLabel: "Dialog" };
+
 // --- composable primitives (also reused by Drawer / ConfirmDialog / DynamicDialog) ---
 export const DialogRoot = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
@@ -45,20 +55,22 @@ export interface DialogContentProps
     VariantProps<typeof contentVariants> {
   /** Show the top-right close button. Default true. */
   showClose?: boolean;
+  /** aria-label for the close button. Default "Close". */
+  closeLabel?: string;
 }
 
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, size, showClose = true, children, ...props }, ref) => (
+>(({ className, size, showClose = true, closeLabel = "Close", children, ...props }, ref) => (
   <DialogPrimitive.Portal>
     <DialogOverlay />
     <DialogPrimitive.Content ref={ref} className={cn(contentVariants({ size }), className)} {...props}>
       {children}
       {showClose && (
         <DialogPrimitive.Close
-          aria-label="Close"
-          className="absolute right-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={closeLabel}
+          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <XIcon />
         </DialogPrimitive.Close>
@@ -90,7 +102,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold tracking-tight", className)}
+    className={cn("m-0 text-lg font-semibold tracking-tight", className)}
     {...props}
   />
 ));
@@ -122,6 +134,8 @@ export interface DialogProps {
   size?: "sm" | "md" | "lg" | "xl";
   /** Show the top-right close button. Default true. */
   showClose?: boolean;
+  /** Screen-reader strings (close button label, fallback title). */
+  messages?: Partial<DialogMessages>;
   /** Body content. */
   children?: React.ReactNode;
   /** Classes on the dialog panel. */
@@ -130,6 +144,8 @@ export interface DialogProps {
   onInteractOutside?: DialogContentProps["onInteractOutside"];
   /** Forwarded to the content — e.g. `e.preventDefault()` to stop Esc close. */
   onEscapeKeyDown?: DialogContentProps["onEscapeKeyDown"];
+  /** Forwarded to the content — e.g. `e.preventDefault()` to focus the panel instead of the first field on open. */
+  onOpenAutoFocus?: DialogContentProps["onOpenAutoFocus"];
 }
 
 /**
@@ -148,27 +164,32 @@ export function Dialog({
   footer,
   size = "md",
   showClose = true,
+  messages,
   children,
   className,
   onInteractOutside,
   onEscapeKeyDown,
+  onOpenAutoFocus,
 }: DialogProps) {
+  const t = { ...DEFAULT_DIALOG_MESSAGES, ...messages };
   return (
     <DialogRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         size={size}
         showClose={showClose}
+        closeLabel={t.close}
         className={className}
         onInteractOutside={onInteractOutside}
         onEscapeKeyDown={onEscapeKeyDown}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         <DialogHeader>
           {title ? (
             <DialogTitle>{title}</DialogTitle>
           ) : (
             // a11y: Radix requires a title — provide a hidden one if none given
-            <DialogTitle className="sr-only">Dialog</DialogTitle>
+            <DialogTitle className="sr-only">{t.dialogLabel}</DialogTitle>
           )}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>

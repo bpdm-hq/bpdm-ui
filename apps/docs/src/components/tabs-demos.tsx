@@ -1,6 +1,7 @@
 'use client';
 
-import { Tabs, type TabItem } from '@bpdm/ui/tabs';
+import { useState } from 'react';
+import { Tabs, TabsRoot, TabsList, TabsTrigger, TabsContent, type TabItem } from '@bpdm/ui/tabs';
 
 const P = ({ children }: { children: React.ReactNode }) => (
   <p className="text-sm text-fd-muted-foreground">{children}</p>
@@ -13,7 +14,9 @@ const ITEMS: TabItem[] = [
 ];
 
 function Box({ children }: { children: React.ReactNode }) {
-  return <div className="w-full max-w-md self-start">{children}</div>;
+  // fill the preview width (tabs are a full-width container — left-aligned tabs,
+  // full-width underline + panel), rather than a narrow centered block
+  return <div className="w-full self-start">{children}</div>;
 }
 
 // ── demos ─────────────────────────────────────────────────────────────────────
@@ -90,6 +93,75 @@ export function TabsDisabledDemo() {
   return (
     <Box>
       <Tabs items={items} defaultValue="overview" />
+    </Box>
+  );
+}
+
+const MANY: TabItem[] = [
+  'Overview', 'Activity', 'Deployments', 'Analytics', 'Members', 'Billing', 'Integrations',
+  'Security', 'Notifications', 'Automations', 'Webhooks', 'API Keys', 'Audit Log', 'Advanced',
+].map((label) => ({
+  value: label.toLowerCase().replace(/\s+/g, '-'),
+  label,
+  content: <P>{label} — settings and details for this section.</P>,
+}));
+
+export function TabsScrollableDemo() {
+  return (
+    <Box>
+      <Tabs items={MANY} defaultValue="overview" scrollable ariaLabel="Workspace sections" />
+    </Box>
+  );
+}
+
+export function TabsOrientationDemo() {
+  return (
+    <Box>
+      <Tabs items={ITEMS} defaultValue="overview" orientation="vertical" ariaLabel="Workspace sections" />
+    </Box>
+  );
+}
+
+export function TabsManualDemo() {
+  return (
+    <Box>
+      <Tabs items={ITEMS} defaultValue="overview" activationMode="manual" ariaLabel="Workspace sections" />
+    </Box>
+  );
+}
+
+export function TabsControlledDemo() {
+  const [value, setValue] = useState('overview');
+  return (
+    <Box>
+      <div className="mb-3 flex items-center gap-2">
+        <span className="text-sm text-fd-muted-foreground">Active tab:</span>
+        <code className="rounded bg-fd-muted px-1.5 py-0.5 text-xs">{value}</code>
+      </div>
+      <Tabs items={ITEMS} value={value} onValueChange={setValue} />
+    </Box>
+  );
+}
+
+export function TabsCompositionDemo() {
+  return (
+    <Box>
+      <TabsRoot defaultValue="overview">
+        <TabsList aria-label="Workspace sections">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">
+          <P>Key metrics and recent activity for your workspace.</P>
+        </TabsContent>
+        <TabsContent value="activity">
+          <P>A chronological feed of deploys, comments, and reviews.</P>
+        </TabsContent>
+        <TabsContent value="settings">
+          <P>Manage members, roles, and integrations.</P>
+        </TabsContent>
+      </TabsRoot>
     </Box>
   );
 }

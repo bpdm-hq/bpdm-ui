@@ -45,6 +45,48 @@ export function DialogBasicDemo() {
   );
 }
 
+export function DialogStackedDemo() {
+  // dialogs nest naturally — the trigger for the second lives in the first's body;
+  // focus-trap, scroll-lock and Esc always apply to the topmost dialog
+  return (
+    <Dialog
+      trigger={<Button>Open dialog</Button>}
+      title="First dialog"
+      description="Open another dialog from inside this one — they stack."
+      footer={
+        <DialogClose asChild>
+          <Button variant="secondary" appearance="ghost">
+            Close
+          </Button>
+        </DialogClose>
+      }
+    >
+      <div className="space-y-3">
+        <p className="text-sm text-fd-muted-foreground">
+          Focus, scroll-lock and Esc apply to whichever dialog is on top.
+        </p>
+        <Dialog
+          size="sm"
+          trigger={
+            <Button variant="secondary" appearance="outline" size="sm">
+              Open second dialog
+            </Button>
+          }
+          title="Second dialog"
+          description="This one opened on top of the first — they stack independently."
+          footer={
+            <DialogClose asChild>
+              <Button>Got it</Button>
+            </DialogClose>
+          }
+        >
+          <p className="text-sm text-fd-muted-foreground">Press Esc to close just this one.</p>
+        </Dialog>
+      </div>
+    </Dialog>
+  );
+}
+
 export function DialogSizesDemo() {
   const sizes: Size[] = ['sm', 'md', 'lg', 'xl'];
   return (

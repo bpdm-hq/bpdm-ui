@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -12,15 +13,24 @@ export const TabsList = React.forwardRef<
     variant?: "underline" | "pill";
     /** Underline track spans the full row ("full") or only the tabs ("content"). */
     baseline?: "full" | "content";
+    /** Let the row scroll horizontally when the tabs overflow (many tabs). */
+    scrollable?: boolean;
   }
->(({ className, variant = "underline", baseline = "full", ...props }, ref) => (
+>(({ className, variant = "underline", baseline = "full", scrollable = false, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-center gap-1",
-      variant === "underline" && "border-b border-border",
+      "relative flex items-center gap-1",
+      // vertical: stack the tabs; the underline track runs down the inline-end edge
+      "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
+      variant === "underline" &&
+        "border-b border-border data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e",
       // content → shrink the list so the baseline ends with the last tab
       variant === "underline" && baseline === "content" && "w-fit",
+      // scroll the row when tabs overflow: keep tabs at natural width (no squeeze),
+      // smooth scroll, and hide the scrollbar (arrow-key focus still scrolls into view)
+      scrollable &&
+        "overflow-x-auto scroll-smooth [scrollbar-width:none] [&>*]:shrink-0 [&::-webkit-scrollbar]:hidden",
       className,
     )}
     {...props}
@@ -29,13 +39,15 @@ export const TabsList = React.forwardRef<
 TabsList.displayName = "TabsList";
 
 const triggerVariants = cva(
-  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed! disabled:opacity-50 data-[orientation=vertical]:justify-start [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
+        // horizontal: a single sliding indicator draws the active marker (see the
+        // convenience `Tabs`); vertical keeps a per-tab inline-end border
         underline:
-          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-primary",
-        pill: "rounded-lg px-3 py-1.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground",
+          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-primary data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary",
+        pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-muted/60 data-[orientation=vertical]:data-[state=active]:bg-muted",
       },
     },
     defaultVariants: { variant: "underline" },
@@ -63,7 +75,9 @@ export const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-      "data-[state=active]:animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
+      // vertical: the panel sits beside the list instead of below it
+      "data-[orientation=vertical]:flex-1 data-[orientation=vertical]:pt-0 data-[orientation=vertical]:ps-4",
+      "data-[state=active]:animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
       className,
     )}
     {...props}
@@ -91,6 +105,16 @@ export interface TabsProps {
   baseline?: "full" | "content";
   /** Tabs stretch to fill the row width equally. */
   fullWidth?: boolean;
+  /** Scroll the tab row horizontally when the tabs overflow (many tabs). Horizontal orientation. */
+  scrollable?: boolean;
+  /** Layout + arrow-key axis. "horizontal" (default) stacks left→right; "vertical" stacks the tabs down the side. */
+  orientation?: "horizontal" | "vertical";
+  /** "automatic" (default) — arrow keys move focus AND select; "manual" — arrow moves focus, Enter/Space selects. */
+  activationMode?: "automatic" | "manual";
+  /** Accessible name for the tablist (screen readers announce it). The one translatable a11y string. */
+  ariaLabel?: string;
+  /** Arrow-key direction for horizontal tabs; auto-detected from the ambient direction when omitted. */
+  dir?: "ltr" | "rtl";
   className?: string;
   listClassName?: string;
 }
@@ -109,35 +133,186 @@ export function Tabs({
   variant = "underline",
   baseline = "full",
   fullWidth = false,
+  scrollable = false,
+  orientation = "horizontal",
+  activationMode = "automatic",
+  ariaLabel,
+  dir,
   className,
   listClassName,
 }: TabsProps) {
   const hasContent = items.some((t) => t.content !== undefined);
+  // auto-detect the ambient direction so horizontal arrow keys mirror under RTL
+  // without the caller wiring up a direction provider (explicit `dir` wins)
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [autoDir, setAutoDir] = React.useState<"ltr" | "rtl" | undefined>(undefined);
+  React.useEffect(() => {
+    if (dir || !rootRef.current) return;
+    setAutoDir(getComputedStyle(rootRef.current).direction === "rtl" ? "rtl" : "ltr");
+  }, [dir]);
+
+  // scroll buttons: a mouse-only affordance (no trackpad/wheel needed) that appears
+  // at whichever edge has more tabs; keyboard users scroll via the arrow keys
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = React.useState({ prev: false, next: false });
+  const rtl = (dir ?? autoDir) === "rtl";
+  const updateEdges = React.useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const pos = Math.abs(el.scrollLeft); // abs handles the negative-scrollLeft RTL model
+    setEdges({ prev: pos > 1, next: pos < max - 1 });
+  }, []);
+  React.useEffect(() => {
+    if (!scrollable) return;
+    updateEdges();
+    const el = listRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateEdges);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [scrollable, updateEdges, items.length]);
+  const scrollByDir = (logical: -1 | 1) =>
+    listRef.current?.scrollBy({
+      left: (rtl ? -logical : logical) * listRef.current.clientWidth * 0.7,
+      behavior: "smooth",
+    });
+
+  // sliding active indicator (horizontal): a single element that translates + resizes
+  // under/behind the active tab, so switching tabs glides instead of jumping
+  const slide = orientation === "horizontal";
+  const indicatorRef = React.useRef<HTMLSpanElement>(null);
+  const measure = React.useCallback(() => {
+    const el = listRef.current;
+    const ind = indicatorRef.current;
+    if (!el || !ind) return;
+    const active = el.querySelector<HTMLElement>('[role="tab"][data-state="active"]');
+    if (!active) {
+      ind.style.opacity = "0";
+      return;
+    }
+    const first = !ind.dataset.ready;
+    if (first) ind.style.transition = "none"; // don't animate the initial placement
+    ind.style.opacity = "1";
+    ind.style.width = `${active.offsetWidth}px`;
+    ind.style.transform = `translateX(${active.offsetLeft - el.scrollLeft}px)`;
+    if (first) {
+      void ind.offsetWidth; // flush, then hand control back to the CSS transition
+      ind.style.transition = "";
+      ind.dataset.ready = "1";
+    }
+  }, []);
+  React.useLayoutEffect(() => {
+    if (!slide) return;
+    measure();
+    const el = listRef.current;
+    if (!el) return;
+    const mo = new MutationObserver(measure);
+    mo.observe(el, { attributes: true, subtree: true, attributeFilter: ["data-state"] });
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      mo.disconnect();
+      ro.disconnect();
+    };
+  }, [slide, measure, items.length, variant]);
+
+  const indicator = slide ? (
+    <span
+      ref={indicatorRef}
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
+        variant === "underline"
+          ? "-bottom-px h-0.5 bg-primary" // sit on the baseline (like the tab's -mb-px border), flush not floating
+          : "inset-y-0 z-0 rounded-lg bg-muted",
+      )}
+    />
+  ) : null;
+
+  // minimal inline chevron (no chip/border) — dims at the edge it can't scroll toward
+  const chevron =
+    "grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
+  // symmetric edge fade so partial tabs dissolve at both ends (RTL-safe)
+  const fade = "linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent)";
+
+  const triggers = items.map((t) => (
+    <TabsTrigger
+      key={t.value}
+      value={t.value}
+      variant={variant}
+      disabled={t.disabled}
+      className={cn(fullWidth && "flex-1 justify-center")}
+    >
+      {t.icon}
+      {t.label}
+    </TabsTrigger>
+  ));
+
   return (
     <TabsRoot
+      ref={rootRef}
       value={value}
       defaultValue={defaultValue ?? items[0]?.value}
       onValueChange={onValueChange}
-      className={className}
+      orientation={orientation}
+      activationMode={activationMode}
+      dir={dir ?? autoDir}
+      className={cn("data-[orientation=vertical]:flex data-[orientation=vertical]:gap-3", className)}
     >
-      <TabsList
-        variant={variant}
-        baseline={baseline}
-        className={cn(fullWidth && "w-full", listClassName)}
-      >
-        {items.map((t) => (
-          <TabsTrigger
-            key={t.value}
-            value={t.value}
-            variant={variant}
-            disabled={t.disabled}
-            className={cn(fullWidth && "flex-1 justify-center")}
+      {scrollable ? (
+        // inline chevrons flank a fade-masked scroll row; the underline moves to the
+        // wrapper so it stays solid edge-to-edge
+        <div className={cn("flex items-center", variant === "underline" && "border-b border-border")}>
+          <button
+            type="button"
+            aria-hidden
+            tabIndex={-1}
+            disabled={!edges.prev}
+            onClick={() => scrollByDir(-1)}
+            className={chevron}
           >
-            {t.icon}
-            {t.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+            <ChevronLeft className="size-4 rtl:-scale-x-100" />
+          </button>
+          <TabsList
+            ref={listRef}
+            variant={variant}
+            baseline={baseline}
+            scrollable
+            aria-label={ariaLabel}
+            onScroll={() => {
+              updateEdges();
+              measure();
+            }}
+            style={{ maskImage: fade, WebkitMaskImage: fade }}
+            className={cn("min-w-0 flex-1 border-b-0", listClassName)}
+          >
+            {indicator}
+            {triggers}
+          </TabsList>
+          <button
+            type="button"
+            aria-hidden
+            tabIndex={-1}
+            disabled={!edges.next}
+            onClick={() => scrollByDir(1)}
+            className={chevron}
+          >
+            <ChevronRight className="size-4 rtl:-scale-x-100" />
+          </button>
+        </div>
+      ) : (
+        <TabsList
+          ref={listRef}
+          variant={variant}
+          baseline={baseline}
+          aria-label={ariaLabel}
+          className={cn(fullWidth && "w-full", listClassName)}
+        >
+          {indicator}
+          {triggers}
+        </TabsList>
+      )}
       {hasContent &&
         items.map((t) => (
           <TabsContent key={t.value} value={t.value}>

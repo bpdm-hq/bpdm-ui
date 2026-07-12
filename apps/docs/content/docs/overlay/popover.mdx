@@ -251,11 +251,98 @@ export class UpdateName {}
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The Popover carries **no built-in copy of its own** — the panel content, any
+labels, and any close / confirm button are entirely author-supplied. So you
+localise a Popover by localising the content you pass into it; there is **no
+`messages` prop** to override (unlike the [Dialog](/docs/overlay/dialog) or
+[Drawer](/docs/overlay/drawer)).
+
+The one string the component itself exposes is the panel's **accessible name**,
+`ariaLabel` (React `ariaLabel`, Angular `[bpdmPopoverAriaLabel]`). The panel is a
+`dialog`, so give it a name — either set `ariaLabel` or include a visible heading
+in the content. `ariaLabel` is the natural place to pass a **translated** label,
+and it's the only piece of Popover text you localise through a prop.
+
+Under `dir="rtl"` the Popover is **direction-aware** with no extra prop:
+`align="start"` / `align="end"` and the collision-flip side mirror automatically
+(React via Radix, Angular via the CDK overlay's directionality), and the panel's
+padding is symmetric. `side` stays a **physical** edge you choose explicitly.
+
+The example below keeps its content in English but passes a translated `ariaLabel`
+(and a short translated close label) — confining the localised copy to your own
+content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="popover-i18n.tsx"
+import { Popover, PopoverClose } from '@bpdm/ui/popover';
+import { Button } from '@bpdm/ui/button';
+
+export function AccountMenu() {
+  return (
+    <Popover
+      // a translated accessible name for the panel's `dialog` role
+      ariaLabel="Kontomenü"
+      trigger={<Button variant="secondary" appearance="outline">Account</Button>}
+    >
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-medium">Signed in as Aria</p>
+        <PopoverClose asChild>
+          <Button appearance="ghost">Schließen</Button>
+        </PopoverClose>
+      </div>
+    </Popover>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="account-menu.ts"
+import { Component } from '@angular/core';
+import { BpdmPopover, BpdmPopoverClose, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'account-menu',
+  imports: [BpdmPopover, BpdmPopoverClose, BpdmButton],
+  templateUrl: './account-menu.html',
+})
+export class AccountMenu {}
+```
+
+```html title="account-menu.html"
+<!-- bpdmPopoverAriaLabel is a translated accessible name for the panel's dialog role -->
+<button
+  bpdmButton
+  variant="secondary"
+  appearance="outline"
+  [bpdmPopover]="panel"
+  bpdmPopoverAriaLabel="Kontomenü"
+>
+  Account
+</button>
+
+<ng-template #panel>
+  <div class="flex flex-col gap-2">
+    <p class="text-sm font-medium">Signed in as Aria</p>
+    <button bpdmButton appearance="ghost" bpdmPopoverClose>Schließen</button>
+  </div>
+</ng-template>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `trigger` | `ReactNode` | — | The element that opens it (React). Angular: the host element with `[bpdmPopover]`. |
+| `trigger` | `ReactNode` | — | The element that opens it (React). Angular: the host element carrying `[bpdmPopover]` (which points at the panel `<ng-template>`). |
+| `children` | `ReactNode` | — | Panel content (React). Angular: the `<ng-template>` referenced by `[bpdmPopover]`. |
 | `side` | `top \| right \| bottom \| left` | `bottom` | Edge to open from. Angular: `bpdmPopoverSide`. |
 | `align` | `start \| center \| end` | `center` | Alignment along the side. Angular: `bpdmPopoverAlign`. |
 | `sideOffset` | `number` | `8` | Gap from the trigger, in px. Angular: `bpdmPopoverOffset`. |
@@ -263,17 +350,36 @@ export class UpdateName {}
 | `showArrow` | `boolean` | `false` | Draw an arrow at the trigger. Angular: `bpdmPopoverShowArrow`. |
 | `bordered` | `boolean` | `true` | Draw a border around the panel; `false` for borderless. Angular: `bpdmPopoverBordered`. |
 | `modal` | `boolean` | `false` | Trap focus + block outside interaction. Angular: `bpdmPopoverModal`. |
-| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: `[(bpdmPopoverOpen)]`. |
+| `ariaLabel` | `string` | — | Accessible name for the panel's `dialog` role; translatable. Angular: `bpdmPopoverAriaLabel`. |
+| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. Angular: two-way `[(bpdmPopoverOpen)]`. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires on open/close. Angular: covered by `[(bpdmPopoverOpen)]`. |
+| `className` | `string` | — | **React** — extra classes on the panel (override padding, width, etc.). Angular: `bpdmPopoverClass`. |
 
 Use **`PopoverClose`** (React) / **`bpdmPopoverClose`** (Angular) on a button
 inside the panel to dismiss it.
 
+### Accessible name — `ariaLabel`
+
+The panel renders with `role="dialog"`, so it needs an accessible name. There's no
+`messages` object — the single translatable string is `ariaLabel` (React
+`ariaLabel`, Angular `[bpdmPopoverAriaLabel]`), which names the panel for assistive
+tech. Set it (or provide a visible heading inside the content), and pass a
+**translated** value for localised UIs.
+
 ## Accessibility
 
-- Built on Radix Popover — the trigger gets `aria-expanded` / `aria-controls`,
-  focus moves into the panel, and `Esc` / outside-click closes it (returning
-  focus to the trigger).
-- Set `modal` when the panel needs the user's full attention — it then traps
-  focus and blocks background interaction like a mini-dialog.
+- The trigger exposes `aria-haspopup="dialog"`, `aria-expanded` (reflecting the
+  open state), and `aria-controls` pointing at the panel while it's open — so
+  assistive tech announces the trigger↔panel relationship.
+- The panel is a `dialog`; give it an accessible name via `ariaLabel` or a visible
+  heading in the content.
+- `Esc` closes the popover; focus moves into the panel on open and returns to the
+  trigger on keyboard or programmatic close.
+- `modal` traps focus and blocks outside interaction like a mini-dialog; non-modal
+  (the default) lets you tab out of the panel and closes on outside-click — without
+  yanking focus back to the trigger.
 - The panel is portaled, so it escapes `overflow: hidden` / stacking-context
-  clipping while staying wired to the trigger for assistive tech.
+  clipping, and it's collision-aware — it flips and shifts to stay in view while
+  staying wired to the trigger for assistive tech.
+- Everything mirrors under `dir="rtl"` with no extra prop — the alignment and the
+  collision-flip side flip automatically.

@@ -13,13 +13,11 @@ the boolean it resolves to (`true` on confirm; `false` on cancel, outside-click,
 or `Esc`). It's built on the [Dialog](/docs/overlay/dialog). In Angular it's the
 injectable `BpdmConfirm` service.
 
-<Callout type="info">
-  **Setup** — mount `ConfirmProvider` once near your app root (React). In Angular
-  there's nothing to mount: `BpdmConfirm` is `providedIn: 'root'`, so just inject it.
-</Callout>
+## Setup
 
-<Tabs groupId="framework" items={['React', 'Angular']}>
-  <Tab value="React">
+**React** — mount `ConfirmProvider` once near your app root; that's the only setup.
+**Angular** has nothing to mount: `BpdmConfirm` is `providedIn: 'root'`, so you just
+inject it where you need it (shown in [Usage](#usage) below).
 
 ```tsx title="app.tsx"
 import { ConfirmProvider } from '@bpdm/ui/confirm-dialog';
@@ -32,25 +30,6 @@ export function App() {
   );
 }
 ```
-
-  </Tab>
-  <Tab value="Angular">
-
-Nothing to register — `BpdmConfirm` is `providedIn: 'root'`. Just inject it
-wherever you need it:
-
-```ts title="confirm-setup.ts"
-import { Component, inject } from '@angular/core';
-import { BpdmConfirm } from '@bpdm/ng';
-
-@Component({ selector: 'example', template: '' })
-export class Example {
-  private readonly confirm = inject(BpdmConfirm);
-}
-```
-
-  </Tab>
-</Tabs>
 
 ## Usage
 
@@ -77,7 +56,7 @@ export function PublishButton() {
       description: 'This will make your edits live for everyone in the workspace.',
     });
     if (ok) {
-      // …publish…
+      // publish the changes here
     }
   }
 
@@ -107,7 +86,7 @@ export class PublishButton {
       description: 'This will make your edits live for everyone in the workspace.',
     });
     if (ok) {
-      // …publish…
+      // publish the changes here
     }
   }
 }
@@ -143,7 +122,7 @@ export function DeleteButton() {
       destructive: true,
     });
     if (ok) {
-      // …delete…
+      // delete the project here
     }
   }
 
@@ -175,7 +154,121 @@ export class DeleteButton {
       destructive: true,
     });
     if (ok) {
-      // …delete…
+      // delete the project here
+    }
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Internationalization
+
+The confirm dialog carries only a little copy of its own — the fallback title, the
+Confirm / Cancel button labels, and the close button's accessible name. Set those
+once for the whole app, and any per-call `title` / `confirmText` / `cancelText`
+still overrides at the call site:
+
+- **React** — pass `messages` to `ConfirmProvider`
+  (`<ConfirmProvider messages={{ … }}>`). It's a `Partial<ConfirmMessages>` merged
+  over the English defaults, so override one key or all four.
+- **Angular** — register `provideBpdmConfirmMessages({ … })` in your app providers
+  (it configures the `BPDM_CONFIRM_MESSAGES` injection token).
+
+Being built on the [Dialog](/docs/overlay/dialog), it mirrors under `dir="rtl"` with
+no extra prop — the close button and footer buttons flip to the inline-start side.
+
+The example below is German (`de-DE`) — localised app-wide `messages` plus a
+translated, destructive per-call prompt.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="confirm-i18n.tsx"
+import { ConfirmProvider, useConfirm } from '@bpdm/ui/confirm-dialog';
+import { Button } from '@bpdm/ui/button';
+
+// Set the app-wide defaults once, near the root.
+export function App() {
+  return (
+    <ConfirmProvider
+      messages={{
+        title: 'Sind Sie sicher?',
+        confirm: 'Bestätigen',
+        cancel: 'Abbrechen',
+        close: 'Schließen',
+      }}
+    >
+      <ProjektLoeschen />
+    </ConfirmProvider>
+  );
+}
+
+function ProjektLoeschen() {
+  const confirm = useConfirm();
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Projekt löschen?',
+      description: 'Dadurch werden das Projekt und alle zugehörigen Daten dauerhaft gelöscht.',
+      destructive: true,
+      confirmText: 'Löschen',
+    });
+    if (ok) {
+      // Projekt hier löschen
+    }
+  }
+
+  return (
+    <Button variant="destructive" onClick={onDelete}>
+      Projekt löschen
+    </Button>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="main.ts"
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideBpdmConfirmMessages } from '@bpdm/ng';
+import { App } from './app';
+
+bootstrapApplication(App, {
+  providers: [
+    provideBpdmConfirmMessages({
+      title: 'Sind Sie sicher?',
+      confirm: 'Bestätigen',
+      cancel: 'Abbrechen',
+      close: 'Schließen',
+    }),
+  ],
+});
+```
+
+```ts title="projekt-loeschen.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmConfirm, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'projekt-loeschen',
+  imports: [BpdmButton],
+  template: `<button bpdmButton variant="destructive" (click)="onDelete()">Projekt löschen</button>`,
+})
+export class ProjektLoeschen {
+  private readonly confirm = inject(BpdmConfirm);
+
+  async onDelete() {
+    const ok = await this.confirm.confirm({
+      title: 'Projekt löschen?',
+      description: 'Dadurch werden das Projekt und alle zugehörigen Daten dauerhaft gelöscht.',
+      destructive: true,
+      confirmText: 'Löschen',
+    });
+    if (ok) {
+      // Projekt hier löschen
     }
   }
 }
@@ -197,11 +290,34 @@ export class DeleteButton {
 | `cancelText` | `string` | `Cancel` | Cancel button label. |
 | `destructive` | `boolean` | `false` | Style the confirm button as destructive (red). |
 
+### App-wide copy — `messages`
+
+Configure the default copy once (see [Internationalization](#internationalization)).
+Per-call `title` / `confirmText` / `cancelText` always take precedence over these.
+
+- **React** — the `messages` prop on `ConfirmProvider` (`Partial<ConfirmMessages>`).
+- **Angular** — `provideBpdmConfirmMessages(Partial<ConfirmMessages>)` in the app
+  providers, backed by the `BPDM_CONFIRM_MESSAGES` injection token.
+
+| `ConfirmMessages` key | Default | Description |
+| --- | --- | --- |
+| `title` | `Are you sure?` | Fallback title when a call omits `title`. |
+| `confirm` | `Confirm` | Confirm button label (per-call `confirmText` overrides). |
+| `cancel` | `Cancel` | Cancel button label (per-call `cancelText` overrides). |
+| `close` | `Close` | Accessible name (`aria-label`) for the dialog's close button. |
+
 ## Accessibility
 
-- Inherits everything from the [Dialog](/docs/overlay/dialog) — focus trap,
-  scroll lock, `role="dialog"` + `aria-modal`, and labelling via the title /
-  description.
-- Cancel, outside-click, and `Esc` all resolve the promise to `false`, so a
-  dismissed prompt is never treated as a confirmation.
-- Focus moves to the dialog on open and returns to the trigger on close.
+- It's a modal built on the [Dialog](/docs/overlay/dialog) — `role="dialog"` +
+  `aria-modal="true"`, with a focus trap and scroll lock while it's open.
+- The `title` is the dialog's accessible name (`aria-labelledby`) and the
+  `description`, when set, is linked via `aria-describedby`.
+- The Confirm and Cancel buttons are labelled by their text (`confirmText` /
+  `cancelText`, or the `messages` defaults); the close button carries an
+  accessible name via `messages.close`.
+- Cancel, outside-click, and `Esc` all resolve the promise to `false`, so any
+  dismissal is never treated as a confirmation.
+- Focus moves into the dialog on open and returns to the element that was focused
+  before it opened (the trigger) on close.
+- All copy — title, confirm, cancel, and the close label — is translatable via
+  `messages`, and everything mirrors correctly under `dir="rtl"`.

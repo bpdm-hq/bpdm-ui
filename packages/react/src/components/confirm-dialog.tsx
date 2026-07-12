@@ -11,6 +11,25 @@ export interface ConfirmOptions {
   destructive?: boolean;
 }
 
+// --- i18n ---
+export interface ConfirmMessages {
+  /** Fallback title when a call omits `title`. */
+  title: string;
+  /** Confirm button text when a call omits `confirmText`. */
+  confirm: string;
+  /** Cancel button text when a call omits `cancelText`. */
+  cancel: string;
+  /** aria-label for the dialog's close button. */
+  close: string;
+}
+
+export const DEFAULT_CONFIRM_MESSAGES: ConfirmMessages = {
+  title: "Are you sure?",
+  confirm: "Confirm",
+  cancel: "Cancel",
+  close: "Close",
+};
+
 type ConfirmFn = (options?: ConfirmOptions) => Promise<boolean>;
 
 const ConfirmContext = React.createContext<ConfirmFn | null>(null);
@@ -27,7 +46,15 @@ export function useConfirm(): ConfirmFn {
  * `await confirm({ title, description, destructive })`. Resolves true on confirm,
  * false on cancel / outside-click / ESC. Built on the Dialog.
  */
-export function ConfirmProvider({ children }: { children: React.ReactNode }) {
+export function ConfirmProvider({
+  children,
+  messages,
+}: {
+  children: React.ReactNode;
+  /** App-wide localizable defaults; per-call `options` still win. */
+  messages?: Partial<ConfirmMessages>;
+}) {
+  const t = { ...DEFAULT_CONFIRM_MESSAGES, ...messages };
   const [state, setState] = React.useState<{
     open: boolean;
     options: ConfirmOptions;
@@ -58,18 +85,19 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
           if (!open) settle(false);
         }}
         size="sm"
-        title={o.title ?? "Are you sure?"}
+        title={o.title ?? t.title}
         description={o.description}
+        messages={{ close: t.close }}
         footer={
           <>
             <Button variant="secondary" appearance="ghost" onClick={() => settle(false)}>
-              {o.cancelText ?? "Cancel"}
+              {o.cancelText ?? t.cancel}
             </Button>
             <Button
               variant={o.destructive ? "destructive" : "primary"}
               onClick={() => settle(true)}
             >
-              {o.confirmText ?? "Confirm"}
+              {o.confirmText ?? t.confirm}
             </Button>
           </>
         }

@@ -40,7 +40,7 @@ import { cn } from "@bpdm/variants";
       <div class="flex flex-col gap-1.5 p-6 pb-2">
         <h2
           [attr.id]="labelId()"
-          [class]="title() ? 'text-lg font-semibold tracking-tight' : 'sr-only'"
+          [class]="title() ? 'm-0 text-lg font-semibold tracking-tight' : 'sr-only'"
         >
           {{ title() || fallbackTitle() }}
         </h2>
@@ -61,9 +61,9 @@ import { cn } from "@bpdm/variants";
       @if (showClose()) {
         <button
           type="button"
-          aria-label="Close"
+          [attr.aria-label]="closeLabel()"
           (click)="dismiss.emit()"
-          class="absolute right-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          class="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <svg
             viewBox="0 0 24 24"
@@ -85,6 +85,8 @@ export class BpdmOverlayPanel {
   readonly title = input("");
   readonly description = input("");
   readonly showClose = input(true);
+  /** aria-label for the close button. */
+  readonly closeLabel = input("Close");
   readonly body = input<TemplateRef<unknown> | null>(null);
   readonly footer = input<TemplateRef<unknown> | null>(null);
   /** Context passed to the body/footer template outlets (e.g. `{ close }`). */

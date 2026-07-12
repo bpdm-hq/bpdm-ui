@@ -20,6 +20,7 @@ import {
   ViewContainerRef,
 } from "@angular/core";
 import { CdkTrapFocus } from "@angular/cdk/a11y";
+import { Directionality } from "@angular/cdk/bidi";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
@@ -70,6 +71,7 @@ export class BpdmPopoverClose {
       role="dialog"
       tabindex="-1"
       [attr.id]="id()"
+      [attr.aria-label]="ariaLabel() || null"
       [class]="boxClass()"
       [style.width]="widthStyle()"
       [cdkTrapFocus]="modal()"
@@ -109,6 +111,9 @@ class BpdmPopoverPanel {
   readonly width = input<number | string | undefined>(undefined);
   readonly id = input("");
   readonly panelClassInput = input("");
+  // a11y: a `role="dialog"` panel should carry an accessible name; this holds
+  // the (translatable) one supplied when the content has no visible heading.
+  readonly ariaLabel = input<string | undefined>(undefined);
 
   private readonly panel = viewChild<ElementRef<HTMLElement>>("panel");
 
@@ -169,6 +174,9 @@ export class BpdmPopover implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly vcr = inject(ViewContainerRef);
   private readonly parentInjector = inject(Injector);
+  // ambient text direction — fed to the overlay so `align="start"/"end"` resolve
+  // to physical left/right correctly (they flip under `dir="rtl"`).
+  private readonly directionality = inject(Directionality);
 
   /** The panel content. */
   readonly content = input<TemplateRef<unknown> | null>(null, { alias: "bpdmPopover" });
@@ -188,6 +196,12 @@ export class BpdmPopover implements OnDestroy {
     transform: booleanAttribute,
   });
   readonly classInput = input("", { alias: "bpdmPopoverClass" });
+  /**
+   * Accessible name for the panel. A `role="dialog"` panel should carry an
+   * accessible name; supply a (translatable) one here when the content has no
+   * visible heading to name it. Optional — omit to leave the panel unnamed.
+   */
+  readonly ariaLabel = input<string | undefined>(undefined, { alias: "bpdmPopoverAriaLabel" });
   /** Open state — two-way bindable via `[(bpdmPopoverOpen)]`. */
   readonly open = model(false, { alias: "bpdmPopoverOpen" });
 
@@ -236,6 +250,8 @@ export class BpdmPopover implements OnDestroy {
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       hasBackdrop: this.modal(),
       backdropClass: "cdk-overlay-transparent-backdrop",
+      // without this the overlay defaults to LTR and `start`/`end` never flip
+      direction: this.directionality,
     });
 
     const ref: PopoverRef = { close: () => this.close() };
@@ -256,6 +272,7 @@ export class BpdmPopover implements OnDestroy {
     p.setInput("width", this.width());
     p.setInput("panelClassInput", this.classInput());
     p.setInput("id", this.panelId);
+    p.setInput("ariaLabel", this.ariaLabel());
 
     positionStrategy.positionChanges.subscribe((change) => {
       this.panelRef?.setInput("side", sideFromPair(change.connectionPair));

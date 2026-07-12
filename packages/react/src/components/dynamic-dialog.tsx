@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog } from "./dialog";
+import { Dialog, type DialogMessages } from "./dialog";
 
 export interface DialogOptions {
   title?: React.ReactNode;
@@ -33,7 +33,14 @@ export function useDialog(): DialogService {
  * `dialog.open(({ close }) => <Form onDone={close} />, { title })` from anywhere —
  * no per-dialog open state or prop drilling. Supports multiple stacked dialogs.
  */
-export function DialogProvider({ children }: { children: React.ReactNode }) {
+export function DialogProvider({
+  children,
+  messages,
+}: {
+  children: React.ReactNode;
+  /** Screen-reader strings (close button label, fallback title) applied to every opened dialog. */
+  messages?: Partial<DialogMessages>;
+}) {
   const [items, setItems] = React.useState<
     { id: string; content: DynamicDialogContent; options: DialogOptions }[]
   >([]);
@@ -74,6 +81,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
           description={item.options.description}
           size={item.options.size ?? "md"}
           footer={item.options.footer}
+          messages={messages}
         >
           {typeof item.content === "function"
             ? item.content({ close: () => close(item.id) })
