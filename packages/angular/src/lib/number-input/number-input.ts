@@ -207,7 +207,7 @@ export class BpdmNumberInput {
 
   protected btnClass(which: "inc" | "dec", extra: string): string {
     return cn(
-      "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 hover:bg-muted active:scale-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",
+      "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 enabled:hover:bg-muted enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
       this.pressed() === which && "scale-90",
       extra,
     );

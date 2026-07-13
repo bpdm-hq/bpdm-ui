@@ -46,7 +46,7 @@ const triggerVariants = cva(
         // horizontal: a single sliding indicator draws the active marker (see the
         // convenience `Tabs`); vertical keeps a per-tab inline-end border
         underline:
-          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-primary data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary",
+          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary-strong",
         pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-muted/60 data-[orientation=vertical]:data-[state=active]:bg-muted",
       },
     },
@@ -224,7 +224,7 @@ export function Tabs({
       className={cn(
         "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
         variant === "underline"
-          ? "-bottom-px h-0.5 bg-primary" // sit on the baseline (like the tab's -mb-px border), flush not floating
+          ? "-bottom-px h-0.5 bg-primary-strong" // sit on the baseline (like the tab's -mb-px border), flush not floating
           : "inset-y-0 z-0 rounded-lg bg-muted",
       )}
     />

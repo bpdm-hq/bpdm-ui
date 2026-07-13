@@ -40,9 +40,9 @@ export const badgeTone: Record<BadgeVariant, Record<"soft" | "solid" | "outline"
     outline: "border-border text-foreground",
   },
   help: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--help)_18%,transparent)] text-help",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--help)_18%,transparent)] text-help-strong",
     solid: "border-transparent bg-help text-help-foreground",
-    outline: "border-help/40 text-help",
+    outline: "border-help/40 text-help-strong",
   },
   contrast: {
     soft: "border-transparent bg-[color-mix(in_srgb,var(--foreground)_12%,transparent)] text-foreground",
@@ -50,29 +50,29 @@ export const badgeTone: Record<BadgeVariant, Record<"soft" | "solid" | "outline"
     outline: "border-foreground/40 text-foreground",
   },
   primary: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary-strong",
     solid: "border-transparent bg-primary text-primary-foreground",
-    outline: "border-primary/40 text-primary",
+    outline: "border-primary/40 text-primary-strong",
   },
   success: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success-strong",
     solid: "border-transparent bg-success text-success-foreground",
-    outline: "border-success/40 text-success",
+    outline: "border-success/40 text-success-strong",
   },
   warning: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--warning)_18%,transparent)] text-warning",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--warning)_18%,transparent)] text-warning-strong",
     solid: "border-transparent bg-warning text-warning-foreground",
-    outline: "border-warning/40 text-warning",
+    outline: "border-warning/40 text-warning-strong",
   },
   info: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--info)_18%,transparent)] text-info",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--info)_18%,transparent)] text-info-strong",
     solid: "border-transparent bg-info text-info-foreground",
-    outline: "border-info/40 text-info",
+    outline: "border-info/40 text-info-strong",
   },
   destructive: {
-    soft: "border-transparent bg-[color-mix(in_srgb,var(--destructive)_18%,transparent)] text-destructive",
+    soft: "border-transparent bg-[color-mix(in_srgb,var(--destructive)_18%,transparent)] text-destructive-strong",
     solid: "border-transparent bg-destructive text-destructive-foreground",
-    outline: "border-destructive/40 text-destructive",
+    outline: "border-destructive/40 text-destructive-strong",
   },
 };
 

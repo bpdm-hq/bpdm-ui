@@ -78,7 +78,7 @@ function Stepper({
                   done
                     ? "bg-primary text-primary-foreground"
                     : active
-                      ? "scale-110 border-2 border-primary text-primary"
+                      ? "scale-110 bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
                       : "border border-border text-muted-foreground",
                 )}
               >

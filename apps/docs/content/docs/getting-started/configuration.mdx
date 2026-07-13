@@ -54,6 +54,33 @@ component follows:
 }
 ```
 
+Each semantic colour also ships a paired `-strong` shade (`--primary-strong`,
+`--destructive-strong`, …) — the accessible, readable-as-text variant of the hue
+used wherever the colour itself carries meaning (e.g. a ghost/outline primary
+button label, coloured badge and alert text). **Why it exists:** a vivid brand hue
+like our amber `--primary` sits well below the WCAG **1.4.3** minimum (4.5:1) when
+used as text on a light background, so `-strong` is the darkened, contrast-safe
+step of the *same* colour — keeping the bright brand for fills while text/indicators
+stay legible. You don't normally set it: on light
+themes it's **auto-derived** from the base with `color-mix` (a slight oklab
+darken), and on dark themes it tracks the base directly — so overriding just
+`--primary` gives you a matching ≥4.5:1 text shade for free. Only override
+`--primary-strong` explicitly for an edge case: an unusually **light** brand
+colour whose auto-derived shade still wouldn't reach the contrast target (set a
+darker value), **or** a brand colour that's **already dark enough** to read as text
+where you don't want the extra darkening — in that case just point it at the base:
+
+```css
+:root {
+  --primary: #0b5cad; /* your already-accessible brand */
+  --primary-strong: var(--primary); /* opt out of the auto-darken; strong == base */
+}
+```
+
+Because it's a plain CSS custom property, you're never forced to invent a second
+colour — leave it for the free auto-derived shade, alias it to `--primary` to opt
+out, or set any exact value you want.
+
 ## Design tokens
 
 These are every token you can override. **Colours** are defined per theme;

@@ -36,7 +36,7 @@ Drop it in with a starting value. Type freely, or use the steppers.
 import { NumberInput } from '@bpdm/ui/number-input';
 
 export function Quantity() {
-  return <NumberInput defaultValue="8" min="0" />;
+  return <NumberInput defaultValue="9" min="0" />;
 }
 ```
 
@@ -50,7 +50,7 @@ import { BpdmNumberInput } from '@bpdm/ng';
 @Component({
   selector: 'quantity',
   imports: [BpdmNumberInput],
-  template: `<bpdm-number-input defaultValue="8" min="0" />`,
+  template: `<bpdm-number-input defaultValue="9" min="0" />`,
 })
 export class Quantity {}
 ```
@@ -227,8 +227,8 @@ import { NumberInput } from '@bpdm/ui/number-input';
 export function Layout() {
   return (
     <div className="flex items-center gap-4">
-      <NumberInput buttonLayout="stacked" defaultValue="8" />
-      <NumberInput buttonLayout="horizontal" defaultValue="8" />
+      <NumberInput buttonLayout="stacked" defaultValue="9" />
+      <NumberInput buttonLayout="horizontal" defaultValue="9" />
     </div>
   );
 }
@@ -246,8 +246,8 @@ import { BpdmNumberInput } from '@bpdm/ng';
   imports: [BpdmNumberInput],
   template: `
     <div class="flex items-center gap-4">
-      <bpdm-number-input buttonLayout="stacked" defaultValue="8" />
-      <bpdm-number-input buttonLayout="horizontal" defaultValue="8" />
+      <bpdm-number-input buttonLayout="stacked" defaultValue="9" />
+      <bpdm-number-input buttonLayout="horizontal" defaultValue="9" />
     </div>
   `,
 })
@@ -274,9 +274,9 @@ import { NumberInput } from '@bpdm/ui/number-input';
 export function Sizes() {
   return (
     <div className="flex items-center gap-4">
-      <NumberInput size="sm" defaultValue="8" />
-      <NumberInput size="md" defaultValue="8" />
-      <NumberInput size="lg" defaultValue="8" />
+      <NumberInput size="sm" defaultValue="9" />
+      <NumberInput size="md" defaultValue="9" />
+      <NumberInput size="lg" defaultValue="9" />
     </div>
   );
 }
@@ -294,9 +294,9 @@ import { BpdmNumberInput } from '@bpdm/ng';
   imports: [BpdmNumberInput],
   template: `
     <div class="flex items-center gap-4">
-      <bpdm-number-input size="sm" defaultValue="8" />
-      <bpdm-number-input size="md" defaultValue="8" />
-      <bpdm-number-input size="lg" defaultValue="8" />
+      <bpdm-number-input size="sm" defaultValue="9" />
+      <bpdm-number-input size="md" defaultValue="9" />
+      <bpdm-number-input size="lg" defaultValue="9" />
     </div>
   `,
 })
@@ -321,7 +321,7 @@ Disabled dims the field and blocks both typing and the steppers.
 import { NumberInput } from '@bpdm/ui/number-input';
 
 export function States() {
-  return <NumberInput disabled defaultValue="8" />;
+  return <NumberInput disabled defaultValue="9" />;
 }
 ```
 
@@ -335,7 +335,7 @@ import { BpdmNumberInput } from '@bpdm/ng';
 @Component({
   selector: 'states',
   imports: [BpdmNumberInput],
-  template: `<bpdm-number-input disabled defaultValue="8" />`,
+  template: `<bpdm-number-input disabled defaultValue="9" />`,
 })
 export class States {}
 ```
