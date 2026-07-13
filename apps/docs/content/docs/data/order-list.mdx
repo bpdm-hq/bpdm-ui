@@ -395,47 +395,6 @@ export class ControlsOnly {
   </Tab>
 </Tabs>
 
-## API
-
-### `OrderList` / `<bpdm-order-list>`
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` / `defaultValue` / `onChange` | `T[]` / `T[]` / `(next) => void` | — | The ordered array — controlled or uncontrolled. Angular: `[(value)]`. |
-| `itemKey` | `(item) => string \| number` | — | **Required.** Stable id per item. |
-| `renderItem` (Angular `itemTemplate`) | `(item) => ReactNode` / `TemplateRef` | — | **Required.** How each row renders. |
-| `header` | `ReactNode` / `string` | — | Optional list header. |
-| `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box matching this text. |
-| `dragdrop` | `boolean` | `true` | Enable drag-to-reorder. |
-| `selectionMode` | `single \| multiple` | `single` | Move one, or several together via the controls. |
-| `scrollHeight` | `string` | `18rem` | Max body height before the list scrolls. |
-| `ariaLabel` | `string` | `Orderable list` | Accessible name for the listbox when there's no visible `header`. |
-| `messages` | `Partial<OrderListMessages>` | English | Override every built-in screen-reader string for i18n — see [Internationalization](#internationalization). |
-| `className` | `string` (Angular `class`) | — | Extra classes. |
-
-`itemKey` and `renderItem` (Angular `itemTemplate`) are the only required props; every
-other prop is optional. The component is controlled when you pass `value`, uncontrolled
-when you pass `defaultValue` (or nothing).
-
-## Accessibility
-
-- The list is a WAI-ARIA **`listbox`**: it's a single tab stop and a roving
-  `aria-activedescendant` tracks the active option. **↑ / ↓** move it, **Home / End**
-  jump to the ends, and **Enter / Space** toggle selection.
-- Each row is a `role="option"` exposing `aria-selected`; in
-  `selectionMode="multiple"` the listbox sets `aria-multiselectable`.
-- The listbox is **named** by its `header` (wired via `aria-labelledby`). With no
-  header, pass `ariaLabel` — it falls back to "Orderable list".
-- The control buttons (**Move up / to top / down / to bottom**) are real
-  `<button>`s with labels, grouped under a `role="group"`, and disabled at the
-  list's edges. If the pressed button disables after a move, focus is kept within
-  the group.
-- Each move is announced through a polite live region, so screen-reader users hear
-  the result. Drag-and-drop is a purely visual enhancement — every reorder is also
-  reachable from the keyboard via the controls.
-- Layout uses logical properties, so the selection accent and control column
-  mirror correctly in RTL.
-
 ## Internationalization
 
 Every built-in string is **translatable**. `header`, `filterPlaceholder`, and each item's
@@ -533,3 +492,45 @@ empty-state, and the listbox name — in **both** frameworks. Anything you omit 
 the English default.
 
 See the [Internationalization guide](/docs/getting-started/i18n) for the shared conventions.
+
+## API
+
+### `OrderList` / `<bpdm-order-list>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` / `onChange` | `T[]` / `T[]` / `(next) => void` | — | The ordered array — controlled or uncontrolled. Angular: `[(value)]`. |
+| `itemKey` | `(item) => string \| number` | — | **Required.** Stable id per item. |
+| `renderItem` (Angular `itemTemplate`) | `(item) => ReactNode` / `TemplateRef` | — | **Required.** How each row renders. |
+| `header` | `ReactNode` / `string` | — | Optional list header. |
+| `filterBy` / `filterPlaceholder` | `(item) => string` / `string` | — | Show a filter box matching this text. |
+| `dragdrop` | `boolean` | `true` | Enable drag-to-reorder. |
+| `selectionMode` | `single \| multiple` | `single` | Move one, or several together via the controls. |
+| `scrollHeight` | `string` | `18rem` | Max body height before the list scrolls. |
+| `ariaLabel` | `string` | `Orderable list` | Accessible name for the listbox when there's no visible `header`. |
+| `messages` | `Partial<OrderListMessages>` | English | Override every built-in screen-reader string for i18n — see [Internationalization](#internationalization). |
+| `className` | `string` (Angular `class`) | — | Extra classes. |
+
+`itemKey` and `renderItem` (Angular `itemTemplate`) are the only required props; every
+other prop is optional. The component is controlled when you pass `value`, uncontrolled
+when you pass `defaultValue` (or nothing).
+
+## Accessibility
+
+- The list is a WAI-ARIA **`listbox`**: it's a single tab stop and a roving
+  `aria-activedescendant` tracks the active option. **↑ / ↓** move it, **Home / End**
+  jump to the ends, and **Enter / Space** toggle selection.
+- Each row is a `role="option"` exposing `aria-selected`; in
+  `selectionMode="multiple"` the listbox sets `aria-multiselectable`.
+- The listbox is **named** by its `header` (wired via `aria-labelledby`). With no
+  header, pass `ariaLabel` — it falls back to "Orderable list".
+- The control buttons (**Move up / to top / down / to bottom**) are real
+  `<button>`s with labels, grouped under a `role="group"`, and disabled at the
+  list's edges. If the pressed button disables after a move, focus is kept within
+  the group.
+- Each move is announced through a polite live region, so screen-reader users hear
+  the result. Drag-and-drop is a purely visual enhancement — every reorder is also
+  reachable from the keyboard via the controls.
+- Layout uses logical properties, so the selection accent and control column
+  mirror correctly in RTL.
+
