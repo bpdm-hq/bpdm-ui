@@ -78,4 +78,65 @@ describe("TreeSelect", () => {
     render(<TreeSelect options={TREE} aria-label="Food" disabled />);
     expect(trigger("Food")).toHaveAttribute("aria-disabled", "true");
   });
+
+  describe("keyboard (WAI-ARIA tree)", () => {
+    const activeItem = () => {
+      const id = screen.getByRole("tree").getAttribute("aria-activedescendant");
+      return id ? document.getElementById(id) : null;
+    };
+
+    const openTree = async () => {
+      await userEvent.click(trigger("Food"));
+      const tree = screen.getByRole("tree");
+      tree.focus();
+      return tree;
+    };
+
+    it("seeds aria-activedescendant on the first treeitem, which carries the tree semantics", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      const active = activeItem();
+      expect(active).toHaveTextContent("Fruit");
+      expect(active).toHaveAttribute("role", "treeitem");
+      expect(active).toHaveAttribute("aria-level", "1");
+      expect(active).toHaveAttribute("aria-checked", "false");
+    });
+
+    it("ArrowDown / ArrowUp / Home / End move the active treeitem", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      expect(activeItem()).toHaveTextContent("Fruit");
+      await userEvent.keyboard("{ArrowDown}");
+      expect(activeItem()).toHaveTextContent("Vegetable");
+      await userEvent.keyboard("{ArrowUp}");
+      expect(activeItem()).toHaveTextContent(/Fruit/);
+      await userEvent.keyboard("{End}");
+      expect(activeItem()).toHaveTextContent("Vegetable");
+      await userEvent.keyboard("{Home}");
+      expect(activeItem()).toHaveTextContent(/Fruit/);
+    });
+
+    it("ArrowRight expands a collapsed branch then steps in; ArrowLeft collapses / moves to parent", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-expanded", "false");
+      await userEvent.keyboard("{ArrowRight}"); // expand Fruit
+      expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-expanded", "true");
+      await userEvent.keyboard("{ArrowRight}"); // step into first child
+      expect(activeItem()).toHaveTextContent("Apple");
+      await userEvent.keyboard("{ArrowLeft}"); // leaf → move to parent
+      expect(activeItem()).toHaveTextContent(/Fruit/);
+      await userEvent.keyboard("{ArrowLeft}"); // expanded parent → collapse
+      expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("Enter / Space toggle selection (aria-checked) of the active treeitem", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      await userEvent.keyboard(" "); // select all Fruit leaves
+      expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-checked", "true");
+      await userEvent.keyboard("{Enter}"); // toggle off
+      expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-checked", "false");
+    });
+  });
 });

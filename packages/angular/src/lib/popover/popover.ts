@@ -23,6 +23,7 @@ import { CdkTrapFocus } from "@angular/cdk/a11y";
 import { Directionality } from "@angular/cdk/bidi";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
+import { Subscription } from "rxjs";
 import { cn } from "@bpdm/variants";
 import {
   connectedPositions,
@@ -210,6 +211,11 @@ export class BpdmPopover implements OnDestroy {
   private overlayRef?: OverlayRef;
   private panelRef?: ComponentRef<BpdmPopoverPanel>;
   private closeTimer?: ReturnType<typeof setTimeout>;
+  // Esc listener on the overlay itself — on open, focus moves into the portaled
+  // panel (a DOM sibling of the trigger), so a keydown there never bubbles to the
+  // trigger host. Listening on the overlay catches Esc wherever focus sits inside
+  // the panel, for both the modal and non-modal variants.
+  private keydownSub?: Subscription;
   // return focus to the trigger on keyboard/programmatic close, but not when the
   // user clicked elsewhere (yanking focus back would fight where they clicked)
   private restoreFocus = true;
@@ -278,6 +284,15 @@ export class BpdmPopover implements OnDestroy {
       this.panelRef?.setInput("side", sideFromPair(change.connectionPair));
     });
 
+    // keyboard dismissal — `restoreFocus` stays true here, so an Esc close returns
+    // focus to the trigger (modal restores via its own focus trap).
+    this.keydownSub = this.overlayRef.keydownEvents().subscribe((event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        this.close();
+      }
+    });
+
     if (this.modal()) {
       this.overlayRef.backdropClick().subscribe(() => this.close());
     } else {
@@ -306,6 +321,8 @@ export class BpdmPopover implements OnDestroy {
   }
 
   private teardown(): void {
+    this.keydownSub?.unsubscribe();
+    this.keydownSub = undefined;
     this.overlayRef?.dispose();
     this.overlayRef = undefined;
     this.panelRef = undefined;

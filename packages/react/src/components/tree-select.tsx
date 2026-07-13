@@ -13,6 +13,17 @@ export type TreeNode = {
   children?: TreeNode[];
 };
 
+// a single visible (expanded) treeitem, in DOM order, for keyboard navigation
+type FlatRow = {
+  node: TreeNode;
+  depth: number;
+  hasChildren: boolean;
+  isOpen: boolean;
+  parentValue: string | null;
+  posinset: number;
+  setsize: number;
+};
+
 function Caret({ open }: { open: boolean }) {
   return (
     <svg viewBox="0 0 16 16" fill="none" className={cn("size-3.5 transition-transform rtl:-scale-x-100", open && "rotate-90")} aria-hidden>
@@ -181,6 +192,115 @@ export function TreeSelect({
       return next;
     });
 
+  // ---- keyboard / focus model (WAI-ARIA tree, aria-activedescendant) --------
+  const treeRef = React.useRef<HTMLDivElement>(null);
+  const searchRef = React.useRef<HTMLInputElement>(null);
+  const [activeValue, setActiveValue] = React.useState<string | null>(null);
+  const itemId = (val: string) => `${treeId}-ti-${val}`;
+
+  // flatten the currently-visible (expanded) tree into DOM-order rows so the
+  // arrow keys can walk exactly what the eye sees.
+  const flatVisible = React.useMemo(() => {
+    const rows: FlatRow[] = [];
+    const walk = (list: TreeNode[], depth: number, parentValue: string | null) => {
+      list.forEach((node, i) => {
+        const hasChildren = !!node.children?.length;
+        const isOpen = forceExpand
+          ? forceExpand.has(node.value) || expanded.has(node.value)
+          : expanded.has(node.value);
+        rows.push({ node, depth, hasChildren, isOpen, parentValue, posinset: i + 1, setsize: list.length });
+        if (hasChildren && isOpen) walk(node.children!, depth + 1, node.value);
+      });
+    };
+    walk(visibleTree, 0, null);
+    return rows;
+  }, [visibleTree, expanded, forceExpand]);
+
+  // keep the active treeitem valid: seed the first row on open, drop it on close,
+  // and re-seed if the active node scrolls out of view (e.g. a collapsed branch).
+  React.useEffect(() => {
+    if (!open) {
+      setActiveValue(null);
+      return;
+    }
+    setActiveValue((cur) =>
+      cur && flatVisible.some((r) => r.node.value === cur) ? cur : (flatVisible[0]?.node.value ?? null),
+    );
+  }, [open, flatVisible]);
+
+  const activeIndex = flatVisible.findIndex((r) => r.node.value === activeValue);
+  const activeId = activeIndex >= 0 ? itemId(flatVisible[activeIndex].node.value) : undefined;
+
+  const moveActive = (i: number) => {
+    const r = flatVisible[i];
+    if (!r) return;
+    setActiveValue(r.node.value);
+    requestAnimationFrame(() =>
+      document.getElementById(itemId(r.node.value))?.scrollIntoView({ block: "nearest" }),
+    );
+  };
+
+  const onTreeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (flatVisible.length === 0) return;
+    const rtl = getComputedStyle(e.currentTarget).direction === "rtl";
+    const forward = rtl ? "ArrowLeft" : "ArrowRight";
+    const backward = rtl ? "ArrowRight" : "ArrowLeft";
+    const idx = activeIndex < 0 ? 0 : activeIndex;
+    const cur = flatVisible[idx];
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        moveActive(Math.min(idx + 1, flatVisible.length - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        moveActive(Math.max(idx - 1, 0));
+        break;
+      case "Home":
+        e.preventDefault();
+        moveActive(0);
+        break;
+      case "End":
+        e.preventDefault();
+        moveActive(flatVisible.length - 1);
+        break;
+      case forward:
+        e.preventDefault();
+        if (cur?.hasChildren) {
+          if (!cur.isOpen) toggleExpand(cur.node.value);
+          else moveActive(idx + 1); // first child is the next visible row
+        }
+        break;
+      case backward:
+        e.preventDefault();
+        if (cur?.hasChildren && cur.isOpen) {
+          toggleExpand(cur.node.value);
+        } else if (cur?.parentValue) {
+          const p = flatVisible.findIndex((r) => r.node.value === cur.parentValue);
+          if (p >= 0) moveActive(p);
+        }
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (cur && !cur.node.disabled) toggleNode(cur.node);
+        break;
+      default: {
+        // type-ahead: jump to the next visible treeitem whose label starts with the key
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          const ch = e.key.toLowerCase();
+          for (let k = 1; k <= flatVisible.length; k++) {
+            const j = (idx + k) % flatVisible.length;
+            if (flatVisible[j].node.label.toLowerCase().startsWith(ch)) {
+              moveActive(j);
+              break;
+            }
+          }
+        }
+      }
+    }
+  };
+
   // "Select all" operates on all leaves currently visible (after filtering)
   const allVisibleLeaves = React.useMemo(
     () => visibleTree.flatMap(leafValues),
@@ -204,7 +324,12 @@ export function TreeSelect({
   const chips = maxDisplay > 0 ? selectedLeaves.slice(0, maxDisplay) : [];
   const extra = selectedLeaves.length - chips.length;
 
-  const renderNode = (node: TreeNode, depth: number): React.ReactNode => {
+  const renderNode = (
+    node: TreeNode,
+    depth: number,
+    posinset: number,
+    setsize: number,
+  ): React.ReactNode => {
     const hasChildren = !!node.children?.length;
     const leaves = leafValues(node);
     const selCount = leaves.filter((v) => selectedSet.has(v)).length;
@@ -213,23 +338,32 @@ export function TreeSelect({
     const isOpen = forceExpand
       ? forceExpand.has(node.value) || expanded.has(node.value)
       : expanded.has(node.value);
+    const isActive = activeValue === node.value;
 
     return (
       <div
         key={node.value}
+        id={itemId(node.value)}
         role="treeitem"
         aria-level={depth + 1}
+        aria-setsize={setsize}
+        aria-posinset={posinset}
+        aria-selected={checked}
         aria-checked={indeterminate ? "mixed" : checked}
         aria-expanded={hasChildren ? isOpen : undefined}
         aria-disabled={node.disabled || undefined}
       >
         <div
-          className="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted"
+          className={cn(
+            "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted",
+            isActive && "bg-muted",
+          )}
           style={{ paddingInlineStart: 8 + depth * 18 }}
         >
           {hasChildren ? (
             <button
               type="button"
+              tabIndex={-1}
               aria-label={isOpen ? t.collapse : t.expand}
               onClick={() => toggleExpand(node.value)}
               className="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground"
@@ -242,6 +376,7 @@ export function TreeSelect({
 
           <button
             type="button"
+            tabIndex={-1}
             disabled={node.disabled}
             onClick={() => toggleNode(node)}
             className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-foreground disabled:pointer-events-none disabled:opacity-50"
@@ -262,7 +397,9 @@ export function TreeSelect({
           </button>
         </div>
         {hasChildren && isOpen && (
-          <div role="group">{node.children!.map((c) => renderNode(c, depth + 1))}</div>
+          <div role="group">
+            {node.children!.map((c, i) => renderNode(c, depth + 1, i + 1, node.children!.length))}
+          </div>
         )}
       </div>
     );
@@ -337,6 +474,12 @@ export function TreeSelect({
           align="start"
           sideOffset={4}
           collisionPadding={8}
+          onOpenAutoFocus={(e) => {
+            // focus the search box (editable combobox) or the tree itself, so
+            // aria-activedescendant is announced from the focused element
+            e.preventDefault();
+            (searchable ? searchRef.current : treeRef.current)?.focus();
+          }}
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
@@ -379,7 +522,7 @@ export function TreeSelect({
                 <>
                   <FieldSearch />
                   <input
-                    autoFocus
+                    ref={searchRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={searchPlaceholder}
@@ -394,14 +537,18 @@ export function TreeSelect({
             <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
           ) : (
             <div
+              ref={treeRef}
               role="tree"
               id={treeId}
               aria-label={ariaLabel ?? placeholder}
               aria-multiselectable="true"
+              tabIndex={0}
+              aria-activedescendant={activeId}
+              onKeyDown={onTreeKeyDown}
               style={{ maxHeight }}
-              className="min-h-0 flex-1 overflow-auto p-1"
+              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
             >
-              {visibleTree.map((n) => renderNode(n, 0))}
+              {visibleTree.map((n, i) => renderNode(n, 0, i + 1, visibleTree.length))}
             </div>
           )}
         </PopoverPrimitive.Content>

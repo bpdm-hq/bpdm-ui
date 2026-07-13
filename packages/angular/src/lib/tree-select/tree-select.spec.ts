@@ -88,4 +88,55 @@ describe("BpdmTreeSelect", () => {
     expect((document.querySelector('[role="tree"]') as HTMLElement).getAttribute("aria-label")).toBe("Food");
     expect((document.querySelector('[role="checkbox"]') as HTMLElement).getAttribute("aria-label")).toBe("Tout");
   });
+
+  describe("keyboard (WAI-ARIA tree)", () => {
+    const key = (tree: HTMLElement, k: string) => {
+      tree.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+      tick();
+    };
+
+    it("focuses the tree on open (non-searchable) and seeds aria-activedescendant", async () => {
+      const fixture = TestBed.createComponent(Host);
+      await open(fixture);
+      const tree = document.querySelector('[role="tree"]') as HTMLElement;
+      expect(document.activeElement).toBe(tree);
+      const parent = document.querySelector('[role="treeitem"]') as HTMLElement;
+      expect(tree.getAttribute("aria-activedescendant")).toBe(parent.id);
+    });
+
+    it("expands/collapses branches, steps in, and moves the active treeitem via arrows", async () => {
+      const fixture = TestBed.createComponent(Host);
+      await open(fixture);
+      const tree = document.querySelector('[role="tree"]') as HTMLElement;
+
+      key(tree, "ArrowRight"); // expand collapsed parent
+      expect((document.querySelector('[role="treeitem"]') as HTMLElement).getAttribute("aria-expanded")).toBe("true");
+
+      key(tree, "ArrowRight"); // step into first child
+      const child1 = document.querySelector('[role="group"] [role="treeitem"]') as HTMLElement;
+      expect(tree.getAttribute("aria-activedescendant")).toBe(child1.id);
+
+      key(tree, "ArrowDown"); // move to second child
+      const children = document.querySelectorAll('[role="group"] [role="treeitem"]');
+      expect(tree.getAttribute("aria-activedescendant")).toBe((children[1] as HTMLElement).id);
+
+      key(tree, "ArrowLeft"); // leaf → move back to parent
+      const parent = document.querySelector('[role="treeitem"]') as HTMLElement;
+      expect(tree.getAttribute("aria-activedescendant")).toBe(parent.id);
+
+      key(tree, "ArrowLeft"); // expanded parent → collapse
+      expect((document.querySelector('[role="treeitem"]') as HTMLElement).getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("toggles selection of the active treeitem with Space/Enter", async () => {
+      const fixture = TestBed.createComponent(Host);
+      await open(fixture);
+      const tree = document.querySelector('[role="tree"]') as HTMLElement;
+      key(tree, "ArrowRight"); // expand
+      key(tree, "ArrowRight"); // active = Child 1
+      key(tree, " "); // select
+      const child1 = document.querySelector('[role="group"] [role="treeitem"]') as HTMLElement;
+      expect(child1.getAttribute("aria-checked")).toBe("true");
+    });
+  });
 });

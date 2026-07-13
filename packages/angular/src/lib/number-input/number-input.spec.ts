@@ -16,6 +16,21 @@ class HostComponent {
 })
 class UncontrolledHost {}
 
+@Component({
+  imports: [BpdmNumberInput],
+  template: `<bpdm-number-input
+    defaultValue="5"
+    min="0"
+    max="10"
+    id="qty"
+    name="quantity"
+    aria-label="Quantity"
+    aria-describedby="hint"
+    required
+  />`,
+})
+class LabelledHost {}
+
 describe("BpdmNumberInput", () => {
   const input = (f: { nativeElement: HTMLElement }) =>
     f.nativeElement.querySelector("input") as HTMLInputElement;
@@ -59,5 +74,39 @@ describe("BpdmNumberInput", () => {
     el.dispatchEvent(new Event("blur"));
     fixture.detectChanges();
     expect(input(fixture).value).toBe("123456789012345678901234");
+  });
+
+  it("forwards labelling attributes to the inner input", () => {
+    const fixture = TestBed.createComponent(LabelledHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    expect(el.id).toBe("qty");
+    expect(el.getAttribute("name")).toBe("quantity");
+    expect(el.getAttribute("aria-label")).toBe("Quantity");
+    expect(el.getAttribute("aria-describedby")).toBe("hint");
+    expect(el.getAttribute("aria-required")).toBe("true");
+    expect(el.required).toBe(true);
+  });
+
+  it("exposes spinbutton semantics (role + aria-value*)", () => {
+    const fixture = TestBed.createComponent(LabelledHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    expect(el.getAttribute("role")).toBe("spinbutton");
+    expect(el.getAttribute("aria-valuenow")).toBe("5");
+    expect(el.getAttribute("aria-valuemin")).toBe("0");
+    expect(el.getAttribute("aria-valuemax")).toBe("10");
+  });
+
+  it("steps with ArrowUp / ArrowDown and respects the clamp", () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const el = input(fixture);
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.val()).toBe("6");
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.val()).toBe("5");
   });
 });

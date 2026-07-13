@@ -127,6 +127,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       disabled,
       onValueChange,
       messages,
+      onKeyDown,
       ...props
     },
     ref,
@@ -163,6 +164,13 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const atMax =
       max !== undefined && !base.isNaN() && safeBase.isGreaterThanOrEqualTo(max);
 
+    // spinbutton value semantics: a numeric `aria-valuenow` plus a spoken
+    // `aria-valuetext` that includes the prefix/suffix when present.
+    const valueText =
+      prefix || suffix
+        ? `${prefix ?? ""}${current}${suffix ? ` ${suffix}` : ""}`.trim()
+        : undefined;
+
     const field = (
       <div
         className={cn(
@@ -177,11 +185,26 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           ref={ref}
           type="text"
           inputMode="decimal"
+          role="spinbutton"
+          aria-valuenow={safeBase.toNumber()}
+          aria-valuemin={min !== undefined ? Number(min) : undefined}
+          aria-valuemax={max !== undefined ? Number(max) : undefined}
+          aria-valuetext={valueText}
           value={current}
           disabled={disabled}
           onChange={(e) => {
             const raw = e.target.value;
             if (raw === "" || partial.test(raw)) setRaw(raw);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp") {
+              e.preventDefault();
+              if (!atMax) inc();
+            } else if (e.key === "ArrowDown") {
+              e.preventDefault();
+              if (!atMin) dec();
+            }
+            onKeyDown?.(e);
           }}
           onBlur={() => commit(current)}
           className={cn(
@@ -200,7 +223,6 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div
         key={buttonLayout}
-        role="group"
         className={cn(
           "inline-flex items-stretch overflow-hidden rounded-[var(--radius)] border border-input bg-background shadow-sm focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
           d.h,

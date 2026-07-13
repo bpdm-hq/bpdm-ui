@@ -299,8 +299,12 @@ export class StatesComponent {
 - The caret and the checkbox glyph are decorative (`aria-hidden`) — state is conveyed by
   `aria-expanded` / `aria-checked`, never a glyph alone. **Select all** is a tri-state
   `role="checkbox"`.
-- Expand/collapse and toggle are operable by keyboard; give the field a name via `<label>`
-  (`id`) or `aria-label`, and set `aria-invalid` on error.
+- Fully operable by keyboard. The tree is a single tab stop and tracks the active node with
+  `aria-activedescendant`: **Up / Down** move between visible treeitems, **Right** expands a
+  collapsed branch then steps into it, **Left** collapses an expanded branch or moves to the
+  parent (both flip under `dir="rtl"`), **Home / End** jump to the first / last visible node,
+  **Enter / Space** toggle selection, type-ahead jumps to the next matching label, and **Esc**
+  closes. Give the field a name via `<label>` (`id`) or `aria-label`, and set `aria-invalid` on error.
 
 ## Internationalization
 
