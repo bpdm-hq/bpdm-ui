@@ -103,6 +103,47 @@ describe("BpdmPopover", () => {
     expect(btn.getAttribute("aria-expanded")).toBe("false");
   });
 
+  it("closes on Escape dispatched from within the panel (focus is portaled away from the trigger)", async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector("button") as HTMLElement;
+
+    btn.click();
+    await settle();
+    const dialog = getDialog()!;
+    expect(dialog).not.toBeNull();
+
+    // Esc originates inside the portaled panel, not on the trigger host — the
+    // overlay-level listener is what catches it.
+    dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await macrotask(200);
+    TestBed.inject(ApplicationRef).tick();
+
+    expect(getDialog()).toBeNull();
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    // keyboard close restores focus to the trigger
+    expect(document.activeElement).toBe(btn);
+  });
+
+  it("closes on Escape when modal", async () => {
+    const fixture = TestBed.createComponent(ConfigHost);
+    fixture.componentInstance.modal.set(true);
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector("button") as HTMLElement;
+
+    btn.click();
+    await settle();
+    const dialog = getDialog()!;
+    expect(dialog).not.toBeNull();
+
+    dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await macrotask(200);
+    TestBed.inject(ApplicationRef).tick();
+
+    expect(getDialog()).toBeNull();
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+  });
+
   it("toggles aria-controls on the trigger between the panel id and null", async () => {
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();

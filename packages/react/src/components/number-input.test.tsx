@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NumberInput } from "./number-input";
 
-const textbox = () => screen.getByRole("textbox") as HTMLInputElement;
+const textbox = () => screen.getByRole("spinbutton") as HTMLInputElement;
 const stepper = (name: "Increase" | "Decrease") => screen.getByRole("button", { name });
 
 describe("NumberInput", () => {
@@ -69,5 +69,42 @@ describe("NumberInput", () => {
     render(<NumberInput messages={{ increase: "Augmenter", decrease: "Diminuer" }} />);
     expect(screen.getByRole("button", { name: "Augmenter" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Diminuer" })).toBeInTheDocument();
+  });
+
+  it("exposes spinbutton semantics (role + aria-value*)", () => {
+    render(<NumberInput defaultValue="5" min="0" max="10" />);
+    const field = textbox();
+    expect(field).toHaveAttribute("role", "spinbutton");
+    expect(field).toHaveAttribute("aria-valuenow", "5");
+    expect(field).toHaveAttribute("aria-valuemin", "0");
+    expect(field).toHaveAttribute("aria-valuemax", "10");
+  });
+
+  it("reflects prefix/suffix in aria-valuetext", () => {
+    render(<NumberInput defaultValue="50" prefix="~" suffix="GB" />);
+    expect(textbox()).toHaveAttribute("aria-valuetext", "~50 GB");
+  });
+
+  it("steps with ArrowUp / ArrowDown and respects the clamp", async () => {
+    render(<NumberInput defaultValue="9" min="0" max="10" />);
+    textbox().focus();
+    await userEvent.keyboard("{ArrowUp}");
+    expect(textbox().value).toBe("10");
+    await userEvent.keyboard("{ArrowUp}"); // already at max — no change
+    expect(textbox().value).toBe("10");
+    await userEvent.keyboard("{ArrowDown}");
+    expect(textbox().value).toBe("9");
+  });
+
+  it("forwards aria-label and aria-describedby to the field", () => {
+    render(<NumberInput defaultValue="1" aria-label="Quantity" aria-describedby="hint" />);
+    expect(textbox()).toHaveAttribute("aria-label", "Quantity");
+    expect(textbox()).toHaveAttribute("aria-describedby", "hint");
+  });
+
+  it("still allows manual typing", async () => {
+    render(<NumberInput defaultValue="" />);
+    await userEvent.type(textbox(), "42");
+    expect(textbox().value).toBe("42");
   });
 });

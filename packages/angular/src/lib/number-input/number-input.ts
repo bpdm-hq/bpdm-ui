@@ -51,7 +51,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "inline-flex" },
   template: `
-    <div [class]="rootClass()" role="group">
+    <div [class]="rootClass()">
       @if (buttonLayout() === "horizontal") {
         <button
           type="button"
@@ -73,9 +73,23 @@ const PARTIAL = /^-?\d*\.?\d*$/;
         <input
           type="text"
           inputmode="decimal"
+          role="spinbutton"
+          [id]="id() || null"
+          [attr.name]="name() || null"
+          [attr.aria-label]="ariaLabel() || null"
+          [attr.aria-labelledby]="ariaLabelledby() || null"
+          [attr.aria-describedby]="ariaDescribedby() || null"
+          [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
+          [attr.aria-required]="required() ? 'true' : null"
+          [required]="required()"
+          [attr.aria-valuenow]="valueNow()"
+          [attr.aria-valuemin]="min() !== undefined ? min() : null"
+          [attr.aria-valuemax]="max() !== undefined ? max() : null"
+          [attr.aria-valuetext]="valueText()"
           [value]="current()"
           [disabled]="disabled()"
           (input)="onInput($any($event.target).value)"
+          (keydown)="onKeydown($event)"
           (blur)="commit(current())"
           [class]="inputClass()"
         />
@@ -142,6 +156,17 @@ export class BpdmNumberInput {
   readonly suffix = input<string>("");
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  readonly id = input<string>("");
+  /** Native `name` for form submission, forwarded to the inner `<input>`. */
+  readonly name = input<string>("");
+  /** Accessible name for the field, forwarded to the inner `<input>`. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** IDs of labelling elements, forwarded to the inner `<input>`. */
+  readonly ariaLabelledby = input<string>("", { alias: "aria-labelledby" });
+  /** IDs of describing elements, forwarded to the inner `<input>`. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  readonly required = input(false, { transform: booleanAttribute });
+  readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   /** Override the stepper button labels (screen-reader text) for i18n. */
   readonly messages = input<{ increase?: string; decrease?: string }>({});
 
@@ -174,6 +199,16 @@ export class BpdmNumberInput {
   protected readonly atMax = computed(() => {
     const max = this.max();
     return max !== undefined && this.base().isGreaterThanOrEqualTo(max);
+  });
+
+  // spinbutton value semantics: a numeric `aria-valuenow` plus a spoken
+  // `aria-valuetext` that includes the prefix/suffix when present.
+  protected readonly valueNow = computed(() => this.base().toNumber());
+  protected readonly valueText = computed(() => {
+    const p = this.prefix();
+    const s = this.suffix();
+    if (!p && !s) return null;
+    return `${p}${this.current()}${s ? ` ${s}` : ""}`.trim();
   });
 
   // a short (~160ms) press flash on the stepper so a quick click reads clearly
@@ -219,6 +254,16 @@ export class BpdmNumberInput {
 
   protected commit(s: string): void {
     this.value.set(this.clamp(s));
+  }
+
+  protected onKeydown(e: KeyboardEvent): void {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!this.atMax()) this.step1(1);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!this.atMin()) this.step1(-1);
+    }
   }
 
   protected step1(dir: 1 | -1): void {
