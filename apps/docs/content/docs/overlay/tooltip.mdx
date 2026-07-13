@@ -141,7 +141,19 @@ export function NotificationsButton() {
   </Tab>
   <Tab value="Angular">
 
-```html title="tooltip-icon.html"
+```ts title="notifications-button.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'notifications-button',
+  imports: [BpdmTooltip, BpdmButton],
+  templateUrl: './notifications-button.html',
+})
+export class NotificationsButton {}
+```
+
+```html title="notifications-button.html"
 <button bpdmButton size="icon" variant="secondary" appearance="ghost" aria-label="Notifications" bpdmTooltip="Notifications">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
     <path d="M10.268 21a2 2 0 0 0 3.464 0" />
@@ -248,7 +260,19 @@ export function PublishButton() {
 
 In Angular, put the directive on a focusable wrapper and disable the child:
 
-```html title="publish.html"
+```ts title="publish-button.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'publish-button',
+  imports: [BpdmTooltip, BpdmButton],
+  templateUrl: './publish-button.html',
+})
+export class PublishButton {}
+```
+
+```html title="publish-button.html"
 <span bpdmTooltip="You need the Admin role to publish" tabindex="0" class="inline-flex">
   <button bpdmButton disabled class="pointer-events-none">Publish</button>
 </span>
@@ -257,29 +281,96 @@ In Angular, put the directive on a focusable wrapper and disable the child:
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The Tooltip carries **no built-in copy of its own** — the `content` is entirely
+author-supplied. So you localise a Tooltip by localising the `content` you pass
+into it; there is **no `messages` prop** to override (like the
+[Popover](/docs/overlay/popover), and unlike the [Dialog](/docs/overlay/dialog)
+or [Drawer](/docs/overlay/drawer)).
+
+Under `dir="rtl"` the Tooltip is **direction-aware** with no extra prop:
+`side="left"` / `side="right"` and the collision-flip side mirror automatically
+(React via Radix, Angular via the CDK overlay's directionality), and the bubble's
+padding and arrow stay symmetric. `side` remains a **physical** edge you choose
+explicitly.
+
+The example below simply passes a translated `content` string — confining the
+localised copy to your own content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip-i18n.tsx"
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+export function CopyButton() {
+  return (
+    // the tooltip text is your own content — pass a translated string
+    <Tooltip content="Adresse kopieren">
+      <Button variant="secondary" appearance="outline">Kopieren</Button>
+    </Tooltip>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="copy-button.ts"
+import { Component } from '@angular/core';
+import { BpdmTooltip, BpdmButton } from '@bpdm/ng';
+
+@Component({
+  selector: 'copy-button',
+  imports: [BpdmTooltip, BpdmButton],
+  // the tooltip text is your own content — pass a translated string
+  template: `<button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Adresse kopieren">Kopieren</button>`,
+})
+export class CopyButton {}
+```
+
+  </Tab>
+</Tabs>
+
+See the [Internationalization guide](/docs/getting-started/i18n) for the shared
+conventions.
+
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `content` | `ReactNode` | — | What the tooltip shows. Empty/nullish → no tooltip. Angular: `[bpdmTooltip]` (string or `TemplateRef`). |
-| `side` | `top \| right \| bottom \| left` | `top` | Edge it appears on. Angular: `bpdmTooltipSide`. |
+| `content` | `ReactNode` | — | What the tooltip shows. Empty/nullish → the child renders with no tooltip. Angular: `[bpdmTooltip]` (a string or a `TemplateRef` for rich content). |
+| `children` | `ReactNode` | — | **React** — the trigger (a single focusable element). Angular: the host element carrying `[bpdmTooltip]`. |
+| `side` | `top \| right \| bottom \| left` | `top` | Edge it appears on (collision-aware). Angular: `bpdmTooltipSide`. |
 | `align` | `start \| center \| end` | `center` | Alignment along the side. Angular: `bpdmTooltipAlign`. |
-| `delayDuration` | `number` | `200` | Delay before opening, in ms. |
-| `sideOffset` | `number` | `6` | Gap from the trigger, in px. |
-| `hideArrow` | `boolean` | `false` | Hide the little arrow. |
-| `disabled` | `boolean` | `false` | Turn the tooltip off (the trigger stays fully interactive). |
-| `open` / `defaultOpen` | `boolean` | — | Controlled / uncontrolled open. |
+| `delayDuration` | `number` | `200` | Delay before opening, in ms. Angular: `bpdmTooltipDelay`. |
+| `sideOffset` | `number` | `6` | Gap from the trigger, in px. Angular: `bpdmTooltipOffset`. |
+| `hideArrow` | `boolean` | `false` | Hide the little arrow. Angular: `bpdmTooltipHideArrow`. |
+| `disabled` | `boolean` | `false` | Turn the tooltip off (the *trigger* stays fully interactive; nothing appears on hover/focus). Angular: `bpdmTooltipDisabled`. |
+| `open` / `defaultOpen` | `boolean` | — | **React** — controlled / uncontrolled open. |
+| `onOpenChange` | `(open: boolean) => void` | — | **React** — fires when the open state changes. |
+| `className` | `string` | — | Extra classes on the tooltip bubble. Angular: `bpdmTooltipClass`. |
 
 Wrap the app in **`TooltipProvider`** (React) only to share one `delayDuration`
 across tooltips — a standalone `Tooltip` works without it.
 
 ## Accessibility
 
-- Built on Radix Tooltip — opens on **hover and keyboard focus**, closes on
-  blur / `Esc`, and is announced to screen readers.
-- It's for supplementary hints, not essential info or interactive content — for
-  that use a [Popover](/docs/overlay/popover).
-- On an icon-only trigger, still give the control its own `aria-label` (the
-  tooltip names it visually; the label names it for assistive tech).
-- For a disabled control, the trigger is wrapped in a focusable element so the
-  explanation remains reachable by keyboard.
+- Built on Radix Tooltip (React) / the CDK overlay (Angular) — the bubble is a
+  `role="tooltip"` and the trigger is wired to it via **`aria-describedby`**, so
+  assistive tech reads the hint as the trigger's description.
+- It opens on **hover *and* keyboard focus**, and dismisses on blur / `Esc` — so it's
+  fully keyboard-reachable, never hover-only.
+- The tooltip **supplements** the trigger's own accessible name, it doesn't replace
+  it: on an icon-only control keep its `aria-label` (the tooltip names it visually;
+  the label names it for assistive tech).
+- For a disabled control, the trigger is wrapped in a focusable element (React does
+  this automatically for a `disabled` child; in Angular put the directive on a
+  focusable wrapper) so the "why is this disabled?" explanation stays perceivable
+  and keyboard-reachable.
+- It's for **supplementary** hints — don't hide essential-only information or
+  interactive content behind hover. For that use a [Popover](/docs/overlay/popover).
+- Everything mirrors under `dir="rtl"` with no extra prop — the alignment and the
+  collision-flip side flip automatically.

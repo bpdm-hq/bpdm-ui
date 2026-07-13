@@ -630,11 +630,12 @@ el.querySelector('nav[aria-label="Pagination"]');      // the pagination landmar
   </Tab>
 </Tabs>
 
-### Pick List & Order List
+### Pick List
 
-Both are WAI-ARIA **`listbox`**es: each list is a `listbox` (named by its header),
-rows are `option`s exposing `aria-selected` (and `aria-disabled` when locked), and
-the move/transfer controls are labelled `button`s. Query by role — no test ids.
+The **Pick List** is two WAI-ARIA **`listbox`**es (source + target): each list is a
+`listbox` (named by its header), rows are `option`s exposing `aria-selected` (and
+`aria-disabled` when locked), and the transfer controls are labelled `button`s.
+Query by role — no test ids.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
@@ -674,6 +675,69 @@ fixture.detectChanges();
 el.querySelector<HTMLButtonElement>('button[aria-label="Move to target"]')!.click();
 fixture.detectChanges();
 // options carry aria-selected / aria-disabled for assertions
+```
+
+  </Tab>
+</Tabs>
+
+### Order List
+
+The **Order List** is a WAI-ARIA **`listbox`** (named by its `header`) of `option`
+rows exposing `aria-selected`, beside a `role="group"` of labelled reorder
+`button`s (**Move up / to top / down / to bottom**, or your `messages`). Query by
+role: select a row, move it with a control by its accessible name, then assert the
+new order (each move is also announced through a polite live region). No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="order-list.test.tsx"
+import { useState } from 'react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { OrderList } from '@bpdm/ui/order-list';
+
+function Pipeline() {
+  const [items, setItems] = useState(['Lint', 'Build', 'Deploy']);
+  return (
+    <OrderList value={items} onChange={setItems} itemKey={(s) => s} renderItem={(s) => s} header="Pipeline stages" />
+  );
+}
+
+render(<Pipeline />);
+
+// the list is a named listbox; rows are options
+const list = screen.getByRole('listbox', { name: 'Pipeline stages' });
+const order = () => within(list).getAllByRole('option').map((o) => o.textContent);
+expect(order()).toEqual(['Lint', 'Build', 'Deploy']);
+
+// select a row, then move it with the labelled control (default messages)
+await userEvent.click(screen.getByText('Deploy'));
+await userEvent.click(screen.getByRole('button', { name: 'Move to top' }));
+
+// the order updates (and the move is announced via the polite live region)
+expect(order()).toEqual(['Deploy', 'Lint', 'Build']);
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="order-list.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// the list is a listbox; rows are options
+const list = el.querySelector('[role="listbox"]') as HTMLElement;
+const order = () =>
+  Array.from(list.querySelectorAll('[role="option"]')).map((o) => o.textContent?.trim());
+expect(order()).toEqual(['Lint', 'Build', 'Deploy']);
+
+// select a row, then move it with the labelled control (default messages)
+const rows = list.querySelectorAll<HTMLElement>('[role="option"]');
+rows[2].click();
+fixture.detectChanges();
+el.querySelector<HTMLButtonElement>('button[aria-label="Move to top"]')!.click();
+fixture.detectChanges();
+expect(order()).toEqual(['Deploy', 'Lint', 'Build']);
 ```
 
   </Tab>
@@ -1483,6 +1547,76 @@ expect(panel.textContent).toContain('Signed in as Aria');
 document.querySelector<HTMLButtonElement>('[bpdmPopoverClose]')!.click();
 fixture.detectChanges();
 // after the close animation the overlay is torn down → no [role="dialog"]
+```
+
+  </Tab>
+</Tabs>
+
+### Tooltip
+
+The **Tooltip** shows its `content` on **hover and keyboard focus** in a
+`role="tooltip"` bubble, and wires the trigger to it via **`aria-describedby`** —
+so drive it by role: focus (or hover) the trigger, find the tooltip by role, assert
+its text and the trigger's `aria-describedby`, then `Esc` / blur to dismiss. No test
+ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tooltip.test.tsx"
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Tooltip } from '@bpdm/ui/tooltip';
+import { Button } from '@bpdm/ui/button';
+
+render(
+  <Tooltip content="Copy address">
+    <Button>Copy</Button>
+  </Tooltip>,
+);
+
+// nothing shown at rest
+const trigger = screen.getByRole('button', { name: 'Copy' });
+expect(screen.queryByRole('tooltip')).toBeNull();
+
+// it opens on keyboard focus (hover works too) — the bubble is a role="tooltip"
+await userEvent.tab();
+expect(trigger).toHaveFocus();
+const tip = await screen.findByRole('tooltip');
+expect(tip).toHaveTextContent('Copy address');
+
+// the trigger is described by the tooltip
+expect(trigger).toHaveAttribute('aria-describedby');
+
+// Esc (or blur) dismisses it
+await userEvent.keyboard('{Escape}');
+expect(screen.queryByRole('tooltip')).toBeNull();
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="tooltip.spec.ts"
+import { fakeAsync, tick } from '@angular/core/testing';
+
+// host template: <button bpdmButton bpdmTooltip="Copy address">Copy</button>
+// wrap the test body in fakeAsync(() => { … }) to advance the open delay
+const el = fixture.nativeElement as HTMLElement;
+const trigger = el.querySelector('button') as HTMLButtonElement;
+
+// nothing shown at rest — the bubble is portaled to the overlay container (document.body)
+expect(document.querySelector('[role="tooltip"]')).toBeNull();
+
+// focus (or mouseenter) opens it after the delay
+trigger.dispatchEvent(new Event('focusin'));
+tick(200); // default delayDuration
+fixture.detectChanges();
+
+const tip = document.querySelector('[role="tooltip"]') as HTMLElement;
+expect(tip.textContent).toContain('Copy address');
+
+// the trigger is described by the tooltip
+expect(trigger.getAttribute('aria-describedby')).toBe(tip.id);
 ```
 
   </Tab>
