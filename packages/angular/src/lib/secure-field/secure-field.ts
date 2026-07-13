@@ -157,7 +157,7 @@ export class BpdmSecureField {
   private timer: ReturnType<typeof setTimeout> | undefined;
 
   protected readonly btnClass =
-    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50";
+    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
 
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));

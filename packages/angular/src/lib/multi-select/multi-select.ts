@@ -74,7 +74,7 @@ let multiUid = 0;
           @for (o of chips(); track o.value) {
             <span class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
               <span class="truncate">{{ o.label }}</span>
-              <button type="button" [attr.aria-label]="t().remove(o.label)" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); toggle(o.value)" class="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+              <button type="button" [attr.aria-label]="t().remove(o.label)" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); toggle(o.value)" class="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
               </button>
             </span>
@@ -86,7 +86,7 @@ let multiUid = 0;
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selected().length > 0 && !disabled()) {
-          <button type="button" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+          <button type="button" [attr.aria-label]="t().clearAll" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -265,7 +265,7 @@ export class BpdmMultiSelect implements OnDestroy {
   protected boxClass(on: boolean): string {
     return cn(
       "grid size-4 shrink-0 place-items-center rounded-[4px] border transition-colors duration-[var(--bpdm-duration-fast)]",
-      on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/50",
+      on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground",
     );
   }
   protected optionClass(i: number): string {
@@ -365,6 +365,10 @@ export class BpdmMultiSelect implements OnDestroy {
     if (!this.open() && (e.key === "Enter" || e.key === " " || e.key === "ArrowDown")) {
       e.preventDefault();
       this.openPanel();
+    } else if ((e.key === "Backspace" || e.key === "Delete") && this.value().length > 0) {
+      // remove the last selected chip straight from the (focused) trigger
+      e.preventDefault();
+      this.value.set(this.value().slice(0, -1));
     }
   }
 

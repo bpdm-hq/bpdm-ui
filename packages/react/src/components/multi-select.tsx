@@ -242,9 +242,14 @@ export function MultiSelect({
           data-disabled={disabled ? "" : undefined}
           tabIndex={disabled ? -1 : 0}
           onKeyDown={(e) => {
-            if (!disabled && (e.key === "Enter" || e.key === " ")) {
+            if (disabled) return;
+            if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               setOpen((o) => !o);
+            } else if ((e.key === "Backspace" || e.key === "Delete") && selected.length > 0) {
+              // remove the last selected chip straight from the (focused) trigger
+              e.preventDefault();
+              setSelected(selected.slice(0, -1));
             }
           }}
           className={cn(triggerVariants({ size }), "group", className)}
@@ -265,13 +270,15 @@ export function MultiSelect({
                     <button
                       type="button"
                       aria-label={t.remove(o.label)}
-                      tabIndex={-1}
                       onPointerDown={(e) => e.stopPropagation()}
+                      // keep Enter/Space/Backspace on the chip's own button — don't
+                      // bubble to the trigger (which would toggle the panel / clear)
+                      onKeyDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggle(o.value);
                       }}
-                      className="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
+                      className="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <FieldClearX />
                     </button>
@@ -289,13 +296,15 @@ export function MultiSelect({
               <button
                 type="button"
                 aria-label={t.clearAll}
-                tabIndex={-1}
                 onPointerDown={(e) => e.stopPropagation()}
+                // keyboard-reachable (native button): Enter/Space activate it; stop
+                // the key from bubbling to the trigger's open/backspace handler
+                onKeyDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   clearAll();
                 }}
-                className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
+                className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <FieldClearX />
               </button>
@@ -342,7 +351,7 @@ export function MultiSelect({
                       "grid size-4 shrink-0 place-items-center rounded-[4px] border",
                       allSel || someSel
                         ? "border-primary bg-primary text-primary-foreground"
-                        : "border-muted-foreground/50",
+                        : "border-muted-foreground",
                     )}
                   >
                     {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
@@ -434,7 +443,7 @@ export function MultiSelect({
                           "grid size-4 shrink-0 place-items-center rounded-[4px] border transition-colors duration-[var(--bpdm-duration-fast)]",
                           isSelected
                             ? "border-primary bg-primary text-primary-foreground"
-                            : "border-muted-foreground/50",
+                            : "border-muted-foreground",
                         )}
                       >
                         {isSelected && <FieldCheck className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" />}

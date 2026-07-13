@@ -157,7 +157,8 @@ interface BodyRow<T> extends RenderRow<T> {
 
     @if (responsive() && isMobile()) {
       <!-- responsive card layout -->
-      <div class="space-y-3">
+      <div class="space-y-3" data-dt-cards>
+
         @if (rows.length === 0) {
           <div class="rounded-xl border border-border bg-card px-4 py-8 text-center text-muted-foreground">{{ emptyContent() }}</div>
         } @else {
@@ -171,7 +172,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 <div class="mb-3 flex items-center justify-between" (click)="$event.stopPropagation()">
                   @if (selectable()) {
                     @if (selectionMode() === "single") {
-                      <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
+                      <button type="button" role="radio" data-dt-radio [attr.tabindex]="radioTabbable(rr.key) ? 0 : -1" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" (keydown)="onRadioKey($event)" [class]="radioClass(selectedSet().has(rr.key))">
                         @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
                       </button>
                     } @else {
@@ -217,7 +218,10 @@ interface BodyRow<T> extends RenderRow<T> {
       <div [class]="frameClass()">
         <div
           #scrollEl
-          class="overflow-auto"
+          [class]="scrollWrapClass()"
+          [attr.role]="scrollableX() ? 'region' : null"
+          [attr.tabindex]="scrollableX() ? 0 : null"
+          [attr.aria-label]="scrollableX() ? (label() || 'Table') : null"
           [style.max-height]="scrollMaxHeight()"
           (scroll)="onScroll(scrollEl)"
         >
@@ -268,7 +272,7 @@ interface BodyRow<T> extends RenderRow<T> {
                   >
                     <div class="flex items-center gap-1">
                       @if (col.sortable) {
-                        <button type="button" (click)="handleSort(col.id, $event.shiftKey)" [class]="sortBtnClass(col)">
+                        <button type="button" (click)="handleSort(col.id, $event.shiftKey)" (keydown)="onHeaderKey($event, col.id)" [class]="sortBtnClass(col)">
                           <span>{{ col.header ?? col.id }}</span>
                           @let dir = dirOf(col.id);
                           @if (dir === null) {
@@ -293,8 +297,17 @@ interface BodyRow<T> extends RenderRow<T> {
                           (clear)="clearFilter(col.id)"
                         />
                       }
-                      @if (pinnable() && !col.disablePinning) {
-                        <bpdm-column-pin-menu [pin]="col.pin" [messages]="t()" (pinChange)="setPin(col.id, $event)" />
+                      @if ((pinnable() && !col.disablePinning) || reorderableColumns()) {
+                        <bpdm-column-pin-menu
+                          [pin]="col.pin"
+                          [messages]="t()"
+                          [showPin]="pinnable() && !col.disablePinning"
+                          [reorderable]="reorderableColumns()"
+                          [canMoveLeft]="canMoveColLeft(col.id)"
+                          [canMoveRight]="canMoveColRight(col.id)"
+                          (pinChange)="setPin(col.id, $event)"
+                          (move)="moveColumnKeyboard(col.id, $event)"
+                        />
                       }
                     </div>
                   </th>
@@ -322,15 +335,17 @@ interface BodyRow<T> extends RenderRow<T> {
                   >
                     @if (reorderableRows()) {
                       <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-e border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
-                        <div
+                        <button
+                          type="button"
                           draggable="true"
                           (dragstart)="dragRowKey.set(rr.key)"
                           (dragend)="dragRowKey.set(null); dropTarget.set(null)"
-                          [attr.aria-label]="t().dragToReorder"
-                          [class]="'grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing ' + (dragRowKey() === rr.key ? 'opacity-40' : '')"
+                          (keydown)="onGripKey($event, rr.key)"
+                          [attr.aria-label]="rowReorderLabel(rr)"
+                          [class]="'grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' + (dragRowKey() === rr.key ? 'opacity-40' : '')"
                         >
                           <svg viewBox="0 0 16 16" class="size-4" fill="none" aria-hidden="true"><path d="M5 4h.01M5 8h.01M5 12h.01M11 4h.01M11 8h.01M11 12h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-                        </div>
+                        </button>
                       </td>
                     }
                     @if (expandable()) {
@@ -346,7 +361,7 @@ interface BodyRow<T> extends RenderRow<T> {
                       <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null" (click)="$event.stopPropagation()">
                         <div class="flex justify-center">
                           @if (selectionMode() === "single") {
-                            <button type="button" role="radio" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" [class]="radioClass(selectedSet().has(rr.key))">
+                            <button type="button" role="radio" data-dt-radio [attr.tabindex]="radioTabbable(rr.key) ? 0 : -1" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" (keydown)="onRadioKey($event)" [class]="radioClass(selectedSet().has(rr.key))">
                               @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
                             </button>
                           } @else {
@@ -560,12 +575,29 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     const gl = this.getRowLabel();
     return gl ? `${this.t().selectRow}: ${gl(rr.row, rr.index)}` : this.t().selectRow;
   }
+  protected rowReorderLabel(rr: RenderRow<T>): string {
+    const gl = this.getRowLabel();
+    return gl ? `${this.t().reorder}: ${gl(rr.row, rr.index)}` : this.t().reorder;
+  }
+  protected scrollWrapClass(): string {
+    return cn(
+      "overflow-auto",
+      this.scrollableX() && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+    );
+  }
 
   /** aria-live announcement (sort changes + result-count changes). */
   protected readonly liveMessage = signal("");
 
   private readonly headRow = viewChild<ElementRef<HTMLTableRowElement>>("headRow");
+  private readonly scrollWrap = viewChild<ElementRef<HTMLElement>>("scrollEl");
   private readonly injector = inject(Injector);
+
+  // does the body overflow horizontally? → the scroll wrapper becomes a
+  // keyboard-focusable region (WCAG 2.1.1) so a wide table with no focusable
+  // cells can still be scrolled by keyboard.
+  protected readonly scrollableX = signal(false);
+  private scrollRo?: ResizeObserver;
 
   // --- mutable UI state (search + filters are controllable → server-side) ---
   private readonly internalQuery = signal("");
@@ -649,6 +681,24 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       );
     });
 
+    // horizontal-overflow detection for the scroll wrapper → keyboard region
+    effect(() => {
+      const el = this.scrollWrap()?.nativeElement;
+      // track layout-affecting signals so we re-measure when they change
+      this.orderedColumns(); this.pageRows(); this.size(); this.reorderableRows();
+      untracked(() => {
+        this.scrollRo?.disconnect();
+        this.scrollRo = undefined;
+        if (!el) { this.scrollableX.set(false); return; }
+        const measure = () => this.scrollableX.set(el.scrollWidth > el.clientWidth + 1);
+        measure();
+        // jsdom (unit tests) has no ResizeObserver — measure once and skip observing
+        if (typeof ResizeObserver === "undefined") return;
+        this.scrollRo = new ResizeObserver(measure);
+        this.scrollRo.observe(el);
+      });
+    });
+
     // announce sort changes to assistive tech
     let firstSort = true;
     let prevSort = new Map<string, SortDirection>();
@@ -701,6 +751,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   ngOnDestroy(): void {
     this.mq?.removeEventListener("change", this.mqHandler);
     this.ro?.disconnect();
+    this.scrollRo?.disconnect();
   }
 
   // ---- helpers exposed to the template ----
@@ -844,6 +895,26 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     this.dragRowKey.set(null);
     this.dropTarget.set(null);
   }
+  // keyboard alternative to dragging a row grip: Arrow / Alt+Arrow moves the row.
+  protected onGripKey(e: KeyboardEvent, key: Key): void {
+    if (e.key === "ArrowUp") { e.preventDefault(); this.moveRowKeyboard(key, -1); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); this.moveRowKeyboard(key, 1); }
+  }
+  private moveRowKeyboard(key: Key, dir: -1 | 1): void {
+    const rk = this.rowKey();
+    const data = this.data();
+    if (!rk) return;
+    const base = this.rowOrder().length ? this.rowOrder() : data.map((r) => rk(r, 0));
+    const from = base.indexOf(key);
+    const to = from + dir;
+    if (from === -1 || to < 0 || to >= base.length) return;
+    const next = [...base];
+    [next[from], next[to]] = [next[to], next[from]];
+    this.rowOrder.set(next);
+    const map = new Map(data.map((r) => [rk(r, 0), r]));
+    this.rowReorder.emit(next.map((k) => map.get(k)).filter((r): r is T => r !== undefined));
+    this.liveMessage.set(this.t().announceRowMove(to + 1, base.length));
+  }
 
   // ---- column reorder ----
   protected onColDrop(overId: string): void {
@@ -865,6 +936,37 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   protected resetColumns(): void {
     this.columnOrder.set([]);
     this.columnOrderChange.emit([]);
+  }
+  // keyboard alternative to dragging a column header (menu items + Alt+Arrow).
+  private reorderIndex(id: string): number {
+    return this.orderedBase().findIndex((c) => c.id === id);
+  }
+  protected canMoveColLeft(id: string): boolean {
+    return this.reorderableColumns() && this.reorderIndex(id) > 0;
+  }
+  protected canMoveColRight(id: string): boolean {
+    if (!this.reorderableColumns()) return false;
+    const i = this.reorderIndex(id);
+    return i >= 0 && i < this.orderedBase().length - 1;
+  }
+  protected onHeaderKey(e: KeyboardEvent, colId: string): void {
+    if (!this.reorderableColumns()) return;
+    if (e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault();
+      this.moveColumnKeyboard(colId, e.key === "ArrowLeft" ? -1 : 1);
+    }
+  }
+  protected moveColumnKeyboard(colId: string, dir: -1 | 1): void {
+    const base = this.columnOrder().length ? this.columnOrder() : this.columns().map((c) => c.id);
+    const from = base.indexOf(colId);
+    const to = from + dir;
+    if (from === -1 || to < 0 || to >= base.length) return;
+    const next = [...base];
+    [next[from], next[to]] = [next[to], next[from]];
+    this.columnOrder.set(next);
+    this.columnOrderChange.emit(next);
+    const label = this.colById().get(colId)?.header ?? colId;
+    this.liveMessage.set(this.t().announceColumnMove(label, to + 1, base.length));
   }
 
   // ---- filtering + search ----
@@ -1149,6 +1251,29 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
   protected toggleAll(): void {
     this.applySelection(this.allSelected() ? [] : this.allKeys());
+  }
+  // Single-select radios can't share one `radiogroup` container across table
+  // rows, so use the WAI-ARIA roving-tabindex radio pattern: exactly one radio
+  // is in the tab order (the selected row, else the first), and Arrow keys move
+  // focus + selection to the adjacent row's radio.
+  private readonly singleRadioTabKey = computed<Key | undefined>(() => {
+    if (!(this.selectable() && this.selectionMode() === "single")) return undefined;
+    const keys = this.allKeys();
+    const sel = this.selectedSet();
+    return keys.find((k) => sel.has(k)) ?? keys[0];
+  });
+  protected radioTabbable(key: Key): boolean {
+    return this.selectionMode() === "single" && key === this.singleRadioTabKey();
+  }
+  protected onRadioKey(e: KeyboardEvent): void {
+    if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key)) return;
+    e.preventDefault();
+    const dir = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1;
+    const cur = e.currentTarget as HTMLButtonElement;
+    const root = cur.closest("table") ?? cur.closest("[data-dt-cards]");
+    const radios = Array.from(root?.querySelectorAll<HTMLButtonElement>("[data-dt-radio]") ?? []);
+    const next = radios[radios.indexOf(cur) + dir];
+    if (next) { next.focus(); next.click(); }
   }
 
   // ---- expansion ----

@@ -80,4 +80,27 @@ describe("BpdmMultiSelect", () => {
     const all = document.querySelector('[role="checkbox"]') as HTMLElement;
     expect(all.getAttribute("aria-label")).toBe("Tout");
   });
+
+  it("makes clear-all keyboard-reachable and clears the selection", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const clear = fixture.nativeElement.querySelector(
+      'button[aria-label="Clear all"]',
+    ) as HTMLButtonElement;
+    expect(clear).toBeTruthy();
+    expect(clear.getAttribute("tabindex")).not.toBe("-1"); // no longer mouse-only
+    clear.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('button[aria-label^="Remove"]').length).toBe(0);
+  });
+
+  it("removes the last chip with Backspace on the focused trigger", () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace" }));
+    fixture.detectChanges();
+    expect(trigger.textContent).toContain("Apple");
+    expect(trigger.textContent).not.toContain("Banana");
+  });
 });

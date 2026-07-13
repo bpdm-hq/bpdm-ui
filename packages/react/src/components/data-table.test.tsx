@@ -197,4 +197,83 @@ describe("DataTable", () => {
     await userEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(firstCol(container)).toEqual(["Ava"]);
   });
+
+  // --- accessibility Batch C: reorder / selection / scroll keyboard paths ---
+
+  it("row drag grip is a focusable button that reorders via the keyboard", async () => {
+    const onRowReorder = vi.fn();
+    render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        rowKey={rowKey}
+        reorderableRows
+        getRowLabel={(r) => r.name}
+        onRowReorder={onRowReorder}
+      />,
+    );
+    const grip = screen.getByRole("button", { name: "Reorder: Milo" });
+    expect(grip.tagName).toBe("BUTTON");
+    grip.focus();
+    await userEvent.keyboard("{ArrowDown}"); // Milo moves down past Ava
+    expect(onRowReorder).toHaveBeenCalled();
+    const lastReorder = onRowReorder.mock.calls[onRowReorder.mock.calls.length - 1]![0] as Row[];
+    expect(lastReorder.map((r) => r.name)).toEqual(["Ava", "Milo", "Sara"]);
+    // the move is announced via the table's aria-live region
+    expect(screen.getByRole("status").textContent).toContain("position 2 of 3");
+  });
+
+  it("exposes keyboard column reordering via the column-options menu", async () => {
+    const onColumnOrderChange = vi.fn();
+    render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        rowKey={rowKey}
+        reorderableColumns
+        onColumnOrderChange={onColumnOrderChange}
+      />,
+    );
+    // the Name column (first) opens its options menu and moves right
+    const menus = screen.getAllByRole("button", { name: "Column options" });
+    await userEvent.click(menus[0]);
+    await userEvent.click(screen.getByRole("menuitem", { name: "Move column right" }));
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["tasks", "name"]);
+  });
+
+  it("marks the horizontal scroll area as a focusable region when it overflows", () => {
+    const sw = Object.getOwnPropertyDescriptor(Element.prototype, "scrollWidth");
+    const cw = Object.getOwnPropertyDescriptor(Element.prototype, "clientWidth");
+    Object.defineProperty(Element.prototype, "scrollWidth", { configurable: true, get: () => 800 });
+    Object.defineProperty(Element.prototype, "clientWidth", { configurable: true, get: () => 200 });
+    try {
+      render(<DataTable columns={COLUMNS} data={DATA} rowKey={rowKey} label="People" />);
+      const region = screen.getByRole("region", { name: "People" });
+      expect(region).toHaveAttribute("tabindex", "0");
+    } finally {
+      if (sw) Object.defineProperty(Element.prototype, "scrollWidth", sw);
+      if (cw) Object.defineProperty(Element.prototype, "clientWidth", cw);
+    }
+  });
+
+  it("uses a roving-tabindex radio group in single-select mode", async () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        rowKey={rowKey}
+        selectable
+        selectionMode="single"
+        getRowLabel={(r) => r.name}
+      />,
+    );
+    const radios = screen.getAllByRole("radio");
+    expect(radios).toHaveLength(3);
+    // exactly one radio is in the tab order (roving tabindex)
+    expect(radios.filter((r) => r.getAttribute("tabindex") === "0")).toHaveLength(1);
+    // arrow keys move focus + selection to the adjacent row's radio
+    radios[0].focus();
+    await userEvent.keyboard("{ArrowDown}");
+    expect(radios[1]).toHaveAttribute("aria-checked", "true");
+  });
 });

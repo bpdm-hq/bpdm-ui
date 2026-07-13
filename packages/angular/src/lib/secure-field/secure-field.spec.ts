@@ -61,4 +61,12 @@ describe("BpdmSecureField", () => {
     // a polite status region backs the copy button for screen-reader feedback
     expect(fixture.nativeElement.querySelector('[role="status"][aria-live="polite"]')).toBeTruthy();
   });
+
+  it("gives the reveal + copy buttons their own focus-visible ring", () => {
+    const fixture = TestBed.createComponent(PassthroughHost); // copyable + revealable
+    fixture.detectChanges();
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll("button")) as HTMLButtonElement[];
+    expect(buttons.length).toBeGreaterThan(0);
+    buttons.forEach((b) => expect(b.className).toContain("focus-visible:ring-2"));
+  });
 });

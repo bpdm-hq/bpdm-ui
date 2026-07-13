@@ -30,6 +30,21 @@ const PIN_ITEM =
     </button>
 
     <ng-template #panel>
+      @if (reorderable()) {
+        <button type="button" [class]="item" [disabled]="!canMoveLeft()" (click)="doMove(-1)">
+          <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+            <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          {{ messages().moveColumnLeft }}
+        </button>
+        <button type="button" [class]="item" [disabled]="!canMoveRight()" (click)="doMove(1)">
+          <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          {{ messages().moveColumnRight }}
+        </button>
+      }
+      @if (showPin()) {
       <button type="button" [class]="item" [disabled]="pin() === 'left'" (click)="choose('left')">
         <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
           <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -46,6 +61,7 @@ const PIN_ITEM =
         <span class="size-3.5"></span>
         {{ messages().unpin }}
       </button>
+      }
     </ng-template>
   `,
 })
@@ -54,12 +70,24 @@ export class BpdmColumnPinMenu {
   readonly pinChange = output<"left" | "right" | undefined>();
   /** Resolved i18n strings from the parent table. */
   readonly messages = input<DataTableMessages>(DEFAULT_DATA_TABLE_MESSAGES);
+  /** Show the pin / unpin items (only when the table is `pinnable`). */
+  readonly showPin = input(true);
+  /** Show the "Move column left/right" items (only when `reorderableColumns`). */
+  readonly reorderable = input(false);
+  readonly canMoveLeft = input(false);
+  readonly canMoveRight = input(false);
+  /** Keyboard column move: -1 = left, 1 = right. */
+  readonly move = output<-1 | 1>();
 
   protected readonly item = PIN_ITEM;
   protected readonly open = signal(false);
 
   protected choose(p: "left" | "right" | undefined): void {
     this.pinChange.emit(p);
+    this.open.set(false);
+  }
+  protected doMove(dir: -1 | 1): void {
+    this.move.emit(dir);
     this.open.set(false);
   }
 }

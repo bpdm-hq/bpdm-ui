@@ -69,7 +69,7 @@ let meterUid = 0;
           [attr.aria-pressed]="revealed()"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
-          class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none"
+          class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
         >
           <svg viewBox="0 0 20 20" fill="none" class="size-4" aria-hidden="true">
             <path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10Z" stroke="currentColor" stroke-width="1.5" />

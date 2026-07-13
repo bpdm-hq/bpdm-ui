@@ -97,6 +97,20 @@ describe("BpdmInputOtp", () => {
     expect(document.activeElement).toBe(inputs[1]); // visual-left advances in RTL
   });
 
+  it("lets the cell row wrap so it reflows on narrow viewports (1.4.10)", () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const group = fixture.nativeElement.querySelector('[role="group"]') as HTMLElement;
+    expect(group.classList.contains("flex-wrap")).toBe(true);
+  });
+
+  it("wraps the grouped row too", () => {
+    const fixture = TestBed.createComponent(GroupedHost);
+    fixture.detectChanges();
+    const group = fixture.nativeElement.querySelector('[role="group"]') as HTMLElement;
+    expect(group.classList.contains("flex-wrap")).toBe(true);
+  });
+
   it("fires (complete), forwards name via a hidden input, and links aria-describedby", () => {
     const fixture = TestBed.createComponent(CompleteHost);
     fixture.detectChanges();

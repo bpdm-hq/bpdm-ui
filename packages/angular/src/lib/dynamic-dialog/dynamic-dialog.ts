@@ -6,7 +6,7 @@ import {
   type Provider,
   TemplateRef,
 } from "@angular/core";
-import { Overlay } from "@angular/cdk/overlay";
+import { Overlay, OverlayContainer, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
 import { BpdmOverlayPanel } from "../overlay/overlay-panel";
@@ -72,11 +72,29 @@ export class BpdmDialogRef {
 @Injectable({ providedIn: "root" })
 export class BpdmDialogService {
   private readonly overlay = inject(Overlay);
+  private readonly overlayContainer = inject(OverlayContainer);
   private readonly injector = inject(Injector);
   private readonly t: DialogMessages = {
     ...DEFAULT_DIALOG_MESSAGES,
     ...(inject(BPDM_DYNAMIC_DIALOG_MESSAGES, { optional: true }) ?? {}),
   };
+
+  // Stacking a11y: with N simultaneous `aria-modal` panels, only the topmost may
+  // be perceivable/trappable — the app background and any lower panels are made
+  // `inert` + `aria-hidden` so a screen reader can't wander into them.
+  private readonly stack: OverlayRef[] = [];
+  private bgInerted: HTMLElement[] = [];
+
+  private setInert(el: Element | null | undefined, on: boolean): void {
+    if (!el) return;
+    if (on) {
+      el.setAttribute("inert", "");
+      el.setAttribute("aria-hidden", "true");
+    } else {
+      el.removeAttribute("inert");
+      el.removeAttribute("aria-hidden");
+    }
+  }
 
   open(content: TemplateRef<unknown>, options: DynamicDialogOptions = {}): BpdmDialogRef {
     const overlayRef = this.overlay.create({
@@ -85,6 +103,19 @@ export class BpdmDialogService {
       hasBackdrop: true,
       backdropClass: ["cdk-overlay-backdrop", "bpdm-dialog-backdrop"],
     });
+
+    // Only the topmost dialog stays perceivable: on the first dialog hide the
+    // whole app background from AT; on each further dialog inert the one beneath.
+    const container = this.overlayContainer.getContainerElement();
+    if (this.stack.length === 0) {
+      this.bgInerted = (Array.from(document.body.children) as HTMLElement[]).filter(
+        (el) => el !== container && !el.contains(container),
+      );
+      for (const el of this.bgInerted) this.setInert(el, true);
+    } else {
+      this.setInert(this.stack[this.stack.length - 1].overlayElement, true);
+    }
+    this.stack.push(overlayRef);
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const id = ++ddid;
@@ -113,6 +144,16 @@ export class BpdmDialogService {
       if (overlayRef.backdropElement) overlayRef.backdropElement.style.opacity = "0";
       setTimeout(() => {
         overlayRef.dispose();
+        // pop this dialog and restore whatever layer is now on top (un-inert the
+        // app background once the last dialog closes) before returning focus.
+        const idx = this.stack.indexOf(overlayRef);
+        if (idx !== -1) this.stack.splice(idx, 1);
+        if (this.stack.length === 0) {
+          for (const el of this.bgInerted) this.setInert(el, false);
+          this.bgInerted = [];
+        } else {
+          this.setInert(this.stack[this.stack.length - 1].overlayElement, false);
+        }
         previouslyFocused?.focus();
       }, 200);
     };

@@ -98,6 +98,8 @@ export interface DataTableMessages {
   reorder: string;
   dragToReorder: string;
   columnOptions: string;
+  moveColumnLeft: string;
+  moveColumnRight: string;
   pinLeft: string;
   pinRight: string;
   unpin: string;
@@ -131,6 +133,8 @@ export interface DataTableMessages {
   range: (from: number, to: number, total: number) => string;
   announceSort: (column: string, direction: "asc" | "desc" | "none") => string;
   announceResults: (count: number) => string;
+  announceRowMove: (position: number, total: number) => string;
+  announceColumnMove: (column: string, position: number, total: number) => string;
 }
 
 export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
@@ -147,6 +151,8 @@ export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
   reorder: "Reorder",
   dragToReorder: "Drag to reorder",
   columnOptions: "Column options",
+  moveColumnLeft: "Move column left",
+  moveColumnRight: "Move column right",
   pinLeft: "Pin left",
   pinRight: "Pin right",
   unpin: "Unpin",
@@ -183,6 +189,9 @@ export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
       ? `Cleared sort on ${column}`
       : `Sorted by ${column} ${direction === "asc" ? "ascending" : "descending"}`,
   announceResults: (count) => `${count} ${count === 1 ? "result" : "results"}`,
+  announceRowMove: (position, total) => `Row moved to position ${position} of ${total}`,
+  announceColumnMove: (column, position, total) =>
+    `Column ${column} moved to position ${position} of ${total}`,
 };
 
 /**
@@ -507,14 +516,28 @@ function PinArrow({ side }: { side: "left" | "right" }) {
 const pinMenuItem =
   "flex cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-4px)] px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-40";
 
-// per-column header menu: pin left / pin right / unpin (interactive freezing)
+// per-column header menu: keyboard column reorder (move left/right) + pin
+// left / pin right / unpin (interactive freezing). A keyboard-reachable
+// alternative to the header drag handles.
 function ColumnPinMenu({
   pin,
   onPin,
+  showPin = true,
+  reorderable = false,
+  canMoveLeft = false,
+  canMoveRight = false,
+  onMove,
   t,
 }: {
   pin?: "left" | "right";
   onPin: (p: "left" | "right" | undefined) => void;
+  /** Show the pin/unpin items (only when the table is `pinnable`). */
+  showPin?: boolean;
+  /** Show the "Move column left/right" items (only when `reorderableColumns`). */
+  reorderable?: boolean;
+  canMoveLeft?: boolean;
+  canMoveRight?: boolean;
+  onMove?: (dir: -1 | 1) => void;
   t: DataTableMessages;
 }) {
   return (
@@ -535,15 +558,29 @@ function ColumnPinMenu({
           sideOffset={4}
           className="z-50 min-w-[9rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md outline-none animate-[bpdm-pop-in_120ms_ease-out]"
         >
-          <DropdownMenu.Item className={pinMenuItem} disabled={pin === "left"} onSelect={() => onPin("left")}>
-            <PinArrow side="left" /> {t.pinLeft}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item className={pinMenuItem} disabled={pin === "right"} onSelect={() => onPin("right")}>
-            <PinArrow side="right" /> {t.pinRight}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item className={pinMenuItem} disabled={!pin} onSelect={() => onPin(undefined)}>
-            <span className="size-3.5" /> {t.unpin}
-          </DropdownMenu.Item>
+          {reorderable && (
+            <>
+              <DropdownMenu.Item className={pinMenuItem} disabled={!canMoveLeft} onSelect={() => onMove?.(-1)}>
+                <PinArrow side="left" /> {t.moveColumnLeft}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item className={pinMenuItem} disabled={!canMoveRight} onSelect={() => onMove?.(1)}>
+                <PinArrow side="right" /> {t.moveColumnRight}
+              </DropdownMenu.Item>
+            </>
+          )}
+          {showPin && (
+            <>
+              <DropdownMenu.Item className={pinMenuItem} disabled={pin === "left"} onSelect={() => onPin("left")}>
+                <PinArrow side="left" /> {t.pinLeft}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item className={pinMenuItem} disabled={pin === "right"} onSelect={() => onPin("right")}>
+                <PinArrow side="right" /> {t.pinRight}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item className={pinMenuItem} disabled={!pin} onSelect={() => onPin(undefined)}>
+                <span className="size-3.5" /> {t.unpin}
+              </DropdownMenu.Item>
+            </>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
@@ -877,23 +914,46 @@ function useMediaQuery(query: string, enabled: boolean) {
   return matches;
 }
 
-// Lightweight radio for single-select mode (no extra dependency).
+// Lightweight radio for single-select mode (no extra dependency). Implements
+// the WAI-ARIA radio pattern across rows via roving tabindex: exactly one radio
+// is in the tab order (`tabbable`), and Arrow keys move focus + selection to the
+// adjacent row's radio. (Table rows can't share one `radiogroup` container.)
 function RowRadio({
   checked,
   onSelect,
   label,
+  tabbable = true,
 }: {
   checked: boolean;
   onSelect: () => void;
   label: string;
+  /** Whether this radio is the group's single tab stop (roving tabindex). */
+  tabbable?: boolean;
 }) {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key)) return;
+    e.preventDefault();
+    const dir = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1;
+    const root = e.currentTarget.closest("table") ?? e.currentTarget.closest("[data-dt-cards]");
+    const radios = Array.from(
+      root?.querySelectorAll<HTMLButtonElement>("[data-dt-radio]") ?? [],
+    );
+    const next = radios[radios.indexOf(e.currentTarget) + dir];
+    if (next) {
+      next.focus();
+      next.click();
+    }
+  };
   return (
     <button
       type="button"
       role="radio"
       aria-checked={checked}
       aria-label={label}
+      data-dt-radio=""
+      tabIndex={tabbable ? 0 : -1}
       onClick={onSelect}
+      onKeyDown={onKeyDown}
       className={cn(
         "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         checked ? "border-primary" : "border-muted-foreground/60",
@@ -1133,6 +1193,8 @@ interface DataTableRowProps<T> {
   isDropAfter: boolean;
   isDragging: boolean;
   rowSelectLabel: string;
+  rowReorderLabel: string;
+  radioTabbable: boolean;
   columns: DataTableColumn<T>[];
   padCls: string;
   bordered: boolean;
@@ -1164,6 +1226,7 @@ interface DataTableRowProps<T> {
   renderExpanded?: (row: T, index: number) => React.ReactNode;
   onRowDragOver: (e: React.DragEvent, key: React.Key) => void;
   onRowDrop: () => void;
+  onRowMoveKeyboard: (key: React.Key, dir: -1 | 1) => void;
   setDragRowKey: (k: React.Key | null) => void;
   setDropTarget: (v: { key: React.Key; pos: "before" | "after" } | null) => void;
   t: DataTableMessages;
@@ -1181,6 +1244,8 @@ function DataTableRowInner<T>({
   isDropAfter,
   isDragging,
   rowSelectLabel,
+  rowReorderLabel,
+  radioTabbable,
   columns,
   padCls,
   bordered,
@@ -1212,6 +1277,7 @@ function DataTableRowInner<T>({
   renderExpanded,
   onRowDragOver,
   onRowDrop,
+  onRowMoveKeyboard,
   setDragRowKey,
   setDropTarget,
   t,
@@ -1265,21 +1331,32 @@ function DataTableRowInner<T>({
             className={cn(padCls, "w-[1%]", bordered && "border-e border-border", cellClassName)}
             onClick={(e) => e.stopPropagation()}
           >
-            <div
+            <button
+              type="button"
               draggable
               onDragStart={() => setDragRowKey(key)}
               onDragEnd={() => {
                 setDragRowKey(null);
                 setDropTarget(null);
               }}
-              aria-label={t.dragToReorder}
+              onKeyDown={(e) => {
+                // keyboard alternative to dragging: Arrow / Alt+Arrow moves the row
+                if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  onRowMoveKeyboard(key, -1);
+                } else if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  onRowMoveKeyboard(key, 1);
+                }
+              }}
+              aria-label={rowReorderLabel}
               className={cn(
-                "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing",
+                "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 isDragging && "opacity-40",
               )}
             >
               <GripGlyph />
-            </div>
+            </button>
           </td>
         )}
         {expandable && (
@@ -1341,6 +1418,7 @@ function DataTableRowInner<T>({
                   checked={selected}
                   onSelect={() => toggleRow(key)}
                   label={rowSelectLabel}
+                  tabbable={radioTabbable}
                 />
               ) : (
                 <Checkbox
@@ -1589,6 +1667,22 @@ export function DataTable<T>({
     setColumnOrder(next);
     l.onColumnOrderChange?.(next);
   }, []);
+  // keyboard alternative to dragging a column header: swap with the left/right
+  // neighbour and announce via the table's aria-live region.
+  const moveColumnKeyboard = React.useCallback((colId: string, dir: -1 | 1) => {
+    const l = latest.current;
+    const base = l.columnOrder.length ? l.columnOrder : l.columns.map((c) => c.id);
+    const from = base.indexOf(colId);
+    const to = from + dir;
+    if (from === -1 || to < 0 || to >= base.length) return;
+    const next = [...base];
+    [next[from], next[to]] = [next[to], next[from]];
+    setColumnOrder(next);
+    l.onColumnOrderChange?.(next);
+    const col = l.colById.get(colId);
+    const columnLabel = typeof col?.header === "string" ? col.header : colId;
+    setLiveMessage(l.t.announceColumnMove(columnLabel, to + 1, base.length));
+  }, []);
 
   const effectiveColumns = React.useMemo(
     () =>
@@ -1664,6 +1758,25 @@ export function DataTable<T>({
       const map = new Map(l.data.map((r) => [rk(r, 0), r]));
       l.onRowReorder(next.map((k) => map.get(k)).filter(Boolean) as T[]);
     }
+  }, []);
+  // keyboard alternative to dragging a row grip: swap with the row above/below
+  // and announce the new position via the table's aria-live region.
+  const moveRowKeyboard = React.useCallback((key: React.Key, dir: -1 | 1) => {
+    const l = latest.current;
+    const rk = l.rowKey;
+    if (!rk) return;
+    const base = l.rowOrder.length ? l.rowOrder : l.data.map((r) => rk(r, 0));
+    const from = base.indexOf(key);
+    const to = from + dir;
+    if (from === -1 || to < 0 || to >= base.length) return;
+    const next = [...base];
+    [next[from], next[to]] = [next[to], next[from]];
+    setRowOrder(next);
+    if (l.onRowReorder) {
+      const map = new Map(l.data.map((r) => [rk(r, 0), r]));
+      l.onRowReorder(next.map((k) => map.get(k)).filter(Boolean) as T[]);
+    }
+    setLiveMessage(l.t.announceRowMove(to + 1, base.length));
   }, []);
 
   // stable per-row drag handlers (read live drop state via the ref)
@@ -1855,6 +1968,10 @@ export function DataTable<T>({
 
   // scroll element (callback ref + state so the virtualizer re-measures on mount)
   const [scrollEl, setScrollEl] = React.useState<HTMLDivElement | null>(null);
+  // does the body overflow horizontally? → the scroll wrapper becomes a
+  // keyboard-focusable region so a wide table with no focusable cells can still
+  // be scrolled by keyboard (WCAG 2.1.1). Re-measured on resize.
+  const [scrollableX, setScrollableX] = React.useState(false);
   const rowEstimate = size === "sm" ? 38 : size === "lg" ? 54 : 45;
   const virtualizer = useVirtualizer({
     count: virtualized ? rows.length : 0,
@@ -1893,6 +2010,13 @@ export function DataTable<T>({
     : someSelected
       ? "indeterminate"
       : false;
+
+  // roving-tabindex anchor for single-select radios: the selected row on the
+  // current page, else the first row — so exactly one radio is in the tab order.
+  const singleRadioTabKey =
+    selectable && selectionMode === "single"
+      ? (selectionArr.find((k) => allKeys.includes(k)) ?? allKeys[0])
+      : undefined;
 
   const applySelection = React.useCallback((nextKeys: React.Key[]) => {
     const l = latest.current;
@@ -1965,6 +2089,17 @@ export function DataTable<T>({
       ].filter((c) => !(c.hideable !== false && hiddenIds.has(c.id))),
     [effectiveColumns, hiddenIds],
   );
+
+  React.useEffect(() => {
+    const el = scrollEl;
+    if (!el) return;
+    const measure = () => setScrollableX(el.scrollWidth > el.clientWidth + 1);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [scrollEl, orderedColumns, data]);
 
   const colCount =
     orderedColumns.length +
@@ -2223,7 +2358,8 @@ export function DataTable<T>({
         </div>
       )}
       {responsive && isMobile ? (
-        <div className="space-y-3">
+        <div className="space-y-3" data-dt-cards="">
+
           {rows.length === 0 ? (
             <div className="rounded-xl border border-border bg-card px-4 py-8 text-center text-muted-foreground">
               {emptyContent}
@@ -2258,7 +2394,7 @@ export function DataTable<T>({
                     >
                       {selectable ? (
                         selectionMode === "single" ? (
-                          <RowRadio checked={selected} onSelect={() => toggleRow(key)} label={rowSelectLabel} />
+                          <RowRadio checked={selected} onSelect={() => toggleRow(key)} label={rowSelectLabel} tabbable={key === singleRadioTabKey} />
                         ) : (
                           <Checkbox size="sm" aria-label={rowSelectLabel} checked={selected} onCheckedChange={() => toggleRow(key)} />
                         )
@@ -2327,7 +2463,13 @@ export function DataTable<T>({
       >
       <div
         ref={setScrollEl}
-        className="overflow-auto"
+        className={cn(
+          "overflow-auto",
+          scrollableX && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+        )}
+        role={scrollableX ? "region" : undefined}
+        aria-label={scrollableX ? (label ?? "Table") : undefined}
+        tabIndex={scrollableX ? 0 : undefined}
         style={
           virtualized
             ? { maxHeight: maxHeight ?? 440 }
@@ -2414,6 +2556,10 @@ export function DataTable<T>({
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
               const dir = entry?.dir ?? null;
+              // position within the drag-reorder order (pins aside) → move bounds
+              const reorderIdx = reorderableColumns
+                ? orderedBase.findIndex((c) => c.id === col.id)
+                : -1;
               const order = showSortOrder
                 ? sortState.findIndex((s) => s.id === col.id) + 1
                 : 0;
@@ -2479,6 +2625,17 @@ export function DataTable<T>({
                       <button
                         type="button"
                         onClick={(e) => handleSort(col.id, e.shiftKey)}
+                        onKeyDown={
+                          reorderableColumns
+                            ? (e) => {
+                                // keyboard alt to header drag: Alt+Arrow moves the column
+                                if (e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+                                  e.preventDefault();
+                                  moveColumnKeyboard(col.id, e.key === "ArrowLeft" ? -1 : 1);
+                                }
+                              }
+                            : undefined
+                        }
                         className={cn(
                           "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
                           justifyClass[align],
@@ -2520,8 +2677,17 @@ export function DataTable<T>({
                         t={t}
                       />
                     )}
-                    {pinnable && !col.disablePinning && (
-                      <ColumnPinMenu pin={col.pin} onPin={(p) => setPin(col.id, p)} t={t} />
+                    {((pinnable && !col.disablePinning) || reorderableColumns) && (
+                      <ColumnPinMenu
+                        pin={col.pin}
+                        onPin={(p) => setPin(col.id, p)}
+                        showPin={pinnable && !col.disablePinning}
+                        reorderable={reorderableColumns}
+                        canMoveLeft={reorderIdx > 0}
+                        canMoveRight={reorderIdx >= 0 && reorderIdx < orderedBase.length - 1}
+                        onMove={(dir) => moveColumnKeyboard(col.id, dir)}
+                        t={t}
+                      />
                     )}
                   </div>
                 </th>
@@ -2576,6 +2742,12 @@ export function DataTable<T>({
                       ? `${t.selectRow}: ${getRowLabel(row, rowIndex)}`
                       : t.selectRow
                   }
+                  rowReorderLabel={
+                    getRowLabel
+                      ? `${t.reorder}: ${getRowLabel(row, rowIndex)}`
+                      : t.reorder
+                  }
+                  radioTabbable={selectionMode === "single" && key === singleRadioTabKey}
                   columns={orderedColumns}
                   padCls={padCls}
                   bordered={bordered}
@@ -2611,6 +2783,7 @@ export function DataTable<T>({
                   renderExpanded={renderExpanded}
                   onRowDragOver={handleRowDragOver}
                   onRowDrop={handleRowDrop}
+                  onRowMoveKeyboard={moveRowKeyboard}
                   setDragRowKey={setDragRowKey}
                   setDropTarget={setDropTarget}
                   t={t}

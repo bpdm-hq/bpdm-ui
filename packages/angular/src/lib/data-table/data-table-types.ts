@@ -209,6 +209,10 @@ export interface DataTableMessages {
   dragToReorder: string;
   /** aria-label of the per-column options (pin) menu trigger. */
   columnOptions: string;
+  /** "Move column left" menu item (keyboard column reorder). */
+  moveColumnLeft: string;
+  /** "Move column right" menu item (keyboard column reorder). */
+  moveColumnRight: string;
   /** "Pin left" menu item. */
   pinLeft: string;
   /** "Pin right" menu item. */
@@ -265,6 +269,10 @@ export interface DataTableMessages {
   announceSort: (column: string, direction: "asc" | "desc" | "none") => string;
   /** aria-live announcement when the processed result count changes. */
   announceResults: (count: number) => string;
+  /** aria-live announcement after a keyboard row move. */
+  announceRowMove: (position: number, total: number) => string;
+  /** aria-live announcement after a keyboard column move. */
+  announceColumnMove: (column: string, position: number, total: number) => string;
 }
 
 export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
@@ -281,6 +289,8 @@ export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
   reorder: "Reorder",
   dragToReorder: "Drag to reorder",
   columnOptions: "Column options",
+  moveColumnLeft: "Move column left",
+  moveColumnRight: "Move column right",
   pinLeft: "Pin left",
   pinRight: "Pin right",
   unpin: "Unpin",
@@ -317,6 +327,9 @@ export const DEFAULT_DATA_TABLE_MESSAGES: DataTableMessages = {
       ? `Cleared sort on ${column}`
       : `Sorted by ${column} ${direction === "asc" ? "ascending" : "descending"}`,
   announceResults: (count) => `${count} result${count === 1 ? "" : "s"}`,
+  announceRowMove: (position, total) => `Row moved to position ${position} of ${total}`,
+  announceColumnMove: (column, position, total) =>
+    `Column ${column} moved to position ${position} of ${total}`,
 };
 
 // --- sorting helpers -------------------------------------------------------

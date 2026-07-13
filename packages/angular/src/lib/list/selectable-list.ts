@@ -4,6 +4,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  ElementRef,
+  inject,
   input,
   output,
   signal,
@@ -131,6 +134,20 @@ export class BpdmSelectableList<T = unknown> {
   // roving active option for the listbox keyboard pattern
   protected readonly activeKey = signal<ItemKey | null>(null);
   protected readonly focused = signal(false);
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  constructor() {
+    // keep the active option visible: with the aria-activedescendant pattern the
+    // browser does not auto-scroll (focus stays on the listbox), so a keyboard
+    // user could drive the active item off-screen in the scrollable body.
+    effect(() => {
+      const id = this.activeDescendant();
+      if (!id) return;
+      const el = this.host.nativeElement.querySelector<HTMLElement>(`[id="${id}"]`);
+      el?.scrollIntoView?.({ block: "nearest" });
+    });
+  }
 
   private readonly baseId = nextListId();
   protected optionId(k: ItemKey): string {

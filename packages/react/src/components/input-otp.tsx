@@ -219,7 +219,7 @@ export function InputOtp({
         id={id}
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
-        className={cn("flex items-center gap-2", className)}
+        className={cn("flex flex-wrap items-center gap-2", className)}
       >
         {cells.map((_, i) => renderCell(i, false, false))}
         {hiddenField}
@@ -236,7 +236,7 @@ export function InputOtp({
       id={id}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
-      className={cn("flex items-center gap-3", className)}
+      className={cn("flex flex-wrap items-center gap-3", className)}
     >
       {sizes.map((sz, g) => {
         const start = offset;

@@ -74,7 +74,7 @@ const BASE_CELL =
         [id]="id() || null"
         [attr.aria-label]="ariaLabel()"
         [attr.aria-describedby]="ariaDescribedby() || null"
-        class="flex items-center gap-3"
+        class="flex flex-wrap items-center gap-3"
       >
         @for (group of groups(); track groupIndex; let groupIndex = $index) {
           @if (groupIndex > 0) {
@@ -113,7 +113,7 @@ const BASE_CELL =
         [id]="id() || null"
         [attr.aria-label]="ariaLabel()"
         [attr.aria-describedby]="ariaDescribedby() || null"
-        class="flex items-center gap-2"
+        class="flex flex-wrap items-center gap-2"
       >
         @for (cell of groups()[0]; track cell.i) {
           <input

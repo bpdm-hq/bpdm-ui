@@ -137,22 +137,25 @@ export class BpdmStepper {
   }
 }
 
-/** Horizontal header row for the steps. */
+/**
+ * Horizontal header row for the steps. Process-steps pattern (not a tabset): a
+ * labelled `role="list"` of step buttons, the active one carrying
+ * `aria-current="step"`. Matches the real Tab-to-each-step behaviour (no roving
+ * tabindex / arrow keys), unlike the ARIA tablist contract.
+ */
 @Component({
   selector: "bpdm-step-list",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    role: "tablist",
+    role: "list",
     class: "flex items-center",
     "[attr.aria-label]": "ariaLabel()",
-    "[attr.aria-orientation]": "orientation()",
   },
   template: `<ng-content />`,
 })
 export class BpdmStepList {
   private readonly stepper = inject(BpdmStepper);
   protected readonly ariaLabel = computed(() => this.stepper.t().ariaLabel);
-  protected readonly orientation = computed(() => this.stepper.orientation());
 }
 
 /** Vertical wrapper around a `<bpdm-step>` + `<bpdm-step-panel>`; draws the rail. */
@@ -195,13 +198,14 @@ export class BpdmStepItem {
   imports: [NgTemplateOutlet],
   host: { class: "contents" },
   template: `
-    <div [class]="vertical() ? 'contents' : isLast() ? 'flex items-center' : 'flex flex-1 items-center'">
+    <div
+      [attr.role]="vertical() ? null : 'listitem'"
+      [class]="vertical() ? 'contents' : isLast() ? 'flex items-center' : 'flex flex-1 items-center'"
+    >
       <button
         type="button"
-        role="tab"
         [attr.id]="tabId()"
         [attr.aria-controls]="panelId()"
-        [attr.aria-selected]="active()"
         [attr.aria-current]="active() ? 'step' : null"
         [disabled]="disabled() || (!clickable() && !active())"
         (click)="onClick()"
@@ -295,7 +299,7 @@ export class BpdmStep {
     cn(
       "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       this.clickable() && !this.active() && "cursor-pointer",
-      // `!` beats the host app's global `[role=tab]{cursor:pointer}`
+      // `!` beats any host-app global that forces a pointer cursor on step buttons
       !this.clickable() && !this.active() && "cursor-not-allowed! opacity-60",
       this.disabled() && "cursor-not-allowed! opacity-50",
     ),
@@ -343,10 +347,11 @@ export class BpdmStepPanels {}
   // Both modes animate height via the grid 1fr↔0fr trick (no JS measuring).
   template: `
     <div
-      role="tabpanel"
+      role="region"
       [attr.id]="panelId()"
       [attr.aria-labelledby]="tabId()"
       [attr.aria-hidden]="!active()"
+      [attr.inert]="!active() ? '' : null"
       [class]="outerClass()"
     >
       <div class="overflow-hidden">

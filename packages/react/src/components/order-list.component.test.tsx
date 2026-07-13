@@ -170,4 +170,14 @@ describe("OrderList (component)", () => {
     setup({ header: undefined, ariaLabel: undefined, messages: { listLabel: "Étapes" } });
     expect(screen.getByRole("listbox", { name: "Étapes" })).toBeTruthy();
   });
+
+  it("scrolls the active option into view when the active key changes", async () => {
+    const spy = vi.spyOn(Element.prototype, "scrollIntoView");
+    setup();
+    const listbox = screen.getByRole("listbox");
+    act(() => listbox.focus()); // activates the first option → scrollIntoView
+    await userEvent.keyboard("{ArrowDown}"); // active moves → scrollIntoView again
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+  });
 });

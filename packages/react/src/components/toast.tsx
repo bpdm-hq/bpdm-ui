@@ -299,6 +299,9 @@ function ToastItem({
   return (
     <ToastPrimitive.Root
       data-bpdm-toast=""
+      // error → assertive live region (`foreground`); every other variant is
+      // polite (`background`) so it announces without stealing focus.
+      type={(record.variant ?? "default") === "error" ? "foreground" : "background"}
       duration={sticky ? Infinity : dur}
       onOpenChange={(open) => {
         if (!open) {

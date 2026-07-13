@@ -111,6 +111,17 @@ describe("InputOtp", () => {
     expect(cells()[0]).toHaveFocus();
   });
 
+  it("lets the cell row wrap so it reflows on narrow viewports (1.4.10)", () => {
+    render(<InputOtp aria-label="Code" />);
+    expect(screen.getByRole("group", { name: "Code" })).toHaveClass("flex-wrap");
+  });
+
+  it("wraps the grouped row too, keeping the separators", () => {
+    render(<InputOtp grouped aria-label="Code" />);
+    expect(screen.getByRole("group", { name: "Code" })).toHaveClass("flex-wrap");
+    expect(screen.getByText("−")).toBeInTheDocument();
+  });
+
   it("allows translating the group + per-cell labels for i18n", () => {
     render(
       <InputOtp length={4} aria-label="Code de vérification" cellLabel={(i, n) => `Chiffre ${i + 1}/${n}`} />,

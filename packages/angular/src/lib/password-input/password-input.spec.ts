@@ -79,4 +79,11 @@ describe("BpdmPasswordInput", () => {
     expect(describedBy.startsWith("hint ")).toBe(true);
     expect(describedBy).toContain(meter.id);
   });
+
+  it("gives the reveal toggle its own focus-visible ring", () => {
+    const fixture = TestBed.createComponent(WeakHost);
+    fixture.detectChanges();
+    const toggle = fixture.nativeElement.querySelector("button") as HTMLButtonElement;
+    expect(toggle.className).toContain("focus-visible:ring-2");
+  });
 });

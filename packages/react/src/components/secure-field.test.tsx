@@ -81,4 +81,10 @@ describe("SecureField", () => {
     expect(screen.getByRole("button", { name: "Révéler" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Copier" })).toBeInTheDocument();
   });
+
+  it("gives the reveal + copy buttons their own focus-visible ring", () => {
+    render(<SecureField data-testid="sf" copyable />);
+    expect(btn("Reveal").className).toMatch(/focus-visible:ring-2/);
+    expect(btn("Copy").className).toMatch(/focus-visible:ring-2/);
+  });
 });
