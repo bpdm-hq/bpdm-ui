@@ -17,6 +17,14 @@ import {
   type BadgeVariants,
 } from "@bpdm/variants";
 
+// --- i18n ---
+export interface BadgeMessages {
+  /** Remove (X) button aria-label. */
+  remove: string;
+}
+
+export const DEFAULT_BADGE_MESSAGES: BadgeMessages = { remove: "Remove" };
+
 /**
  * `<bpdm-badge>` — a compact status/label chip. Six variants × four appearances
  * (`soft`/`solid`/`outline`/`ghost`), an optional status `dot` (with a `pulse`
@@ -54,9 +62,9 @@ import {
         @if (removable()) {
           <button
             type="button"
-            aria-label="Remove"
+            [attr.aria-label]="t().remove"
             (click)="remove($event)"
-            class="-mr-1 ml-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <svg viewBox="0 0 16 16" fill="none" class="size-2.5" aria-hidden="true">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -80,10 +88,14 @@ export class BpdmBadge {
   /** Show a remove button; the badge collapses + fades, then emits `removed`. */
   readonly removable = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Override the translatable strings (currently just the remove button label). */
+  readonly messages = input<Partial<BadgeMessages>>({});
   /** Fired after the badge has collapsed away. */
   readonly removed = output<void>();
 
   protected readonly removing = signal(false);
+
+  protected readonly t = computed(() => ({ ...DEFAULT_BADGE_MESSAGES, ...this.messages() }));
 
   protected readonly dotColor = computed(() => badgeDot[this.variant()]);
 
@@ -140,12 +152,14 @@ export class BpdmBadge {
     <ng-content />
     @if (show()) {
       <span
-        class="pointer-events-none absolute z-10 -translate-y-1/2 translate-x-1/2"
-        [class]="dot() ? 'right-1 top-1' : 'right-0 top-0'"
+        class="pointer-events-none absolute z-10 -translate-y-1/2 translate-x-1/2 rtl:-translate-x-1/2"
+        [class]="dot() ? 'end-1 top-1' : 'end-0 top-0'"
       >
         <span
           class="flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
           [class]="indicatorClass()"
+          [attr.role]="ariaLabel() ? 'status' : null"
+          [attr.aria-label]="ariaLabel()"
         >{{ label() }}</span>
       </span>
     }
@@ -161,6 +175,12 @@ export class BpdmNotificationBadge {
   /** Still render when count is 0. */
   readonly showZero = input(false, { transform: booleanAttribute });
   readonly variant = input<BadgeVariant>("destructive");
+  /**
+   * Accessible name for the indicator (e.g. "5 unread messages"). When set, the
+   * count/dot span gets `role="status"` + `aria-label` so a screen reader
+   * announces it; when unset the indicator stays decorative.
+   */
+  readonly ariaLabel = input<string | undefined>();
 
   protected readonly show = computed(() => {
     if (this.dot()) return true;

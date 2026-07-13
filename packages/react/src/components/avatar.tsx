@@ -13,6 +13,24 @@ import { cn } from "@/lib/utils";
 
 export type { AvatarSize, AvatarShape, AvatarStatus };
 
+// --- i18n ---
+export interface AvatarMessages {
+  online: string;
+  offline: string;
+  busy: string;
+  away: string;
+  /** AvatarGroup overflow tile label. `{count}` is interpolated. */
+  more: string;
+}
+
+export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
+  online: "Online",
+  offline: "Offline",
+  busy: "Busy",
+  away: "Away",
+  more: "{count} more",
+};
+
 // local aliases so the component body below reads the same as before
 const SIZE = avatarSize;
 const STATUS_COLOR = avatarStatusColor;
@@ -34,6 +52,8 @@ export interface AvatarProps {
   colorful?: boolean;
   /** Draw a background-colored ring around the circle (used by AvatarGroup). */
   ring?: boolean;
+  /** Override the translatable strings (status dot labels). */
+  messages?: Partial<AvatarMessages>;
   className?: string;
 }
 
@@ -57,6 +77,7 @@ export const Avatar = React.forwardRef<
       status,
       colorful = true,
       ring = false,
+      messages,
       className,
     },
     ref,
@@ -66,6 +87,7 @@ export const Avatar = React.forwardRef<
       colorful && initials
         ? avatarTint(name ?? "")
         : "bg-muted text-muted-foreground";
+    const t = React.useMemo(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...messages }), [messages]);
 
     return (
       <AvatarPrimitive.Root
@@ -92,6 +114,10 @@ export const Avatar = React.forwardRef<
           )}
           <AvatarPrimitive.Fallback
             delayMs={src ? 300 : 0}
+            // when we fall back to initials/icon, name the avatar so a screen
+            // reader announces the full person name, not just the initials
+            role={name ? "img" : undefined}
+            aria-label={name || undefined}
             className={cn(
               "flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
               tint,
@@ -104,14 +130,15 @@ export const Avatar = React.forwardRef<
 
         {status && (
           <span
+            role="img"
             className={cn(
               "absolute z-10 rounded-full ring-2 ring-background",
               STATUS_COLOR[status],
-              // ~28% of the avatar, nudged onto the lower-right edge
+              // ~28% of the avatar, nudged onto the lower-inline-end edge
               "size-[28%] min-h-2 min-w-2",
-              shape === "circle" ? "bottom-[6%] right-[6%]" : "-bottom-0.5 -right-0.5",
+              shape === "circle" ? "bottom-[6%] end-[6%]" : "-bottom-0.5 -end-0.5",
             )}
-            aria-label={status}
+            aria-label={t[status]}
           />
         )}
       </AvatarPrimitive.Root>
@@ -140,6 +167,12 @@ export interface AvatarGroupProps {
   max?: number;
   /** Applied to every avatar (and the overflow tile). */
   size?: AvatarSize;
+  /**
+   * Override the translatable strings. Forwarded down to each child Avatar so a
+   * group-level `messages` localizes the children's status dots too (a child's
+   * own `messages` prop, if set, still wins).
+   */
+  messages?: Partial<AvatarMessages>;
   className?: string;
 }
 
@@ -147,29 +180,35 @@ export interface AvatarGroupProps {
  * Overlapping stack of avatars with a `+N` overflow tile. Each avatar lifts on
  * hover so the one under the cursor comes forward.
  */
-export function AvatarGroup({ children, max, size = "md", className }: AvatarGroupProps) {
+export function AvatarGroup({ children, max, size = "md", messages, className }: AvatarGroupProps) {
   const all = React.Children.toArray(children).filter(React.isValidElement);
   const shown = max ? all.slice(0, max) : all;
   const overflow = all.length - shown.length;
+  const t = React.useMemo(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...messages }), [messages]);
 
   return (
     <div className={cn("flex items-center", className)}>
-      {shown.map((child, i) =>
-        React.cloneElement(child as React.ReactElement<AvatarProps>, {
+      {shown.map((child, i) => {
+        const el = child as React.ReactElement<AvatarProps>;
+        return React.cloneElement(el, {
           key: i,
           size,
           ring: true,
+          // forward the group's messages; the child's own messages still wins
+          messages: { ...messages, ...el.props.messages },
           className: cn(
-            (child as React.ReactElement<AvatarProps>).props.className,
+            el.props.className,
             "transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
-            i > 0 && "-ml-2.5",
+            i > 0 && "-ms-2.5",
           ),
-        }),
-      )}
+        });
+      })}
       {overflow > 0 && (
         <span
+          role="img"
+          aria-label={t.more.replace("{count}", String(overflow))}
           className={cn(
-            "relative -ml-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
+            "relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
             SIZE[size],
           )}
         >

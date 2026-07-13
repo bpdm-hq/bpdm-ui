@@ -425,6 +425,18 @@ export function Badged() {
   </Tab>
   <Tab value="Angular">
 
+```ts title="avatar-badge.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatar, BpdmNotificationBadge } from '@bpdm/ng';
+
+@Component({
+  selector: 'badged',
+  imports: [BpdmAvatar, BpdmNotificationBadge],
+  templateUrl: './avatar-badge.html',
+})
+export class Badged {}
+```
+
 ```html title="avatar-badge.html"
 <bpdm-notification-badge [count]="4">
   <bpdm-avatar name="Aria Lindqvist" src="/aria.jpg" size="lg" />
@@ -435,6 +447,104 @@ export function Badged() {
 <bpdm-notification-badge dot variant="success">
   <bpdm-avatar name="Theo Brandt" size="lg" />
 </bpdm-notification-badge>
+```
+
+  </Tab>
+</Tabs>
+
+## Internationalization
+
+Almost everything the avatar shows is **author-supplied** — the `name` (which
+drives the initials and the alt text) and any `alt` you pass are your own content,
+so you translate them exactly like the rest of your app. The strings the component
+owns are the **presence-status labels** — the screen-reader name of the status dot
+(`online` / `offline` / `busy` / `away`) — and the AvatarGroup **overflow** label
+(`more`, with `{count}` interpolated for the `+N` tile). Set them via a single
+`messages` object; it's a `Partial<AvatarMessages>` merged over the English
+defaults, so override one key or several:
+
+- **`online` / `offline` / `busy` / `away`** — the status dot's accessible name per
+  presence value. Defaults `"Online"` / `"Offline"` / `"Busy"` / `"Away"`.
+- **`more`** — the AvatarGroup overflow tile's label. `{count}` is interpolated.
+  Default `"{count} more"`.
+
+- **React** — pass `messages` to `<Avatar messages={{ … }} />` and/or
+  `<AvatarGroup messages={{ … }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-avatar>` and/or `<bpdm-avatar-group>`.
+
+A `messages` object set on the **group** is forwarded to its child avatars, so you
+localise the status labels and the overflow label together in one place.
+
+The avatar mirrors under `dir="rtl"` with no extra prop — the presence dot moves to
+the inline-end bottom corner and the group stack overlaps in the reading direction.
+
+The example below localises only the built-in status / overflow strings to German
+via `messages` — the names stay your own content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-i18n.tsx"
+import { Avatar, AvatarGroup, type AvatarMessages } from '@bpdm/ui/avatar';
+
+// Only the built-in status + overflow strings are translated; names stay as-is.
+const messages: Partial<AvatarMessages> = {
+  online: 'Online',
+  offline: 'Offline',
+  busy: 'Beschäftigt',
+  away: 'Abwesend',
+  more: '{count} weitere',
+};
+
+export function Team() {
+  return (
+    <AvatarGroup max={4} messages={messages}>
+      <Avatar name="Aria Lindqvist" src="/aria.jpg" status="online" />
+      <Avatar name="Theo Brandt" status="busy" />
+      <Avatar name="Lena Cho" src="/lena.jpg" status="away" />
+      <Avatar name="Mateo Silva" status="offline" />
+      <Avatar name="Ines Vidal" />
+      <Avatar name="Sam Reyes" />
+    </AvatarGroup>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="team.ts"
+import { Component } from '@angular/core';
+import { BpdmAvatarGroup, type AvatarGroupUser, type AvatarMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'team',
+  imports: [BpdmAvatarGroup],
+  templateUrl: './team.html',
+})
+export class Team {
+  // Only the built-in status + overflow strings are translated; names stay as-is.
+  readonly messages: Partial<AvatarMessages> = {
+    online: 'Online',
+    offline: 'Offline',
+    busy: 'Beschäftigt',
+    away: 'Abwesend',
+    more: '{count} weitere',
+  };
+
+  readonly people: AvatarGroupUser[] = [
+    { name: 'Aria Lindqvist', src: '/aria.jpg', status: 'online' },
+    { name: 'Theo Brandt', status: 'busy' },
+    { name: 'Lena Cho', src: '/lena.jpg', status: 'away' },
+    { name: 'Mateo Silva', status: 'offline' },
+    { name: 'Ines Vidal' },
+    { name: 'Sam Reyes' },
+  ];
+}
+```
+
+```html title="team.html"
+<bpdm-avatar-group [users]="people" [max]="4" [messages]="messages" />
 ```
 
   </Tab>
@@ -452,16 +562,22 @@ export function Badged() {
 | `icon` | `ReactNode` | user glyph | **React only** — custom fallback when there's no image and no name. Angular shows the built-in user icon. |
 | `size` | `xs \| sm \| md \| lg \| xl \| 2xl` | `md` | Avatar size. |
 | `shape` | `circle \| square` | `circle` | Circle or rounded square. |
-| `status` | `online \| busy \| away \| offline` | — | Presence dot. |
+| `status` | `online \| busy \| away \| offline` | — | Presence dot; its screen-reader name comes from `messages`. |
 | `colorful` | `boolean` | `true` | Auto-tint initials from the name; `false` → neutral. |
+| `ring` | `boolean` | `false` | Draw a background-coloured ring around the avatar (used by `AvatarGroup`). Angular: `[ring]`. |
+| `messages` | `Partial<AvatarMessages>` | English | Override the translatable strings — the status dot labels (see below). Angular: `[messages]`. |
+| `className` | `string` | — | **React** — extra classes on the root. Angular: use `class`. |
 
 ### `AvatarGroup` / `<bpdm-avatar-group>`
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `max` | `number` | — | Show at most this many; the rest collapse into `+N`. |
+| `children` | `ReactNode` | — | **React** — the `<Avatar>` elements to stack. Angular uses `[users]` instead. |
+| `users` | `AvatarGroupUser[]` | — | **Angular** — `{ name?, src?, status? }[]` (React composes `<Avatar>` children instead). |
+| `max` | `number` | — | Show at most this many; the rest collapse into `+N`. Angular: `[max]`. |
 | `size` | `AvatarSize` | `md` | Applied to every avatar and the overflow tile. |
-| `users` | `AvatarGroupUser[]` | — | **Angular** — `{ name?, src?, status? }[]` (React composes `<Avatar>` children). |
+| `messages` | `Partial<AvatarMessages>` | English | Override the translatable strings — the `+N` overflow label + status dot labels; forwarded to child avatars (see below). Angular: `[messages]`. |
+| `className` | `string` | — | **React** — extra classes on the wrapper. Angular: use `class`. |
 
 ### `NotificationBadge` / `<bpdm-notification-badge>`
 
@@ -473,13 +589,41 @@ export function Badged() {
 | `showZero` | `boolean` | `false` | Render when `count` is 0. |
 | `variant` | `BadgeVariant` | `destructive` | Indicator colour. |
 
+### App-wide copy — `messages`
+
+Localise the built-in strings — the presence-status labels and the AvatarGroup
+overflow label — in one place (see [Internationalization](#internationalization)).
+It's a `Partial<AvatarMessages>` merged over the English defaults, so override one
+key or several. A `messages` set on the group is forwarded to its child avatars.
+
+- **React** — the `messages` prop on `<Avatar>` and/or `<AvatarGroup>`.
+- **Angular** — the `[messages]` input on `<bpdm-avatar>` and/or `<bpdm-avatar-group>`.
+
+| `AvatarMessages` key | Default | Description |
+| --- | --- | --- |
+| `online` | `Online` | Accessible name of the status dot when `status="online"`. |
+| `offline` | `Offline` | Accessible name of the status dot when `status="offline"`. |
+| `busy` | `Busy` | Accessible name of the status dot when `status="busy"`. |
+| `away` | `Away` | Accessible name of the status dot when `status="away"`. |
+| `more` | `{count} more` | AvatarGroup overflow tile label; `{count}` is interpolated. |
+
 ## Accessibility
 
-- The image uses `alt` (defaults to `name`); decorative initials/icon fallbacks
-  are not announced as images, so a missing image never produces a broken-image
-  read-out.
-- The presence dot carries an `aria-label` of its status (e.g. "online").
-- For an avatar that acts as a control (a menu trigger, a link), wrap it in a
-  `<button>` / `<a>` with an accessible name rather than relying on the image.
-- `NotificationBadge` overlays a count visually; convey the same information in
-  the trigger's accessible name (e.g. `aria-label="Messages, 4 unread"`).
+- The avatar shows an image described by `alt` (which defaults to `name`), falling
+  back to initials and then an icon — but when it falls back it still exposes the
+  person's `name` to screen readers, so the identity is never lost and a missing
+  image never produces a broken-image read-out.
+- The presence dot is exposed as an image (`role="img"`) with a **localised label**
+  from `messages` (default `"Online"` / `"Offline"` / `"Busy"` / `"Away"`), so
+  status is announced in words — never conveyed by colour alone.
+- The default user icon (shown when there's no image and no name) is decorative and
+  `aria-hidden`, so it isn't announced.
+- The AvatarGroup's overflow tile announces its count via `messages.more`
+  (default `"{count} more"`), so the hidden people are conveyed in text.
+- Everything mirrors under `dir="rtl"` — the presence dot moves to the inline-end
+  bottom corner and the group stack overlaps in the reading direction.
+- Avatars are **non-interactive** by default. For an avatar that acts as a control
+  (a menu trigger, a link), wrap it in a `<button>` / `<a>` with an accessible name
+  rather than relying on the image.
+- `NotificationBadge` overlays a count visually; convey the same information in the
+  trigger's accessible name (e.g. `aria-label="Messages, 4 unread"`).

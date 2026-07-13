@@ -13,6 +13,16 @@ import {
   type ProgressVariant,
 } from "@bpdm/variants";
 
+// --- i18n ---
+export interface ProgressMessages {
+  /** Accessible name fallback when no string `label` is given. */
+  label: string;
+  /** aria-valuetext while indeterminate (no known value). */
+  loading: string;
+}
+
+export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", loading: "Loading" };
+
 /**
  * `<bpdm-progress-bar>` — a process indicator: determinate (drive `value`, the
  * fill animates to its width) or `indeterminate` (an animated sweep). Five
@@ -33,11 +43,12 @@ import {
     }
     <div
       role="progressbar"
-      [attr.aria-label]="label() ?? 'Progress'"
+      [attr.aria-label]="label() ?? t().label"
       [attr.aria-valuemin]="0"
       [attr.aria-valuemax]="indeterminate() ? null : max()"
       [attr.aria-valuenow]="indeterminate() ? null : round(value())"
-      [attr.aria-valuetext]="indeterminate() ? 'Loading' : valueText()"
+      [attr.aria-valuetext]="indeterminate() ? t().loading : valueText()"
+      [attr.aria-busy]="indeterminate() ? true : null"
       class="relative w-full overflow-hidden rounded-full bg-muted"
       [class]="inside() ? 'h-5' : track()"
     >
@@ -49,7 +60,7 @@ import {
 
       @if (indeterminate()) {
         <span
-          class="absolute inset-y-0 left-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]"
+          class="absolute inset-y-0 start-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]"
           [class]="fill()"
         >
           <span aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></span>
@@ -63,7 +74,7 @@ import {
           <span aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></span>
           @if (inside() && pct() > 0) {
             <span
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-[0.7rem] font-semibold tabular-nums"
+              class="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center text-[0.7rem] font-semibold tabular-nums"
               [class]="fillFg()"
               [style.width.%]="(100 / pct()) * 100"
             >{{ valueText() }}</span>
@@ -90,7 +101,10 @@ export class BpdmProgressBar {
   readonly format = input<(value: number, max: number) => string>();
   /** Leading text shown opposite the value (e.g. "Uploading…"). */
   readonly label = input<string>();
+  /** Override the translatable strings (accessible name fallback + loading text). */
+  readonly messages = input<Partial<ProgressMessages>>({});
 
+  protected readonly t = computed(() => ({ ...DEFAULT_PROGRESS_MESSAGES, ...this.messages() }));
   protected readonly pct = computed(() =>
     this.indeterminate() ? 0 : Math.min(100, Math.max(0, (this.value() / this.max()) * 100)),
   );

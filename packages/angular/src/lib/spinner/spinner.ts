@@ -7,6 +7,14 @@ import {
 } from "@angular/core";
 import { cn, spinnerSize, type SpinnerSize, type SpinnerVariant } from "@bpdm/variants";
 
+// --- i18n ---
+export interface SpinnerMessages {
+  /** Visually-hidden accessible label announced to screen readers. */
+  loading: string;
+}
+
+export const DEFAULT_SPINNER_MESSAGES: SpinnerMessages = { loading: "Loading" };
+
 /**
  * `<bpdm-spinner>` — a loading indicator in six looks: `ring`, `gradient`,
  * `square`, `dots`, `bars`, `flip`. Inherits the current text color (set a
@@ -20,13 +28,13 @@ import { cn, spinnerSize, type SpinnerSize, type SpinnerVariant } from "@bpdm/va
   template: `
     @switch (variant()) {
       @case ("gradient") {
-        <span class="inline-block animate-spin rounded-full" [class]="s().ring" [style]="gradientStyle()"></span>
+        <span aria-hidden="true" class="inline-block animate-spin rounded-full" [class]="s().ring" [style]="gradientStyle()"></span>
       }
       @case ("square") {
-        <span class="inline-block animate-spin rounded-[28%]" [class]="s().ring" [style]="squareStyle()"></span>
+        <span aria-hidden="true" class="inline-block animate-spin rounded-[28%]" [class]="s().ring" [style]="squareStyle()"></span>
       }
       @case ("dots") {
-        <span class="inline-flex items-center" [class]="s().gap">
+        <span aria-hidden="true" class="inline-flex items-center" [class]="s().gap">
           @for (i of [0, 1, 2]; track i) {
             <span
               class="inline-block rounded-full bg-current animate-[bpdm-dot-bounce_1.1s_ease-in-out_infinite]"
@@ -37,7 +45,7 @@ import { cn, spinnerSize, type SpinnerSize, type SpinnerVariant } from "@bpdm/va
         </span>
       }
       @case ("bars") {
-        <span class="inline-flex items-end" [class]="s().gap">
+        <span aria-hidden="true" class="inline-flex items-end" [class]="s().gap">
           @for (i of [0, 1, 2, 3]; track i) {
             <span
               class="inline-block origin-bottom rounded-full bg-current animate-[bpdm-bar_1s_ease-in-out_infinite]"
@@ -49,26 +57,30 @@ import { cn, spinnerSize, type SpinnerSize, type SpinnerVariant } from "@bpdm/va
       }
       @case ("flip") {
         <span
+          aria-hidden="true"
           class="inline-block rounded-[32%] shadow-sm animate-[bpdm-flip_1.2s_ease-in-out_infinite]"
           [class]="s().ring"
           style="background: linear-gradient(135deg, currentColor, color-mix(in srgb, currentColor 45%, transparent))"
         ></span>
       }
       @default {
-        <span class="inline-block animate-spin rounded-full border-current/25 border-t-current" [class]="s().ring + ' ' + s().border"></span>
+        <span aria-hidden="true" class="inline-block animate-spin rounded-full border-current/25 border-t-current" [class]="s().ring + ' ' + s().border"></span>
       }
     }
-    <span class="sr-only">{{ label() }}</span>
+    <span class="sr-only">{{ label() || t().loading }}</span>
   `,
 })
 export class BpdmSpinner {
   readonly variant = input<SpinnerVariant>("ring");
   readonly size = input<SpinnerSize>("md");
-  /** Accessible label (visually hidden). */
-  readonly label = input("Loading");
+  /** Accessible label (visually hidden). Overrides `messages.loading`. */
+  readonly label = input<string>();
+  /** Override the translatable strings (currently just the loading label). */
+  readonly messages = input<Partial<SpinnerMessages>>({});
   /** Extra classes; `text-*` recolors the spinner (merged via tailwind-merge). */
   readonly classInput = input<string>("", { alias: "class" });
 
+  protected readonly t = computed(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...this.messages() }));
   protected readonly s = computed(() => spinnerSize[this.size()]);
   protected readonly hostClass = computed(() =>
     cn("inline-flex items-center justify-center text-primary", this.classInput()),
@@ -113,7 +125,7 @@ export class BpdmSpinner {
     "[class.hidden]": "!show()",
   },
   template: `
-    <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [label]="label() ?? 'Loading'" />
+    <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [label]="label() ?? t().loading" />
     @if (label()) {
       <p class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
     }
@@ -131,7 +143,10 @@ export class BpdmLoadingOverlay {
   readonly fullPage = input(false, { transform: booleanAttribute });
   /** Blur the content behind the overlay. */
   readonly blur = input(true, { transform: booleanAttribute });
+  /** Override the translatable strings (currently just the loading label). */
+  readonly messages = input<Partial<SpinnerMessages>>({});
 
+  protected readonly t = computed(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...this.messages() }));
   protected readonly spinnerSize = computed<SpinnerSize>(
     () => this.size() ?? (this.fullPage() ? "lg" : "md"),
   );

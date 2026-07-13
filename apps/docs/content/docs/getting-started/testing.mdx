@@ -1600,6 +1600,233 @@ expect(host.textContent).not.toContain('Invite sent');
   </Tab>
 </Tabs>
 
+### Avatar
+
+The **Avatar** falls back to initials from `name`, so assert the initials by text.
+The presence dot is an **image** (`role="img"`) whose accessible name is the
+localised status label (`messages`, default `"Online"` / `"Busy"` / …), so query it
+by role + name — never the colour. An **AvatarGroup** past its `max` renders a `+N`
+overflow tile whose text comes from `messages.more` (default `"{count} more"`), so
+assert that label. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
+
+render(<Avatar name="Aria Lindqvist" status="busy" />);
+
+// with no image the initials show as text
+screen.getByText('AL');
+
+// the status dot is an image with a localised accessible name (not colour-only)
+screen.getByRole('img', { name: 'Busy' });
+
+// a group past `max` collapses the rest into a "+N" tile (messages.more)
+render(
+  <AvatarGroup max={2}>
+    <Avatar name="Aria Lindqvist" />
+    <Avatar name="Theo Brandt" />
+    <Avatar name="Lena Cho" />
+    <Avatar name="Mateo Silva" />
+  </AvatarGroup>,
+);
+screen.getByText('+2'); // 4 avatars, 2 shown → "+2"
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar.spec.ts"
+const el = fixture.nativeElement as HTMLElement;
+
+// with no image the initials show as text
+expect(el.textContent).toContain('AL');
+
+// the status dot is an image with a localised accessible name (not colour-only)
+const dot = el.querySelector('[role="img"]') as HTMLElement;
+expect(dot.getAttribute('aria-label')).toBe('Busy');
+
+// a <bpdm-avatar-group [users]="people" [max]="2" /> past its max renders a "+N" tile
+// expect(el.textContent).toContain('+2'); // 4 users, 2 shown → "+2" (messages.more)
+```
+
+  </Tab>
+</Tabs>
+
+### Badge
+
+The **Badge** is a simple `<span>` label, so assert its text directly; in React
+extra props (`data-testid`, `id`, `aria-*`) spread onto it. A **removable** badge
+adds a labelled remove `button` (`Remove`, or your `messages.remove`) that fires
+`onRemove` / `(removed)` once the collapse transition ends — so click it and, in
+React, dispatch a `transitionend` (`propertyName: 'grid-template-columns'`) to
+complete it. `NotificationBadge` renders its `count` as text (capped as `99+`), so
+assert that text. No test ids needed.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="badge.test.tsx"
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Badge, NotificationBadge } from '@bpdm/ui/badge';
+
+const onRemove = jest.fn();
+
+const { container } = render(
+  <Badge variant="neutral" onRemove={onRemove}>
+    Design
+  </Badge>,
+);
+
+// the label is plain text
+screen.getByText('Design');
+
+// the remove button is labelled (messages.remove, default "Remove")
+await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+// onRemove fires after the collapse transition ends
+fireEvent.transitionEnd(container.firstChild as Element, { propertyName: 'grid-template-columns' });
+expect(onRemove).toHaveBeenCalledTimes(1);
+
+// NotificationBadge renders the count as text, capped by max ("99+")
+render(<NotificationBadge count={5}><span>Inbox</span></NotificationBadge>);
+screen.getByText('5');
+render(<NotificationBadge count={128} max={99}><span>Inbox</span></NotificationBadge>);
+screen.getByText('99+');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="badge.spec.ts"
+const host = fixture.nativeElement as HTMLElement; // <bpdm-badge removable>
+
+// the label is plain text
+expect(host.textContent).toContain('Design');
+
+// the remove button is labelled (messages.remove, default "Remove")
+host.querySelector<HTMLButtonElement>('button[aria-label="Remove"]')!.click();
+fixture.detectChanges();
+
+// (removed) emits after the collapse transition ends
+host.dispatchEvent(Object.assign(new Event('transitionend'), { propertyName: 'grid-template-columns' }));
+fixture.detectChanges();
+// assert your (removed) handler ran, e.g. expect(component.onRemoved).toHaveBeenCalled();
+
+// a <bpdm-notification-badge [count]="5"> renders the count as text ("99+" over max)
+// expect(host.textContent).toContain('5');
+```
+
+  </Tab>
+</Tabs>
+
+### Progress
+
+The **Progress** bar is a `role="progressbar"`. A **determinate** bar carries
+`aria-valuenow` (plus `aria-valuemin` / `aria-valuemax`) and an `aria-valuetext`
+reflecting the formatted value; an **indeterminate** one drops `aria-valuenow`, sets
+`aria-busy="true"`, and announces its `Loading` valuetext (`messages.loading`). Query
+by role and assert those attributes — never the fill colour. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { ProgressBar } from '@bpdm/ui/progress';
+
+// determinate — exposes the exact value
+const { unmount } = render(<ProgressBar value={50} />);
+const bar = screen.getByRole('progressbar');
+expect(bar).toHaveAttribute('aria-valuenow', '50');
+expect(bar).toHaveAttribute('aria-valuetext', '50%');
+unmount();
+
+// indeterminate — no value, but announces busy + the loading text
+render(<ProgressBar indeterminate />);
+const busy = screen.getByRole('progressbar');
+expect(busy).not.toHaveAttribute('aria-valuenow');
+expect(busy).toHaveAttribute('aria-busy', 'true');
+expect(busy).toHaveAttribute('aria-valuetext', 'Loading');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="progress.spec.ts"
+const el = fixture.nativeElement as HTMLElement; // <bpdm-progress-bar [value]="50" />
+
+// determinate — exposes the exact value
+const bar = el.querySelector('[role="progressbar"]') as HTMLElement;
+expect(bar.getAttribute('aria-valuenow')).toBe('50');
+expect(bar.getAttribute('aria-valuetext')).toBe('50%');
+
+// indeterminate ([indeterminate]="true") drops the value, sets aria-busy,
+// and announces the loading text:
+// expect(bar.hasAttribute('aria-valuenow')).toBe(false);
+// expect(bar.getAttribute('aria-busy')).toBe('true');
+// expect(bar.getAttribute('aria-valuetext')).toBe('Loading');
+```
+
+  </Tab>
+</Tabs>
+
+### Spinner
+
+The **Spinner** is a `role="status"` live region whose accessible name is a
+visually-hidden label (the per-instance `label`, else `messages.loading`, default
+`"Loading"`) — so query it by role and assert that text, never the animation. The
+**LoadingOverlay** adds `aria-busy="true"` and renders its `label` as a visible
+message. No test ids.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner.test.tsx"
+import { render, screen } from '@testing-library/react';
+import { Spinner, LoadingOverlay } from '@bpdm/ui/spinner';
+
+// the spinner is a status live region named by its hidden label
+const { unmount } = render(<Spinner />);
+const status = screen.getByRole('status');
+expect(status).toHaveTextContent('Loading'); // default label
+unmount();
+
+// a per-instance label sets the accessible name
+render(<Spinner label="Loading results" />);
+expect(screen.getByRole('status')).toHaveTextContent('Loading results');
+
+// the overlay announces busy and shows its visible message
+render(<LoadingOverlay show label="Saving…" />);
+const overlay = screen.getByRole('status', { name: /Saving/ });
+expect(overlay).toHaveAttribute('aria-busy', 'true');
+expect(overlay).toHaveTextContent('Saving…');
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="spinner.spec.ts"
+const el = fixture.nativeElement as HTMLElement; // <bpdm-spinner> / <bpdm-loading-overlay>
+
+// the spinner is a status live region named by its hidden label
+const status = el.querySelector('[role="status"]') as HTMLElement;
+expect(status.textContent).toContain('Loading'); // default label (or your [label])
+
+// the overlay announces busy and shows its visible [label] message
+// <bpdm-loading-overlay [show]="true" label="Saving…" />
+const overlay = el.querySelector('bpdm-loading-overlay') as HTMLElement;
+expect(overlay.getAttribute('aria-busy')).toBe('true');
+expect(overlay.textContent).toContain('Saving…');
+```
+
+  </Tab>
+</Tabs>
+
 <Callout type="info">
   Querying by **role** and **text** (Testing Library's recommendation) is the most
   robust approach — it works across every component (simple or composed) and

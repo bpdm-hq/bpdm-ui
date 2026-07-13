@@ -10,6 +10,16 @@ import { cn } from "@/lib/utils";
 
 export type { ProgressVariant, ProgressSize };
 
+// --- i18n ---
+export interface ProgressMessages {
+  /** Accessible name fallback when no string `label` is given. */
+  label: string;
+  /** aria-valuetext while indeterminate (no known value). */
+  loading: string;
+}
+
+export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", loading: "Loading" };
+
 export interface ProgressBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   /** Current value (ignored when `indeterminate`). */
   value?: number;
@@ -27,6 +37,8 @@ export interface ProgressBarProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   format?: (value: number, max: number) => React.ReactNode;
   /** Leading text shown opposite the value (e.g. "Uploading…"). */
   label?: React.ReactNode;
+  /** Override the translatable strings (accessible name fallback + loading text). */
+  messages?: Partial<ProgressMessages>;
 }
 
 /**
@@ -46,11 +58,13 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
       valuePosition = "outside",
       format,
       label,
+      messages,
       className,
       ...props
     },
     ref,
   ) => {
+    const t = React.useMemo(() => ({ ...DEFAULT_PROGRESS_MESSAGES, ...messages }), [messages]);
     const pct = indeterminate ? 0 : Math.min(100, Math.max(0, (value / max) * 100));
     const inside = valuePosition === "inside" && !indeterminate;
     const hasHeader = !indeterminate && !inside && (showValue || !!format || !!label);
@@ -66,11 +80,12 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
         )}
         <div
           role="progressbar"
-          aria-label={typeof label === "string" ? label : "Progress"}
+          aria-label={typeof label === "string" ? label : t.label}
           aria-valuemin={0}
           aria-valuemax={indeterminate ? undefined : max}
           aria-valuenow={indeterminate ? undefined : Math.round(value)}
-          aria-valuetext={indeterminate ? "Loading" : (typeof valueText === "string" ? valueText : `${Math.round(pct)}%`)}
+          aria-valuetext={indeterminate ? t.loading : (typeof valueText === "string" ? valueText : `${Math.round(pct)}%`)}
+          aria-busy={indeterminate ? true : undefined}
           className={cn(
             "relative w-full overflow-hidden rounded-full bg-muted",
             inside ? "h-5" : progressTrack[size],
@@ -86,7 +101,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
           {indeterminate ? (
             <span
               className={cn(
-                "absolute inset-y-0 left-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]",
+                "absolute inset-y-0 start-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]",
                 progressFill[variant],
               )}
             >
@@ -107,7 +122,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
               {inside && pct > 0 && (
                 <span
                   className={cn(
-                    "pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-[0.7rem] font-semibold tabular-nums",
+                    "pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center text-[0.7rem] font-semibold tabular-nums",
                     progressFillFg[variant],
                   )}
                   style={{ width: `${(100 / pct) * 100}%` }}

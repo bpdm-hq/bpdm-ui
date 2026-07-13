@@ -496,28 +496,146 @@ export class UploadCard {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The **value and label text is author-supplied** — you set the leading `label`, and
+for the value you take the default percentage or supply your own `format` — so you
+localise it in your own app exactly like the rest of the content you pass in. A
+determinate bar's `aria-valuetext` follows your `format`, so to localise the
+**announced** value, localise `format` (e.g. with `Intl.NumberFormat`).
+
+The two strings the component owns are set via a single `messages` object — a
+`Partial<ProgressMessages>` merged over the English defaults, so override one key or
+both:
+
+- **`label`** — the fallback **accessible name**, used only when you don't pass a
+  string `label`. Default `"Progress"`.
+- **`loading`** — the `aria-valuetext` announced while `indeterminate` (no known
+  value). Default `"Loading"`.
+
+- **React** — pass `messages` to `<ProgressBar messages={{ … }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-progress-bar>`.
+
+The bar mirrors under `dir="rtl"` with no extra prop — the fill grows from the
+inline-start, the indeterminate sweep and the inside-value follow the writing
+direction, and the label/value header flips automatically.
+
+The example below localises the built-in strings to German via `messages` (the
+fallback name and the loading text) and localises the announced value through
+`format` with `Intl.NumberFormat` — any visible copy you pass stays in your app's
+own content:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="progress-i18n.tsx"
+import { ProgressBar, type ProgressMessages } from '@bpdm/ui/progress';
+
+// Only the built-in strings are translated.
+const messages: Partial<ProgressMessages> = {
+  label: 'Fortschritt',
+  loading: 'Wird geladen',
+};
+
+// Localise the announced value by localising `format`.
+const percent = new Intl.NumberFormat('de-DE', { style: 'percent' });
+
+export function UploadProgress() {
+  return (
+    <ProgressBar
+      value={72}
+      showValue
+      messages={messages}
+      format={(v, max) => percent.format(v / max)}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="progress-i18n.ts"
+import { Component } from '@angular/core';
+import { BpdmProgressBar, type ProgressMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'upload-progress',
+  imports: [BpdmProgressBar],
+  templateUrl: './progress-i18n.html',
+})
+export class UploadProgress {
+  // Only the built-in strings are translated.
+  readonly messages: Partial<ProgressMessages> = {
+    label: 'Fortschritt',
+    loading: 'Wird geladen',
+  };
+
+  // Localise the announced value by localising `format`.
+  private readonly percent = new Intl.NumberFormat('de-DE', { style: 'percent' });
+  readonly percentFormat = (v: number, max: number) => this.percent.format(v / max);
+}
+```
+
+```html title="progress-i18n.html"
+<bpdm-progress-bar [value]="72" showValue [messages]="messages" [format]="percentFormat" />
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `number` | `0` | Current value (ignored when `indeterminate`). |
-| `max` | `number` | `100` | Maximum value. |
-| `indeterminate` | `boolean` | `false` | Animated sweep when there's no known total. |
-| `size` | `sm \| md \| lg` | `md` | Track height. |
-| `variant` | `primary \| success \| warning \| destructive \| info` | `primary` | Fill colour. |
-| `showValue` | `boolean` | `false` | Show the value (defaults to the percentage). |
-| `valuePosition` | `outside \| inside` | `outside` | Value in a row above, or inside the bar. |
-| `format` | `(value, max) => ReactNode` | — | Custom value label. Implies `showValue`. |
-| `label` | `ReactNode` | — | Leading text shown opposite the value. |
+| `value` | `number` | `0` | Current value (ignored when `indeterminate`). Angular: `[value]`. |
+| `max` | `number` | `100` | Maximum value. Angular: `[max]`. |
+| `indeterminate` | `boolean` | `false` | Animated sweep when there's no known total. Angular: `[indeterminate]`. |
+| `size` | `sm \| md \| lg` | `md` | Track height. Angular: `[size]`. |
+| `variant` | `primary \| success \| warning \| destructive \| info` | `primary` | Fill colour. Angular: `[variant]`. |
+| `showValue` | `boolean` | `false` | Show the value (defaults to the percentage). Angular: `showValue`. |
+| `valuePosition` | `outside \| inside` | `outside` | Value in a row above, or inside the bar. Angular: `[valuePosition]`. |
+| `format` | `(value, max) => ReactNode` | — | Custom value label. Implies `showValue`. Angular: a `(value, max) => string` **function input**, `[format]`. |
+| `label` | `ReactNode` (Angular: `string`) | — | Leading text shown opposite the value; a string `label` is also the accessible name. Angular: `[label]`. |
+| `className` | `string` | — | **React** — extra classes on the root element. |
+| `messages` | `Partial<ProgressMessages>` | English | Override the translatable strings — the fallback accessible name + the indeterminate loading text (see below). Angular: `[messages]`. |
 
-In Angular, every prop above is an `@Input` on `<bpdm-progress-bar>` (`format` is
-a function input, `label` is a `string`).
+In Angular, every prop above is an `@Input` on `<bpdm-progress-bar>`: `format` is a
+**function input** (define the function on the component and bind `[format]`) and
+`label` is a `string`. In React all other native `<div>` attributes are forwarded
+onto the root element.
+
+### App-wide copy — `messages`
+
+Localise the two built-in strings — the fallback accessible name and the
+indeterminate loading text — in one place (see
+[Internationalization](#internationalization)). It's a `Partial<ProgressMessages>`
+merged over the English defaults — override one key or both.
+
+- **React** — the `messages` prop on `<ProgressBar>`.
+- **Angular** — the `[messages]` input on `<bpdm-progress-bar>`.
+
+| `ProgressMessages` key | Default | Description |
+| --- | --- | --- |
+| `label` | `Progress` | Fallback accessible name, used only when no string `label` is given. |
+| `loading` | `Loading` | `aria-valuetext` announced while `indeterminate`. |
 
 ## Accessibility
 
-- Renders `role="progressbar"` with `aria-valuemin`, `aria-valuemax`,
-  `aria-valuenow`, and `aria-valuetext`, so assistive tech announces progress.
-- When `indeterminate`, `aria-valuenow`/`aria-valuemax` are omitted and
-  `aria-valuetext` reads "Loading".
-- Pass a `label` (or wrap with your own labelled text) to name what's loading;
-  it's used as the bar's `aria-label`.
+- The bar is a `role="progressbar"` carrying `aria-valuemin`, `aria-valuemax`, and
+  `aria-valuenow`, plus an `aria-valuetext` that reflects the **formatted** value —
+  so assistive tech announces the same readout your users see.
+- A **determinate** bar exposes its exact value; an **indeterminate** one omits
+  `aria-valuenow` / `aria-valuemax`, sets `aria-busy`, and announces
+  `messages.loading` (default `"Loading"`), so a screen reader knows work is ongoing
+  without a number.
+- Give the bar a name: pass a string `label` (e.g. "Uploading…"), or rely on the
+  `messages.label` fallback (default `"Progress"`) when you don't — either becomes the
+  bar's accessible name.
+- Progress is conveyed as **text**, never by colour alone — the `variant` fill and the
+  soft top gloss are decorative (`aria-hidden`), so the value reads clearly for
+  everyone.
+- Everything mirrors under `dir="rtl"` — the fill grows from the inline-start and the
+  indeterminate sweep + inside-value follow the writing direction; the value stays
+  translatable through `format` and the fallback name / loading text through
+  `messages`.

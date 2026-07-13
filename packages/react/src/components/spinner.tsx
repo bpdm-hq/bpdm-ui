@@ -4,11 +4,21 @@ import { cn } from "@/lib/utils";
 
 export type { SpinnerVariant, SpinnerSize };
 
+// --- i18n ---
+export interface SpinnerMessages {
+  /** Visually-hidden accessible label announced to screen readers. */
+  loading: string;
+}
+
+export const DEFAULT_SPINNER_MESSAGES: SpinnerMessages = { loading: "Loading" };
+
 export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: SpinnerVariant;
   size?: SpinnerSize;
-  /** Accessible label (visually hidden). Default "Loading". */
+  /** Accessible label (visually hidden). Overrides `messages.loading`. */
   label?: string;
+  /** Override the translatable strings (currently just the loading label). */
+  messages?: Partial<SpinnerMessages>;
 }
 
 /**
@@ -17,8 +27,9 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> {
  * recolor), sizes xs–xl, and announces itself to screen readers.
  */
 export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
-  ({ variant = "ring", size = "md", label = "Loading", className, ...props }, ref) => {
+  ({ variant = "ring", size = "md", label, messages, className, ...props }, ref) => {
     const s = spinnerSize[size];
+    const t = React.useMemo(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...messages }), [messages]);
     return (
       <span
         ref={ref}
@@ -29,6 +40,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
       >
         {variant === "ring" && (
           <span
+            aria-hidden="true"
             className={cn(
               "inline-block animate-spin rounded-full border-current/25 border-t-current",
               s.ring,
@@ -40,6 +52,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
         {variant === "gradient" && (
           // a conic-gradient "comet" ring with a fading tail, masked to a ring
           <span
+            aria-hidden="true"
             className={cn("inline-block animate-spin rounded-full", s.ring)}
             style={{
               background: "conic-gradient(from 90deg, transparent 5%, currentColor)",
@@ -53,6 +66,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
           // rotating gradient border on a rounded square (gradient shows only on
           // the border via mask-composite)
           <span
+            aria-hidden="true"
             className={cn("inline-block animate-spin rounded-[28%]", s.ring)}
             style={{
               padding: s.thickness,
@@ -67,7 +81,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
         )}
 
         {variant === "dots" && (
-          <span className={cn("inline-flex items-center", s.gap)}>
+          <span aria-hidden="true" className={cn("inline-flex items-center", s.gap)}>
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
@@ -85,6 +99,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
           // a glossy squircle flipping on X then Y (3D) — the sheen gradient makes
           // it catch the light as it turns
           <span
+            aria-hidden="true"
             className={cn(
               "inline-block rounded-[32%] shadow-sm animate-[bpdm-flip_1.2s_ease-in-out_infinite]",
               s.ring,
@@ -97,7 +112,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
         )}
 
         {variant === "bars" && (
-          <span className={cn("inline-flex items-end", s.gap)}>
+          <span aria-hidden="true" className={cn("inline-flex items-end", s.gap)}>
             {[0, 1, 2, 3].map((i) => (
               <span
                 key={i}
@@ -111,7 +126,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
           </span>
         )}
 
-        <span className="sr-only">{label}</span>
+        <span className="sr-only">{label ?? t.loading}</span>
       </span>
     );
   },
@@ -129,6 +144,8 @@ export interface LoadingOverlayProps extends React.HTMLAttributes<HTMLDivElement
   fullPage?: boolean;
   /** Blur the content behind the overlay. Default true. */
   blur?: boolean;
+  /** Override the translatable strings (currently just the loading label). */
+  messages?: Partial<SpinnerMessages>;
 }
 
 /**
@@ -138,9 +155,10 @@ export interface LoadingOverlayProps extends React.HTMLAttributes<HTMLDivElement
  */
 export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayProps>(
   (
-    { show = true, label, variant = "ring", size, fullPage = false, blur = true, className, children, ...props },
+    { show = true, label, variant = "ring", size, fullPage = false, blur = true, messages, className, children, ...props },
     ref,
   ) => {
+    const t = React.useMemo(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...messages }), [messages]);
     if (!show) return null;
     return (
       <div
@@ -156,7 +174,7 @@ export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayPro
         )}
         {...props}
       >
-        <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} label={label ?? "Loading"} />
+        <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} label={label ?? t.loading} />
         {label && <p className="m-0 text-sm font-medium text-muted-foreground">{label}</p>}
         {children}
       </div>
