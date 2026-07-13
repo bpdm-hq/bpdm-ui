@@ -265,3 +265,115 @@ describe("BpdmDataTable defaults", () => {
     expect(trigger).toBeTruthy();
   });
 });
+
+// --- accessibility Batch C: reorder / selection / scroll keyboard paths ---
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" reorderableRows [getRowLabel]="getRowLabel" (rowReorder)="lastOrder.set($event)" />
+  `,
+})
+class ReorderRowsHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+  readonly getRowLabel = (r: Row) => r.name;
+  readonly lastOrder = signal<Row[]>([]);
+}
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" reorderableColumns (columnOrderChange)="lastColOrder.set($event)" />
+  `,
+})
+class ReorderColsHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+  readonly lastColOrder = signal<string[]>([]);
+}
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `
+    <bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" selectable selectionMode="single" [getRowLabel]="getRowLabel" />
+  `,
+})
+class SingleSelectHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+  readonly getRowLabel = (r: Row) => r.name;
+}
+
+@Component({
+  imports: [BpdmDataTable],
+  template: `<bpdm-data-table [columns]="columns" [data]="data" [rowKey]="rowKey" label="People" />`,
+})
+class LabelHost {
+  readonly columns = COLUMNS;
+  readonly data = DATA;
+  readonly rowKey = (r: Row) => r.id;
+}
+
+describe("BpdmDataTable accessibility (Batch C)", () => {
+  it("row grip is a focusable button that reorders via the keyboard", () => {
+    const fixture = TestBed.createComponent(ReorderRowsHost);
+    fixture.detectChanges();
+    const grip = fixture.nativeElement.querySelector(
+      'button[aria-label="Reorder: Milo"]',
+    ) as HTMLButtonElement;
+    expect(grip).toBeTruthy();
+    grip.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    fixture.detectChanges();
+    // Milo moved down past Ava → Ava, Milo, Sara
+    expect(fixture.componentInstance.lastOrder().map((r) => r.name)).toEqual(["Ava", "Milo", "Sara"]);
+  });
+
+  it("reorders columns via Alt+Arrow on the header, and exposes a menu trigger", () => {
+    const fixture = TestBed.createComponent(ReorderColsHost);
+    fixture.detectChanges();
+    // keyboard column-options menu is reachable
+    expect(fixture.nativeElement.querySelector('button[aria-label="Column options"]')).toBeTruthy();
+    const nameBtn = fixture.nativeElement.querySelectorAll("thead th button")[0] as HTMLButtonElement;
+    nameBtn.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", altKey: true, bubbles: true }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.lastColOrder()).toEqual(["tasks", "name"]);
+  });
+
+  it("uses a roving-tabindex radio group in single-select mode", () => {
+    const fixture = TestBed.createComponent(SingleSelectHost);
+    fixture.detectChanges();
+    const radios = Array.from(
+      fixture.nativeElement.querySelectorAll('[role="radio"]'),
+    ) as HTMLElement[];
+    expect(radios.length).toBe(3);
+    // exactly one radio is in the tab order (roving tabindex)
+    expect(radios.filter((r) => r.getAttribute("tabindex") === "0").length).toBe(1);
+    // arrow keys move focus + selection to the adjacent row's radio
+    radios[0].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    fixture.detectChanges();
+    expect(radios[1].getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("marks the horizontal scroll area as a focusable region when it overflows", () => {
+    const sw = Object.getOwnPropertyDescriptor(Element.prototype, "scrollWidth");
+    const cw = Object.getOwnPropertyDescriptor(Element.prototype, "clientWidth");
+    Object.defineProperty(Element.prototype, "scrollWidth", { configurable: true, get: () => 800 });
+    Object.defineProperty(Element.prototype, "clientWidth", { configurable: true, get: () => 200 });
+    try {
+      const fixture = TestBed.createComponent(LabelHost);
+      fixture.detectChanges();
+      fixture.detectChanges(); // let the overflow effect measure + reflect
+      const region = fixture.nativeElement.querySelector('[role="region"]') as HTMLElement;
+      expect(region).toBeTruthy();
+      expect(region.getAttribute("tabindex")).toBe("0");
+      expect(region.getAttribute("aria-label")).toBe("People");
+    } finally {
+      if (sw) Object.defineProperty(Element.prototype, "scrollWidth", sw);
+      if (cw) Object.defineProperty(Element.prototype, "clientWidth", cw);
+    }
+  });
+});

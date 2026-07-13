@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 /** Switch track styling (size + shape, checked/unchecked via data-state). */
 export const switchVariants = cva(
-  "group peer inline-flex shrink-0 cursor-pointer items-center border-2 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:border-muted-foreground/40 data-[state=unchecked]:bg-input data-[state=checked]:border-primary data-[state=checked]:bg-primary",
+  "group peer inline-flex shrink-0 cursor-pointer items-center border-2 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:border-muted-foreground data-[state=unchecked]:bg-input data-[state=checked]:border-primary data-[state=checked]:bg-primary",
   {
     variants: {
       size: {

@@ -186,6 +186,50 @@ describe("BpdmToaster (rendering)", () => {
     expect(svc.toasts().length).toBe(0);
   });
 
+  it("pauses auto-dismiss while a toast is keyboard-focused, and resumes on blur", async () => {
+    const fixture = TestBed.createComponent(ToasterHost);
+    fixture.detectChanges();
+    await settle();
+
+    svc.show("Focused", { duration: 80 });
+    await settle();
+    const item = items()[0] as HTMLElement;
+    expect(item).toBeTruthy();
+
+    // focus into the toast → the auto-dismiss timer is cleared (parity with hover)
+    item.dispatchEvent(new FocusEvent("focusin"));
+
+    await macrotask(200); // well past the 80ms duration
+    TestBed.inject(ApplicationRef).tick();
+    expect(items().length).toBe(1); // still there — focus paused it
+
+    // focus leaves the toast entirely (no relatedTarget) → timer resumes, dismisses
+    item.dispatchEvent(new FocusEvent("focusout"));
+    await macrotask(350); // remaining duration + exit-animation fallback
+    TestBed.inject(ApplicationRef).tick();
+    expect(items().length).toBe(0);
+    expect(svc.toasts().length).toBe(0);
+  });
+
+  it("keeps the timer paused when focus only moves between the toast's own controls", async () => {
+    const fixture = TestBed.createComponent(ToasterHost);
+    fixture.detectChanges();
+    await settle();
+
+    svc.show("Two buttons", { duration: 80, action: { label: "Undo", onClick: () => {} } });
+    await settle();
+    const item = items()[0] as HTMLElement;
+
+    item.dispatchEvent(new FocusEvent("focusin"));
+    // focusout whose relatedTarget is still inside the toast must NOT resume
+    const inner = item.querySelector("button") as HTMLElement;
+    item.dispatchEvent(new FocusEvent("focusout", { relatedTarget: inner } as FocusEventInit));
+
+    await macrotask(200);
+    TestBed.inject(ApplicationRef).tick();
+    expect(items().length).toBe(1); // still paused — focus never left the toast
+  });
+
   it("a sticky toast (Infinity) does not auto-dismiss", async () => {
     const fixture = TestBed.createComponent(ToasterHost);
     fixture.detectChanges();

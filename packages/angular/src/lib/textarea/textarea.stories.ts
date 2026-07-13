@@ -3,21 +3,14 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { BpdmTextarea } from "./textarea";
 
-/** Character counter paired with maxLength. */
+/** Character counter paired with maxlength — `showCount` linked via aria-describedby. */
 @Component({
   selector: "demo-textarea-count",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BpdmTextarea],
   template: `
     <div class="w-80">
-      <textarea
-        bpdmTextarea
-        maxlength="200"
-        placeholder="Bio"
-        [value]="text()"
-        (input)="text.set($any($event.target).value)"
-      ></textarea>
-      <div class="mt-1 text-right text-xs tabular-nums text-muted-foreground">{{ text().length }} / 200</div>
+      <textarea bpdmTextarea showCount maxlength="200" placeholder="Bio" [value]="text()"></textarea>
     </div>
   `,
 })
@@ -96,21 +89,17 @@ export const WithCount: Story = {
   parameters: {
     docs: {
       source: {
-        code: `import { Component, signal } from '@angular/core';
+        code: `import { Component } from '@angular/core';
 import { BpdmTextarea } from '@bpdm/ng';
 
 @Component({
   selector: 'app-textarea-count',
   imports: [BpdmTextarea],
   template: \`
-    <textarea bpdmTextarea maxlength="200" placeholder="Bio"
-      [value]="text()" (input)="text.set($any($event.target).value)"></textarea>
-    <div class="mt-1 text-right text-xs text-muted-foreground">{{ text().length }} / 200</div>
+    <textarea bpdmTextarea showCount maxlength="200" placeholder="Bio"></textarea>
   \`,
 })
-export class TextareaCountComponent {
-  readonly text = signal('');
-}`,
+export class TextareaCountComponent {}`,
       },
     },
   },

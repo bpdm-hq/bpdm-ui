@@ -192,8 +192,8 @@ export class AutoResize {}
 
 ## Character count
 
-Pass `showCount` (React) to show a live counter, paired with `maxLength` for an
-`n / max` readout.
+Pass `showCount` to show a live counter, paired with `maxLength` (React) /
+`maxlength` (Angular) for an `n / max` readout.
 
 <Preview>
   <TextareaCountDemo />
@@ -214,22 +214,17 @@ export function Count() {
   <Tab value="Angular">
 
 ```ts title="count.ts"
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { BpdmTextarea } from '@bpdm/ng';
 
-// Angular exposes the field; render your own counter from the bound value.
 @Component({
   selector: 'count',
   imports: [BpdmTextarea],
   template: `
-    <textarea bpdmTextarea maxlength="120" [value]="text()"
-      (input)="text.set($any($event.target).value)" placeholder="Up to 120 characters…"></textarea>
-    <p class="mt-1 text-right text-xs tabular-nums text-muted-foreground">{{ text().length }} / 120</p>
+    <textarea bpdmTextarea showCount maxlength="120" placeholder="Up to 120 characters…"></textarea>
   `,
 })
-export class Count {
-  readonly text = signal('');
-}
+export class Count {}
 ```
 
   </Tab>
@@ -294,7 +289,7 @@ Extends the native `<textarea>` — `placeholder`, `value`, `defaultValue`, `row
 | `size` | `sm \| md \| lg` | `md` | Padding + text scale. |
 | `resize` | `none \| vertical \| both` | `vertical` | Drag-handle behaviour. |
 | `autoResize` | `boolean` | `false` | Grow to fit content (disables manual resize). |
-| `showCount` *(React)* | `boolean` | `false` | Show a character counter (pairs with `maxLength`). |
+| `showCount` | `boolean` | `false` | Show a character counter (pairs with `maxLength` / `maxlength`), linked to the field via `aria-describedby`. |
 | `className` | `string` (Angular `class`) | — | Extra classes. |
 
 ## Accessibility

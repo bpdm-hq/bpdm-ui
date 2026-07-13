@@ -43,4 +43,11 @@ describe("Checkbox", () => {
     const svg = screen.getByRole("checkbox", { name: "On" }).querySelector("svg");
     expect(svg).toHaveAttribute("aria-hidden", "true");
   });
+
+  it("uses a ≥3:1 unchecked border (full muted-foreground, no opacity)", () => {
+    render(<Checkbox aria-label="Accept" />);
+    const cls = screen.getByRole("checkbox", { name: "Accept" }).className;
+    expect(cls).toMatch(/(^|\s)border-muted-foreground(\s|$)/);
+    expect(cls).not.toMatch(/border-muted-foreground\//);
+  });
 });

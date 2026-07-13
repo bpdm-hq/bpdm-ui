@@ -69,4 +69,24 @@ describe("MultiSelect", () => {
     render(<MultiSelect options={OPTIONS} aria-label="Tags" disabled />);
     expect(trigger("Tags")).toHaveAttribute("aria-disabled", "true");
   });
+
+  it("exposes a keyboard-reachable clear-all that clears via Enter", async () => {
+    const onValueChange = vi.fn();
+    render(<MultiSelect options={OPTIONS} aria-label="Tags" value={["a", "b"]} onValueChange={onValueChange} />);
+    const clear = screen.getByRole("button", { name: "Clear all" });
+    // no longer mouse-only (tabindex=-1) — it's in the tab order
+    expect(clear).not.toHaveAttribute("tabindex", "-1");
+    clear.focus();
+    expect(clear).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    expect(onValueChange).toHaveBeenCalledWith([]);
+  });
+
+  it("removes the last chip with Backspace on the focused trigger", async () => {
+    const onValueChange = vi.fn();
+    render(<MultiSelect options={OPTIONS} aria-label="Tags" value={["a", "b"]} onValueChange={onValueChange} />);
+    trigger("Tags").focus();
+    await userEvent.keyboard("{Backspace}");
+    expect(onValueChange).toHaveBeenCalledWith(["a"]);
+  });
 });

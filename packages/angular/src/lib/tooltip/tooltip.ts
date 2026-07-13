@@ -10,9 +10,11 @@ import {
   inject,
   input,
   OnDestroy,
+  output,
   TemplateRef,
   ViewContainerRef,
 } from "@angular/core";
+import { Directionality } from "@angular/cdk/bidi";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
@@ -42,6 +44,9 @@ let uid = 0;
     "[class]": "boxClass()",
     "[attr.id]": "id()",
     role: "tooltip",
+    // keep the bubble alive while the pointer is over it (WCAG 1.4.13 "hoverable")
+    "(mouseenter)": "keepAlive.emit()",
+    "(mouseleave)": "dismiss.emit()",
   },
   template: `
     @if (isTemplate()) {
@@ -73,6 +78,11 @@ class BpdmTooltipContent {
   readonly closing = input(false);
   readonly id = input("");
   readonly boxClassInput = input("");
+
+  /** Pointer entered the bubble — the directive cancels the pending hide. */
+  readonly keepAlive = output<void>();
+  /** Pointer left the bubble — the directive schedules the hide. */
+  readonly dismiss = output<void>();
 
   protected readonly arrowClass = computed(() => OVERLAY_ARROW[this.side()]);
 
@@ -125,6 +135,9 @@ export class BpdmTooltip implements OnDestroy {
   private readonly overlay = inject(Overlay);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly vcr = inject(ViewContainerRef);
+  // ambient text direction — fed to the overlay so `align="start"/"end"` resolve
+  // to physical left/right correctly (they flip under `dir="rtl"`).
+  private readonly directionality = inject(Directionality);
 
   /** Tooltip body — a string, or a `TemplateRef` for rich content. */
   readonly content = input<string | TemplateRef<unknown> | null | undefined>("", {
@@ -185,10 +198,18 @@ export class BpdmTooltip implements OnDestroy {
     this.overlayRef = this.overlay.create({
       positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      // without this the overlay defaults to LTR and `start`/`end` never flip
+      direction: this.directionality,
     });
 
     const ref = this.overlayRef.attach(new ComponentPortal(BpdmTooltipContent, this.vcr));
     this.contentRef = ref;
+
+    // hoverable (WCAG 1.4.13): treat trigger + bubble as one hover region so the
+    // pointer can travel across the offset gap onto the bubble without it tearing
+    // down. Entering the bubble cancels a pending hide; leaving it re-schedules.
+    ref.instance.keepAlive.subscribe(() => this.onEnter());
+    ref.instance.dismiss.subscribe(() => this.onLeave());
 
     const c = this.content();
     const isTpl = c instanceof TemplateRef;

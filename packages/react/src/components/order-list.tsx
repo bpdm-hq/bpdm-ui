@@ -136,6 +136,15 @@ export function SelectableList<T>({
 
   const activeIndex = activeKey == null ? -1 : shown.findIndex((i) => keyOf(i) === activeKey);
 
+  // keep the active option visible: with the aria-activedescendant pattern the
+  // browser does not auto-scroll (focus stays on the listbox), so a keyboard user
+  // could drive the active item off-screen in the scrollable body.
+  React.useEffect(() => {
+    if (activeKey == null || typeof document === "undefined") return;
+    document.getElementById(optionId(activeKey))?.scrollIntoView?.({ block: "nearest" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey]);
+
   const setActiveTo = (idx: number) => {
     if (idx >= 0) setActiveKey(keyOf(shown[idx]));
   };

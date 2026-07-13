@@ -92,4 +92,9 @@ describe("PasswordInput", () => {
     render(<PasswordInput data-testid="pw" feedback={false} messages={{ show: "Afficher" }} />);
     expect(screen.getByRole("button", { name: "Afficher" })).toBeInTheDocument();
   });
+
+  it("gives the reveal toggle its own focus-visible ring", () => {
+    render(<PasswordInput data-testid="pw" feedback={false} />);
+    expect(toggle("Show password").className).toMatch(/focus-visible:ring-2/);
+  });
 });

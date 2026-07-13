@@ -1,5 +1,6 @@
 import { Component, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import { vi } from "vitest";
 import { BpdmOrderList, type OrderListMessages } from "./order-list";
 
 @Component({
@@ -165,5 +166,23 @@ describe("BpdmOrderList", () => {
     expect(fixture.nativeElement.textContent).toContain("Rien à trier");
     const lb = fixture.nativeElement.querySelector('[role="listbox"]') as HTMLElement;
     expect(lb.getAttribute("aria-label")).toBe("Étapes");
+  });
+
+  it("scrolls the active option into view when the active key changes", () => {
+    // jsdom has no scrollIntoView — install a spy for the duration of the test
+    const original = Element.prototype.scrollIntoView;
+    const spy = vi.fn();
+    Element.prototype.scrollIntoView = spy;
+    try {
+      const fixture = setup();
+      const lb = listbox(fixture);
+      lb.dispatchEvent(new Event("focus")); // activates the first option
+      fixture.detectChanges();
+      lb.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" })); // active moves
+      fixture.detectChanges();
+      expect(spy).toHaveBeenCalled();
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
   });
 });

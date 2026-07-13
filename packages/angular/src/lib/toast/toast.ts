@@ -263,6 +263,8 @@ const SWIPE_THRESHOLD = 45;
     "[style.--radix-toast-swipe-move-y]": "moveY()",
     "(mouseenter)": "onHoverStart()",
     "(mouseleave)": "onHoverEnd()",
+    "(focusin)": "onFocusIn()",
+    "(focusout)": "onFocusOut($event)",
     "(animationend)": "onAnimationEnd($event)",
     "(pointerdown)": "onPointerDown($event)",
     "(pointermove)": "onPointerMove($event)",
@@ -454,6 +456,19 @@ export class BpdmToastItem {
     this.clearTimer();
   }
   protected onHoverEnd(): void {
+    this.resumeTimer();
+  }
+
+  // Keyboard parity with hover: a keyboard user reading/acting on a toast
+  // (Tab into the action or close button) shouldn't have it vanish mid-read.
+  protected onFocusIn(): void {
+    this.clearTimer();
+  }
+  protected onFocusOut(event: FocusEvent): void {
+    // `focusout` bubbles, so it also fires when focus merely moves between the
+    // toast's own controls — only resume once focus leaves the toast entirely.
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
     this.resumeTimer();
   }
 

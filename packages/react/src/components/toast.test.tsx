@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, act, fireEvent } from "@testing-library/react";
+import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Toaster, toast } from "./toast";
 
@@ -129,6 +129,34 @@ describe("Toaster / toast", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("announces error toasts assertively (Toast.Root type='foreground')", async () => {
+    render(<Toaster />);
+    act(() => {
+      toast.error("Boom");
+    });
+    // Radix mirrors the toast text into a visually-hidden live region whose
+    // politeness follows `type`: error → assertive.
+    await waitFor(() => {
+      expect(
+        document.querySelector('[role="status"][aria-live="assertive"]'),
+      ).toBeInTheDocument();
+    });
+    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+  });
+
+  it("announces non-error toasts politely (Toast.Root type='background')", async () => {
+    render(<Toaster />);
+    act(() => {
+      toast.success("Yay");
+    });
+    await waitFor(() => {
+      expect(
+        document.querySelector('[role="status"][aria-live="polite"]'),
+      ).toBeInTheDocument();
+    });
+    expect(document.querySelector('[aria-live="assertive"]')).toBeNull();
   });
 
   it("a normal toast can be dismissed via the close button", () => {

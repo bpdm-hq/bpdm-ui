@@ -30,7 +30,7 @@ export const DEFAULT_STEPPER_MESSAGES: StepperMessages = {
   step: "Step {index} of {total}",
 };
 
-// stable id bases so a step tab and its panel can reference each other
+// stable id bases so a step button and its panel can reference each other
 const stepTabId = (uid: string, value: string) => `${uid}-tab-${value}`;
 const stepPanelId = (uid: string, value: string) => `${uid}-panel-${value}`;
 
@@ -247,11 +247,13 @@ export const StepList = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const ctx = useStepperContext("StepList");
   return (
+    // Process-steps pattern (not a tabset): a labelled list of step buttons, the
+    // active one carrying aria-current="step". Matches the real Tab-to-each-step
+    // behaviour (no roving tabindex / arrow keys), unlike the ARIA tablist contract.
     <div
       ref={ref}
-      role="tablist"
+      role="list"
       aria-label={ctx.messages.ariaLabel}
-      aria-orientation={ctx.orientation}
       className={cn("flex items-center", className)}
       {...props}
     >
@@ -298,10 +300,8 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
   const trigger = (
     <button
       type="button"
-      role="tab"
       id={stepTabId(ctx.uid, value)}
       aria-controls={stepPanelId(ctx.uid, value)}
-      aria-selected={active}
       aria-current={active ? "step" : undefined}
       disabled={disabled || (!clickable && !active)}
       onClick={() => clickable && ctx.activate(value)}
@@ -309,7 +309,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
         "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         clickable && !active && "cursor-pointer",
         // locked (linear future) or disabled steps read as not-allowed + dimmed;
-        // `!` beats the host app's global `[role=tab]{cursor:pointer}`
+        // `!` beats any host-app global that forces a pointer cursor on step buttons
         !clickable && !active && "cursor-not-allowed! opacity-60",
         disabled && "cursor-not-allowed! opacity-50",
         className,
@@ -335,7 +335,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
 
   // horizontal: stretch + a connector that fills as the step completes
   return (
-    <div className={cn("flex items-center", !isLast && "flex-1")}>
+    <div role="listitem" className={cn("flex items-center", !isLast && "flex-1")}>
       {trigger}
       {!isLast && (
         // track + a primary fill that grows left→right as the step completes
@@ -380,10 +380,13 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
   if (vertical) {
     return (
       <div
-        role="tabpanel"
+        role="region"
         id={stepPanelId(ctx.uid, value)}
         aria-labelledby={stepTabId(ctx.uid, value)}
         aria-hidden={!active}
+        // inactive panels stay mounted for the collapse animation, so take them out
+        // of the tab order + AT tree (mirrors Accordion) — not just aria-hidden.
+        inert={!active}
         className={cn(
           "grid transition-[grid-template-rows,opacity] duration-[360ms] ease-[var(--bpdm-ease-out)]",
           active ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
@@ -403,7 +406,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
   if (!active) return null;
   return (
     <div
-      role="tabpanel"
+      role="region"
       id={stepPanelId(ctx.uid, value)}
       aria-labelledby={stepTabId(ctx.uid, value)}
       className={cn(

@@ -665,7 +665,7 @@ default below.
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `ariaLabel` | `Progress` | Accessible name for the step list (`tablist`). |
+| `ariaLabel` | `Progress` | Accessible name for the step list (`role="list"`). |
 | `completed` | `Completed` | Announced status of a completed step. |
 | `current` | `Current step` | Announced status of the active step. |
 | `upcoming` | `Not completed` | Announced status of an upcoming step. |
@@ -708,14 +708,16 @@ the same surface as signals + methods: `s.value()`, `s.activeIndex()`, `s.steps(
 
 ## Accessibility
 
-Both frameworks implement the same **tablist** pattern for the steps:
+Both frameworks implement the same **process-steps** pattern (a progress indicator, not
+a tabset — so no roving-tabindex/arrow-key tab contract):
 
-- **Roles and wiring.** The step list is a `role="tablist"` with an `aria-label` (from
-  `messages.ariaLabel`) and `aria-orientation` matching `orientation`. Each step is a
-  `role="tab"` carrying `aria-selected`, and the active step also carries
-  `aria-current="step"`. A step is linked to its panel both ways — `aria-controls` from
-  the step to the `role="tabpanel"`, and `aria-labelledby` from the panel back to the
-  step.
+- **Roles and wiring.** The step list is a `role="list"` with an `aria-label` (from
+  `messages.ariaLabel`), and each step is a `<button>` (a `role="listitem"`); the active
+  step carries `aria-current="step"`. A step is linked to its panel both ways —
+  `aria-controls` from the step button to its `role="region"` panel, and
+  `aria-labelledby` from the panel back to the step. Inactive vertical panels stay
+  mounted for the collapse animation but are `inert` (and `aria-hidden`), so keyboard
+  and screen readers skip their contents entirely.
 - **Status is announced, not colour-only.** Each step renders a **visually-hidden
   status** combining its position and state — e.g. "Step 2 of 3, Current step" — so
   completed / current / upcoming / locked is spoken, never conveyed by colour alone.
@@ -724,8 +726,9 @@ Both frameworks implement the same **tablist** pattern for the steps:
 - **Linear and locked steps.** With `linear`, steps that aren't reachable yet are
   `disabled` (non-interactive) — so keyboard and screen readers skip them; with
   `lockIndicator` they show a lock and announce **"Locked"**.
-- **Keyboard.** **Tab** moves between the steps (each reachable step is a tab stop),
-  and **Enter** / **Space** activates a reachable step. The **Back** / **Next** /
+- **Keyboard.** **Tab** moves between the steps (each reachable step is its own tab
+  stop — there is no arrow-key roving, matching the process-steps pattern), and
+  **Enter** / **Space** activates a reachable step. The **Back** / **Next** /
   **Finish** controls are real buttons that drive the flow, so it's fully
   keyboard-operable end to end.
 - **Focus.** Steps show a visible focus-visible ring.
