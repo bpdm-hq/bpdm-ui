@@ -22,14 +22,16 @@ export const avatarStatusColor: Record<AvatarStatus, string> = {
   away: "bg-warning",
 };
 
-// deterministic, pleasant tint per name — so initials avatars aren't all grey
+// deterministic, pleasant tint per name — so initials avatars aren't all grey.
+// The tint background is unchanged; the initials text uses a theme-aware "strong"
+// value (darker on light, bright on dark) so it reads ≥4.5:1 on the pale tint.
 export const avatarPalette = [
-  "bg-[color-mix(in_srgb,var(--info)_20%,transparent)] text-info",
-  "bg-[color-mix(in_srgb,var(--success)_20%,transparent)] text-success",
-  "bg-[color-mix(in_srgb,var(--accent)_22%,transparent)] text-accent",
-  "bg-[color-mix(in_srgb,#8b5cf6_22%,transparent)] text-[#8b5cf6]",
-  "bg-[color-mix(in_srgb,#ec4899_22%,transparent)] text-[#ec4899]",
-  "bg-[color-mix(in_srgb,#14b8a6_22%,transparent)] text-[#14b8a6]",
+  "bg-[color-mix(in_srgb,var(--info)_20%,transparent)] text-info-strong",
+  "bg-[color-mix(in_srgb,var(--success)_20%,transparent)] text-success-strong",
+  "bg-[color-mix(in_srgb,var(--accent)_22%,transparent)] text-[var(--avatar-orange)]",
+  "bg-[color-mix(in_srgb,#8b5cf6_22%,transparent)] text-[var(--avatar-violet)]",
+  "bg-[color-mix(in_srgb,#ec4899_22%,transparent)] text-[var(--avatar-pink)]",
+  "bg-[color-mix(in_srgb,#14b8a6_22%,transparent)] text-[var(--avatar-teal)]",
 ];
 
 /** Up to two uppercase initials from a name. */

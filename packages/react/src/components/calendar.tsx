@@ -443,7 +443,7 @@ export function Calendar({
                     "hover:bg-muted active:scale-90",
                     outside && "text-muted-foreground/40",
                     !outside && !selected && "text-foreground",
-                    isToday && !selected && "font-semibold text-primary",
+                    isToday && !selected && "font-semibold text-foreground ring-1 ring-inset ring-primary",
                     selected &&
                       "bg-primary font-semibold text-primary-foreground hover:bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
                     disabledDay && "pointer-events-none text-muted-foreground/30 line-through",

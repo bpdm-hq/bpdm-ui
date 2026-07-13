@@ -304,7 +304,7 @@ export class BpdmStep {
     cn(
       "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
       this.state() === "completed" && "border-primary bg-primary text-primary-foreground",
-      this.state() === "active" && "scale-105 border-primary text-primary",
+      this.state() === "active" && "scale-105 border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background",
       this.state() === "upcoming" && "border-border text-muted-foreground",
     ),
   );

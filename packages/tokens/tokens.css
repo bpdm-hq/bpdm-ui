@@ -40,15 +40,15 @@
   --muted: #f0eee9;
   --muted-foreground: #6b6862;
   --border: #e7e3dc;
-  --input: #dcd7cd;
-  --ring: #f5a623;
+  --input: #948c7d; /* ≥3:1 vs page/card for a perceivable field boundary */
+  --ring: #9a5400; /* darker gold — focus ring reaches ≥3:1 on light */
   --primary: #f5a623; /* amber — the bpdm brand, in every theme */
   --primary-foreground: #1a1205;
   --secondary: #f0eee9;
   --secondary-foreground: #1c1a17;
   --accent: #ff7a3c;
   --accent-foreground: #1a1205;
-  --destructive: #ef4444;
+  --destructive: #d32f2f; /* deepened so near-white text on a solid fill clears 4.5:1 */
   --destructive-foreground: #fafafa;
   --success: #15803d; /* gains / positive deltas */
   --success-foreground: #ffffff;
@@ -58,6 +58,25 @@
   --info-foreground: #ffffff;
   --help: #7c3aed; /* violet — advisory / tips */
   --help-foreground: #ffffff;
+  /* "strong" ramp — the readable-as-text variant of each accent on LIGHT surfaces
+     (fills stay the brand hues). Used by colored soft/outline/ghost TEXT where the
+     hue itself carries meaning (button ghost/outline primary, badge/alert text).
+     AUTO-DERIVED from each base via a theme-aware oklab darken, so a consumer who
+     overrides only the base token (e.g. --primary) automatically gets a matching
+     accessible ≥4.5:1 text shade — no need to also set --*-strong. (For an unusually
+     light brand color the derived shade may still be low-contrast; override
+     --primary-strong explicitly in that edge case.) */
+  --primary-strong: color-mix(in oklab, var(--primary), black 30%);
+  --destructive-strong: color-mix(in oklab, var(--destructive), black 10%);
+  --success-strong: color-mix(in oklab, var(--success), black 12%);
+  --warning-strong: color-mix(in oklab, var(--warning), black 12%);
+  --info-strong: color-mix(in oklab, var(--info), black 8%);
+  --help-strong: color-mix(in oklab, var(--help), black 8%);
+  /* Avatar auto-tint initials text (readable on the pale tint, hue-preserving). */
+  --avatar-orange: #9a3d10;
+  --avatar-violet: #6d28d9;
+  --avatar-pink: #a3216a;
+  --avatar-teal: #0f6d63;
 }
 
 /* ── LIGHT · Cool Mist ────────────────────────────────────────── */
@@ -71,15 +90,15 @@
   --muted: #eef0f4;
   --muted-foreground: #646b78;
   --border: #e2e6ec;
-  --input: #d6dbe4;
-  --ring: #f5a623;
+  --input: #878d99; /* ≥3:1 vs page/card for a perceivable field boundary */
+  --ring: #9a5400; /* darker gold — focus ring reaches ≥3:1 on light */
   --primary: #f5a623;
   --primary-foreground: #1a1205;
   --secondary: #eef0f4;
   --secondary-foreground: #1a1d24;
   --accent: #ff7a3c;
   --accent-foreground: #1a1205;
-  --destructive: #ef4444;
+  --destructive: #d32f2f; /* deepened so near-white text on a solid fill clears 4.5:1 */
   --destructive-foreground: #fafafa;
   --success: #15803d;
   --success-foreground: #ffffff;
@@ -89,6 +108,18 @@
   --info-foreground: #ffffff;
   --help: #7c3aed; /* violet — advisory / tips */
   --help-foreground: #ffffff;
+  /* "strong" ramp — readable-as-text variant on LIGHT surfaces, auto-derived from
+     each base via oklab darken (override the base token → strong follows). */
+  --primary-strong: color-mix(in oklab, var(--primary), black 30%);
+  --destructive-strong: color-mix(in oklab, var(--destructive), black 10%);
+  --success-strong: color-mix(in oklab, var(--success), black 12%);
+  --warning-strong: color-mix(in oklab, var(--warning), black 12%);
+  --info-strong: color-mix(in oklab, var(--info), black 8%);
+  --help-strong: color-mix(in oklab, var(--help), black 8%);
+  --avatar-orange: #9a3d10;
+  --avatar-violet: #6d28d9;
+  --avatar-pink: #a3216a;
+  --avatar-teal: #0f6d63;
 }
 
 /* ── DARK · Charcoal (default dark) ───────────────────────────── */
@@ -103,7 +134,7 @@
   --muted: #242429;
   --muted-foreground: #a5a3ad;
   --border: #2e2e35; /* a touch brighter so edges are visible */
-  --input: #2a2a31;
+  --input: #6b6b78; /* ≥3:1 vs page/card for a perceivable field boundary */
   --ring: #f5a623;
   --primary: #f5a623;
   --primary-foreground: #1a1205;
@@ -111,7 +142,7 @@
   --secondary-foreground: #f7f6f3;
   --accent: #ff7a3c;
   --accent-foreground: #1a1205;
-  --destructive: #ef4444;
+  --destructive: #d32f2f; /* deepened so near-white text on a solid fill clears 4.5:1 */
   --destructive-foreground: #fafafa;
   --success: #4ade80; /* brighter green reads on dark */
   --success-foreground: #052e16;
@@ -121,6 +152,20 @@
   --info-foreground: #0a1f44;
   --help: #a78bfa; /* brighter violet reads on dark */
   --help-foreground: #1e1b3a;
+  /* "strong" ramp — on dark the accents already read as text, so strong == the
+     bright hue (identity → a consumer's base override flows through). Only
+     destructive-strong stays an explicit bright red for text, because the base
+     --destructive is a darker fill on charcoal. */
+  --primary-strong: var(--primary);
+  --destructive-strong: #f87171;
+  --success-strong: var(--success);
+  --warning-strong: var(--warning);
+  --info-strong: var(--info);
+  --help-strong: var(--help);
+  --avatar-orange: #ff7a3c;
+  --avatar-violet: #9d84f8;
+  --avatar-pink: #f062a4;
+  --avatar-teal: #14b8a6;
 }
 
 /* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
@@ -135,7 +180,7 @@
   --muted: #1c2128;
   --muted-foreground: #8b949e;
   --border: #2a313c;
-  --input: #30363d;
+  --input: #646c78; /* ≥3:1 vs page/card for a perceivable field boundary */
   --ring: #f5a623;
   --primary: #f5a623; /* warm amber pops on cool slate */
   --primary-foreground: #1a1205;
@@ -153,6 +198,18 @@
   --info-foreground: #0d1117;
   --help: #a371f7;
   --help-foreground: #0d1117;
+  /* "strong" ramp — on dark the accents already read as text, so strong == hue
+     (identity → a consumer's base override flows through). */
+  --primary-strong: var(--primary);
+  --destructive-strong: var(--destructive);
+  --success-strong: var(--success);
+  --warning-strong: var(--warning);
+  --info-strong: var(--info);
+  --help-strong: var(--help);
+  --avatar-orange: #ff7a3c;
+  --avatar-violet: #9d84f8;
+  --avatar-pink: #f062a4;
+  --avatar-teal: #14b8a6;
 }
 
 /* Map Tailwind utilities → raw vars (resolved at runtime). */
@@ -172,20 +229,26 @@
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-strong: var(--primary-strong);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-strong: var(--destructive-strong);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-strong: var(--success-strong);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-strong: var(--warning-strong);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-info-strong: var(--info-strong);
   --color-help: var(--help);
   --color-help-foreground: var(--help-foreground);
+  --color-help-strong: var(--help-strong);
 }
 
 /* Overlay entry/exit animations — shared by Tooltip, Popover, Dialog, Drawer.

@@ -41,7 +41,7 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
   // no per-tab active marker for horizontal — the sliding indicator draws it (see template);
   // vertical adds its own per-tab marker back in `triggerClass`
   underline:
-    "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-primary",
+    "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong",
   pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground",
 };
 
@@ -228,7 +228,7 @@ export class BpdmTabs {
     const verticalActive = !vertical
       ? ""
       : underline
-        ? "mb-0 -me-px border-b-0 border-e-2 data-[state=active]:border-primary"
+        ? "mb-0 -me-px border-b-0 border-e-2 data-[state=active]:border-primary-strong"
         : "data-[state=inactive]:enabled:hover:bg-muted/60 data-[state=active]:bg-muted";
     return cn(
       TRIGGER_BASE,
@@ -243,7 +243,7 @@ export class BpdmTabs {
     cn(
       "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
       this.variant() === "underline"
-        ? "-bottom-px h-0.5 bg-primary" // sit on the baseline (like the tab's -mb-px border), flush not floating
+        ? "-bottom-px h-0.5 bg-primary-strong" // sit on the baseline (like the tab's -mb-px border), flush not floating
         : "inset-y-0 z-0 rounded-lg bg-muted",
     ),
   );

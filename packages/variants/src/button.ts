@@ -67,23 +67,23 @@ export const buttonVariants = cva(
       { variant: "contrast", appearance: "solid", class: "bg-foreground text-background hover:bg-foreground/90" },
 
       // ── outline (border, transparent fill) — secondary/contrast read as a neutral outline ──
-      { variant: "primary", appearance: "outline", class: "border-primary text-primary hover:bg-primary/10" },
+      { variant: "primary", appearance: "outline", class: "border-primary-strong text-primary-strong hover:bg-primary/10" },
       { variant: "secondary", appearance: "outline", class: "border-input text-foreground hover:bg-muted" },
       { variant: "success", appearance: "outline", class: "border-success text-success hover:bg-success/10" },
       { variant: "info", appearance: "outline", class: "border-info text-info hover:bg-info/10" },
       { variant: "warning", appearance: "outline", class: "border-warning text-warning hover:bg-warning/10" },
       { variant: "help", appearance: "outline", class: "border-help text-help hover:bg-help/10" },
-      { variant: "destructive", appearance: "outline", class: "border-destructive text-destructive hover:bg-destructive/10" },
+      { variant: "destructive", appearance: "outline", class: "border-destructive text-destructive-strong hover:bg-destructive/10" },
       { variant: "contrast", appearance: "outline", class: "border-foreground/40 text-foreground hover:bg-muted" },
 
       // ── ghost (no border, transparent fill) — secondary/contrast read as a neutral ghost ──
-      { variant: "primary", appearance: "ghost", class: "text-primary hover:bg-primary/10" },
+      { variant: "primary", appearance: "ghost", class: "text-primary-strong hover:bg-primary/10" },
       { variant: "secondary", appearance: "ghost", class: "text-foreground hover:bg-muted" },
       { variant: "success", appearance: "ghost", class: "text-success hover:bg-success/10" },
       { variant: "info", appearance: "ghost", class: "text-info hover:bg-info/10" },
       { variant: "warning", appearance: "ghost", class: "text-warning hover:bg-warning/10" },
       { variant: "help", appearance: "ghost", class: "text-help hover:bg-help/10" },
-      { variant: "destructive", appearance: "ghost", class: "text-destructive hover:bg-destructive/10" },
+      { variant: "destructive", appearance: "ghost", class: "text-destructive-strong hover:bg-destructive/10" },
       { variant: "contrast", appearance: "ghost", class: "text-foreground hover:bg-muted" },
     ],
     defaultVariants: { variant: "primary", appearance: "solid", size: "md", shape: "default" },

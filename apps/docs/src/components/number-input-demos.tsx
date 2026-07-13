@@ -20,7 +20,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 export function NumberInputUsageDemo() {
   return (
     <div className="flex justify-center">
-      <NumberInput defaultValue="8" min="0" />
+      <NumberInput defaultValue="9" min="0" />
     </div>
   );
 }
@@ -28,9 +28,9 @@ export function NumberInputUsageDemo() {
 export function NumberInputSizesDemo() {
   return (
     <Row>
-      <NumberInput size="sm" defaultValue="8" />
-      <NumberInput size="md" defaultValue="8" />
-      <NumberInput size="lg" defaultValue="8" />
+      <NumberInput size="sm" defaultValue="9" />
+      <NumberInput size="md" defaultValue="9" />
+      <NumberInput size="lg" defaultValue="9" />
     </Row>
   );
 }
@@ -39,10 +39,10 @@ export function NumberInputLayoutDemo() {
   return (
     <Row>
       <Field label="Stacked (default)">
-        <NumberInput buttonLayout="stacked" defaultValue="8" />
+        <NumberInput buttonLayout="stacked" defaultValue="9" />
       </Field>
       <Field label="Horizontal">
-        <NumberInput buttonLayout="horizontal" defaultValue="8" />
+        <NumberInput buttonLayout="horizontal" defaultValue="9" />
       </Field>
     </Row>
   );
@@ -93,7 +93,7 @@ export function NumberInputPrecisionDemo() {
 export function NumberInputStatesDemo() {
   return (
     <div className="flex justify-center">
-      <NumberInput disabled defaultValue="8" />
+      <NumberInput disabled defaultValue="9" />
     </div>
   );
 }

@@ -7,7 +7,7 @@ export type FloatLabelVariant = "over" | "in" | "on";
 
 /** Resting (placeholder) state — same for every variant. */
 export const floatResting =
-  "pointer-events-none absolute start-3 z-10 origin-left text-muted-foreground transition-all duration-150 top-1/2 -translate-y-1/2 text-sm peer-focus:text-ring";
+  "pointer-events-none absolute start-3 z-10 origin-left text-muted-foreground transition-all duration-150 top-1/2 -translate-y-1/2 text-sm peer-focus:text-foreground";
 
 /** Floated state — on focus OR when filled (:not(:placeholder-shown)). */
 export const floatFloated: Record<FloatLabelVariant, string> = {

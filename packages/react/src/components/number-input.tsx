@@ -92,7 +92,7 @@ function StepButton({
         timer.current = setTimeout(() => setPressed(false), 160);
       }}
       className={cn(
-        "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 hover:bg-muted active:scale-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",
+        "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 enabled:hover:bg-muted enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
         pressed && "scale-90",
         className,
       )}

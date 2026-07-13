@@ -173,7 +173,7 @@ export class BpdmAlert {
     if (a === "solid") return "size-4";
     return cn("size-4", this.tone().fg); // outline
   });
-  protected readonly bodyClass = computed(() => (this.solid() ? "text-current/90" : "text-muted-foreground"));
+  protected readonly bodyClass = computed(() => (this.solid() ? "text-current" : "text-muted-foreground"));
   protected readonly closeClass = computed(() =>
     this.solid()
       ? "text-current/70 hover:bg-white/15 hover:text-current"

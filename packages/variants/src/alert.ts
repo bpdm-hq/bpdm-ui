@@ -43,7 +43,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-border",
   },
   primary: {
-    fg: "text-primary",
+    fg: "text-primary-strong",
     accent: "before:bg-primary",
     tint: "bg-[color-mix(in_srgb,var(--primary)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] border-[color-mix(in_srgb,var(--primary)_28%,transparent)] text-foreground",
@@ -51,7 +51,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-primary/50",
   },
   success: {
-    fg: "text-success",
+    fg: "text-success-strong",
     accent: "before:bg-success",
     tint: "bg-[color-mix(in_srgb,var(--success)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--success)_10%,transparent)] border-[color-mix(in_srgb,var(--success)_28%,transparent)] text-foreground",
@@ -59,7 +59,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-success/50",
   },
   info: {
-    fg: "text-info",
+    fg: "text-info-strong",
     accent: "before:bg-info",
     tint: "bg-[color-mix(in_srgb,var(--info)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--info)_10%,transparent)] border-[color-mix(in_srgb,var(--info)_28%,transparent)] text-foreground",
@@ -67,7 +67,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-info/50",
   },
   warning: {
-    fg: "text-warning",
+    fg: "text-warning-strong",
     accent: "before:bg-warning",
     tint: "bg-[color-mix(in_srgb,var(--warning)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--warning)_12%,transparent)] border-[color-mix(in_srgb,var(--warning)_32%,transparent)] text-foreground",
@@ -75,7 +75,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-warning/50",
   },
   help: {
-    fg: "text-help",
+    fg: "text-help-strong",
     accent: "before:bg-help",
     tint: "bg-[color-mix(in_srgb,var(--help)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--help)_10%,transparent)] border-[color-mix(in_srgb,var(--help)_28%,transparent)] text-foreground",
@@ -83,7 +83,7 @@ export const alertTones: Record<AlertVariant, AlertTone> = {
     outline: "border-help/50",
   },
   error: {
-    fg: "text-destructive",
+    fg: "text-destructive-strong",
     accent: "before:bg-destructive",
     tint: "bg-[color-mix(in_srgb,var(--destructive)_16%,transparent)]",
     soft: "bg-[color-mix(in_srgb,var(--destructive)_10%,transparent)] border-[color-mix(in_srgb,var(--destructive)_28%,transparent)] text-foreground",
