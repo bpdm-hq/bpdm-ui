@@ -17,6 +17,24 @@ import {
   type AvatarStatus,
 } from "@bpdm/variants";
 
+// --- i18n ---
+export interface AvatarMessages {
+  online: string;
+  offline: string;
+  busy: string;
+  away: string;
+  /** AvatarGroup overflow tile label. `{count}` is interpolated. */
+  more: string;
+}
+
+export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
+  online: "Online",
+  offline: "Offline",
+  busy: "Busy",
+  away: "Away",
+  more: "{count} more",
+};
+
 /**
  * `<bpdm-avatar>` — an image with a graceful fallback to initials (auto-tinted
  * from the name) and then a person icon. Circle or square, six sizes, an optional
@@ -49,6 +67,8 @@ import {
         <span
           class="flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] [&_svg]:size-[55%]"
           [class]="tint()"
+          [attr.role]="name() ? 'img' : null"
+          [attr.aria-label]="name() || null"
         >
           @if (initials()) {
             {{ initials() }}
@@ -64,9 +84,10 @@ import {
 
     @if (status()) {
       <span
+        role="img"
         class="absolute z-10 rounded-full ring-2 ring-background size-[28%] min-h-2 min-w-2"
         [class]="statusDotClass()"
-        [attr.aria-label]="status()"
+        [attr.aria-label]="statusLabel()"
       ></span>
     }
   `,
@@ -85,8 +106,15 @@ export class BpdmAvatar {
   readonly colorful = input(true, { transform: booleanAttribute });
   /** Background-colored ring around the avatar (used by the group). */
   readonly ring = input(false, { transform: booleanAttribute });
+  /** Override the translatable strings (status dot labels). */
+  readonly messages = input<Partial<AvatarMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
 
+  protected readonly t = computed(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...this.messages() }));
+  protected readonly statusLabel = computed(() => {
+    const st = this.status();
+    return st ? this.t()[st] : null;
+  });
   protected readonly failed = signal(false);
   protected readonly initials = computed(() => {
     const n = this.name();
@@ -102,7 +130,7 @@ export class BpdmAvatar {
     if (!st) return "";
     return cn(
       avatarStatusColor[st],
-      this.shape() === "circle" ? "bottom-[6%] right-[6%]" : "-bottom-0.5 -right-0.5",
+      this.shape() === "circle" ? "bottom-[6%] end-[6%]" : "-bottom-0.5 -end-0.5",
     );
   });
   protected readonly hostClass = computed(() =>
@@ -137,14 +165,17 @@ export interface AvatarGroupUser {
         [src]="u.src"
         [status]="u.status"
         [size]="size()"
+        [messages]="messages()"
         ring
         class="transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
-        [class.-ml-2.5]="$index > 0"
+        [class.-ms-2.5]="$index > 0"
       />
     }
     @if (overflow() > 0) {
       <span
-        class="relative -ml-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
+        role="img"
+        [attr.aria-label]="overflowLabel()"
+        class="relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
         [class]="sizeClass()"
       >+{{ overflow() }}</span>
     }
@@ -155,6 +186,12 @@ export class BpdmAvatarGroup {
   /** Show at most this many avatars; the rest collapse into a "+N" tile. */
   readonly max = input<number>();
   readonly size = input<AvatarSize>("md");
+  /**
+   * Override the translatable strings. Forwarded down to each child avatar so a
+   * group-level `messages` localizes the children's status dots and the overflow
+   * tile.
+   */
+  readonly messages = input<Partial<AvatarMessages>>({});
 
   protected readonly shown = computed(() => {
     const m = this.max();
@@ -162,4 +199,8 @@ export class BpdmAvatarGroup {
   });
   protected readonly overflow = computed(() => this.users().length - this.shown().length);
   protected readonly sizeClass = computed(() => avatarSize[this.size()]);
+  protected readonly overflowLabel = computed(() => {
+    const t = { ...DEFAULT_AVATAR_MESSAGES, ...this.messages() };
+    return t.more.replace("{count}", String(this.overflow()));
+  });
 }

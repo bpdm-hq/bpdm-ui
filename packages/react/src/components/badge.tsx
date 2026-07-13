@@ -12,6 +12,14 @@ import { cn } from "@/lib/utils";
 
 export type { BadgeVariant, BadgeAppearance };
 
+// --- i18n ---
+export interface BadgeMessages {
+  /** Remove (X) button aria-label. */
+  remove: string;
+}
+
+export const DEFAULT_BADGE_MESSAGES: BadgeMessages = { remove: "Remove" };
+
 // local aliases so the component body below reads the same as before
 const DOT = badgeDot;
 const TONE = badgeTone;
@@ -29,6 +37,8 @@ export interface BadgeProps
   onRemove?: () => void;
   /** Render as the child element (e.g. an <a>) instead of a <span>. */
   asChild?: boolean;
+  /** Override the translatable strings (currently just the remove button label). */
+  messages?: Partial<BadgeMessages>;
 }
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
@@ -44,11 +54,13 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       asChild = false,
       children,
       onClick,
+      messages,
       ...props
     },
     ref,
   ) => {
     const [removing, setRemoving] = React.useState(false);
+    const t = React.useMemo(() => ({ ...DEFAULT_BADGE_MESSAGES, ...messages }), [messages]);
     const interactive = asChild || !!onClick;
     const ghost = appearance === "ghost";
     // ghost = no chrome (transparent, no border/padding); else the tinted/solid/outline tone
@@ -110,12 +122,12 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         {onRemove && (
           <button
             type="button"
-            aria-label="Remove"
+            aria-label={t.remove}
             onClick={(e) => {
               e.stopPropagation();
               setRemoving(true);
             }}
-            className="-mr-1 ml-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <svg viewBox="0 0 16 16" fill="none" className="size-2.5" aria-hidden>
               <path
@@ -163,6 +175,13 @@ export interface NotificationBadgeProps {
   showZero?: boolean;
   variant?: BadgeVariant;
   className?: string;
+  /**
+   * Accessible name for the indicator (e.g. "5 unread messages"). When set, the
+   * count/dot span gets `role="status"` + `aria-label` so a screen reader
+   * announces it; when unset the indicator stays decorative (the consumer's own
+   * icon/button carries the meaning).
+   */
+  ariaLabel?: string;
 }
 
 /**
@@ -178,6 +197,7 @@ export function NotificationBadge({
   showZero = false,
   variant = "destructive",
   className,
+  ariaLabel,
 }: NotificationBadgeProps) {
   const show = dot || (count !== undefined && (count > 0 || (count === 0 && showZero)));
   const label = dot
@@ -198,13 +218,15 @@ export function NotificationBadge({
         // the icon's corner whitespace (a count badge is wide enough already).
         <span
           className={cn(
-            "pointer-events-none absolute z-10 -translate-y-1/2 translate-x-1/2",
-            dot ? "right-1 top-1" : "right-0 top-0",
+            "pointer-events-none absolute z-10 -translate-y-1/2 translate-x-1/2 rtl:-translate-x-1/2",
+            dot ? "end-1 top-1" : "end-0 top-0",
           )}
         >
           <span
             // re-pops when the number changes
             key={label ?? "dot"}
+            role={ariaLabel ? "status" : undefined}
+            aria-label={ariaLabel}
             className={cn(
               "flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
               TONE[variant].solid,

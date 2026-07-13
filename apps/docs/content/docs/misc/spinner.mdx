@@ -449,34 +449,157 @@ export class OverlayCard {
   </Tab>
 </Tabs>
 
+## Internationalization
+
+The spinner announces itself to screen readers through a **visually-hidden
+label** — it has no other copy of its own. You set that label in one of three
+places, in order of precedence:
+
+1. **`label`** (per instance) — a string on a single `<Spinner>` / `<LoadingOverlay>`.
+   Best for context-specific announcements ("Loading results", "Saving").
+2. **`messages.loading`** — the app-wide default label, set via a single `messages`
+   object. It's a `Partial<SpinnerMessages>` merged over the English default, so a
+   spinner with no `label` announces this instead.
+3. The built-in default — **`"Loading"`** — used when neither is set.
+
+A string `label` always wins over `messages.loading`, which wins over the built-in
+default. Any **visible** overlay text (`LoadingOverlay`'s `label`) is your own copy
+— you translate it like the rest of the content you pass in.
+
+- **React** — pass `messages` to `<Spinner messages={{ loading: '…' }} />` or
+  `<LoadingOverlay messages={{ loading: '…' }} />`.
+- **Angular** — bind `[messages]` on `<bpdm-spinner>` and `<bpdm-loading-overlay>`.
+
+The spinner is **direction-neutral**: its animated shape is rotationally symmetric,
+so it mirrors cleanly under `dir="rtl"` with no extra prop. An inline spinner beside
+text, and the overlay's spinner-over-message stack, both follow the writing
+direction automatically.
+
+The example below sets the app-wide default label via `messages` — only that short
+built-in string is localised; any visible message you pass stays your own copy:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="spinner-i18n.tsx"
+import { Spinner, LoadingOverlay, type SpinnerMessages } from '@bpdm/ui/spinner';
+
+// Sets the app-wide default sr-only label used when no `label` is passed.
+const messages: Partial<SpinnerMessages> = {
+  loading: 'Wird geladen',
+};
+
+export function LoadingStates() {
+  return (
+    <>
+      {/* uses messages.loading → announces "Wird geladen" */}
+      <Spinner size="lg" messages={messages} />
+
+      {/* a per-instance label still wins over messages.loading */}
+      <Spinner size="sm" variant="dots" label="Loading results" messages={messages} />
+
+      <div className="relative h-24 rounded-xl border">
+        <LoadingOverlay show messages={messages} />
+      </div>
+    </>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="loading-states.ts"
+import { Component } from '@angular/core';
+import { BpdmSpinner, BpdmLoadingOverlay, type SpinnerMessages } from '@bpdm/ng';
+
+@Component({
+  selector: 'loading-states',
+  imports: [BpdmSpinner, BpdmLoadingOverlay],
+  templateUrl: './loading-states.html',
+})
+export class LoadingStates {
+  // Sets the app-wide default sr-only label used when no `label` is passed.
+  readonly messages: Partial<SpinnerMessages> = {
+    loading: 'Wird geladen',
+  };
+}
+```
+
+```html title="loading-states.html"
+<!-- uses messages.loading → announces "Wird geladen" -->
+<bpdm-spinner size="lg" [messages]="messages" />
+
+<!-- a per-instance label still wins over messages.loading -->
+<bpdm-spinner size="sm" variant="dots" label="Loading results" [messages]="messages" />
+
+<div class="relative h-24 rounded-xl border">
+  <bpdm-loading-overlay [show]="true" [messages]="messages" />
+</div>
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `Spinner` / `<bpdm-spinner>`
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `ring \| gradient \| square \| dots \| bars \| flip` | `ring` | Visual style. |
-| `size` | `xs \| sm \| md \| lg \| xl` | `md` | Spinner size. |
-| `label` | `string` | `Loading` | Visually-hidden accessible label. |
+| `variant` | `ring \| gradient \| square \| dots \| bars \| flip` | `ring` | Visual style. Angular: `[variant]`. |
+| `size` | `xs \| sm \| md \| lg \| xl` | `md` | Spinner size. Angular: `[size]`. |
+| `label` | `string` | `messages.loading` | Visually-hidden accessible label for this instance — **wins** over `messages.loading`. Angular: `[label]`. |
+| `messages` | `Partial<SpinnerMessages>` | English | Override the app-wide default sr-only label (see below). Angular: `[messages]`. |
+| `className` | `string` | — | Extra classes; a `text-*` class recolours the spinner. Angular: `class`. |
 
-Recolour with any `text-*` class — the spinner inherits `currentColor`.
+Recolour with any `text-*` class — the spinner inherits `currentColor`. In React
+all other native `<span>` attributes are forwarded onto the root.
 
 ### `LoadingOverlay` / `<bpdm-loading-overlay>`
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `show` | `boolean` | `true` | Render the overlay. |
-| `label` | `string` | — | Message shown under the spinner. |
-| `variant` | `SpinnerVariant` | `ring` | Spinner style. |
-| `size` | `SpinnerSize` | `md` (`lg` if `fullPage`) | Spinner size. |
-| `fullPage` | `boolean` | `false` | Cover the viewport instead of the ancestor. |
-| `blur` | `boolean` | `true` | Blur the content behind the scrim. |
+| `show` | `boolean` | `true` | Render the overlay. Angular: `[show]`. |
+| `label` | `string` | — | **Visible** message shown under the spinner; also names the inner spinner for screen readers. Angular: `[label]`. |
+| `variant` | `SpinnerVariant` | `ring` | Inner spinner style. Angular: `[variant]`. |
+| `size` | `SpinnerSize` | `md` (`lg` if `fullPage`) | Inner spinner size. Angular: `[size]`. |
+| `fullPage` | `boolean` | `false` | Cover the viewport instead of the nearest positioned ancestor. Angular: `[fullPage]`. |
+| `blur` | `boolean` | `true` | Blur the content behind the scrim. Angular: `[blur]`. |
+| `messages` | `Partial<SpinnerMessages>` | English | Override the inner spinner's default sr-only label when no `label` is set (see below). Angular: `[messages]`. |
+| `className` | `string` | — | **React** — extra classes on the overlay root. Angular: `class`. |
+
+Give the overlay's nearest ancestor `relative` so it's scoped to that box (or set
+`fullPage` to cover the viewport). In React all other native `<div>` attributes are
+forwarded onto the root.
+
+### App-wide copy — `messages`
+
+Set the spinner's default screen-reader label in one place (see
+[Internationalization](#internationalization)). It's a `Partial<SpinnerMessages>`
+merged over the English default — a per-instance `label` string still wins over it.
+
+- **React** — the `messages` prop on `<Spinner>` and `<LoadingOverlay>`.
+- **Angular** — the `[messages]` input on `<bpdm-spinner>` and `<bpdm-loading-overlay>`.
+
+| `SpinnerMessages` key | Default | Description |
+| --- | --- | --- |
+| `loading` | `Loading` | Visually-hidden accessible label announced while loading, used when no per-instance `label` is passed. |
 
 ## Accessibility
 
-- The spinner is a live region — `role="status"` with `aria-live="polite"` — and
-  carries a visually-hidden `label` (default "Loading") so screen readers
-  announce the loading state.
-- Set a meaningful `label` for context (e.g. "Loading results", "Saving").
-- `LoadingOverlay` also sets `aria-busy="true"` while shown.
+- The spinner is a **live region** — `role="status"` with `aria-live="polite"` — so
+  assistive tech announces the loading state when it appears, without interrupting.
+- It carries a **visually-hidden label** (the per-instance `label`, else
+  `messages.loading`, else the built-in `"Loading"`), so the loading state is
+  conveyed as text — never by motion or colour alone.
+- The animated shape itself is decorative; the accessible name comes from that
+  hidden label, so set a meaningful `label` for context (e.g. "Loading results",
+  "Saving").
+- `LoadingOverlay` adds `aria-busy="true"` while shown and covers its nearest
+  positioned ancestor — or the whole viewport with `fullPage`. Its visible `label`
+  doubles as the inner spinner's accessible name.
+- Everything is **direction-neutral** under `dir="rtl"`: the animated shape is
+  rotationally symmetric, and the inline spinner-plus-text and the overlay's
+  spinner-over-message stack follow the writing direction.
 - The animation respects `prefers-reduced-motion`.
