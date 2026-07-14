@@ -79,6 +79,21 @@ describe("BpdmSpinner", () => {
     expect(sr()).toBe("Please wait");
   });
 
+  it("drops its live region and sr-only label when announce is false", () => {
+    TestBed.overrideComponent(SpinnerI18nHost, {
+      set: {
+        imports: [BpdmSpinner],
+        template: `<bpdm-spinner [announce]="false" />`,
+      },
+    });
+    const fixture = TestBed.createComponent(SpinnerI18nHost);
+    fixture.detectChanges();
+    const host = fixture.nativeElement.querySelector("bpdm-spinner") as HTMLElement;
+    expect(host.getAttribute("role")).toBeNull();
+    expect(host.getAttribute("aria-live")).toBeNull();
+    expect(host.querySelector(".sr-only")).toBeFalsy();
+  });
+
   it("renders each variant's shape", () => {
     const fixture = TestBed.createComponent(SpinnerI18nHost);
 
@@ -104,6 +119,10 @@ describe("BpdmLoadingOverlay", () => {
     expect(host.getAttribute("aria-live")).toBe("polite");
     expect(host.getAttribute("aria-busy")).toBe("true");
     expect(host.classList.contains("hidden")).toBe(false);
+    // the overlay is the single live region — the inner spinner drops its own
+    // role=status so screen readers announce once, not twice.
+    const spinner = host.querySelector("bpdm-spinner") as HTMLElement;
+    expect(spinner.getAttribute("role")).toBeNull();
 
     fixture.componentInstance.show.set(false);
     fixture.detectChanges();
@@ -121,19 +140,20 @@ describe("BpdmLoadingOverlay", () => {
     expect(host.querySelector("p")?.textContent).toContain("Saving");
   });
 
-  it("resolves the inner spinner label from messages, and label wins over messages", () => {
+  it("announces via an sr-only fallback from messages when no label is given; the visible label wins", () => {
     const fixture = TestBed.createComponent(OverlayHost);
     fixture.componentInstance.messages.set({ loading: "Cargando" });
     fixture.detectChanges();
-    const sr = () =>
-      (
-        fixture.nativeElement.querySelector("bpdm-spinner .sr-only") as HTMLElement
-      ).textContent?.trim();
+    const host = fixture.nativeElement.querySelector("bpdm-loading-overlay") as HTMLElement;
 
-    expect(sr()).toBe("Cargando");
+    // no visible label → the overlay's own sr-only fallback carries the announcement
+    expect(host.querySelector(".sr-only")?.textContent?.trim()).toBe("Cargando");
+    expect(host.querySelector("p")).toBeFalsy();
 
+    // a visible label replaces the fallback (single announced text, no duplicate)
     fixture.componentInstance.label.set("Saving");
     fixture.detectChanges();
-    expect(sr()).toBe("Saving");
+    expect(host.querySelector("p")?.textContent).toContain("Saving");
+    expect(host.querySelector(".sr-only")).toBeFalsy();
   });
 });

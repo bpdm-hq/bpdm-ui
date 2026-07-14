@@ -26,6 +26,16 @@
   --bpdm-duration-fast: 120ms;
   --bpdm-duration-base: 180ms;
   --bpdm-duration-slow: 240ms;
+
+  /* Active option indicator — Select / Multi-Select / Tree-Select. The
+     keyboard-active (highlighted) row gets a soft brand tint plus an amber
+     inline-start bar. The BAR carries the WCAG 1.4.11 ≥3:1 indicator contrast
+     (the tint alone is decorative, ~1.05:1). These follow the active theme's
+     `--ring`/`--primary`. Override to restyle — or set the bar to `transparent`
+     to remove it, in which case make `--bpdm-option-active-bg` itself meet 3:1
+     so the highlight stays perceivable (that opt-out is your a11y call). */
+  --bpdm-option-active-bg: color-mix(in oklab, var(--primary) 10%, transparent);
+  --bpdm-option-active-bar: var(--ring);
 }
 
 /* ── LIGHT · Warm Paper (default) ─────────────────────────────── */

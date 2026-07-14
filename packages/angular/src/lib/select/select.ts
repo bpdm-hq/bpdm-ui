@@ -114,7 +114,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span class="truncate" [class.text-muted-foreground]="!selectedLabel()">
+      <span class="truncate" [class.text-muted-foreground]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
         {{ selectedLabel() || placeholder() }}
       </span>
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]" [class.rotate-180]="open()">
@@ -163,7 +163,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     }
                   </span>
-                  <span class="truncate">{{ r.option.label }}</span>
+                  <span class="truncate" [attr.title]="r.option.label">{{ r.option.label }}</span>
                 </button>
               }
             </ng-container>
@@ -239,7 +239,11 @@ export class BpdmSelect implements OnDestroy {
   protected optionClass(i: number): string {
     return cn(
       "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
-      i === this.active() && "bg-muted",
+      // keyboard-active / hovered row: an amber inline-start bar (ring token, ≥3:1
+      // in every theme) + soft tint + weight — clearly perceptible where bg-muted
+      // alone was ~1.05:1. RTL-safe (logical shadow mirror), jitter-free (inset).
+      i === this.active() &&
+        "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
     );
   }
 
@@ -325,6 +329,53 @@ export class BpdmSelect implements OnDestroy {
     }
   }
 
+  /** Jump the active row to the first / last selectable option (skips groups). */
+  private jumpTo(edge: "start" | "end"): void {
+    const rows = this.rows();
+    let i = -1;
+    if (edge === "start") {
+      i = rows.findIndex((r) => r.kind === "item");
+    } else {
+      for (let k = rows.length - 1; k >= 0; k--)
+        if (rows[k].kind === "item") {
+          i = k;
+          break;
+        }
+    }
+    if (i < 0) return;
+    this.active.set(i);
+    this.viewport()?.scrollToIndex(i, "smooth");
+  }
+
+  private typeahead = "";
+  private typeaheadTimer?: ReturnType<typeof setTimeout>;
+  // APG type-ahead: accumulate rapid keystrokes and jump to the first option whose
+  // label starts with the buffer. A lone repeated key cycles matches.
+  private onType(char: string): void {
+    if (this.typeaheadTimer) clearTimeout(this.typeaheadTimer);
+    const q = (this.typeahead + char).toLowerCase();
+    this.typeahead = q;
+    this.typeaheadTimer = setTimeout(() => {
+      this.typeahead = "";
+    }, 500);
+    const rows = this.rows();
+    const items: number[] = [];
+    for (let i = 0; i < rows.length; i++) if (rows[i].kind === "item") items.push(i);
+    if (!items.length) return;
+    const pos = items.indexOf(this.active());
+    // fresh single char → start after the active row (cycle); accumulating → include it
+    const offset = q.length === 1 ? 1 : 0;
+    for (let n = 0; n < items.length; n++) {
+      const idx = items[(pos + offset + n + items.length) % items.length];
+      const r = rows[idx];
+      if (r.kind === "item" && r.option.label.toLowerCase().startsWith(q)) {
+        this.active.set(idx);
+        this.viewport()?.scrollToIndex(idx, "smooth");
+        return;
+      }
+    }
+  }
+
   protected onKeydown(e: KeyboardEvent): void {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -332,6 +383,12 @@ export class BpdmSelect implements OnDestroy {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       this.move(-1);
+    } else if (e.key === "Home" && !this.searchable()) {
+      e.preventDefault();
+      this.jumpTo("start");
+    } else if (e.key === "End" && !this.searchable()) {
+      e.preventDefault();
+      this.jumpTo("end");
     } else if (e.key === "Enter") {
       e.preventDefault();
       const r = this.rows()[this.active()];
@@ -339,10 +396,22 @@ export class BpdmSelect implements OnDestroy {
     } else if (e.key === "Escape") {
       e.preventDefault();
       this.close();
+    } else if (
+      !this.searchable() &&
+      e.key.length === 1 &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey &&
+      /\S/.test(e.key)
+    ) {
+      // printable character → type-ahead (only when there's no filter input)
+      e.preventDefault();
+      this.onType(e.key);
     }
   }
 
   ngOnDestroy(): void {
+    if (this.typeaheadTimer) clearTimeout(this.typeaheadTimer);
     this.overlayRef?.dispose();
   }
 }

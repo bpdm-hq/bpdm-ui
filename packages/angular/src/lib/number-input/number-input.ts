@@ -58,7 +58,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           [attr.aria-label]="t().decrease"
           [disabled]="disabled() || atMin()"
           (click)="step1(-1)"
-          [class]="btnClass('dec', dims().btn + ' border-r border-input')"
+          [class]="btnClass('dec', dims().btn + ' border-e border-input')"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path [attr.d]="glyph.minus" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -76,6 +76,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           role="spinbutton"
           [id]="id() || null"
           [attr.name]="name() || null"
+          [attr.autocomplete]="autoComplete() || null"
           [attr.aria-label]="ariaLabel() || null"
           [attr.aria-labelledby]="ariaLabelledby() || null"
           [attr.aria-describedby]="ariaDescribedby() || null"
@@ -104,14 +105,14 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           [attr.aria-label]="t().increase"
           [disabled]="disabled() || atMax()"
           (click)="step1(1)"
-          [class]="btnClass('inc', dims().btn + ' border-l border-input')"
+          [class]="btnClass('inc', dims().btn + ' border-s border-input')"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path [attr.d]="glyph.plus" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
       } @else {
-        <div class="flex w-7 flex-col border-l border-input">
+        <div class="flex w-7 flex-col border-s border-input">
           <button
             type="button"
             [attr.aria-label]="t().increase"
@@ -159,6 +160,8 @@ export class BpdmNumberInput {
   readonly id = input<string>("");
   /** Native `name` for form submission, forwarded to the inner `<input>`. */
   readonly name = input<string>("");
+  /** Native `autocomplete` hint, forwarded to the inner `<input>`. */
+  readonly autoComplete = input<string>("");
   /** Accessible name for the field, forwarded to the inner `<input>`. */
   readonly ariaLabel = input<string>("", { alias: "aria-label" });
   /** IDs of labelling elements, forwarded to the inner `<input>`. */

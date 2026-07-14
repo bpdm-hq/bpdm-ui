@@ -25,6 +25,21 @@ export interface BadgeMessages {
 
 export const DEFAULT_BADGE_MESSAGES: BadgeMessages = { remove: "Remove" };
 
+export interface NotificationBadgeMessages {
+  /**
+   * Accessible label for a numeric count — receives the displayed count text
+   * (already capped, e.g. `"99+"`). Default `"{count} notifications"`.
+   */
+  count: (count: string) => string;
+  /** Accessible label for the dot (no-number) indicator. Default "New notifications". */
+  dot: string;
+}
+
+export const DEFAULT_NOTIFICATION_BADGE_MESSAGES: NotificationBadgeMessages = {
+  count: (count) => `${count} notifications`,
+  dot: "New notifications",
+};
+
 /**
  * `<bpdm-badge>` — a compact status/label chip. Six variants × four appearances
  * (`soft`/`solid`/`outline`/`ghost`), an optional status `dot` (with a `pulse`
@@ -45,7 +60,12 @@ export const DEFAULT_BADGE_MESSAGES: BadgeMessages = { remove: "Remove" };
   },
   template: `
     <span [class]="removable() ? 'block min-w-0 overflow-hidden' : 'contents'">
-      <span [class]="badgeClass()">
+      <span
+        [class]="badgeClass()"
+        [attr.role]="interactive() ? 'button' : null"
+        [attr.tabindex]="interactive() ? 0 : null"
+        (keydown)="onKeyDown($event)"
+      >
         @if (dot()) {
           <span class="relative flex size-2 shrink-0">
             @if (pulse()) {
@@ -109,6 +129,10 @@ export class BpdmBadge {
       tone,
       ghost && "h-auto gap-1.5 px-0 text-sm font-normal",
       this.interactive() && "cursor-pointer active:scale-[0.96]",
+      // an interactive badge is keyboard-operable (role=button + tabindex), so it
+      // needs a visible focus ring like the rest of the library's controls
+      this.interactive() &&
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       this.removable() &&
         "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
       this.classInput(),
@@ -122,6 +146,19 @@ export class BpdmBadge {
       this.removing() ? "grid-cols-[0fr] opacity-0" : "grid-cols-[1fr] opacity-100",
     );
   });
+
+  /**
+   * An interactive badge (`role="button"`, focusable) activates on Enter/Space —
+   * the synthesized click bubbles to the host's `(click)` binding, mirroring a
+   * pointer click.
+   */
+  protected onKeyDown(e: KeyboardEvent): void {
+    if (!this.interactive()) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      (e.target as HTMLElement).click();
+    }
+  }
 
   protected remove(event: Event): void {
     event.stopPropagation();
@@ -158,8 +195,8 @@ export class BpdmBadge {
         <span
           class="flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
           [class]="indicatorClass()"
-          [attr.role]="ariaLabel() ? 'status' : null"
-          [attr.aria-label]="ariaLabel()"
+          [attr.role]="announced() ? 'status' : null"
+          [attr.aria-label]="announced()"
         >{{ label() }}</span>
       </span>
     }
@@ -176,12 +213,22 @@ export class BpdmNotificationBadge {
   readonly showZero = input(false, { transform: booleanAttribute });
   readonly variant = input<BadgeVariant>("destructive");
   /**
-   * Accessible name for the indicator (e.g. "5 unread messages"). When set, the
-   * count/dot span gets `role="status"` + `aria-label` so a screen reader
-   * announces it; when unset the indicator stays decorative.
+   * Accessible name for the indicator. Overrides the default templated label
+   * (`messages`). Set this when the meaning is more specific than the generic
+   * default (e.g. "5 unread messages").
    */
   readonly ariaLabel = input<string | undefined>();
+  /**
+   * Override the translatable label templates. By default the indicator
+   * announces meaningfully — "{count} notifications" for a count, "New
+   * notifications" for a dot — so a screen reader never reads a bare "5".
+   */
+  readonly messages = input<Partial<NotificationBadgeMessages>>({});
 
+  protected readonly t = computed(() => ({
+    ...DEFAULT_NOTIFICATION_BADGE_MESSAGES,
+    ...this.messages(),
+  }));
   protected readonly show = computed(() => {
     if (this.dot()) return true;
     const c = this.count();
@@ -192,6 +239,15 @@ export class BpdmNotificationBadge {
     const c = this.count();
     if (c === undefined) return "";
     return c > this.max() ? `${this.max()}+` : String(c);
+  });
+  // Announce meaningfully by default so a screen reader never reads a bare "5".
+  // An explicit `ariaLabel` wins; otherwise use the templated label.
+  protected readonly announced = computed(() => {
+    const explicit = this.ariaLabel();
+    if (explicit) return explicit;
+    if (this.dot()) return this.t().dot;
+    const l = this.label();
+    return l ? this.t().count(l) : undefined;
   });
   protected readonly indicatorClass = computed(() =>
     cn(

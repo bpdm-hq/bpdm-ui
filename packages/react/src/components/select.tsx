@@ -22,7 +22,7 @@ const isGroup = (x: SelectOption | SelectOptionGroup): x is SelectOptionGroup =>
   Array.isArray((x as SelectOptionGroup).options);
 
 const triggerVariants = cva(
-  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus:ring-destructive",
+  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
   {
     variants: {
       size: {
@@ -197,6 +197,46 @@ export function Select({
       return i < 0 || i >= rows.length ? cur : i;
     });
 
+  // first / last selectable option row (skips group headers) — for Home / End
+  const edgeItem = (from: "start" | "end") => {
+    if (from === "start") return rows.findIndex((r) => r.kind === "item");
+    for (let i = rows.length - 1; i >= 0; i--) if (rows[i].kind === "item") return i;
+    return -1;
+  };
+
+  // APG type-ahead: accumulate rapid keystrokes and jump to the first option
+  // whose label starts with the buffer. A lone repeated key cycles matches.
+  const typeahead = React.useRef("");
+  const typeaheadTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(
+    () => () => {
+      if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current);
+    },
+    [],
+  );
+  const onType = (char: string) => {
+    if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current);
+    const q = (typeahead.current + char).toLowerCase();
+    typeahead.current = q;
+    typeaheadTimer.current = setTimeout(() => {
+      typeahead.current = "";
+    }, 500);
+    const items: number[] = [];
+    for (let i = 0; i < rows.length; i++) if (rows[i].kind === "item") items.push(i);
+    if (!items.length) return;
+    const pos = items.indexOf(active);
+    // fresh single char → start after the active row (cycle); accumulating → include it
+    const offset = q.length === 1 ? 1 : 0;
+    for (let n = 0; n < items.length; n++) {
+      const idx = items[(pos + offset + n + items.length) % items.length];
+      const r = rows[idx];
+      if (r.kind === "item" && r.option.label.toLowerCase().startsWith(q)) {
+        setActive(idx);
+        return;
+      }
+    }
+  };
+
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -204,10 +244,29 @@ export function Select({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       move(-1);
+    } else if (e.key === "Home" && !searchable) {
+      e.preventDefault();
+      const i = edgeItem("start");
+      if (i >= 0) setActive(i);
+    } else if (e.key === "End" && !searchable) {
+      e.preventDefault();
+      const i = edgeItem("end");
+      if (i >= 0) setActive(i);
     } else if (e.key === "Enter") {
       e.preventDefault();
       const r = rows[active];
       if (r?.kind === "item" && !r.option.disabled) commit(r.option.value);
+    } else if (
+      !searchable &&
+      e.key.length === 1 &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey &&
+      /\S/.test(e.key)
+    ) {
+      // printable character → type-ahead (only when there's no filter input)
+      e.preventDefault();
+      onType(e.key);
     }
   };
 
@@ -232,7 +291,10 @@ export function Select({
           disabled={disabled}
           className={cn(triggerVariants({ size }), "group", className)}
         >
-          <span className={cn("truncate", !selectedLabel && "text-muted-foreground")}>
+          <span
+            className={cn("truncate", !selectedLabel && "text-muted-foreground")}
+            title={selectedLabel ?? placeholder}
+          >
             {selectedLabel ?? placeholder}
           </span>
           <FieldChevron />
@@ -335,7 +397,12 @@ export function Select({
                       onMouseMove={() => setActive(vi.index)}
                       className={cn(
                         "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
-                        isActive && "bg-muted",
+                        // keyboard-active / hovered row: an amber inline-start bar (ring
+                        // token, ≥3:1 in every theme) + soft tint + weight — clearly
+                        // perceptible where bg-muted alone was ~1.05:1. RTL-safe (logical
+                        // shadow mirror), jitter-free (inset shadow takes no layout space).
+                        isActive &&
+                          "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
                       )}
                       {...common}
                     >
@@ -347,7 +414,9 @@ export function Select({
                         )}
                       </span>
                       {o.icon}
-                      <span className="truncate">{o.label}</span>
+                      <span className="truncate" title={o.label}>
+                        {o.label}
+                      </span>
                     </button>
                   );
                 })}

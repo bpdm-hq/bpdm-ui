@@ -48,7 +48,7 @@ let meterUid = 0;
   host: { class: "block w-full" },
   template: `
     <div [class]="rootClass()">
-      <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null">
+      <div [class]="wrapClass()">
         <input
           [id]="id() || null"
           [type]="revealed() ? 'text' : 'password'"

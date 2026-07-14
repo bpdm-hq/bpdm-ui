@@ -15,6 +15,14 @@ describe("Accordion", () => {
     ITEMS.forEach((i) => expect(screen.getByRole("button", { name: i.title as string })).toBeTruthy());
   });
 
+  it("gives the trigger a focus ring with an offset (separated from the header)", () => {
+    render(<Accordion items={ITEMS} />);
+    const trigger = screen.getByRole("button", { name: "First" });
+    expect(trigger.className).toContain("focus-visible:ring-2");
+    expect(trigger.className).toContain("focus-visible:ring-offset-2");
+    expect(trigger.className).toContain("focus-visible:ring-offset-background");
+  });
+
   it("opens the defaultValue section", () => {
     render(<Accordion items={ITEMS} defaultValue="a" />);
     expect(screen.getByRole("button", { name: "First" })).toHaveAttribute("aria-expanded", "true");

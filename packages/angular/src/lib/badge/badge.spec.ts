@@ -2,13 +2,29 @@ import { Component, signal } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { vi } from "vitest";
-import { BpdmBadge, BpdmNotificationBadge, type BadgeMessages } from "./badge";
+import {
+  BpdmBadge,
+  BpdmNotificationBadge,
+  type BadgeMessages,
+  type NotificationBadgeMessages,
+} from "./badge";
 
 @Component({
   imports: [BpdmBadge],
   template: `<bpdm-badge variant="success" appearance="solid">Active</bpdm-badge>`,
 })
 class BadgeHost {}
+
+@Component({
+  imports: [BpdmBadge],
+  template: `<bpdm-badge interactive (click)="onClick()">Filter</bpdm-badge>`,
+})
+class InteractiveBadgeHost {
+  clicks = 0;
+  onClick(): void {
+    this.clicks++;
+  }
+}
 
 @Component({
   imports: [BpdmBadge],
@@ -38,6 +54,7 @@ class NotifHost {}
     [dot]="dot()"
     [showZero]="showZero()"
     [ariaLabel]="ariaLabel()"
+    [messages]="messages()"
     >x</bpdm-notification-badge
   >`,
 })
@@ -47,6 +64,7 @@ class NotifConfigHost {
   readonly dot = signal(false);
   readonly showZero = signal(false);
   readonly ariaLabel = signal<string | undefined>(undefined);
+  readonly messages = signal<Partial<NotificationBadgeMessages>>({});
 }
 
 /** Dispatch a `transitionend` for a given CSS property (env-agnostic — no `TransitionEvent`). */
@@ -112,6 +130,27 @@ describe("BpdmBadge", () => {
     fireTransitionEnd(badgeEl, "grid-template-columns"); // the collapse transition → emit
     expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  it("makes an interactive badge keyboard-operable (role=button, focusable, Enter/Space)", () => {
+    const fixture = TestBed.createComponent(InteractiveBadgeHost);
+    fixture.detectChanges();
+    const badge = fixture.nativeElement.querySelector("span.inline-flex") as HTMLElement;
+    expect(badge.getAttribute("role")).toBe("button");
+    expect(badge.getAttribute("tabindex")).toBe("0");
+
+    badge.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    badge.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.clicks).toBe(2);
+  });
+
+  it("leaves a non-interactive badge without a button role / tabindex", () => {
+    const fixture = TestBed.createComponent(BadgeHost);
+    fixture.detectChanges();
+    const badge = fixture.nativeElement.querySelector("span.inline-flex") as HTMLElement;
+    expect(badge.getAttribute("role")).toBeNull();
+    expect(badge.getAttribute("tabindex")).toBeNull();
+  });
 });
 
 describe("BpdmNotificationBadge", () => {
@@ -160,9 +199,37 @@ describe("BpdmNotificationBadge", () => {
     expect(status.textContent).toContain("5");
   });
 
-  it("keeps the indicator decorative when no ariaLabel is given", () => {
+  it("announces a meaningful default label including the count", () => {
     const fixture = TestBed.createComponent(NotifConfigHost);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('[role="status"]')).toBeFalsy();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status).toBeTruthy();
+    expect(status.getAttribute("aria-label")).toBe("5 notifications");
+    expect(status.textContent).toContain("5");
+  });
+
+  it("uses the capped count text in the default label", () => {
+    const fixture = TestBed.createComponent(NotifConfigHost);
+    fixture.componentInstance.count.set(128);
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status.getAttribute("aria-label")).toBe("99+ notifications");
+  });
+
+  it("announces a default dot label", () => {
+    const fixture = TestBed.createComponent(NotifConfigHost);
+    fixture.componentInstance.dot.set(true);
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status.getAttribute("aria-label")).toBe("New notifications");
+  });
+
+  it("supports overriding the label templates via [messages] (i18n)", () => {
+    const fixture = TestBed.createComponent(NotifConfigHost);
+    fixture.componentInstance.count.set(3);
+    fixture.componentInstance.messages.set({ count: (c) => `${c} ungelesene Nachrichten` });
+    fixture.detectChanges();
+    const status = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
+    expect(status.getAttribute("aria-label")).toBe("3 ungelesene Nachrichten");
   });
 });

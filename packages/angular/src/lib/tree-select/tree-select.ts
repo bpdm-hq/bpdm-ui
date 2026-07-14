@@ -180,7 +180,7 @@ let treeUid = 0;
         [attr.aria-expanded]="n.children?.length ? isExpanded(n) : null"
         [attr.aria-disabled]="n.disabled || null"
       >
-        <div class="flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted" [class.bg-muted]="activeValue() === n.value" [style.paddingInlineStart.px]="8 + depth * 18">
+        <div [class]="rowClass(n)" [style.paddingInlineStart.px]="8 + depth * 18" (mousemove)="activeValue.set(n.value)">
           @if (n.children?.length) {
             <button type="button" tabindex="-1" [attr.aria-label]="isExpanded(n) ? t().collapse : t().expand" (click)="toggleExpand(n.value)" class="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground">
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 transition-transform rtl:-scale-x-100" [class.rotate-90]="isExpanded(n)"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -349,6 +349,18 @@ export class BpdmTreeSelect implements OnDestroy {
     return cn(
       "grid size-4 shrink-0 place-items-center rounded-[4px] border",
       on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/50",
+    );
+  }
+
+  protected rowClass(n: TreeNode): string {
+    return cn(
+      "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
+      // active treeitem — follows both the keyboard (aria-activedescendant) and the
+      // pointer (mousemove), so a single highlight tracks the cursor. An amber
+      // inline-start bar (ring token, ≥3:1 in every theme) + soft tint + weight —
+      // clearly perceptible where bg-muted alone was ~1.05:1. RTL-safe, jitter-free.
+      this.activeValue() === n.value &&
+        "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
     );
   }
 

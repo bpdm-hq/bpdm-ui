@@ -64,6 +64,14 @@ describe("BpdmAccordion", () => {
     expect(fixture.nativeElement.textContent).toContain("Body A");
   });
 
+  it("gives the trigger a focus ring with an offset (separated from the header)", () => {
+    const fixture = create();
+    const btn = fixture.nativeElement.querySelector("button") as HTMLElement;
+    expect(btn.className).toContain("focus-visible:ring-2");
+    expect(btn.className).toContain("focus-visible:ring-offset-2");
+    expect(btn.className).toContain("focus-visible:ring-offset-background");
+  });
+
   it("wires each trigger to its panel (ids + aria-controls / aria-labelledby)", () => {
     const fixture = create();
     const btn = fixture.nativeElement.querySelector("button") as HTMLElement;

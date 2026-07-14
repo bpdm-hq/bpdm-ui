@@ -19,6 +19,12 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> {
   label?: string;
   /** Override the translatable strings (currently just the loading label). */
   messages?: Partial<SpinnerMessages>;
+  /**
+   * Own a live region (`role="status"` + a visually-hidden label). Default true.
+   * Set `false` when the spinner sits inside another live region (e.g. a
+   * `LoadingOverlay`) so screen readers announce once, not twice.
+   */
+  announce?: boolean;
 }
 
 /**
@@ -27,14 +33,14 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> {
  * recolor), sizes xs–xl, and announces itself to screen readers.
  */
 export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
-  ({ variant = "ring", size = "md", label, messages, className, ...props }, ref) => {
+  ({ variant = "ring", size = "md", label, messages, announce = true, className, ...props }, ref) => {
     const s = spinnerSize[size];
     const t = React.useMemo(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...messages }), [messages]);
     return (
       <span
         ref={ref}
-        role="status"
-        aria-live="polite"
+        role={announce ? "status" : undefined}
+        aria-live={announce ? "polite" : undefined}
         className={cn("inline-flex items-center justify-center text-primary", className)}
         {...props}
       >
@@ -126,7 +132,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
           </span>
         )}
 
-        <span className="sr-only">{label ?? t.loading}</span>
+        {announce && <span className="sr-only">{label ?? t.loading}</span>}
       </span>
     );
   },
@@ -174,8 +180,16 @@ export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayPro
         )}
         {...props}
       >
-        <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} label={label ?? t.loading} />
-        {label && <p className="m-0 text-sm font-medium text-muted-foreground">{label}</p>}
+        {/* The overlay itself is the single live region, so the spinner doesn't
+            announce (avoids a nested `role="status"` double-announce). The
+            overlay owns the accessible text: the visible label, or an sr-only
+            fallback when there's no visible message. */}
+        <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} announce={false} />
+        {label ? (
+          <p className="m-0 text-sm font-medium text-muted-foreground">{label}</p>
+        ) : (
+          <span className="sr-only">{t.loading}</span>
+        )}
         {children}
       </div>
     );

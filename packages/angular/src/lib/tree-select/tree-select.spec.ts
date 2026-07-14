@@ -128,6 +128,33 @@ describe("BpdmTreeSelect", () => {
       expect((document.querySelector('[role="treeitem"]') as HTMLElement).getAttribute("aria-expanded")).toBe("false");
     });
 
+    it("marks the active treeitem row with the accessible amber indicator", async () => {
+      const fixture = TestBed.createComponent(Host);
+      await open(fixture);
+      const tree = document.querySelector('[role="tree"]') as HTMLElement;
+      const active = document.getElementById(
+        tree.getAttribute("aria-activedescendant")!,
+      ) as HTMLElement;
+      const row = active.firstElementChild as HTMLElement;
+      expect(row.className).toContain("bg-[var(--bpdm-option-active-bg)]");
+      expect(row.className).toContain("shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)]");
+      expect(row.className).toContain("rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]");
+    });
+
+    it("pointer move sets the hovered treeitem active, so the single highlight follows the cursor", async () => {
+      const fixture = TestBed.createComponent(Host);
+      await open(fixture);
+      const tree = document.querySelector('[role="tree"]') as HTMLElement;
+      key(tree, "ArrowRight"); // expand Parent so its children are visible
+      const child2 = Array.from(document.querySelectorAll('[role="treeitem"]')).find(
+        (i) => i.textContent?.includes("Child 2"),
+      ) as HTMLElement;
+      const row = child2.firstElementChild as HTMLElement;
+      row.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+      tick();
+      expect(tree.getAttribute("aria-activedescendant")).toBe(child2.id); // amber moved to hovered row
+    });
+
     it("toggles selection of the active treeitem with Space/Enter", async () => {
       const fixture = TestBed.createComponent(Host);
       await open(fixture);

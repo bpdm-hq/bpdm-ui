@@ -32,6 +32,12 @@ class NoFeedbackHost {}
 })
 class PassthroughHost {}
 
+@Component({
+  imports: [BpdmPasswordInput],
+  template: `<bpdm-password-input aria-invalid defaultValue="abc" />`,
+})
+class InvalidHost {}
+
 describe("scorePassword", () => {
   it("scores from length + variety, capped at 4", () => {
     expect(scorePassword("")).toBe(0);
@@ -85,5 +91,14 @@ describe("BpdmPasswordInput", () => {
     fixture.detectChanges();
     const toggle = fixture.nativeElement.querySelector("button") as HTMLButtonElement;
     expect(toggle.className).toContain("focus-visible:ring-2");
+  });
+
+  it("sets aria-invalid on the input (the widget), not on the wrapper div", () => {
+    const fixture = TestBed.createComponent(InvalidHost);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector("input") as HTMLInputElement;
+    const wrapper = fixture.nativeElement.querySelector("div > div") as HTMLElement;
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    expect(wrapper.hasAttribute("aria-invalid")).toBe(false);
   });
 });

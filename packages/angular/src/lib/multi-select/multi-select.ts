@@ -271,7 +271,11 @@ export class BpdmMultiSelect implements OnDestroy {
   protected optionClass(i: number): string {
     return cn(
       "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
-      i === this.active() && "bg-muted",
+      // keyboard-active / hovered row: an amber inline-start bar (ring token, ≥3:1
+      // in every theme) + soft tint + weight — clearly perceptible where bg-muted
+      // alone was ~1.05:1. RTL-safe (logical shadow mirror), jitter-free (inset).
+      i === this.active() &&
+        "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
     );
   }
 

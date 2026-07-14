@@ -107,4 +107,14 @@ describe("NumberInput", () => {
     await userEvent.type(textbox(), "42");
     expect(textbox().value).toBe("42");
   });
+
+  it("uses logical (RTL-safe) divider borders on the horizontal steppers", () => {
+    render(<NumberInput defaultValue="1" buttonLayout="horizontal" />);
+    // decrease is start-side (border-e = trailing edge); increase is end-side (border-s)
+    expect(stepper("Decrease").className).toMatch(/border-e/);
+    expect(stepper("Increase").className).toMatch(/border-s/);
+    // and no physical left/right border classes remain
+    expect(stepper("Decrease").className).not.toMatch(/border-r\b/);
+    expect(stepper("Increase").className).not.toMatch(/border-l\b/);
+  });
 });

@@ -16,9 +16,14 @@ export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
 export interface ToastMessages {
   /** Dismiss (X) button aria-label. */
   dismiss: string;
+  /** Accessible label for the toast live-region / viewport. */
+  regionLabel: string;
 }
 
-export const DEFAULT_TOAST_MESSAGES: ToastMessages = { dismiss: "Dismiss" };
+export const DEFAULT_TOAST_MESSAGES: ToastMessages = {
+  dismiss: "Dismiss",
+  regionLabel: "Notifications",
+};
 
 export interface ToastAction {
   label: string;
@@ -234,9 +239,10 @@ export function Toaster({
 
   const cfg = POSITIONS[position];
   const dismissLabel = messages?.dismiss ?? DEFAULT_TOAST_MESSAGES.dismiss;
+  const regionLabel = messages?.regionLabel ?? DEFAULT_TOAST_MESSAGES.regionLabel;
 
   return (
-    <ToastPrimitive.Provider duration={duration} swipeDirection={cfg.swipe}>
+    <ToastPrimitive.Provider duration={duration} swipeDirection={cfg.swipe} label={regionLabel}>
       {list.map((t) => (
         <ToastItem
           key={t.id}
@@ -247,6 +253,7 @@ export function Toaster({
         />
       ))}
       <ToastPrimitive.Viewport
+        label={regionLabel}
         className={cn(
           "pointer-events-none fixed z-[100] m-0 flex w-[min(24rem,calc(100vw-2rem))] list-none flex-col gap-3 p-4 outline-none",
           cfg.viewport,

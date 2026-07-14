@@ -15,6 +15,17 @@ class CardHost {}
 class HoverableHost {}
 
 @Component({
+  imports: [BpdmCard],
+  template: `<bpdm-card interactive (click)="onClick()">Open</bpdm-card>`,
+})
+class InteractiveCardHost {
+  clicks = 0;
+  onClick(): void {
+    this.clicks++;
+  }
+}
+
+@Component({
   imports: [BpdmCardFooter],
   template: `<div bpdmCardFooter [divider]="divider()">footer</div>`,
 })
@@ -71,5 +82,26 @@ describe("BpdmCard", () => {
     fixture.detectChanges();
     const card = fixture.nativeElement.querySelector("bpdm-card") as HTMLElement;
     expect(card.classList.contains("no-underline")).toBe(true);
+  });
+
+  it("makes an interactive card keyboard-operable (role=button, focusable, Enter/Space)", () => {
+    const fixture = TestBed.createComponent(InteractiveCardHost);
+    fixture.detectChanges();
+    const card = fixture.nativeElement.querySelector("bpdm-card") as HTMLElement;
+    expect(card.getAttribute("role")).toBe("button");
+    expect(card.getAttribute("tabindex")).toBe("0");
+
+    card.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    card.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.clicks).toBe(2);
+  });
+
+  it("leaves a non-interactive card without a button role / tabindex", () => {
+    const fixture = TestBed.createComponent(CardHost);
+    fixture.detectChanges();
+    const card = fixture.nativeElement.querySelector("bpdm-card") as HTMLElement;
+    expect(card.getAttribute("role")).toBeNull();
+    expect(card.getAttribute("tabindex")).toBeNull();
   });
 });

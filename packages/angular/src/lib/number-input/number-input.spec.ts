@@ -27,6 +27,7 @@ class UncontrolledHost {}
     aria-label="Quantity"
     aria-describedby="hint"
     required
+    autoComplete="off"
   />`,
 })
 class LabelledHost {}
@@ -86,6 +87,7 @@ describe("BpdmNumberInput", () => {
     expect(el.getAttribute("aria-describedby")).toBe("hint");
     expect(el.getAttribute("aria-required")).toBe("true");
     expect(el.required).toBe(true);
+    expect(el.getAttribute("autocomplete")).toBe("off");
   });
 
   it("exposes spinbutton semantics (role + aria-value*)", () => {

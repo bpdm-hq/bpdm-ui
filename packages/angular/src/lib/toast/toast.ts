@@ -74,9 +74,14 @@ interface ToastRecord extends Omit<ToastOptions, "id"> {
 export interface ToastMessages {
   /** aria-label for each toast's close (X) button. */
   dismiss: string;
+  /** Accessible label for the toast live-region / viewport. */
+  regionLabel: string;
 }
 
-export const DEFAULT_TOAST_MESSAGES: ToastMessages = { dismiss: "Dismiss" };
+export const DEFAULT_TOAST_MESSAGES: ToastMessages = {
+  dismiss: "Dismiss",
+  regionLabel: "Notifications",
+};
 
 /** App-wide localizable defaults for the toast close button; `<bpdm-toaster [messages]>` still wins. */
 export const BPDM_TOAST_MESSAGES = new InjectionToken<Partial<ToastMessages>>(
@@ -567,7 +572,7 @@ export class BpdmToastItem {
   imports: [BpdmToastItem],
   template: `
     <ng-template #viewport>
-      <ol role="region" aria-label="Notifications" [class]="viewportClass()">
+      <ol role="region" [attr.aria-label]="msg().regionLabel" [class]="viewportClass()">
         @for (t of toasts(); track t.id) {
           <li class="contents">
             <bpdm-toast-item

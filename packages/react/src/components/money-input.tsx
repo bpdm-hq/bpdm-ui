@@ -92,6 +92,23 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
     }
   }, [locale, currency]);
 
+  // Some locales place the currency symbol after the number (e.g. de-DE → "1 €").
+  // Ask Intl where the symbol sits relative to the digits and slot it accordingly.
+  const symbolBefore = React.useMemo(() => {
+    try {
+      const parts = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency,
+      }).formatToParts(1);
+      const currencyIndex = parts.findIndex((p) => p.type === "currency");
+      const numberIndex = parts.findIndex((p) => p.type === "integer");
+      if (currencyIndex === -1 || numberIndex === -1) return true;
+      return currencyIndex < numberIndex;
+    } catch {
+      return true;
+    }
+  }, [locale, currency]);
+
   const grouped = React.useMemo(() => {
     if (raw === "" || raw === "-" || raw === ".") return "";
     const bn = new BigNumber(raw);
@@ -118,9 +135,11 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
         className,
       )}
     >
-      <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
-        {symbol}
-      </span>
+      {symbolBefore && (
+        <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
+          {symbol}
+        </span>
+      )}
       <input
         ref={ref}
         {...props}
@@ -148,6 +167,11 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
         }}
         className="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
+      {!symbolBefore && (
+        <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
+          {symbol}
+        </span>
+      )}
     </div>
   );
 });

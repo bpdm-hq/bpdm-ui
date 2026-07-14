@@ -49,7 +49,7 @@ function maskValue(formatted: string, tail: number): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "block w-full" },
   template: `
-    <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null">
+    <div [class]="wrapClass()">
       <input
         [id]="id() || null"
         type="text"

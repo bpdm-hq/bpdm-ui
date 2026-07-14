@@ -46,7 +46,7 @@ export const AccordionTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         // `text-start` (logical) so the header aligns correctly under `dir="rtl"`
-        "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
+        "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
         // open header stands out; closed is calmer — the "active" emphasis
         variant === "borderless"
           ? "px-0 py-4 font-medium text-muted-foreground hover:text-foreground data-[state=open]:text-foreground"

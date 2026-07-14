@@ -28,6 +28,24 @@ describe("MoneyInput", () => {
     expect(screen.getByText("$")).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("places the currency symbol before the value for a prefix locale (en-US)", () => {
+    render(<MoneyInput defaultValue="10" />);
+    const symbol = screen.getByText("$");
+    // symbol precedes the input in DOM order
+    expect(symbol.compareDocumentPosition(textbox())).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it("places the currency symbol after the value for a suffix locale (de-DE)", () => {
+    render(<MoneyInput defaultValue="10" currency="EUR" locale="de-DE" />);
+    const symbol = screen.getByText("€");
+    // symbol follows the input in DOM order
+    expect(symbol.compareDocumentPosition(textbox())).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING,
+    );
+  });
+
   it("shows the raw value on focus and reformats on blur", async () => {
     render(<MoneyInput defaultValue="1234.5" />);
     await userEvent.click(textbox());

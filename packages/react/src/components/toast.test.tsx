@@ -92,6 +92,13 @@ describe("Toaster / toast", () => {
     expect(screen.queryByRole("button", { name: "Dismiss" })).not.toBeInTheDocument();
   });
 
+  it("labels the toast region 'Notifications' by default and via messages", () => {
+    const { rerender } = render(<Toaster />);
+    expect(screen.getByRole("region", { name: "Notifications" })).toBeInTheDocument();
+    rerender(<Toaster messages={{ regionLabel: "Benachrichtigungen" }} />);
+    expect(screen.getByRole("region", { name: "Benachrichtigungen" })).toBeInTheDocument();
+  });
+
   it("promise toast shows the loading title, then the success title", async () => {
     render(<Toaster />);
     let resolve!: (value: string) => void;

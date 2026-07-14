@@ -623,12 +623,16 @@ export class DestinationPage implements OnInit {
 
 Toast has almost no built-in copy of its own — every title, description, action
 label, and `promise(...)` message is **author-supplied**, so you translate them in
-your own app exactly like the rest of the content you pass in. The one string the
-component owns is the **close (X) button's accessible name**, set via a single
-`messages` object — a `Partial<ToastMessages>` merged over the English default:
+your own app exactly like the rest of the content you pass in. The two strings the
+component owns are the **close (X) button's accessible name** and the **toast
+region's label**, set via a single `messages` object — a `Partial<ToastMessages>`
+merged over the English default:
 
 - **`dismiss`** — the close (X) button's accessible name (`aria-label`). Default
   `"Dismiss"`.
+- **`regionLabel`** — the accessible label for the toast live-region / viewport
+  landmark (React's Radix `Toast.Provider`/`Toast.Viewport` label and Angular's
+  `role="region"` list). Default `"Notifications"`.
 
 - **React** — pass `messages` to `<Toaster messages={{ dismiss: '…' }} />`.
 - **Angular** — bind `[messages]` on `<bpdm-toaster>`, or provide it app-wide with
@@ -781,6 +785,7 @@ single place (see [Internationalization](#internationalization)). It's a
 | `ToastMessages` key | Default | Description |
 | --- | --- | --- |
 | `dismiss` | `Dismiss` | Accessible name (`aria-label`) for the close (X) button. |
+| `regionLabel` | `Notifications` | Accessible label for the toast live-region / viewport landmark. |
 
 ## Accessibility
 

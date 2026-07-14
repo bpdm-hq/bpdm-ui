@@ -354,9 +354,16 @@ export function TreeSelect({
         aria-disabled={node.disabled || undefined}
       >
         <div
+          onMouseMove={() => setActiveValue(node.value)}
           className={cn(
-            "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)] hover:bg-muted",
-            isActive && "bg-muted",
+            "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
+            // active treeitem — follows both the keyboard (aria-activedescendant) and
+            // the pointer (onMouseMove), so there's a single highlight that tracks the
+            // cursor. An amber inline-start bar (ring token, ≥3:1 in every theme) + soft
+            // tint + weight — clearly perceptible where bg-muted alone was ~1.05:1.
+            // RTL-safe (logical shadow mirror), jitter-free (inset shadow takes no space).
+            isActive &&
+              "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
           )}
           style={{ paddingInlineStart: 8 + depth * 18 }}
         >

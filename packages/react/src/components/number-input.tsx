@@ -235,7 +235,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             path={Glyph.minus}
             disabled={disabled || atMin}
             onTrigger={dec}
-            className={cn(d.btn, "border-r border-input")}
+            className={cn(d.btn, "border-e border-input")}
           />
         )}
 
@@ -247,10 +247,10 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             path={Glyph.plus}
             disabled={disabled || atMax}
             onTrigger={inc}
-            className={cn(d.btn, "border-l border-input")}
+            className={cn(d.btn, "border-s border-input")}
           />
         ) : (
-          <div className="flex w-7 flex-col border-l border-input">
+          <div className="flex w-7 flex-col border-s border-input">
             <StepButton
               label={t.increase}
               path={Glyph.up}

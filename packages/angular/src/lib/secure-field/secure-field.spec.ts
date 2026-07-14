@@ -21,6 +21,12 @@ class GroupedHost {}
 })
 class PassthroughHost {}
 
+@Component({
+  imports: [BpdmSecureField],
+  template: `<bpdm-secure-field aria-invalid defaultValue="secret" />`,
+})
+class InvalidHost {}
+
 describe("BpdmSecureField", () => {
   const input = (f: { nativeElement: HTMLElement }) =>
     f.nativeElement.querySelector("input") as HTMLInputElement;
@@ -68,5 +74,14 @@ describe("BpdmSecureField", () => {
     const buttons = Array.from(fixture.nativeElement.querySelectorAll("button")) as HTMLButtonElement[];
     expect(buttons.length).toBeGreaterThan(0);
     buttons.forEach((b) => expect(b.className).toContain("focus-visible:ring-2"));
+  });
+
+  it("sets aria-invalid on the input (the widget), not on the wrapper div", () => {
+    const fixture = TestBed.createComponent(InvalidHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    const wrapper = fixture.nativeElement.querySelector("div") as HTMLElement;
+    expect(el.getAttribute("aria-invalid")).toBe("true");
+    expect(wrapper.hasAttribute("aria-invalid")).toBe(false);
   });
 });

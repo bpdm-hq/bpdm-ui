@@ -158,7 +158,7 @@ export class BpdmAccordion {
   protected readonly itemClass = computed(() => ITEM_VARIANT[this.variant()]);
   protected readonly triggerClass = computed(() =>
     cn(
-      "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold",
+      "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold",
       TRIGGER_VARIANT[this.variant()],
     ),
   );

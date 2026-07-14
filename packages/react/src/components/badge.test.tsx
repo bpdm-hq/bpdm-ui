@@ -52,6 +52,23 @@ describe("Badge", () => {
     );
     expect(screen.getByRole("link", { name: "New" })).toHaveAttribute("href", "/x");
   });
+
+  it("makes an onClick badge keyboard-operable (role=button, focusable, Enter/Space)", async () => {
+    const onClick = vi.fn();
+    render(<Badge onClick={onClick}>Filter</Badge>);
+    const badge = screen.getByRole("button", { name: "Filter" });
+    expect(badge).toHaveAttribute("tabindex", "0");
+    badge.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("leaves a non-clickable badge a plain span (no button role / tabindex)", () => {
+    render(<Badge>Static</Badge>);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByText("Static")).not.toHaveAttribute("tabindex");
+  });
 });
 
 describe("NotificationBadge", () => {
@@ -110,12 +127,44 @@ describe("NotificationBadge", () => {
     expect(status).toHaveTextContent("5");
   });
 
-  it("keeps the indicator decorative when no ariaLabel is given", () => {
+  it("announces a meaningful default label including the count", () => {
     render(
       <NotificationBadge count={5}>
         <button>Bell</button>
       </NotificationBadge>,
     );
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-label", "5 notifications");
+    expect(status).toHaveTextContent("5");
+  });
+
+  it("uses the capped count text in the default label", () => {
+    render(
+      <NotificationBadge count={128} max={99}>
+        <button>Inbox</button>
+      </NotificationBadge>,
+    );
+    expect(screen.getByRole("status")).toHaveAttribute("aria-label", "99+ notifications");
+  });
+
+  it("announces a default dot label", () => {
+    render(
+      <NotificationBadge dot>
+        <button>Bell</button>
+      </NotificationBadge>,
+    );
+    expect(screen.getByRole("status")).toHaveAttribute("aria-label", "New notifications");
+  });
+
+  it("supports overriding the label templates via messages (i18n)", () => {
+    render(
+      <NotificationBadge count={3} messages={{ count: (c) => `${c} ungelesene Nachrichten` }}>
+        <button>Bell</button>
+      </NotificationBadge>,
+    );
+    expect(screen.getByRole("status")).toHaveAttribute(
+      "aria-label",
+      "3 ungelesene Nachrichten",
+    );
   });
 });

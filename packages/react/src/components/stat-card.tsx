@@ -107,8 +107,8 @@ export function StatCard({
   const deltaColor = neutral
     ? "text-muted-foreground"
     : good
-      ? "text-success"
-      : "text-destructive";
+      ? "text-success-strong"
+      : "text-destructive-strong";
   const deltaNum = hasDelta ? new Intl.NumberFormat(locale).format(Math.abs(delta as number)) : "";
   // screen-reader alternative: convey the DIRECTION that the arrow/colour show visually
   const deltaSr = neutral

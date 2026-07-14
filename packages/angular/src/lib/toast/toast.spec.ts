@@ -150,6 +150,22 @@ describe("BpdmToaster (rendering)", () => {
     expect(document.querySelector('button[aria-label="Dismiss"]')).toBeNull();
   });
 
+  it("localizes the region label via [messages]", async () => {
+    const fixture = TestBed.createComponent(ToasterHost);
+    fixture.detectChanges();
+    await settle();
+
+    expect(document.querySelector('[role="region"][aria-label="Notifications"]')).toBeTruthy();
+
+    fixture.componentInstance.messages.set({ regionLabel: "Benachrichtigungen" });
+    fixture.detectChanges();
+    await settle();
+    expect(
+      document.querySelector('[role="region"][aria-label="Benachrichtigungen"]'),
+    ).toBeTruthy();
+    expect(document.querySelector('[role="region"][aria-label="Notifications"]')).toBeNull();
+  });
+
   it("marks the viewport a labelled region and error toasts as assertive alerts", async () => {
     const fixture = TestBed.createComponent(ToasterHost);
     fixture.detectChanges();
