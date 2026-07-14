@@ -51,6 +51,7 @@ describe("BpdmTreeSelect", () => {
     const fixture = TestBed.createComponent(Host);
     const trigger = await open(fixture);
     const tree = document.querySelector('[role="tree"]') as HTMLElement;
+    // state via BOTH aria-selected (VoiceOver) and aria-checked (NVDA/JAWS) for coverage
     expect(tree.getAttribute("aria-multiselectable")).toBe("true");
     expect(trigger.getAttribute("aria-haspopup")).toBe("tree");
     expect(trigger.getAttribute("aria-controls")).toBe(tree.id);
@@ -59,6 +60,7 @@ describe("BpdmTreeSelect", () => {
     expect(parent.getAttribute("aria-level")).toBe("1");
     expect(parent.getAttribute("aria-expanded")).toBe("false");
     expect(parent.getAttribute("aria-checked")).toBe("false");
+    expect(parent.getAttribute("aria-selected")).toBe("false");
   });
 
   it("checking a parent selects all its leaves", async () => {

@@ -31,6 +31,9 @@ describe("TreeSelect", () => {
     await userEvent.click(trigger("Food"));
     const tree = screen.getByRole("tree");
     expect(tree).toHaveAttribute("aria-label", "Food");
+    // state is exposed via BOTH aria-selected and aria-checked for broad screen-reader
+    // coverage — VoiceOver announces aria-selected on outline rows, NVDA/JAWS announce
+    // aria-checked on treeitems (VO doesn't reliably read aria-checked here)
     expect(tree).toHaveAttribute("aria-multiselectable", "true");
     expect(trigger("Food").getAttribute("aria-controls")).toBe(tree.id);
 
@@ -38,6 +41,7 @@ describe("TreeSelect", () => {
     expect(fruit).toHaveAttribute("aria-level", "1");
     expect(fruit).toHaveAttribute("aria-expanded", "false"); // collapsed branch
     expect(fruit).toHaveAttribute("aria-checked", "false");
+    expect(fruit).toHaveAttribute("aria-selected", "false");
   });
 
   it("expands a branch to reveal levelled child treeitems", async () => {

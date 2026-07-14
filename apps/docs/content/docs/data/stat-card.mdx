@@ -337,9 +337,9 @@ export class Dashboard {}
   red/green. `deltaLabel` follows for context ("vs last month"). The direction words
   are translatable via `messages`.
 - The coloured delta **text** uses the darkened `-strong` colour tokens, so red
-  (negative) and green (positive) deltas clear the **4.5:1** text-contrast bar
-  (WCAG 1.4.3) on the light themes (paper, mist) and stay unchanged on the dark
-  themes (charcoal, slate). The arrow glyph is decorative and inherits the same colour.
+  (negative) and green (positive) deltas measure at **≥4.5:1** against the card on
+  the light themes (paper, mist) and stay unchanged on the dark themes (charcoal,
+  slate). The arrow glyph is decorative and inherits the same colour.
 - The icon badge is decorative (`aria-hidden`) — the `label` carries the meaning.
 - While `loading`, the card sets `aria-busy` + `aria-live="polite"` and is labelled
   `<label> <loading>` (the metric name plus a "loading" suffix) so assistive tech

@@ -141,7 +141,7 @@ The keyboard-active (highlighted) row in these listboxes gets a soft brand tint 
 | `--bpdm-option-active-bg` | `color-mix(in oklab, var(--primary) 10%, transparent)` | The tint behind the highlighted option |
 | `--bpdm-option-active-bar` | `var(--ring)` | The inline-start accent bar |
 
-Why the bar exists: a subtle brand tint alone sits at ~1.05:1 against the panel — far below the WCAG 1.4.11 **≥3:1** an active-state indicator needs. The bar (built on `--ring`, engineered ≥3:1 on light) is what actually carries that contrast, so a low-vision or keyboard user can always tell which option is focused. The tint is decorative on top.
+Why the bar exists: a subtle brand tint alone sits at ~1.05:1 against the panel — too faint on its own to signal which option is active. The bar (built on `--ring`, measured ≥3:1 on the light themes) is what actually carries that contrast, so a low-vision or keyboard user can tell which option is focused. The tint is decorative on top.
 
 Don't want the bar? Remove it — but keep the highlight perceivable by giving the **fill** enough contrast yourself:
 

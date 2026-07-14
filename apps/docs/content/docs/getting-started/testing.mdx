@@ -375,8 +375,8 @@ expect(field.value).toBe('4242 4242 4242 4242');
 ### Float Label
 
 The **Float Label** renders a real `<label>` associated with the control it wraps — so the field is
-reachable by its label text with `getByLabelText`, no test ids. It also guarantees the association
-(a matching id is generated when you don't pass `htmlFor`), which is worth asserting.
+reachable by its label text with `getByLabelText`, no test ids. It also wires the association
+deterministically (a matching id is generated when you don't pass `htmlFor`), which is worth asserting.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
@@ -393,7 +393,7 @@ render(
 // the label is wired to the control, so query the field by its label text
 const field = screen.getByLabelText('Email') as HTMLInputElement;
 
-// association is guaranteed even without htmlFor
+// association is deterministic even without htmlFor
 expect(screen.getByText('Email').getAttribute('for')).toBe(field.id);
 ```
 
