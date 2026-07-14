@@ -386,7 +386,7 @@ export function Example() {
   return (
     <div className="flex w-80 flex-col gap-1.5">
       <TreeSelect aria-invalid options={tree} placeholder="Required" />
-      <p className="text-sm text-destructive">Select at least one category.</p>
+      <p className="text-sm text-destructive-strong">Select at least one category.</p>
     </div>
   );
 }`,
@@ -396,7 +396,7 @@ export function Example() {
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">
       <TreeSelect aria-invalid options={TREE} placeholder="Required" />
-      <p className="text-sm text-destructive">Select at least one category.</p>
+      <p className="text-sm text-destructive-strong">Select at least one category.</p>
     </div>
   ),
 };

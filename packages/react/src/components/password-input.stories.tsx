@@ -176,7 +176,7 @@ export function Example() {
   return (
     <div className="flex w-72 flex-col gap-1.5">
       <PasswordInput aria-invalid feedback={false} placeholder="Password" />
-      <p className="text-sm text-destructive">Password is required.</p>
+      <p className="text-sm text-destructive-strong">Password is required.</p>
     </div>
   );
 }`,
@@ -186,7 +186,7 @@ export function Example() {
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">
       <PasswordInput aria-invalid feedback={false} placeholder="Password" />
-      <p className="text-sm text-destructive">Password is required.</p>
+      <p className="text-sm text-destructive-strong">Password is required.</p>
     </div>
   ),
 };

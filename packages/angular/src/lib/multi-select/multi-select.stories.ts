@@ -236,7 +236,7 @@ export const Invalid: Story = {
     props: { options: FRAMEWORKS },
     template: `<div class="flex w-80 flex-col gap-1.5">
   <bpdm-multi-select aria-invalid [options]="options" placeholder="Required" />
-  <p class="text-sm text-destructive">Select at least one.</p>
+  <p class="text-sm text-destructive-strong">Select at least one.</p>
 </div>`,
   }),
   parameters: {
@@ -251,7 +251,7 @@ import { BpdmMultiSelect, SelectItems } from '@bpdm/ng';
   template: \`
     <div class="flex w-80 flex-col gap-1.5">
       <bpdm-multi-select aria-invalid [options]="frameworks" placeholder="Required" />
-      <p class="text-sm text-destructive">Select at least one.</p>
+      <p class="text-sm text-destructive-strong">Select at least one.</p>
     </div>
   \`,
 })

@@ -144,7 +144,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="flex w-80 flex-col gap-1.5">
   <textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea>
-  <p class="text-sm text-destructive">Message is required.</p>
+  <p class="text-sm text-destructive-strong">Message is required.</p>
 </div>`,
   }),
   parameters: {
@@ -159,7 +159,7 @@ import { BpdmTextarea } from '@bpdm/ng';
   template: \`
     <div class="flex w-80 flex-col gap-1.5">
       <textarea bpdmTextarea aria-invalid="true" placeholder="Message"></textarea>
-      <p class="text-sm text-destructive">Message is required.</p>
+      <p class="text-sm text-destructive-strong">Message is required.</p>
     </div>
   \`,
 })

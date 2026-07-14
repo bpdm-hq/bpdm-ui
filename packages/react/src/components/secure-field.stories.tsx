@@ -173,7 +173,7 @@ export function Example() {
   return (
     <div className="flex w-72 flex-col gap-1.5">
       <SecureField aria-invalid format="grouped" unmaskedTail={4} defaultValue="4821" />
-      <p className="text-sm text-destructive">Enter a valid license key.</p>
+      <p className="text-sm text-destructive-strong">Enter a valid license key.</p>
     </div>
   );
 }`,
@@ -183,7 +183,7 @@ export function Example() {
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">
       <SecureField aria-invalid format="grouped" unmaskedTail={4} defaultValue="4821" />
-      <p className="text-sm text-destructive">Enter a valid license key.</p>
+      <p className="text-sm text-destructive-strong">Enter a valid license key.</p>
     </div>
   ),
 };

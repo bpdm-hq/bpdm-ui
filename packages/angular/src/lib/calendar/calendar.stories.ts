@@ -404,7 +404,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="w-72 space-y-1.5">
   <bpdm-date-picker invalid placeholder="Required" />
-  <p class="text-xs text-destructive">Please choose a date.</p>
+  <p class="text-xs text-destructive-strong">Please choose a date.</p>
 </div>`,
   }),
   parameters: {
@@ -419,7 +419,7 @@ import { BpdmDatePicker } from '@bpdm/ng';
   template: \`
     <div class="space-y-1.5">
       <bpdm-date-picker invalid placeholder="Required" />
-      <p class="text-xs text-destructive">Please choose a date.</p>
+      <p class="text-xs text-destructive-strong">Please choose a date.</p>
     </div>
   \`,
 })

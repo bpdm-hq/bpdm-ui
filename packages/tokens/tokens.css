@@ -48,7 +48,7 @@
   --popover: #ffffff;
   --popover-foreground: #1c1a17;
   --muted: #f0eee9;
-  --muted-foreground: #6b6862;
+  --muted-foreground: #676460; /* nudged darker: clears 4.5:1 as text over colored soft-tint surfaces (Alert) */
   --border: #e7e3dc;
   --input: #948c7d; /* ≥3:1 vs page/card for a perceivable field boundary */
   --ring: #9a5400; /* darker gold — focus ring reaches ≥3:1 on light */
@@ -76,7 +76,7 @@
      accessible ≥4.5:1 text shade — no need to also set --*-strong. (For an unusually
      light brand color the derived shade may still be low-contrast; override
      --primary-strong explicitly in that edge case.) */
-  --primary-strong: color-mix(in oklab, var(--primary), black 30%);
+  --primary-strong: color-mix(in oklab, var(--primary), black 40%); /* amber is a light brand hue — extra darken so primary TEXT clears 4.5:1 on the primary soft tint */
   --destructive-strong: color-mix(in oklab, var(--destructive), black 10%);
   --success-strong: color-mix(in oklab, var(--success), black 12%);
   --warning-strong: color-mix(in oklab, var(--warning), black 12%);
@@ -98,7 +98,7 @@
   --popover: #ffffff;
   --popover-foreground: #1a1d24;
   --muted: #eef0f4;
-  --muted-foreground: #646b78;
+  --muted-foreground: #606673; /* nudged darker: clears 4.5:1 as text over colored soft-tint surfaces (Alert) */
   --border: #e2e6ec;
   --input: #878d99; /* ≥3:1 vs page/card for a perceivable field boundary */
   --ring: #9a5400; /* darker gold — focus ring reaches ≥3:1 on light */
@@ -120,7 +120,7 @@
   --help-foreground: #ffffff;
   /* "strong" ramp — readable-as-text variant on LIGHT surfaces, auto-derived from
      each base via oklab darken (override the base token → strong follows). */
-  --primary-strong: color-mix(in oklab, var(--primary), black 30%);
+  --primary-strong: color-mix(in oklab, var(--primary), black 40%); /* amber is a light brand hue — extra darken so primary TEXT clears 4.5:1 on the primary soft tint */
   --destructive-strong: color-mix(in oklab, var(--destructive), black 10%);
   --success-strong: color-mix(in oklab, var(--success), black 12%);
   --warning-strong: color-mix(in oklab, var(--warning), black 12%);
@@ -212,7 +212,9 @@
      (identity → a consumer's base override flows through). */
   --primary-strong: var(--primary);
   --destructive-strong: var(--destructive);
-  --success-strong: var(--success);
+  /* slate's base success (#3fb950) reads as text on solid fills but dips to ~4.2:1
+     on the soft success tint — brighten the TEXT ramp so soft badges/alerts clear 4.5:1 */
+  --success-strong: #56d364;
   --warning-strong: var(--warning);
   --info-strong: var(--info);
   --help-strong: var(--help);

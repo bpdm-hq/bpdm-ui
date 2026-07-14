@@ -239,7 +239,7 @@ export const FormField: Story = {
   <div class="flex flex-col gap-1.5">
     <label for="email" class="text-sm font-medium text-foreground">Email</label>
     <input bpdmInput id="email" type="email" aria-invalid="true" aria-describedby="email-err" value="not-an-email" />
-    <p id="email-err" class="text-sm text-destructive">Enter a valid email address.</p>
+    <p id="email-err" class="text-sm text-destructive-strong">Enter a valid email address.</p>
   </div>
 </div>`,
   }),
@@ -257,7 +257,7 @@ import { BpdmInput } from '@bpdm/ng';
       <label for="email" class="text-sm font-medium">Email</label>
       <input bpdmInput id="email" type="email" aria-invalid="true"
              aria-describedby="email-err" placeholder="name@company.com" />
-      <p id="email-err" class="text-sm text-destructive">Enter a valid email address.</p>
+      <p id="email-err" class="text-sm text-destructive-strong">Enter a valid email address.</p>
     </div>
   \`,
 })

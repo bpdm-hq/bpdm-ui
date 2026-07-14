@@ -149,7 +149,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="flex w-64 flex-col gap-1.5">
   <bpdm-money-input aria-invalid="true" currency="USD" defaultValue="0" />
-  <p class="text-sm text-destructive">Amount must be greater than 0.</p>
+  <p class="text-sm text-destructive-strong">Amount must be greater than 0.</p>
 </div>`,
   }),
   parameters: {
@@ -164,7 +164,7 @@ import { BpdmMoneyInput } from '@bpdm/ng';
   template: \`
     <div class="flex w-64 flex-col gap-1.5">
       <bpdm-money-input aria-invalid="true" currency="USD" defaultValue="0" />
-      <p class="text-sm text-destructive">Amount must be greater than 0.</p>
+      <p class="text-sm text-destructive-strong">Amount must be greater than 0.</p>
     </div>
   \`,
 })

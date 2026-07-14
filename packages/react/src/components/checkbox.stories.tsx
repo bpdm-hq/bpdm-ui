@@ -210,7 +210,7 @@ export function Example() {
         <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
         <label htmlFor="agree">I agree</label>
       </div>
-      <p id="agree-err" className="text-sm text-destructive">
+      <p id="agree-err" className="text-sm text-destructive-strong">
         You must agree to continue.
       </p>
     </div>
@@ -227,7 +227,7 @@ export function Example() {
           I agree to the processing of my data
         </label>
       </div>
-      <p id="agree-err" className="text-sm text-destructive">
+      <p id="agree-err" className="text-sm text-destructive-strong">
         You must agree to continue.
       </p>
     </div>

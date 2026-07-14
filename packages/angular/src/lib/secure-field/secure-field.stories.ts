@@ -168,7 +168,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="flex w-72 flex-col gap-1.5">
   <bpdm-secure-field aria-invalid="true" format="grouped" [unmaskedTail]="4" defaultValue="4821" />
-  <p class="text-sm text-destructive">Enter a valid license key.</p>
+  <p class="text-sm text-destructive-strong">Enter a valid license key.</p>
 </div>`,
   }),
   parameters: {
@@ -183,7 +183,7 @@ import { BpdmSecureField } from '@bpdm/ng';
   template: \`
     <div class="flex w-72 flex-col gap-1.5">
       <bpdm-secure-field aria-invalid="true" format="grouped" [unmaskedTail]="4" defaultValue="4821" />
-      <p class="text-sm text-destructive">Enter a valid license key.</p>
+      <p class="text-sm text-destructive-strong">Enter a valid license key.</p>
     </div>
   \`,
 })

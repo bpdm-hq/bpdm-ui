@@ -136,7 +136,7 @@ export const Advanced: Story = {
   <bpdm-card-header>
     <h3 bpdmCardTitle>Project Atlas</h3>
     <p bpdmCardDescription>Updated 2 days ago</p>
-    <span bpdmCardAction class="inline-flex h-6 items-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-2.5 text-xs font-medium text-success">Live</span>
+    <span bpdmCardAction class="inline-flex h-6 items-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-2.5 text-xs font-medium text-success-strong">Live</span>
   </bpdm-card-header>
   <div bpdmCardContent>${BODY}</div>
   <div bpdmCardFooter>
