@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card";
 
 describe("Card", () => {
@@ -89,5 +90,38 @@ describe("Card", () => {
   it("keeps a clickable/link card free of a host link underline", () => {
     const { container } = render(<Card interactive>x</Card>);
     expect((container.firstElementChild as HTMLElement).className).toContain("no-underline");
+  });
+
+  it("makes an interactive card keyboard-operable (role=button, focusable, Enter/Space)", async () => {
+    const onClick = vi.fn();
+    render(
+      <Card interactive onClick={onClick}>
+        Open
+      </Card>,
+    );
+    const card = screen.getByRole("button", { name: "Open" });
+    expect(card).toHaveAttribute("tabindex", "0");
+    card.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("leaves a non-interactive card a plain div (no button role / tabindex)", () => {
+    const { container } = render(<Card>Plain</Card>);
+    const el = container.firstElementChild as HTMLElement;
+    expect(el).not.toHaveAttribute("role");
+    expect(el).not.toHaveAttribute("tabindex");
+  });
+
+  it("delegates semantics to the child under asChild (no injected role/tabindex)", () => {
+    render(
+      <Card interactive asChild>
+        <a href="/x">Link card</a>
+      </Card>,
+    );
+    const link = screen.getByRole("link", { name: "Link card" });
+    expect(link).not.toHaveAttribute("role", "button");
+    expect(link).not.toHaveAttribute("tabindex");
   });
 });

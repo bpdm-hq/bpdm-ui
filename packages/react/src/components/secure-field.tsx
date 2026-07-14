@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const wrapVariants = cva(
-  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-within:ring-destructive",
+  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:focus-within:ring-destructive",
   {
     variants: {
       size: {
@@ -163,7 +163,6 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
 
   return (
     <div
-      aria-invalid={ariaInvalid}
       className={cn(
         wrapVariants({ size }),
         disabled && "cursor-not-allowed opacity-50",

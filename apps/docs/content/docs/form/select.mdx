@@ -510,8 +510,15 @@ to name the listbox).
   search box when `searchable`, otherwise the listbox), so screen readers announce each option as
   you arrow through — even though the list is virtualized. Group headers are decorative
   (`aria-hidden`).
-- **Keyboard**: arrows move the active option, Enter selects, Esc closes, and `searchable` makes
-  the filter an editable combobox (`aria-autocomplete="list"`).
+- **Keyboard**: <kbd>↑</kbd>/<kbd>↓</kbd> move the active option, <kbd>Home</kbd>/<kbd>End</kbd>
+  jump to the first/last option, <kbd>Enter</kbd> selects, and <kbd>Esc</kbd> closes. **Type-ahead**:
+  when not `searchable`, typing printable characters focuses the first option starting with what you
+  typed (rapid keystrokes accumulate). With `searchable`, the filter is an editable combobox
+  (`aria-autocomplete="list"`) and typing filters instead.
+- The **active/highlighted option** is marked with an amber inline-start bar plus a soft tint and
+  heavier text — a clearly perceptible ≥3:1 focus indicator (not colour alone), mirrored under RTL.
+- **Truncated text** (a long selected value or option label) carries a native `title`, so the full
+  text is revealed on hover.
 - Give it a name — pair a `<label>` (linked via `id`) or pass `aria-label`. Set `aria-invalid`
   when selection fails validation.
 

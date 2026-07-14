@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { buttonVariants, cn, type VariantProps } from "@bpdm/variants";
 
 export interface ButtonProps
@@ -95,8 +95,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       onClick?.(e);
     };
 
-    // asChild: Radix Slot requires a single child, so we can't inject a spinner —
-    // convey busy/disabled via ARIA + pointer suppression and pass the child through.
+    // asChild: Radix Slot merges onto a single child element, so we can't inject a
+    // visible spinner — convey busy/disabled via ARIA + pointer suppression. But we
+    // still preserve the sr-only loading label: `Slottable` lets us append it inside
+    // the slotted element so the busy state has an accessible name, just like the
+    // native path.
     if (asChild) {
       return (
         <Slot
@@ -108,7 +111,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className={cn(classes, inactive && "pointer-events-none opacity-50")}
           {...(props as React.HTMLAttributes<HTMLElement>)}
         >
-          {children}
+          <Slottable>{children}</Slottable>
+          {loading ? <span className="sr-only">{loadingLabel}</span> : null}
         </Slot>
       );
     }

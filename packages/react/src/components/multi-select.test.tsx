@@ -58,6 +58,31 @@ describe("MultiSelect", () => {
     expect(listbox).toHaveAttribute("aria-label", "Tags");
   });
 
+  it("marks the active option with the accessible amber indicator (not bg-muted)", async () => {
+    // give the virtualized scroll element a real height so the option rows render
+    // in jsdom (which otherwise reports 0 → tanstack renders nothing). tanstack
+    // measures via offsetWidth/offsetHeight.
+    const realW = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth");
+    const realH = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetHeight");
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", { configurable: true, get: () => 220 });
+    Object.defineProperty(HTMLElement.prototype, "offsetHeight", { configurable: true, get: () => 300 });
+    try {
+      render(<MultiSelect options={OPTIONS} aria-label="Tags" selectAll={false} />);
+      await userEvent.click(trigger("Tags"));
+      const listbox = screen.getByRole("listbox");
+      const active = document.getElementById(listbox.getAttribute("aria-activedescendant")!);
+      expect(active).toBeTruthy();
+      expect(active!.className).toContain("bg-[var(--bpdm-option-active-bg)]");
+      expect(active!.className).toContain("shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)]");
+      expect(active!.className).toContain("rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]");
+      // the weak, near-invisible bg-muted active fill is gone
+      expect(active!.className).not.toContain("bg-muted");
+    } finally {
+      if (realW) Object.defineProperty(HTMLElement.prototype, "offsetWidth", realW);
+      if (realH) Object.defineProperty(HTMLElement.prototype, "offsetHeight", realH);
+    }
+  });
+
   it("exposes Select all as a tri-state checkbox with a translatable label", async () => {
     render(<MultiSelect options={OPTIONS} aria-label="Tags" messages={{ selectAll: "Tout" }} />);
     await userEvent.click(trigger("Tags"));

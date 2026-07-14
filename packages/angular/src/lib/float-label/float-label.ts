@@ -31,7 +31,7 @@ let floatUid = 0;
   host: { class: "relative block" },
   template: `
     <ng-content />
-    <label [attr.for]="resolvedFor() ?? htmlFor()" [class]="labelClass()">{{ label() }}</label>
+    <label [attr.for]="resolvedFor()" [class]="labelClass()">{{ label() }}</label>
   `,
 })
 export class BpdmFloatLabel {
@@ -43,8 +43,19 @@ export class BpdmFloatLabel {
 
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  /** The id actually applied to the control + label after render (guarantees association). */
-  protected readonly resolvedFor = signal<string | undefined>(undefined);
+  /**
+   * Deterministic fallback id, generated once at construction from a per-instance
+   * counter — no `window`, no async gap — so `<label for>` is resolvable on the
+   * very first (incl. server-side) render and never dangles.
+   */
+  private readonly fallbackId = `bpdm-float-${(floatUid += 1)}`;
+  /** Set from the projected control's own id (if any) during the browser render. */
+  private readonly controlId = signal<string | undefined>(undefined);
+
+  /** The id the label points at. Mirrors React's precedence: htmlFor · own id · generated. */
+  protected readonly resolvedFor = computed(
+    () => this.htmlFor() ?? this.controlId() ?? this.fallbackId,
+  );
 
   protected readonly labelClass = computed(() =>
     cn(floatResting, floatFloated[this.variant()]),
@@ -53,7 +64,8 @@ export class BpdmFloatLabel {
   constructor() {
     // mirror React's clone: give the wrapped control `peer` + a blank placeholder
     // (so :placeholder-shown drives the float), and guarantee `<label for>` matches
-    // the control's id — using htmlFor, else the control's own id, else a generated one
+    // the control's id. Browser-only DOM wiring; the id itself is already resolved
+    // synchronously via `resolvedFor` (SSR-safe) above.
     afterNextRender(() => {
       const control = this.el.nativeElement.querySelector<HTMLInputElement>(
         "input, textarea, select",
@@ -62,9 +74,14 @@ export class BpdmFloatLabel {
       control.classList.add("peer");
       if (this.variant() === "in") control.classList.add("pt-4");
       if (!control.getAttribute("placeholder")) control.setAttribute("placeholder", " ");
-      const id = this.htmlFor() ?? control.getAttribute("id") ?? `bpdm-float-${(floatUid += 1)}`;
-      control.setAttribute("id", id);
-      this.resolvedFor.set(id);
+      const explicit = this.htmlFor();
+      if (explicit) {
+        control.setAttribute("id", explicit);
+      } else {
+        const own = control.getAttribute("id");
+        if (own) this.controlId.set(own);
+        else control.setAttribute("id", this.fallbackId);
+      }
     });
   }
 }

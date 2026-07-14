@@ -130,6 +130,25 @@ describe("TreeSelect", () => {
       expect(screen.getByRole("treeitem", { name: /Fruit/ })).toHaveAttribute("aria-expanded", "false");
     });
 
+    it("marks the active treeitem row with the accessible amber indicator", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      const row = activeItem()!.firstElementChild as HTMLElement;
+      expect(row.className).toContain("bg-[var(--bpdm-option-active-bg)]");
+      expect(row.className).toContain("shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)]");
+      expect(row.className).toContain("rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]");
+    });
+
+    it("pointer move sets the hovered treeitem active, so the single highlight follows the cursor", async () => {
+      render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
+      await openTree();
+      expect(activeItem()).toHaveTextContent(/Fruit/); // seeded on the first row
+      const vegRow = screen.getByRole("treeitem", { name: /Vegetable/ })
+        .firstElementChild as HTMLElement;
+      await userEvent.hover(vegRow);
+      expect(activeItem()).toHaveTextContent("Vegetable"); // amber moved to the hovered row
+    });
+
     it("Enter / Space toggle selection (aria-checked) of the active treeitem", async () => {
       render(<TreeSelect options={TREE} aria-label="Food" selectAll={false} />);
       await openTree();

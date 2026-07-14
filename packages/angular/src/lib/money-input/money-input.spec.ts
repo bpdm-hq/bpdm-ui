@@ -21,10 +21,18 @@ class JpyHost {}
       name="price"
       aria-label="Total"
       aria-describedby="hint"
+      required
+      autoComplete="transaction-amount"
       defaultValue="10" />
   `,
 })
 class PassthroughHost {}
+
+@Component({
+  imports: [BpdmMoneyInput],
+  template: `<bpdm-money-input currency="EUR" locale="de-DE" defaultValue="10" />`,
+})
+class EurHost {}
 
 describe("BpdmMoneyInput", () => {
   const input = (f: { nativeElement: HTMLElement }) =>
@@ -63,13 +71,34 @@ describe("BpdmMoneyInput", () => {
     expect(input(fixture).value).toBe("2,500.5");
   });
 
-  it("forwards name / aria-label / aria-describedby to the input and hides the symbol", () => {
+  it("forwards name / aria-label / aria-describedby / required / autocomplete to the input and hides the symbol", () => {
     const fixture = TestBed.createComponent(PassthroughHost);
     fixture.detectChanges();
     const el = input(fixture);
     expect(el.getAttribute("name")).toBe("price");
     expect(el.getAttribute("aria-label")).toBe("Total");
     expect(el.getAttribute("aria-describedby")).toBe("hint");
+    expect(el.required).toBe(true);
+    expect(el.getAttribute("aria-required")).toBe("true");
+    expect(el.getAttribute("autocomplete")).toBe("transaction-amount");
     expect(symbol(fixture).getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("places the currency symbol before the value for a prefix locale (en-US)", () => {
+    const fixture = TestBed.createComponent(UsdHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    expect(symbol(fixture).compareDocumentPosition(el)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it("places the currency symbol after the value for a suffix locale (de-DE)", () => {
+    const fixture = TestBed.createComponent(EurHost);
+    fixture.detectChanges();
+    const el = input(fixture);
+    expect(symbol(fixture).compareDocumentPosition(el)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING,
+    );
   });
 });

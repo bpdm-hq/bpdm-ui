@@ -53,14 +53,23 @@ describe("Spinner", () => {
     const { container } = render(<Spinner variant="ring" />);
     expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
   });
+
+  it("drops its live region and sr-only label when announce is false", () => {
+    render(<Spinner announce={false} />);
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+  });
 });
 
 describe("LoadingOverlay", () => {
   it("renders a busy status region when shown", () => {
     render(<LoadingOverlay />);
-    // both the overlay and its inner spinner carry role=status; the overlay is aria-busy
-    const overlay = screen.getAllByRole("status").find((el) => el.getAttribute("aria-busy") === "true");
-    expect(overlay).toBeDefined();
+    // the overlay is the single live region; the inner spinner drops its own
+    // role=status so screen readers announce once, not twice.
+    const statuses = screen.getAllByRole("status");
+    expect(statuses).toHaveLength(1);
+    const overlay = statuses[0];
+    expect(overlay).toHaveAttribute("aria-busy", "true");
     expect(overlay).toHaveAttribute("aria-live", "polite");
   });
 
@@ -71,24 +80,24 @@ describe("LoadingOverlay", () => {
 
   it("shows a visible message only when label is set", () => {
     const { rerender } = render(<LoadingOverlay />);
-    // no visible paragraph, but the inner spinner still announces "Loading"
+    // no visible paragraph — the overlay announces via an sr-only fallback "Loading"
     expect(screen.getByText("Loading")).toBeInTheDocument();
     expect(screen.queryByText("Saving")).not.toBeInTheDocument();
 
     rerender(<LoadingOverlay label="Saving" />);
-    // label renders both as visible <p> and inner sr-only label → two matches
-    expect(screen.getAllByText("Saving").length).toBeGreaterThanOrEqual(1);
+    // the label renders once, as the visible <p> (no duplicate sr-only label)
+    expect(screen.getAllByText("Saving")).toHaveLength(1);
   });
 
-  it("resolves the inner spinner label from messages when no label is given", () => {
+  it("announces via an sr-only fallback from messages when no label is given", () => {
     render(<LoadingOverlay messages={{ loading: "Cargando" }} />);
     expect(screen.getByText("Cargando")).toBeInTheDocument();
   });
 
-  it("a per-instance label wins over messages for the inner spinner", () => {
+  it("uses the visible label (not the messages fallback) when a label is given", () => {
     render(<LoadingOverlay label="Saving" messages={{ loading: "Cargando" }} />);
-    // "Saving" appears twice: the visible <p> and the inner spinner's sr-only label
-    expect(screen.getAllByText("Saving").length).toBe(2);
+    // "Saving" is the single announced/visible text; the fallback is not rendered
+    expect(screen.getAllByText("Saving")).toHaveLength(1);
     expect(screen.queryByText("Cargando")).not.toBeInTheDocument();
   });
 });

@@ -97,4 +97,13 @@ describe("PasswordInput", () => {
     render(<PasswordInput data-testid="pw" feedback={false} />);
     expect(toggle("Show password").className).toMatch(/focus-visible:ring-2/);
   });
+
+  it("puts aria-invalid on the input (the widget), not the wrapper", () => {
+    const { container } = render(
+      <PasswordInput data-testid="pw" aria-invalid feedback={false} />,
+    );
+    expect(field()).toHaveAttribute("aria-invalid", "true");
+    // no ancestor <div> carries the attribute
+    expect(container.querySelector("div[aria-invalid]")).toBeNull();
+  });
 });

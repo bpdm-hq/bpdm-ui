@@ -33,23 +33,31 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
   host: { class: "block w-full" },
   template: `
     <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null">
-      <span aria-hidden="true" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+      @if (symbolBefore()) {
+        <span aria-hidden="true" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+      }
       <input
         [id]="id() || null"
         type="text"
         inputmode="decimal"
         [disabled]="disabled()"
+        [required]="required()"
         [value]="focused() ? current() : grouped()"
         [attr.name]="name() || null"
+        [attr.autocomplete]="autoComplete() || null"
         [attr.placeholder]="placeholder() || null"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-describedby]="ariaDescribedby() || null"
+        [attr.aria-required]="required() ? 'true' : null"
         [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
         (focus)="onFocus($any($event.target))"
         (blur)="onBlur()"
         (input)="onInput($any($event.target).value)"
         class="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
+      @if (!symbolBefore()) {
+        <span aria-hidden="true" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+      }
     </div>
   `,
 })
@@ -66,11 +74,15 @@ export class BpdmMoneyInput {
   readonly allowNegative = input(false, { transform: booleanAttribute });
   readonly size = input<FieldSize>("md");
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Marks the field required, forwarded to the inner `<input>`. */
+  readonly required = input(false, { transform: booleanAttribute });
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
   readonly id = input<string>("");
   /** Native `name` for form submission, forwarded to the inner `<input>`. */
   readonly name = input<string>("");
+  /** Native `autocomplete` hint, forwarded to the inner `<input>`. */
+  readonly autoComplete = input<string>("");
   /** Accessible name for the field, forwarded to the inner `<input>`. */
   readonly ariaLabel = input<string>("", { alias: "aria-label" });
   /** IDs of describing elements, forwarded to the inner `<input>`. */
@@ -103,6 +115,23 @@ export class BpdmMoneyInput {
       return parts.find((p) => p.type === "currency")?.value ?? this.currency();
     } catch {
       return this.currency();
+    }
+  });
+
+  // Some locales place the currency symbol after the number (e.g. de-DE → "1 €").
+  // Ask Intl where the symbol sits relative to the digits and slot it accordingly.
+  protected readonly symbolBefore = computed(() => {
+    try {
+      const parts = new Intl.NumberFormat(this.locale(), {
+        style: "currency",
+        currency: this.currency(),
+      }).formatToParts(1);
+      const currencyIndex = parts.findIndex((p) => p.type === "currency");
+      const numberIndex = parts.findIndex((p) => p.type === "integer");
+      if (currencyIndex === -1 || numberIndex === -1) return true;
+      return currencyIndex < numberIndex;
+    } catch {
+      return true;
     }
   });
 

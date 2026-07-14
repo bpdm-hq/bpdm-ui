@@ -54,6 +54,22 @@ describe("BpdmFloatLabel", () => {
     expect(input.getAttribute("id")).toBe(forId);
   });
 
+  it("resolves the label `for` deterministically on first render (before afterNextRender)", () => {
+    // No whenStable(): the id must already be resolvable synchronously (SSR-safe,
+    // no window, no async gap) so the label never dangles on the first paint.
+    const fixture = TestBed.createComponent(NoIdHost);
+    fixture.detectChanges();
+    const label = fixture.nativeElement.querySelector("label") as HTMLLabelElement;
+    expect(label.getAttribute("for")).toBeTruthy();
+  });
+
+  it("uses a caller-supplied htmlFor on first render", () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const label = fixture.nativeElement.querySelector("label") as HTMLLabelElement;
+    expect(label.getAttribute("for")).toBe("email");
+  });
+
   it("adds pt-4 for variant='in' and preserves a caller-supplied placeholder", async () => {
     const fixture = TestBed.createComponent(VariantHost);
     await settle(fixture);

@@ -11,11 +11,32 @@ export interface CardProps
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, hoverable, interactive, asChild = false, ...props }, ref) => {
+  (
+    { className, variant, hoverable, interactive, asChild = false, role, tabIndex, onKeyDown, ...props },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "div";
+    // An `interactive` card renders hover/press affordances, so it must be a real,
+    // keyboard-operable control — focusable (tabIndex=0), `role="button"`, and
+    // Enter/Space activation. When `asChild`, the consumer's own <a>/<button> child
+    // already carries the semantics, so we leave those untouched.
+    const keyboardable = interactive && !asChild;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(e);
+      if (!keyboardable || e.defaultPrevented) return;
+      // only self-activate — never hijack Enter/Space aimed at a nested control
+      if (e.target !== e.currentTarget) return;
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        e.currentTarget.click();
+      }
+    };
     return (
       <Comp
         ref={ref}
+        role={keyboardable ? (role ?? "button") : role}
+        tabIndex={keyboardable ? (tabIndex ?? 0) : tabIndex}
+        onKeyDown={handleKeyDown}
         className={cn(cardVariants({ variant, hoverable, interactive }), className)}
         {...props}
       />

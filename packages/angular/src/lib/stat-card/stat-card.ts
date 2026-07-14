@@ -139,7 +139,7 @@ export class BpdmStatCard {
   protected readonly deltaColor = computed(() => {
     if (this.neutral()) return "text-muted-foreground";
     const good = this.positiveIsGood() ? this.up() : !this.up();
-    return good ? "text-success" : "text-destructive";
+    return good ? "text-success-strong" : "text-destructive-strong";
   });
 
   protected readonly cardClass = computed(() =>

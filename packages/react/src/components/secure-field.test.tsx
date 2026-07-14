@@ -87,4 +87,10 @@ describe("SecureField", () => {
     expect(btn("Reveal").className).toMatch(/focus-visible:ring-2/);
     expect(btn("Copy").className).toMatch(/focus-visible:ring-2/);
   });
+
+  it("puts aria-invalid on the input (the widget), not the wrapper", () => {
+    const { container } = render(<SecureField data-testid="sf" aria-invalid />);
+    expect(field()).toHaveAttribute("aria-invalid", "true");
+    expect(container.querySelector("div[aria-invalid]")).toBeNull();
+  });
 });

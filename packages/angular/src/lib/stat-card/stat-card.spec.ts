@@ -35,14 +35,15 @@ describe("BpdmStatCard", () => {
     expect(host.textContent).toContain("8,420");
     expect(host.textContent).toContain("vs last week");
     const delta = host.querySelector("span.font-medium") as HTMLElement;
-    expect(delta.className).toContain("text-success");
+    // uses the darkened -strong token so coloured delta text clears 4.5:1 on light themes
+    expect(delta.className).toContain("text-success-strong");
   });
 
   it("colors an increase red when positiveIsGood is false", () => {
     const fixture = TestBed.createComponent(ChurnHost);
     fixture.detectChanges();
     const delta = fixture.nativeElement.querySelector("span.font-medium") as HTMLElement;
-    expect(delta.className).toContain("text-destructive");
+    expect(delta.className).toContain("text-destructive-strong");
   });
 
   it("exposes the card as a labelled group", () => {

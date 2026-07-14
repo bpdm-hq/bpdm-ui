@@ -62,6 +62,18 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     const [removing, setRemoving] = React.useState(false);
     const t = React.useMemo(() => ({ ...DEFAULT_BADGE_MESSAGES, ...messages }), [messages]);
     const interactive = asChild || !!onClick;
+    // A click-handled badge (not the asChild path, which delegates to its child)
+    // renders as a <span>, so make it a real, keyboard-operable control:
+    // role=button, focusable, focus-visible ring, Enter/Space activation.
+    const clickable = !!onClick && !asChild;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+      props.onKeyDown?.(e);
+      if (e.defaultPrevented || e.target !== e.currentTarget) return;
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        e.currentTarget.click();
+      }
+    };
     const ghost = appearance === "ghost";
     // ghost = no chrome (transparent, no border/padding); else the tinted/solid/outline tone
     const toneClass = ghost
@@ -98,11 +110,20 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           toneClass,
           ghostClass,
           interactive && "cursor-pointer active:scale-[0.96]",
+          clickable &&
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           // dynamic chips pop in on mount
           onRemove && "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
           className,
         )}
         {...props}
+        {...(clickable
+          ? {
+              role: props.role ?? "button",
+              tabIndex: props.tabIndex ?? 0,
+              onKeyDown: handleKeyDown,
+            }
+          : {})}
       >
         {dot && (
           <span className="relative flex size-2 shrink-0">
@@ -162,6 +183,22 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 );
 Badge.displayName = "Badge";
 
+// --- i18n ---
+export interface NotificationBadgeMessages {
+  /**
+   * Accessible label for a numeric count — receives the displayed count text
+   * (already capped, e.g. `"99+"`). Default `"{count} notifications"`.
+   */
+  count: (count: string) => string;
+  /** Accessible label for the dot (no-number) indicator. Default "New notifications". */
+  dot: string;
+}
+
+export const DEFAULT_NOTIFICATION_BADGE_MESSAGES: NotificationBadgeMessages = {
+  count: (count) => `${count} notifications`,
+  dot: "New notifications",
+};
+
 export interface NotificationBadgeProps {
   /** The element to overlay onto (an icon, an icon button, an avatar…). */
   children: React.ReactNode;
@@ -176,12 +213,17 @@ export interface NotificationBadgeProps {
   variant?: BadgeVariant;
   className?: string;
   /**
-   * Accessible name for the indicator (e.g. "5 unread messages"). When set, the
-   * count/dot span gets `role="status"` + `aria-label` so a screen reader
-   * announces it; when unset the indicator stays decorative (the consumer's own
-   * icon/button carries the meaning).
+   * Accessible name for the indicator. Overrides the default templated label
+   * (`messages`). Set this when the indicator's meaning is more specific than
+   * the generic default (e.g. "5 unread messages").
    */
   ariaLabel?: string;
+  /**
+   * Override the translatable label templates. By default the indicator
+   * announces meaningfully — "{count} notifications" for a count, "New
+   * notifications" for a dot — so a screen reader never reads a bare "5".
+   */
+  messages?: Partial<NotificationBadgeMessages>;
 }
 
 /**
@@ -198,7 +240,12 @@ export function NotificationBadge({
   variant = "destructive",
   className,
   ariaLabel,
+  messages,
 }: NotificationBadgeProps) {
+  const t = React.useMemo(
+    () => ({ ...DEFAULT_NOTIFICATION_BADGE_MESSAGES, ...messages }),
+    [messages],
+  );
   const show = dot || (count !== undefined && (count > 0 || (count === 0 && showZero)));
   const label = dot
     ? null
@@ -207,6 +254,9 @@ export function NotificationBadge({
         ? `${max}+`
         : String(count)
       : null;
+  // Announce meaningfully by default so a screen reader never reads a bare "5".
+  // An explicit `ariaLabel` wins; otherwise use the templated label.
+  const announced = ariaLabel ?? (dot ? t.dot : label != null ? t.count(label) : undefined);
 
   return (
     <span className={cn("relative inline-flex", className)}>
@@ -225,8 +275,8 @@ export function NotificationBadge({
           <span
             // re-pops when the number changes
             key={label ?? "dot"}
-            role={ariaLabel ? "status" : undefined}
-            aria-label={ariaLabel}
+            role={announced ? "status" : undefined}
+            aria-label={announced}
             className={cn(
               "flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
               TONE[variant].solid,

@@ -108,6 +108,27 @@ describe("Button", () => {
       );
       expect(screen.getByText("Wird geladen")).toBeInTheDocument();
     });
+
+    it("preserves the sr-only loading label in the asChild path", () => {
+      render(
+        <Button asChild loading loadingLabel="Wird geladen">
+          <a href="/x">Speichern</a>
+        </Button>,
+      );
+      const link = screen.getByRole("link", { name: /Speichern/ });
+      expect(link).toHaveAttribute("aria-busy", "true");
+      // the sr-only label is appended inside the slotted element via Slottable
+      expect(link).toHaveTextContent("Wird geladen");
+    });
+
+    it("does not inject a loading label into asChild when not loading", () => {
+      render(
+        <Button asChild loadingLabel="Wird geladen">
+          <a href="/x">Speichern</a>
+        </Button>,
+      );
+      expect(screen.queryByText("Wird geladen")).not.toBeInTheDocument();
+    });
   });
 
   describe("dev accessibility guard", () => {

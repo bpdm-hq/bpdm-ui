@@ -6,7 +6,7 @@ export type FieldSize = "sm" | "md" | "lg";
 
 /** Single-value Select uses a native `<button>` with fixed-height variants. */
 export const SELECT_TRIGGER_BASE =
-  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus:ring-destructive";
+  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive";
 export const SELECT_TRIGGER_SIZE: Record<FieldSize, string> = {
   sm: "h-8 px-2.5 text-sm",
   md: "h-10 px-3 text-sm",
@@ -29,10 +29,11 @@ export const FIELD_PANEL =
 /**
  * Wrapper shell for the boxed text-input family (MoneyInput / PasswordInput /
  * SecureField) — a bordered row that holds the input plus inline adornments
- * (symbol, toggle, copy). `focus-within` lifts the ring; `aria-invalid` reddens.
+ * (symbol, toggle, copy). `focus-within` lifts the ring; an inner control's
+ * `aria-invalid` (matched via `:has`) reddens the shell.
  */
 export const WRAP_FIELD_BASE =
-  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-within:ring-destructive";
+  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:focus-within:ring-destructive";
 export const WRAP_FIELD_SIZE: Record<FieldSize, string> = {
   sm: "h-8 px-2.5 text-sm",
   md: "h-10 px-3 text-sm",

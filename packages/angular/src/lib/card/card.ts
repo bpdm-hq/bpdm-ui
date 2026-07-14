@@ -4,6 +4,8 @@ import {
   Component,
   Directive,
   computed,
+  ElementRef,
+  inject,
   input,
 } from "@angular/core";
 import { cardVariants, cn, type CardVariants } from "@bpdm/variants";
@@ -26,7 +28,14 @@ import { cardVariants, cn, type CardVariants } from "@bpdm/variants";
 @Component({
   selector: "bpdm-card",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { "[class]": "classes()" },
+  host: {
+    "[class]": "classes()",
+    // An `interactive` card carries hover/press affordances, so it must be a
+    // real, keyboard-operable control: focusable + role=button + Enter/Space.
+    "[attr.role]": "interactive() ? 'button' : null",
+    "[attr.tabindex]": "interactive() ? 0 : null",
+    "(keydown)": "onKeyDown($event)",
+  },
   template: `<ng-content />`,
 })
 export class BpdmCard {
@@ -39,6 +48,8 @@ export class BpdmCard {
   /** Extra classes, merged with tailwind-merge. */
   readonly classInput = input<string>("", { alias: "class" });
 
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
   protected readonly classes = computed(() =>
     cn(
       cardVariants({
@@ -49,6 +60,16 @@ export class BpdmCard {
       this.classInput(),
     ),
   );
+
+  protected onKeyDown(e: KeyboardEvent): void {
+    if (!this.interactive()) return;
+    // only self-activate — never hijack Enter/Space aimed at a nested control
+    if (e.target !== this.host.nativeElement) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      this.host.nativeElement.click();
+    }
+  }
 }
 
 const ASPECTS: Record<string, string> = {

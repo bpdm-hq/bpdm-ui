@@ -24,7 +24,11 @@ export const DEFAULT_SPINNER_MESSAGES: SpinnerMessages = { loading: "Loading" };
 @Component({
   selector: "bpdm-spinner",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { role: "status", "aria-live": "polite", "[class]": "hostClass()" },
+  host: {
+    "[attr.role]": "announce() ? 'status' : null",
+    "[attr.aria-live]": "announce() ? 'polite' : null",
+    "[class]": "hostClass()",
+  },
   template: `
     @switch (variant()) {
       @case ("gradient") {
@@ -67,7 +71,9 @@ export const DEFAULT_SPINNER_MESSAGES: SpinnerMessages = { loading: "Loading" };
         <span aria-hidden="true" class="inline-block animate-spin rounded-full border-current/25 border-t-current" [class]="s().ring + ' ' + s().border"></span>
       }
     }
-    <span class="sr-only">{{ label() || t().loading }}</span>
+    @if (announce()) {
+      <span class="sr-only">{{ label() || t().loading }}</span>
+    }
   `,
 })
 export class BpdmSpinner {
@@ -77,6 +83,12 @@ export class BpdmSpinner {
   readonly label = input<string>();
   /** Override the translatable strings (currently just the loading label). */
   readonly messages = input<Partial<SpinnerMessages>>({});
+  /**
+   * Own a live region (`role="status"` + a visually-hidden label). Default true.
+   * Set `false` when the spinner sits inside another live region (e.g. a
+   * `<bpdm-loading-overlay>`) so screen readers announce once, not twice.
+   */
+  readonly announce = input(true, { transform: booleanAttribute });
   /** Extra classes; `text-*` recolors the spinner (merged via tailwind-merge). */
   readonly classInput = input<string>("", { alias: "class" });
 
@@ -125,9 +137,15 @@ export class BpdmSpinner {
     "[class.hidden]": "!show()",
   },
   template: `
-    <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [label]="label() ?? t().loading" />
+    <!-- The overlay itself is the single live region, so the spinner doesn't
+         announce (avoids a nested role="status" double-announce). The overlay
+         owns the accessible text: the visible label, or an sr-only fallback
+         when there's no visible message. -->
+    <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [announce]="false" />
     @if (label()) {
       <p class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
+    } @else {
+      <span class="sr-only">{{ t().loading }}</span>
     }
     <ng-content />
   `,
