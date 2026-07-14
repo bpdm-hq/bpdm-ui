@@ -43,10 +43,12 @@ const triggerVariants = cva(
   {
     variants: {
       variant: {
-        // horizontal: a single sliding indicator draws the active marker (see the
-        // convenience `Tabs`); vertical keeps a per-tab inline-end border
+        // each trigger draws its own active border, so the bare parts work standalone.
+        // The convenience `Tabs` adds a sliding indicator for horizontal and suppresses
+        // this static bottom border there (so the two don't double up); vertical always
+        // uses its own inline-end border.
         underline:
-          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary-strong",
+          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong data-[state=active]:border-primary-strong data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary-strong",
         pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-muted/60 data-[orientation=vertical]:data-[state=active]:bg-muted",
       },
     },
@@ -230,6 +232,13 @@ export function Tabs({
     />
   ) : null;
 
+  // where the sliding indicator draws the marker (horizontal underline), hide each
+  // trigger's own static bottom border so the two don't stack into a double line
+  const suppressStatic =
+    slide && variant === "underline"
+      ? "[&_[role=tab][data-state=active]]:border-b-transparent!"
+      : "";
+
   // minimal inline chevron (no chip/border) — dims at the edge it can't scroll toward
   const chevron =
     "grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
@@ -285,7 +294,7 @@ export function Tabs({
               measure();
             }}
             style={{ maskImage: fade, WebkitMaskImage: fade }}
-            className={cn("min-w-0 flex-1 border-b-0", listClassName)}
+            className={cn("min-w-0 flex-1 border-b-0", suppressStatic, listClassName)}
           >
             {indicator}
             {triggers}
@@ -307,7 +316,7 @@ export function Tabs({
           variant={variant}
           baseline={baseline}
           aria-label={ariaLabel}
-          className={cn(fullWidth && "w-full", listClassName)}
+          className={cn(fullWidth && "w-full", suppressStatic, listClassName)}
         >
           {indicator}
           {triggers}

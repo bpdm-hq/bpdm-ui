@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Tabs, type TabItem } from "./tabs";
+import { Tabs, TabsRoot, TabsList, TabsTrigger, TabsContent, type TabItem } from "./tabs";
 
 const ITEMS: TabItem[] = [
   { value: "a", label: "Overview", content: <p>Overview body</p> },
@@ -67,5 +67,34 @@ describe("Tabs", () => {
     expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
     await userEvent.keyboard("{Enter}");
     expect(screen.getByRole("tab", { name: "Activity" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  describe("composition (bare parts)", () => {
+    it("draws its own active underline standalone (no sliding indicator present)", () => {
+      // the bare parts have no wrapper-level sliding indicator, so the active trigger
+      // must carry the underline itself — otherwise it's just bold text (regression guard)
+      render(
+        <TabsRoot defaultValue="a">
+          <TabsList aria-label="Sections">
+            <TabsTrigger value="a">Overview</TabsTrigger>
+            <TabsTrigger value="b">Activity</TabsTrigger>
+          </TabsList>
+          <TabsContent value="a">Overview body</TabsContent>
+          <TabsContent value="b">Activity body</TabsContent>
+        </TabsRoot>,
+      );
+      const active = screen.getByRole("tab", { name: "Overview" });
+      expect(active).toHaveAttribute("aria-selected", "true");
+      expect(active.className).toContain("data-[state=active]:border-primary-strong");
+    });
+
+    it("the convenience Tabs suppresses that static border where the sliding indicator draws it", () => {
+      render(<Tabs items={ITEMS} defaultValue="a" />);
+      // horizontal underline: the animated indicator is the sole marker, so the list
+      // neutralises each trigger's own bottom border to avoid a doubled line
+      expect(screen.getByRole("tablist").className).toContain(
+        "[&_[role=tab][data-state=active]]:border-b-transparent",
+      );
+    });
   });
 });
