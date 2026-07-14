@@ -89,7 +89,9 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
           role="tab"
           [id]="ids + '-tab-' + t.value"
           [attr.aria-selected]="t.value === active()"
-          [attr.aria-controls]="ids + '-panel-' + t.value"
+          [attr.aria-controls]="
+            hasContent() && t.value === active() ? ids + '-panel-' + t.value : null
+          "
           [attr.data-state]="t.value === active() ? 'active' : 'inactive'"
           [tabindex]="t.value === rovingValue() ? 0 : -1"
           [disabled]="t.disabled || null"

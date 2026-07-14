@@ -144,6 +144,7 @@ export function StatCard({
         {hasDelta && (
           <div className="mt-1.5 flex items-center gap-1.5 text-sm">
             <span
+              role="img"
               aria-label={deltaSr}
               className={cn("inline-flex items-center gap-0.5 font-medium", deltaColor)}
             >

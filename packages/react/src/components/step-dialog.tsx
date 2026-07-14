@@ -94,7 +94,10 @@ function Stepper({
               </span>
             </li>
             {i < steps.length - 1 && (
-              <span
+              // Decorative connector — an <li> (not a bare <span>) so the <ol> has only
+              // list-item children; aria-hidden keeps it out of the AT tree.
+              <li
+                aria-hidden="true"
                 className={cn(
                   "h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]",
                   i < current ? "bg-primary" : "bg-border",

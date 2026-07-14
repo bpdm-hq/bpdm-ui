@@ -62,7 +62,7 @@ let statCardUid = 0;
       <p class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
       @if (hasDelta()) {
         <div class="mt-1.5 flex items-center gap-1.5 text-sm">
-          <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()" [attr.aria-label]="deltaSr()">
+          <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()" role="img" [attr.aria-label]="deltaSr()">
             @if (!neutral()) {
               <svg viewBox="0 0 12 12" fill="none" class="size-3" aria-hidden="true">
                 <path
