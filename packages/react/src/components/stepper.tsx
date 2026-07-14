@@ -301,7 +301,9 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
     <button
       type="button"
       id={stepTabId(ctx.uid, value)}
-      aria-controls={stepPanelId(ctx.uid, value)}
+      // Horizontal panels mount only while active, so only reference a panel that
+      // actually exists in the DOM — a dangling aria-controls is an invalid ARIA value.
+      aria-controls={vertical || active ? stepPanelId(ctx.uid, value) : undefined}
       aria-current={active ? "step" : undefined}
       disabled={disabled || (!clickable && !active)}
       onClick={() => clickable && ctx.activate(value)}

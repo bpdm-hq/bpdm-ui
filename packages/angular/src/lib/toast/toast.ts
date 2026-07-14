@@ -572,18 +572,22 @@ export class BpdmToastItem {
   imports: [BpdmToastItem],
   template: `
     <ng-template #viewport>
-      <ol role="region" [attr.aria-label]="msg().regionLabel" [class]="viewportClass()">
-        @for (t of toasts(); track t.id) {
-          <li class="contents">
-            <bpdm-toast-item
-              [record]="t"
-              [cfg]="cfg()"
-              [fallbackDuration]="duration()"
-              [dismissLabel]="msg().dismiss"
-            />
-          </li>
-        }
-      </ol>
+      <!-- region landmark wraps the list; role="region" cannot sit on the <ol> itself
+           (it would override the list role and orphan the <li> children). -->
+      <div role="region" [attr.aria-label]="msg().regionLabel">
+        <ol [class]="viewportClass()">
+          @for (t of toasts(); track t.id) {
+            <li class="contents">
+              <bpdm-toast-item
+                [record]="t"
+                [cfg]="cfg()"
+                [fallbackDuration]="duration()"
+                [dismissLabel]="msg().dismiss"
+              />
+            </li>
+          }
+        </ol>
+      </div>
     </ng-template>
   `,
 })

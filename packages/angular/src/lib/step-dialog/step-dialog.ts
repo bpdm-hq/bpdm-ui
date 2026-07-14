@@ -88,10 +88,13 @@ export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
                 </span>
               </li>
               @if ($index < steps().length - 1) {
-                <span
+                <!-- Decorative connector — an <li> (not a bare <span>) so the <ol> has
+                     only list-item children; aria-hidden keeps it out of the AT tree. -->
+                <li
+                  aria-hidden="true"
                   class="h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]"
                   [class]="$index < step() ? 'bg-primary' : 'bg-border'"
-                ></span>
+                ></li>
               }
             }
           </ol>
