@@ -416,7 +416,7 @@ export const Invalid: Story = {
   render: () => (
     <div className="w-72 space-y-1.5">
       <DatePicker invalid placeholder="Required" />
-      <p className="text-xs text-destructive">Please choose a date.</p>
+      <p className="text-xs text-destructive-strong">Please choose a date.</p>
     </div>
   ),
   parameters: {
@@ -428,7 +428,7 @@ export function Example() {
   return (
     <div className="space-y-1.5">
       <DatePicker invalid placeholder="Required" />
-      <p className="text-xs text-destructive">Please choose a date.</p>
+      <p className="text-xs text-destructive-strong">Please choose a date.</p>
     </div>
   );
 }`,

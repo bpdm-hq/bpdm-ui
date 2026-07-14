@@ -187,7 +187,7 @@ export const Invalid: Story = {
   <label class="flex cursor-pointer items-center gap-2 text-sm">
     <bpdm-checkbox aria-invalid="true" /> I agree to the processing of my data
   </label>
-  <p class="text-sm text-destructive">You must agree to continue.</p>
+  <p class="text-sm text-destructive-strong">You must agree to continue.</p>
 </div>`,
   }),
   parameters: {
@@ -204,7 +204,7 @@ import { BpdmCheckbox } from '@bpdm/ng';
       <label class="flex cursor-pointer items-center gap-2 text-sm">
         <bpdm-checkbox aria-invalid="true" /> I agree to the processing of my data
       </label>
-      <p class="text-sm text-destructive">You must agree to continue.</p>
+      <p class="text-sm text-destructive-strong">You must agree to continue.</p>
     </div>
   \`,
 })

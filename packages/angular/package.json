@@ -31,6 +31,7 @@
     "test:watch": "ng test",
     "storybook": "ng run bpdm-ng:storybook",
     "build-storybook": "ng run bpdm-ng:build-storybook",
+    "test:a11y:browser": "ng run bpdm-ng:build-storybook && concurrently -k -s first -n SB,AXE \"http-server storybook-static -p 9000 -s\" \"wait-on -t 60000 http-get://127.0.0.1:9000/index.json && test-storybook --url http://127.0.0.1:9000\"",
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
@@ -61,13 +62,18 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/platform-browser-dynamic": "^21.2.0",
+    "@axe-core/playwright": "^4.12.1",
     "@storybook/addon-a11y": "^10.4.6",
     "@storybook/addon-docs": "^10.4.6",
     "@storybook/angular": "^10.4.6",
+    "@storybook/test-runner": "^0.24.4",
     "@tailwindcss/postcss": "^4.3.0",
+    "concurrently": "^10.0.3",
     "eslint": "^10.5.0",
+    "http-server": "^14.1.1",
     "jsdom": "^29.1.1",
     "ng-packagr": "^21.2.5",
+    "playwright": "^1.61.1",
     "rxjs": "^7.8.2",
     "storybook": "^10.4.6",
     "tailwindcss": "^4.3.0",
@@ -75,6 +81,7 @@
     "typescript-eslint": "^8.61.1",
     "vitest": "^4.1.9",
     "vitest-axe": "^0.1.0",
+    "wait-on": "^9.0.10",
     "zone.js": "^0.15.1"
   }
 }

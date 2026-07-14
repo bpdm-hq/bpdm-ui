@@ -441,7 +441,7 @@ export function Calendar({
                     "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                     round,
                     "hover:bg-muted active:scale-90",
-                    outside && "text-muted-foreground/40",
+                    outside && "text-muted-foreground",
                     !outside && !selected && "text-foreground",
                     isToday && !selected && "font-semibold text-foreground ring-1 ring-inset ring-primary",
                     selected &&

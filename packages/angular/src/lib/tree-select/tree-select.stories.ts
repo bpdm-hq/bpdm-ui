@@ -333,7 +333,7 @@ export const Invalid: Story = {
     props: { options: TREE },
     template: `<div class="flex w-80 flex-col gap-1.5">
   <bpdm-tree-select aria-invalid [options]="options" placeholder="Required" />
-  <p class="text-sm text-destructive">Select at least one category.</p>
+  <p class="text-sm text-destructive-strong">Select at least one category.</p>
 </div>`,
   }),
   parameters: {
@@ -348,7 +348,7 @@ import { BpdmTreeSelect, TreeNode } from '@bpdm/ng';
   template: \`
     <div class="flex w-80 flex-col gap-1.5">
       <bpdm-tree-select aria-invalid [options]="categories" placeholder="Required" />
-      <p class="text-sm text-destructive">Select at least one category.</p>
+      <p class="text-sm text-destructive-strong">Select at least one category.</p>
     </div>
   \`,
 })

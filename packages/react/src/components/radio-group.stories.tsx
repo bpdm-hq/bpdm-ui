@@ -254,7 +254,7 @@ export function Example() {
           <label htmlFor="inv-pro">Pro</label>
         </div>
       </RadioGroup>
-      <p className="text-sm text-destructive">Please choose a plan.</p>
+      <p className="text-sm text-destructive-strong">Please choose a plan.</p>
     </div>
   );
 }`,
@@ -277,7 +277,7 @@ export function Example() {
           </label>
         </div>
       </RadioGroup>
-      <p className="text-sm text-destructive">Please choose a plan.</p>
+      <p className="text-sm text-destructive-strong">Please choose a plan.</p>
     </div>
   ),
 };

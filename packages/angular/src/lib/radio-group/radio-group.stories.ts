@@ -200,7 +200,7 @@ export const Invalid: Story = {
     <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" aria-invalid="true" /> Free</label>
     <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" aria-invalid="true" /> Pro</label>
   </bpdm-radio-group>
-  <p class="text-sm text-destructive">Please choose a plan.</p>
+  <p class="text-sm text-destructive-strong">Please choose a plan.</p>
 </div>`,
   }),
   parameters: {
@@ -218,7 +218,7 @@ import { BpdmRadioGroup, BpdmRadio } from '@bpdm/ng';
         <label class="flex items-center gap-2 text-sm"><bpdm-radio value="free" aria-invalid="true" /> Free</label>
         <label class="flex items-center gap-2 text-sm"><bpdm-radio value="pro" aria-invalid="true" /> Pro</label>
       </bpdm-radio-group>
-      <p class="text-sm text-destructive">Please choose a plan.</p>
+      <p class="text-sm text-destructive-strong">Please choose a plan.</p>
     </div>
   \`,
 })

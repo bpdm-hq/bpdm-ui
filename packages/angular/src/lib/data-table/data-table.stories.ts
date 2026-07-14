@@ -123,8 +123,9 @@ const HUGE: Member[] = Array.from({ length: 10000 }, (_, i) => {
 });
 
 const STATUS_STYLE: Record<Member["status"], string> = {
-  active: "bg-success/15 text-success",
-  invited: "bg-primary/15 text-primary",
+  // mirror Badge `soft` tones — the `-strong` text ramp clears 4.5:1 on the tint
+  active: "bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success-strong",
+  invited: "bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary-strong",
   disabled: "bg-muted text-muted-foreground",
 };
 

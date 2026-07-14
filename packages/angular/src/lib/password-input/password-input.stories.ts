@@ -162,7 +162,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="flex w-72 flex-col gap-1.5">
   <bpdm-password-input aria-invalid="true" [feedback]="false" placeholder="Password" />
-  <p class="text-sm text-destructive">Password is required.</p>
+  <p class="text-sm text-destructive-strong">Password is required.</p>
 </div>`,
   }),
   parameters: {
@@ -177,7 +177,7 @@ import { BpdmPasswordInput } from '@bpdm/ng';
   template: \`
     <div class="flex w-72 flex-col gap-1.5">
       <bpdm-password-input aria-invalid="true" [feedback]="false" placeholder="Password" />
-      <p class="text-sm text-destructive">Password is required.</p>
+      <p class="text-sm text-destructive-strong">Password is required.</p>
     </div>
   \`,
 })

@@ -86,7 +86,7 @@ export const CustomBrandColors: Story = {
 }
 
 /* …or scope it to a subtree via inline style */
-<div style={{ "--primary": "#0d9488", "--primary-foreground": "#fff" }}>
+<div style={{ "--primary": "#0f766e", "--primary-foreground": "#fff" }}>
   <Button>Primary</Button>
 </div>`,
       },
@@ -106,11 +106,11 @@ export const CustomBrandColors: Story = {
         }
       />
       <Brand
-        name="Override → teal  ( --primary: #0d9488 )"
+        name="Override → teal  ( --primary: #0f766e )"
         vars={
           {
-            "--primary": "#0d9488",
-            "--ring": "#0d9488",
+            "--primary": "#0f766e",
+            "--ring": "#0f766e",
             "--primary-foreground": "#ffffff",
           } as CSSProperties
         }
@@ -280,7 +280,7 @@ export const CustomThemeTemplate: Story = {
                 </td>
                 <td className="px-4 py-2">
                   {t.required ? (
-                    <span className="font-medium text-primary">required</span>
+                    <span className="font-medium text-primary-strong">required</span>
                   ) : (
                     <span className="text-muted-foreground">optional</span>
                   )}

@@ -264,7 +264,7 @@ export function Example() {
   return (
     <div className="flex w-80 flex-col gap-1.5">
       <MultiSelect aria-invalid options={frameworks} placeholder="Required" />
-      <p className="text-sm text-destructive">Select at least one.</p>
+      <p className="text-sm text-destructive-strong">Select at least one.</p>
     </div>
   );
 }`,
@@ -274,7 +274,7 @@ export function Example() {
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">
       <MultiSelect aria-invalid options={FRAMEWORKS} placeholder="Required" />
-      <p className="text-sm text-destructive">Select at least one.</p>
+      <p className="text-sm text-destructive-strong">Select at least one.</p>
     </div>
   ),
 };

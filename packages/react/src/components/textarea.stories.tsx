@@ -143,7 +143,7 @@ export function Example() {
   return (
     <div className="flex w-80 flex-col gap-1.5">
       <Textarea aria-invalid placeholder="Message" />
-      <p className="text-sm text-destructive">Message is required.</p>
+      <p className="text-sm text-destructive-strong">Message is required.</p>
     </div>
   );
 }`,
@@ -153,7 +153,7 @@ export function Example() {
   render: () => (
     <div className="flex w-80 flex-col gap-1.5">
       <Textarea aria-invalid placeholder="Message" />
-      <p className="text-sm text-destructive">Message is required.</p>
+      <p className="text-sm text-destructive-strong">Message is required.</p>
     </div>
   ),
 };

@@ -228,7 +228,7 @@ export function Example() {
     <div className="flex flex-col gap-1.5">
       <label htmlFor="email" className="text-sm font-medium">Email</label>
       <Input id="email" type="email" aria-invalid aria-describedby="email-err" placeholder="name@company.com" />
-      <p id="email-err" className="text-sm text-destructive">Enter a valid email address.</p>
+      <p id="email-err" className="text-sm text-destructive-strong">Enter a valid email address.</p>
     </div>
   );
 }`,
@@ -256,7 +256,7 @@ export function Example() {
           defaultValue="not-an-email"
           startIcon={<Mail />}
         />
-        <p id="email-err" className="text-sm text-destructive">
+        <p id="email-err" className="text-sm text-destructive-strong">
           Enter a valid email address.
         </p>
       </div>

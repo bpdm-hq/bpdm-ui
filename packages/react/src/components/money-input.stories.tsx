@@ -167,7 +167,7 @@ export function Example() {
   return (
     <div className="flex w-64 flex-col gap-1.5">
       <MoneyInput aria-invalid currency="USD" defaultValue="0" />
-      <p className="text-sm text-destructive">Amount must be greater than 0.</p>
+      <p className="text-sm text-destructive-strong">Amount must be greater than 0.</p>
     </div>
   );
 }`,
@@ -177,7 +177,7 @@ export function Example() {
   render: () => (
     <div className="flex w-64 flex-col gap-1.5">
       <MoneyInput aria-invalid currency="USD" defaultValue="0" />
-      <p className="text-sm text-destructive">Amount must be greater than 0.</p>
+      <p className="text-sm text-destructive-strong">Amount must be greater than 0.</p>
     </div>
   ),
 };

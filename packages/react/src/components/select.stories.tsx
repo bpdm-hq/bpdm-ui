@@ -289,7 +289,7 @@ export function Example() {
   return (
     <div className="flex w-72 flex-col gap-1.5">
       <Select aria-invalid options={frameworks} placeholder="Required" />
-      <p className="text-sm text-destructive">Please choose a framework.</p>
+      <p className="text-sm text-destructive-strong">Please choose a framework.</p>
     </div>
   );
 }`,
@@ -299,7 +299,7 @@ export function Example() {
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">
       <Select aria-invalid options={FRAMEWORKS} placeholder="Required" />
-      <p className="text-sm text-destructive">Please choose a framework.</p>
+      <p className="text-sm text-destructive-strong">Please choose a framework.</p>
     </div>
   ),
 };
