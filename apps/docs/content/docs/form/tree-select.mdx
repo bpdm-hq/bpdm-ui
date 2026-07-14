@@ -291,11 +291,13 @@ export class StatesComponent {
 
 ## Accessibility
 
-- A real **WAI-ARIA tree**: the panel is `role="tree"` (`aria-multiselectable`), each node is a
-  `role="treeitem"` carrying `aria-level`, `aria-expanded` (branches), and `aria-checked`
-  (`true` / `false` / **`mixed`** — a parent is mixed when only some descendants are selected);
-  child nodes sit in a nested `role="group"`. The trigger is `role="combobox"` with
-  `aria-haspopup="tree"` and `aria-controls`.
+- Built on the WAI-ARIA **tree** pattern: the panel is `role="tree"` (`aria-multiselectable`),
+  each node is a `role="treeitem"` carrying `aria-level`, `aria-expanded` (branches), and its
+  chosen state as **both** `aria-selected` and `aria-checked` (`true` / `false` / **`mixed`** —
+  a parent is `mixed` when only some descendants are chosen); child nodes sit in a nested
+  `role="group"`. The trigger is `role="combobox"` with `aria-haspopup="tree"` and `aria-controls`.
+  Both state attributes are set so more screen readers surface the state — some read
+  `aria-selected`, others `aria-checked`.
 - The caret and the checkbox glyph are decorative (`aria-hidden`) — state is conveyed by
   `aria-expanded` / `aria-checked`, never a glyph alone. **Select all** is a tri-state
   `role="checkbox"`.

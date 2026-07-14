@@ -216,8 +216,8 @@ In **React**, `FloatLabel` also spreads any extra native `<div>` props (`data-*`
 ## Accessibility
 
 - The label is a real `<label>` associated with the control by `for`/`id`, so clicking it focuses
-  the field and assistive tech announces it as the field's **name**. The association is guaranteed:
-  the id comes from `htmlFor`, else the control's own `id`, else a generated one — it never dangles.
+  the field and assistive tech announces it as the field's **name**. The association is deterministic:
+  the id comes from `htmlFor`, else the control's own `id`, else a generated one — so it never dangles.
 - Because it's a true label (not a placeholder standing in for one), the field keeps its accessible
   name even after the label floats away — unlike placeholder-only patterns, which lose the name as
   soon as the user types.

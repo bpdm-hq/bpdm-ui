@@ -362,10 +362,10 @@ across tooltips — a standalone `Tooltip` works without it.
   `role="tooltip"` and the trigger is wired to it via **`aria-describedby`**, so
   assistive tech reads the hint as the trigger's description.
 - It opens on **hover *and* keyboard focus**, and dismisses on blur / `Esc` — so it's
-  fully keyboard-reachable, never hover-only.
-- The bubble is **hoverable** (WCAG 1.4.13): moving the pointer off the trigger and
-  onto the tooltip itself keeps it open, so you can read (or reach content in) a
-  tooltip without it vanishing — in both React and Angular.
+  reachable by keyboard, not hover-only.
+- The bubble is **hoverable**: moving the pointer off the trigger and onto the tooltip
+  itself keeps it open, so you can read (or reach content in) a tooltip without it
+  vanishing — in both React and Angular.
 - The tooltip **supplements** the trigger's own accessible name, it doesn't replace
   it: on an icon-only control keep its `aria-label` (the tooltip names it visually;
   the label names it for assistive tech).
