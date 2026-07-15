@@ -21,6 +21,80 @@ function isRtl(el: HTMLElement): boolean {
   return typeof getComputedStyle === "function" && getComputedStyle(el).direction === "rtl";
 }
 
+/** A single radio button inside a `<bpdm-radio-group>`. */
+// Declared before BpdmRadioGroup on purpose: the group's `contentChildren(BpdmRadio)`
+// query compiles to eager static class metadata that references BpdmRadio at
+// class-definition time. If BpdmRadio were declared after the group, a JIT build
+// (e.g. Storybook/webpack) throws a temporal-dead-zone ReferenceError while
+// evaluating the module. BpdmRadio's own reference to the group is a lazy field
+// `inject(BpdmRadioGroup)` (resolved at construction), so the reverse order is safe.
+@Component({
+  selector: "bpdm-radio",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: "inline-flex" },
+  template: `
+    <button
+      type="button"
+      role="radio"
+      [id]="id() || null"
+      [class]="itemClass()"
+      [attr.tabindex]="tabindex()"
+      [attr.data-state]="checked() ? 'checked' : 'unchecked'"
+      [attr.aria-checked]="checked()"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-labelledby]="ariaLabelledby() || null"
+      [attr.aria-describedby]="ariaDescribedby() || null"
+      [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
+      [disabled]="isDisabled()"
+      (click)="group.select(value())"
+    >
+      @if (checked()) {
+        <span class="flex h-full w-full items-center justify-center">
+          <span class="size-[45%] rounded-full bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"></span>
+        </span>
+      }
+    </button>
+  `,
+})
+export class BpdmRadio {
+  readonly value = input.required<string>();
+  readonly size = input<NonNullable<RadioVariants["size"]>>("md");
+  /** Disable just this option. */
+  readonly disabled = input(false, { transform: booleanAttribute });
+  /** Invalid state — set `aria-invalid="true"`; styled red. */
+  readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
+  readonly classInput = input<string>("", { alias: "class" });
+  /** Control id (label association / testing), forwarded to the radio. */
+  readonly id = input<string>("");
+  /** Accessible name — pass a translated string for i18n. Forwarded to the radio. */
+  readonly ariaLabel = input<string>("", { alias: "aria-label" });
+  /** Id(s) of the element(s) labelling the radio. Forwarded to the radio. */
+  readonly ariaLabelledby = input<string>("", { alias: "aria-labelledby" });
+  /** Id(s) of describing elements (help / error text). Forwarded to the radio. */
+  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+
+  protected readonly group = inject(BpdmRadioGroup);
+  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  protected readonly checked = computed(() => this.group.value() === this.value());
+  /** Disabled by the group or by this option. */
+  isDisabled(): boolean {
+    return this.group.disabled() || this.disabled();
+  }
+  /** Roving tabindex — only the group's single tab stop is 0. */
+  protected readonly tabindex = computed(() =>
+    this.isDisabled() ? -1 : this.group.rovingValue() === this.value() ? 0 : -1,
+  );
+  protected readonly itemClass = computed(() =>
+    cn(radioItemVariants({ size: this.size() }), this.classInput()),
+  );
+
+  /** Focus this radio's control (used by the group's arrow-key navigation). */
+  focus(): void {
+    this.el.nativeElement.querySelector("button")?.focus();
+  }
+}
+
 /**
  * `<bpdm-radio-group>` — a single-select group of `<bpdm-radio>` items. Works with
  * `[(ngModel)]` / reactive forms (ControlValueAccessor) or `[(value)]`. Vertical
@@ -114,73 +188,5 @@ export class BpdmRadioGroup implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
-  }
-}
-
-/** A single radio button inside a `<bpdm-radio-group>`. */
-@Component({
-  selector: "bpdm-radio",
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "inline-flex" },
-  template: `
-    <button
-      type="button"
-      role="radio"
-      [id]="id() || null"
-      [class]="itemClass()"
-      [attr.tabindex]="tabindex()"
-      [attr.data-state]="checked() ? 'checked' : 'unchecked'"
-      [attr.aria-checked]="checked()"
-      [attr.aria-label]="ariaLabel() || null"
-      [attr.aria-labelledby]="ariaLabelledby() || null"
-      [attr.aria-describedby]="ariaDescribedby() || null"
-      [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
-      [disabled]="isDisabled()"
-      (click)="group.select(value())"
-    >
-      @if (checked()) {
-        <span class="flex h-full w-full items-center justify-center">
-          <span class="size-[45%] rounded-full bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"></span>
-        </span>
-      }
-    </button>
-  `,
-})
-export class BpdmRadio {
-  readonly value = input.required<string>();
-  readonly size = input<NonNullable<RadioVariants["size"]>>("md");
-  /** Disable just this option. */
-  readonly disabled = input(false, { transform: booleanAttribute });
-  /** Invalid state — set `aria-invalid="true"`; styled red. */
-  readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
-  readonly classInput = input<string>("", { alias: "class" });
-  /** Control id (label association / testing), forwarded to the radio. */
-  readonly id = input<string>("");
-  /** Accessible name — pass a translated string for i18n. Forwarded to the radio. */
-  readonly ariaLabel = input<string>("", { alias: "aria-label" });
-  /** Id(s) of the element(s) labelling the radio. Forwarded to the radio. */
-  readonly ariaLabelledby = input<string>("", { alias: "aria-labelledby" });
-  /** Id(s) of describing elements (help / error text). Forwarded to the radio. */
-  readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
-
-  protected readonly group = inject(BpdmRadioGroup);
-  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
-
-  protected readonly checked = computed(() => this.group.value() === this.value());
-  /** Disabled by the group or by this option. */
-  isDisabled(): boolean {
-    return this.group.disabled() || this.disabled();
-  }
-  /** Roving tabindex — only the group's single tab stop is 0. */
-  protected readonly tabindex = computed(() =>
-    this.isDisabled() ? -1 : this.group.rovingValue() === this.value() ? 0 : -1,
-  );
-  protected readonly itemClass = computed(() =>
-    cn(radioItemVariants({ size: this.size() }), this.classInput()),
-  );
-
-  /** Focus this radio's control (used by the group's arrow-key navigation). */
-  focus(): void {
-    this.el.nativeElement.querySelector("button")?.focus();
   }
 }

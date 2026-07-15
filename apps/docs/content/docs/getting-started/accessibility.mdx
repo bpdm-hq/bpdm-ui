@@ -1,0 +1,56 @@
+---
+title: Accessibility
+description: The accessibility patterns bpdm/ui follows, and how every release is verified.
+---
+
+Accessibility is handled at build time, not bolted on afterward. This page describes
+**what the library does** and **how each release is checked**, so you can evaluate it
+against your own requirements.
+
+<Callout type="info">
+  bpdm/ui does not assert a formal conformance level. Whether a screen is accessible
+  depends on how components are composed, themed, and used in your product — so what
+  we can responsibly share is what the components *do* and how we *verify* them, below.
+  Verification in your own context stays with you.
+</Callout>
+
+## What the components do
+
+- **Keyboard** — every interactive component is operable without a mouse. Key maps are
+  documented per component; roving focus / arrow-key navigation is used where the ARIA
+  pattern calls for it (radio groups, tabs, tree, listboxes). Overlays trap focus while
+  open, close on `Esc`, and return focus to their trigger. No keyboard traps.
+- **Focus visibility** — a visible focus ring (with offset) on every focusable element,
+  shown for keyboard focus via `focus-visible`.
+- **Colour contrast** — text is chosen against a **≥4.5:1** target and non-text indicators
+  against **≥3:1**, across all four built-in themes. A vivid brand hue like the amber
+  `--primary` is auto-darkened to a `-strong` step for text and indicator use — see
+  [Configuration](/docs/getting-started/configuration).
+- **Motion** — animations honour `prefers-reduced-motion`.
+- **RTL** — logical CSS properties throughout, so layouts mirror under `dir="rtl"`.
+- **Screen readers** — ARIA roles, names, and states on every control; live regions for
+  async and toast messages. Where platforms read one attribute over another, both are
+  provided (e.g. tree node state is exposed as `aria-selected` *and* `aria-checked`).
+- **Reflow** — content reflows without loss down to narrow widths and at 200% zoom; wide
+  content (tables, tab rows, steppers) scrolls within its own container.
+
+## How each release is verified
+
+- **Unit axe (jsdom)** — every component is rendered and checked with `axe-core` in the
+  test suite (roles, names, ARIA validity, label associations, structure). Runs on every PR.
+- **Browser axe (Chromium)** — each Storybook story is checked with `@axe-core/playwright`
+  for **colour contrast across all four themes × LTR/RTL** in CI — the check jsdom cannot
+  do. Runs on every PR.
+- **Manual review** — keyboard-only walkthrough, screen-reader announcement checks
+  (VoiceOver / NVDA), and reflow / zoom / text-spacing, following the project's manual
+  protocol.
+
+## Your part
+
+- **Provide names.** Icon-only controls need an `aria-label`; form fields need a real
+  label. The components expose the hooks — supplying the text is up to you.
+- **If you override tokens, you own their contrast.** The defaults are measured against the
+  targets above; changing `--primary`, a `-strong` shade, or the active-option tokens can
+  move those ratios — re-check them (see [Configuration](/docs/getting-started/configuration)).
+- **Test in your app.** These checks cover components in isolation. Composition, your
+  content, and your own styles are only verifiable in your product.

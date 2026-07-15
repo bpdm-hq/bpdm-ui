@@ -38,3 +38,37 @@ jobs:
         env:
           TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           TURBO_SCM_HEAD: ${{ github.sha }}
+
+  # Real-browser colour-contrast gate: builds each Storybook, runs axe-core over
+  # every story × 4 themes × LTR/RTL in headless Chromium. jsdom (the unit test
+  # suite) can't compute contrast, so this is what actually guards the token /
+  # `-strong` contrast work against regressions. Runs in parallel with `verify`
+  # and per framework, so it never slows the main gate.
+  a11y-browser:
+    name: Accessibility · browser-axe
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ['@bpdm/ui', '@bpdm/ng']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium (Playwright)
+        run: pnpm --filter ${{ matrix.package }} exec playwright install --with-deps chromium
+
+      - name: Contrast sweep (all themes × dir)
+        run: pnpm --filter ${{ matrix.package }} test:a11y:browser
