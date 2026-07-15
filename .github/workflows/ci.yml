@@ -70,5 +70,11 @@ jobs:
       - name: Install Chromium (Playwright)
         run: pnpm --filter ${{ matrix.package }} exec playwright install --with-deps chromium
 
+      # Storybook builds from source and imports the workspace's built packages
+      # (e.g. @bpdm/variants dist) — a fresh install doesn't build them, so do it
+      # here before the Storybook build inside the sweep.
+      - name: Build workspace dependencies
+        run: pnpm exec turbo run build --filter=${{ matrix.package }}^...
+
       - name: Contrast sweep (all themes × dir)
         run: pnpm --filter ${{ matrix.package }} test:a11y:browser
