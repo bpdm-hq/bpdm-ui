@@ -128,6 +128,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 [maxDisplay]="0"
                 [selectAll]="false"
                 searchable
+                [aria-label]="t().columns"
                 [placeholder]="t().columns"
                 [options]="toggleOptions()"
                 [value]="visibleToggleIds()"
@@ -229,16 +230,16 @@ interface BodyRow<T> extends RenderRow<T> {
             <thead>
               <tr #headRow>
                 @if (reorderableRows()) {
-                  <th scope="col" [attr.aria-label]="t().reorder" [class]="leadHeadClass(false)"
+                  <th scope="col" [class]="leadHeadClass(false)"
                     [style.position]="stickyHeader() ? 'sticky' : null"
-                    [style.top.px]="stickyHeader() ? 0 : null"></th>
+                    [style.top.px]="stickyHeader() ? 0 : null"><span class="sr-only">{{ t().reorder }}</span></th>
                 }
                 @if (expandable()) {
-                  <th scope="col" [attr.aria-label]="t().expand" data-pin-id="__lead_expand"
+                  <th scope="col" data-pin-id="__lead_expand"
                     [class]="leadHeadClass(true)"
                     [style.position]="hasLeftPin() || stickyHeader() ? 'sticky' : null"
                     [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"
-                    [style.top.px]="stickyHeader() ? 0 : null"></th>
+                    [style.top.px]="stickyHeader() ? 0 : null"><span class="sr-only">{{ t().expand }}</span></th>
                 }
                 @if (selectable()) {
                   <th scope="col" data-pin-id="__lead_select"
@@ -250,6 +251,8 @@ interface BodyRow<T> extends RenderRow<T> {
                       <div class="flex justify-center">
                         <bpdm-checkbox size="sm" [attr.aria-label]="t().selectAllRows" [checked]="allSelected()" [indeterminate]="someSelected()" (checkedChange)="toggleAll()" />
                       </div>
+                    } @else {
+                      <span class="sr-only">{{ t().selectRow }}</span>
                     }
                   </th>
                 }
@@ -271,9 +274,10 @@ interface BodyRow<T> extends RenderRow<T> {
                     [class]="headCellClass(col)"
                   >
                     <div class="flex items-center gap-1">
+                      @let emptyHeader = !col.header?.trim();
                       @if (col.sortable) {
                         <button type="button" (click)="handleSort(col.id, $event.shiftKey)" (keydown)="onHeaderKey($event, col.id)" [class]="sortBtnClass(col)">
-                          <span>{{ col.header ?? col.id }}</span>
+                          <span>{{ col.header ?? col.id }}@if (emptyHeader) {<span class="sr-only">{{ col.id }}</span>}</span>
                           @let dir = dirOf(col.id);
                           @if (dir === null) {
                             <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 opacity-40" fill="none" aria-hidden="true"><path d="M5 6.5 8 3.5l3 3M5 9.5 8 12.5l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -285,7 +289,7 @@ interface BodyRow<T> extends RenderRow<T> {
                           }
                         </button>
                       } @else {
-                        <span [class]="'flex-1 ' + alignClass(col)">{{ col.header ?? col.id }}</span>
+                        <span [class]="'flex-1 ' + alignClass(col)">{{ col.header ?? col.id }}@if (emptyHeader) {<span class="sr-only">{{ col.id }}</span>}</span>
                       }
                       @if (col.filterable) {
                         <bpdm-column-filter-menu

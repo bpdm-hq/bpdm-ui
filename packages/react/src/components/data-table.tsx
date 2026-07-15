@@ -2325,6 +2325,7 @@ export function DataTable<T>({
                   maxDisplay={0}
                   selectAll={false}
                   searchable
+                  aria-label={t.columns}
                   placeholder={t.columns}
                   options={toggleable.map((c) => ({
                     value: c.id,
@@ -2491,7 +2492,6 @@ export function DataTable<T>({
             {reorderableRows && (
               <th
                 scope="col"
-                aria-label={t.reorder}
                 className={cn(
                   padCls,
                   "w-[1%]",
@@ -2500,12 +2500,13 @@ export function DataTable<T>({
                   stickyHeader && "sticky top-0 z-10",
                   headerClassName,
                 )}
-              />
+              >
+                <span className="sr-only">{t.reorder}</span>
+              </th>
             )}
             {expandable && (
               <th
                 scope="col"
-                aria-label={t.expand}
                 data-pin-id="__lead_expand"
                 style={{
                   ...(hasLeftPin ? { position: "sticky", insetInlineStart: expanderLeft } : {}),
@@ -2520,7 +2521,9 @@ export function DataTable<T>({
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
                 )}
-              />
+              >
+                <span className="sr-only">{t.expand}</span>
+              </th>
             )}
             {selectable && (
               <th
@@ -2540,7 +2543,7 @@ export function DataTable<T>({
                   headerClassName,
                 )}
               >
-                {selectionMode === "multiple" && (
+                {selectionMode === "multiple" ? (
                   <div className="flex justify-center">
                     <Checkbox
                       size="sm"
@@ -2549,6 +2552,8 @@ export function DataTable<T>({
                       onCheckedChange={toggleAll}
                     />
                   </div>
+                ) : (
+                  <span className="sr-only">{t.selectRow}</span>
                 )}
               </th>
             )}
@@ -2556,6 +2561,13 @@ export function DataTable<T>({
               const align = col.align ?? (col.numeric ? "right" : "left");
               const entry = sortState.find((s) => s.id === col.id);
               const dir = entry?.dir ?? null;
+              // a header cell must have an accessible name (WCAG / axe
+              // `empty-table-header`). When the column's header renders to empty
+              // text (e.g. an actions column with `header: ""`), fall back to an
+              // sr-only label of the column id — no visible change.
+              const emptyHeader =
+                col.header == null ||
+                (typeof col.header === "string" && col.header.trim() === "");
               // position within the drag-reorder order (pins aside) → move bounds
               const reorderIdx = reorderableColumns
                 ? orderedBase.findIndex((c) => c.id === col.id)
@@ -2644,7 +2656,10 @@ export function DataTable<T>({
                           dir && "text-foreground",
                         )}
                       >
-                        <span>{col.header ?? col.id}</span>
+                        <span>
+                          {col.header ?? col.id}
+                          {emptyHeader && <span className="sr-only">{col.id}</span>}
+                        </span>
                         <SortIcon dir={dir} />
                         {order > 0 && (
                           <span className="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
@@ -2655,6 +2670,7 @@ export function DataTable<T>({
                     ) : (
                       <span className={cn("flex-1", alignClass[align])}>
                         {col.header ?? col.id}
+                        {emptyHeader && <span className="sr-only">{col.id}</span>}
                       </span>
                     )}
                     {col.filterable && (
