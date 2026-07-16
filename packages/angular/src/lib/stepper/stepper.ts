@@ -171,7 +171,7 @@ export class BpdmStepList {
           class="absolute bottom-0 start-4 top-9 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-border"
         >
           <span
-            class="absolute inset-0 origin-top rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
+            class="absolute inset-0 origin-top rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
             [class]="completed() ? 'scale-y-100' : 'scale-y-0'"
           ></span>
         </span>
@@ -232,7 +232,7 @@ export class BpdmStepItem {
       @if (!vertical() && !isLast()) {
         <span aria-hidden="true" class="relative mx-3 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
           <span
-            class="absolute inset-0 origin-left rtl:origin-right rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
+            class="absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
             [class]="completed() ? 'scale-x-100' : 'scale-x-0'"
           ></span>
         </span>
@@ -307,7 +307,7 @@ export class BpdmStep {
   protected readonly markerClass = computed(() =>
     cn(
       "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
-      this.state() === "completed" && "border-primary bg-primary text-primary-foreground",
+      this.state() === "completed" && "border-success bg-success text-success-foreground",
       this.state() === "active" && "scale-105 border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background",
       this.state() === "upcoming" && "border-border text-muted-foreground",
     ),
