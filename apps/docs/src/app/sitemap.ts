@@ -3,7 +3,7 @@ import { source } from '@/lib/source';
 
 export const dynamic = 'force-static';
 
-const SITE = 'https://docs.bpdm.dev';
+const SITE = 'https://docs.ui.bpdm.dev';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return source.getPages().map((page) => ({

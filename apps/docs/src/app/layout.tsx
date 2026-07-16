@@ -7,7 +7,7 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-const SITE = 'https://docs.bpdm.dev';
+const SITE = 'https://docs.ui.bpdm.dev';
 const TITLE = 'bpdm/ui — component library for React & Angular';
 const DESCRIPTION =
   'Documentation for bpdm/ui — an accessible, themeable component library with native React (@bpdm/ui) and Angular (@bpdm/ng) implementations, built from one shared set of design tokens.';
