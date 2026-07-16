@@ -54,8 +54,8 @@ export default function Home() {
             <div className="hero-copy">
             <span className="eyebrow">bpdm · design system</span>
             <h1>
-              One design system,<br />
-              <span className="amber">every framework.</span>
+              One design system for<br />
+              <span className="amber">React &amp; Angular.</span>
             </h1>
             <p className="tagline">
               An accessible, themeable, shadcn-style component library on one shared set of design
@@ -230,11 +230,11 @@ export default function Home() {
         <section id="frameworks" className="soft">
           <div className="wrap">
             <div className="section-head">
-              <h2>Pick your framework</h2>
-              <p>Same design, same tokens — choose the implementation you build with.</p>
+              <h2>One system, both frameworks</h2>
+              <p>The same components and design tokens, implemented natively in React and Angular — documented together in one place.</p>
             </div>
             <div className="cards">
-              <a className="card card--active" href={DOCS} style={{ "--accent": "var(--react)" } as CSSProperties}>
+              <div className="card" style={{ "--accent": "var(--react)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
@@ -250,10 +250,9 @@ export default function Home() {
                 </div>
                 <h3>React</h3>
                 <p>38 components built on Radix primitives, Tailwind 4, and four themes.</p>
-                <span className="cta">Explore React docs <span className="arrow">→</span></span>
-              </a>
+              </div>
 
-              <a className="card card--active" href={DOCS} style={{ "--accent": "var(--angular)" } as CSSProperties}>
+              <div className="card" style={{ "--accent": "var(--angular)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="0 0 256 272" fill="none">
@@ -266,7 +265,11 @@ export default function Home() {
                 </div>
                 <h3>Angular</h3>
                 <p>38 components built with Angular standalone components, the CDK, and four themes.</p>
-                <span className="cta">Explore Angular docs <span className="arrow">→</span></span>
+              </div>
+            </div>
+            <div className="fw-cta">
+              <a className="btn btn-primary" href={DOCS}>
+                Explore the docs <span className="arrow">→</span>
               </a>
             </div>
           </div>
@@ -308,7 +311,7 @@ export default function Home() {
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" /><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" /><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" /></svg></span>
                 <h3>Shared design tokens</h3>
-                <p>One source of truth (<code>@bpdm/tokens</code>) powers every framework — re-brand by overriding variables.</p>
+                <p>One source of truth (<code>@bpdm/tokens</code>) powers both frameworks — re-brand by overriding variables.</p>
               </div>
             </div>
           </div>
@@ -452,7 +455,7 @@ export function Example() {
           <div className="foot-grid">
             <div className="foot-brand">
               <span className="brand-mark"><span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span></span>
-              <p>An open-source, shadcn-style design system for React and Angular — one token set, every framework.</p>
+              <p>An open-source, shadcn-style design system for React and Angular — one token set, both frameworks.</p>
             </div>
             <div className="foot-col">
               <h4>Documentation</h4>
