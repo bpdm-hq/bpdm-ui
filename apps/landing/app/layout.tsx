@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ScrollTop } from "./scroll-top";
 
 const SITE = "https://ui.bpdm.dev";
 const TITLE = "bpdm/ui — a shadcn-style component library for React & Angular";
@@ -143,6 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         {children}
+        <ScrollTop />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

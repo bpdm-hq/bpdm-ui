@@ -3,8 +3,7 @@ import { InstallTabs } from "./install-tabs";
 import { ThemeToggle } from "./theme-toggle";
 import { HeroPreview } from "./hero-preview";
 
-const REACT_DOCS = "/react/?path=/docs/introduction--docs";
-const ANGULAR_DOCS = "/angular/?path=/docs/introduction--docs";
+const DOCS = "https://docs.ui.bpdm.dev/docs";
 const REPO = "https://github.com/BDev-9/bpdm-ui";
 
 const STATS = [
@@ -30,7 +29,7 @@ export default function Home() {
       <header className="nav">
         <div className="wrap nav-inner">
           <a className="brand-mark" href="/">
-            <span className="b">&lt;</span>Bpdm<span className="b"> /&gt;</span>
+            <span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span>
           </a>
           <nav className="nav-links">
             <a className="hide-sm" href="#showcase">Showcase</a>
@@ -43,7 +42,7 @@ export default function Home() {
               GitHub
             </a>
             <ThemeToggle />
-            <a className="nav-cta" href={REACT_DOCS}>Get started</a>
+            <a className="nav-cta" href={DOCS}>Get started</a>
           </nav>
         </div>
       </header>
@@ -64,7 +63,7 @@ export default function Home() {
               everywhere.
             </p>
             <div className="cta-row">
-              <a className="btn btn-primary" href={REACT_DOCS}>
+              <a className="btn btn-primary" href={DOCS}>
                 Explore the components <span className="arrow">→</span>
               </a>
               <a className="btn btn-ghost" href={REPO} target="_blank" rel="noopener noreferrer">
@@ -201,6 +200,28 @@ export default function Home() {
                   <span className="d-avatar d-avatar-more">+12</span>
                 </div>
               </div>
+              {/* tabs */}
+              <div className="demo">
+                <span className="demo-label">Tabs</span>
+                <div className="d-tabs" role="img" aria-label="Tabs, Overview selected">
+                  <span className="d-tab d-tab-active">Overview</span>
+                  <span className="d-tab">Activity</span>
+                  <span className="d-tab">Settings</span>
+                </div>
+              </div>
+              {/* progress */}
+              <div className="demo">
+                <span className="demo-label">Progress</span>
+                <div className="d-progress-wrap">
+                  <div className="d-progress-top">
+                    <span className="demo-text">Storage used</span>
+                    <span className="d-progress-val">68%</span>
+                  </div>
+                  <div className="d-progress" role="img" aria-label="68 percent">
+                    <span style={{ width: "68%" }} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -213,7 +234,7 @@ export default function Home() {
               <p>Same design, same tokens — choose the implementation you build with.</p>
             </div>
             <div className="cards">
-              <a className="card card--active" href={REACT_DOCS} style={{ "--accent": "var(--react)" } as CSSProperties}>
+              <a className="card card--active" href={DOCS} style={{ "--accent": "var(--react)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
@@ -232,7 +253,7 @@ export default function Home() {
                 <span className="cta">Explore React docs <span className="arrow">→</span></span>
               </a>
 
-              <a className="card card--active" href={ANGULAR_DOCS} style={{ "--accent": "var(--angular)" } as CSSProperties}>
+              <a className="card card--active" href={DOCS} style={{ "--accent": "var(--angular)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="0 0 256 272" fill="none">
@@ -419,7 +440,7 @@ export function Example() {
             <h2>Build your next interface on bpdm</h2>
             <p>One design system, React and Angular, accessible and themeable — ready today.</p>
             <div className="cta-row">
-              <a className="btn btn-primary" href={REACT_DOCS}>Explore the docs <span className="arrow">→</span></a>
+              <a className="btn btn-primary" href={DOCS}>Explore the docs <span className="arrow">→</span></a>
               <a className="btn btn-ghost" href={REPO} target="_blank" rel="noopener noreferrer">Star on GitHub</a>
             </div>
           </div>
@@ -430,13 +451,12 @@ export function Example() {
         <div className="wrap">
           <div className="foot-grid">
             <div className="foot-brand">
-              <span className="brand-mark"><span className="b">&lt;</span>Bpdm<span className="b"> /&gt;</span></span>
+              <span className="brand-mark"><span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span></span>
               <p>An open-source, shadcn-style design system for React and Angular — one token set, every framework.</p>
             </div>
             <div className="foot-col">
-              <h4>Frameworks</h4>
-              <a href={REACT_DOCS}>React docs</a>
-              <a href={ANGULAR_DOCS}>Angular docs</a>
+              <h4>Documentation</h4>
+              <a href={DOCS}>Docs</a>
             </div>
             <div className="foot-col">
               <h4>Explore</h4>
