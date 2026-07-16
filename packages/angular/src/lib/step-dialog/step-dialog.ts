@@ -93,7 +93,7 @@ export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
                 <li
                   aria-hidden="true"
                   class="h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]"
-                  [class]="$index < step() ? 'bg-primary' : 'bg-border'"
+                  [class]="$index < step() ? 'bg-success' : 'bg-border'"
                 ></li>
               }
             }
@@ -179,7 +179,7 @@ export class BpdmStepDialog {
     return cn(
       "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
       i < step
-        ? "bg-primary text-primary-foreground"
+        ? "bg-success text-success-foreground"
         : i === step
           ? "scale-110 bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
           : "border border-border text-muted-foreground",
