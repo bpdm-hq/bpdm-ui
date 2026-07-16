@@ -224,7 +224,7 @@ function Marker({
     <span
       className={cn(
         "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
-        state === "completed" && "border-primary bg-primary text-primary-foreground",
+        state === "completed" && "border-success bg-success text-success-foreground",
         state === "active" && "scale-105 border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background",
         state === "upcoming" && "border-border text-muted-foreground",
       )}
@@ -344,7 +344,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
         <span aria-hidden className="relative mx-3 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
           <span
             className={cn(
-              "absolute inset-0 origin-left rtl:origin-right rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
+              "absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
               completed ? "scale-x-100" : "scale-x-0",
             )}
           />
@@ -446,7 +446,7 @@ function StepItemImpl({ value, children, className }: StepItemProps) {
           >
             <span
               className={cn(
-                "absolute inset-0 origin-top rounded-full bg-primary transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
+                "absolute inset-0 origin-top rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
                 completed ? "scale-y-100" : "scale-y-0",
               )}
             />

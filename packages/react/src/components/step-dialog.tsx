@@ -76,7 +76,7 @@ function Stepper({
                 className={cn(
                   "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
                   done
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-success text-success-foreground"
                     : active
                       ? "scale-110 bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
                       : "border border-border text-muted-foreground",
@@ -100,7 +100,7 @@ function Stepper({
                 aria-hidden="true"
                 className={cn(
                   "h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]",
-                  i < current ? "bg-primary" : "bg-border",
+                  i < current ? "bg-success" : "bg-border",
                 )}
               />
             )}
