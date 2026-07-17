@@ -60,9 +60,11 @@ export const viewport: Viewport = {
   colorScheme: "dark light",
 };
 
-// Runs before paint: pick the saved theme (or system preference) and set it on
-// <html>, so there's no flash of the wrong theme. SSR defaults to dark.
-const THEME_INIT = `(function(){try{var t=localStorage.getItem('bpdm-theme');if(t!=='light'&&t!=='dark'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.dataset.theme=t;}catch(e){}})();`;
+// Runs before paint: pick the theme and set it on <html> so there's no flash of
+// the wrong one. Precedence: the shared `.bpdm.dev` cookie (an explicit choice
+// carried over from the docs) → this site's own saved theme → system preference.
+// SSR defaults to dark.
+const THEME_INIT = `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)bpdm-mode=(light|dark)/);var t=m?m[1]:localStorage.getItem('bpdm-theme');if(t!=='light'&&t!=='dark'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.dataset.theme=t;}catch(e){}})();`;
 
 // Structured data: the site + the software (component library) it documents.
 const jsonLd = {

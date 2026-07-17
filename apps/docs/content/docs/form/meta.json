@@ -2,6 +2,7 @@
   "title": "Form",
   "icon": "TextCursorInput",
   "pages": [
+    "button",
     "input",
     "textarea",
     "number-input",

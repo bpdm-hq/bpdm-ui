@@ -106,6 +106,7 @@ export function SelectableList<T>({
   // roving "active" option for the WAI-ARIA listbox keyboard pattern
   const [activeKey, setActiveKey] = React.useState<ItemKey | null>(null);
 
+  const listboxRef = React.useRef<HTMLDivElement>(null);
   const baseId = React.useId();
   const headerId = header ? `${baseId}-label` : undefined;
   const optionId = (k: ItemKey) => `${baseId}-opt-${String(k)}`;
@@ -141,6 +142,12 @@ export function SelectableList<T>({
   // could drive the active item off-screen in the scrollable body.
   React.useEffect(() => {
     if (activeKey == null || typeof document === "undefined") return;
+    // Only self-scroll while the listbox actually holds focus. On mount the
+    // active option is auto-set (null → first item), which would otherwise
+    // scrollIntoView and yank the *page* to this component — with several lists
+    // on one page the last-mounted one wins the scroll position.
+    const lb = listboxRef.current;
+    if (!lb || !lb.contains(document.activeElement)) return;
     document.getElementById(optionId(activeKey))?.scrollIntoView?.({ block: "nearest" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
@@ -215,6 +222,7 @@ export function SelectableList<T>({
       )}
 
       <div
+        ref={listboxRef}
         role="listbox"
         aria-multiselectable={multiselectable || undefined}
         aria-labelledby={headerId}

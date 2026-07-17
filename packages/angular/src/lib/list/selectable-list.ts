@@ -143,7 +143,9 @@ export class BpdmSelectableList<T = unknown> {
     // user could drive the active item off-screen in the scrollable body.
     effect(() => {
       const id = this.activeDescendant();
-      if (!id) return;
+      // only self-scroll while the listbox holds focus — never yank the page
+      // toward this list from a programmatic active change made while unfocused.
+      if (!id || !this.focused()) return;
       const el = this.host.nativeElement.querySelector<HTMLElement>(`[id="${id}"]`);
       el?.scrollIntoView?.({ block: "nearest" });
     });

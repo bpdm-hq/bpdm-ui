@@ -23,6 +23,16 @@ export function ThemeToggle() {
     } catch {
       /* storage unavailable */
     }
+    // Carry this explicit light/dark choice across *.bpdm.dev (e.g. to the docs)
+    // via a shared cookie — apex domain in prod, host-only on localhost.
+    try {
+      const onBpdm = /(^|\.)bpdm\.dev$/.test(location.hostname);
+      document.cookie =
+        `bpdm-mode=${next}; path=/; max-age=31536000; SameSite=Lax` +
+        (onBpdm ? "; domain=.bpdm.dev" : "");
+    } catch {
+      /* cookies unavailable */
+    }
   };
 
   return (
