@@ -114,6 +114,8 @@ section { padding: 3.25rem 0; }
 .row { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
 .cta { margin-top: 0.35rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.95rem; color: var(--accent); }
 .card--active:hover .cta .arrow { transform: translateX(4px); }
+.fw-cta { margin-top: 2.25rem; display: flex; justify-content: center; }
+.fw-cta .btn:hover .arrow { transform: translateX(4px); }
 .arrow { transition: transform 0.28s var(--ease); }
 .badge {
   margin-left: auto; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
@@ -460,7 +462,20 @@ h1 .amber {
 .panel-row-btn { width: 100%; padding: 0; background: transparent; border: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
 .fw-tab.is-active { color: #1a1205; background: var(--primary); border-color: transparent; }
 .fw-note { margin-left: auto; display: inline-flex; align-items: center; font-size: 0.72rem; color: var(--muted); }
-.live-dot { width: 0.45rem; height: 0.45rem; border-radius: 999px; color: #3fb950; background: #3fb950; margin-left: 0.45rem; animation: live-ping 1.8s var(--ease) infinite; }
+/* "live/online" dot — a gently-beating green dot with an expanding ring ripple */
+.live-dot {
+  position: relative; display: inline-block;
+  width: 0.5rem; height: 0.5rem; border-radius: 999px;
+  background: #3fb950; margin-left: 0.5rem;
+  box-shadow: 0 0 6px color-mix(in srgb, #3fb950 70%, transparent);
+  animation: live-dot-beat 1.6s var(--ease) infinite;
+}
+.live-dot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 999px;
+  background: #3fb950; animation: live-dot-ring 1.6s var(--ease) infinite;
+}
+@keyframes live-dot-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.86); } }
+@keyframes live-dot-ring { 0% { opacity: 0.55; transform: scale(1); } 80%, 100% { opacity: 0; transform: scale(2.6); } }
 
 /* design-token swatches */
 .token-swatches { display: flex; gap: 0.45rem; }
@@ -577,7 +592,7 @@ h1 .amber {
 
 @media (prefers-reduced-motion: reduce) {
   .window { animation: none; }
-  .d-badge i.live, .live-dot { animation: none; }
+  .d-badge i.live, .live-dot, .live-dot::after { animation: none; }
 }
 
 /* ── toast (Copy link → bpdm-style notification, portaled to body) ───────── */
