@@ -60,13 +60,26 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla → cz-shortcut-listen)
           inject attributes on <body> that aren't in the SSR'd HTML. */}
       <body className="flex flex-col min-h-screen" suppressHydrationWarning>
-        {/* One theme signal: next-themes toggles the `.dark` class (what Fumadocs
-            + its code highlighting use). global.css mirrors bpdm's dark palette
-            under `.dark`, so background, components and code switch together. */}
+        {/* Four @bpdm/ui themes chosen via data-theme (tokens.css supplies each
+            palette). Runs before paint AND before next-themes' own script, so it:
+            (1) honours a cross-property light/dark choice carried over from the
+            marketing site via the shared `.bpdm.dev` cookie `bpdm-mode` — if that
+            mode disagrees with the stored docs theme, we fall back to that mode's
+            default (charcoal / paper); (2) writes the resolved theme into the
+            `theme` storage key so next-themes applies the same value (no flash,
+            no revert); (3) sets `data-theme` + the `.dark` signal that Fumadocs
+            chrome + Shiki code rely on. The ThemeSelect keeps both in sync after. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var D={charcoal:1,slate:1};var s=localStorage.getItem('theme');var m=document.cookie.match(/(?:^|;\\s*)bpdm-mode=(light|dark)/);var mode=m?m[1]:null;var t=s;if(t){if(mode&&((mode==='dark')!==!!D[t]))t=mode==='dark'?'charcoal':'paper';}else t=mode==='dark'?'charcoal':(mode==='light'?'paper':'paper');if(t!==s){try{localStorage.setItem('theme',t);}catch(e){}}var el=document.documentElement;el.setAttribute('data-theme',t);if(D[t])el.classList.add('dark');else el.classList.remove('dark');}catch(e){}})();`,
+          }}
+        />
         <RootProvider
           theme={{
-            attribute: 'class',
-            defaultTheme: 'light',
+            attribute: 'data-theme',
+            themes: ['paper', 'mist', 'charcoal', 'slate'],
+            defaultTheme: 'paper',
+            storageKey: 'theme',
             enableSystem: false,
           }}
         >

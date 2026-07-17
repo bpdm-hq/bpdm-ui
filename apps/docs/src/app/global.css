@@ -1,8 +1,12 @@
 @import 'tailwindcss';
 /* shadcn theme: maps every --color-fd-* to shadcn-style vars (--primary,
    --background, --border, --ring…) — exactly what @bpdm/tokens defines. */
-@import 'fumadocs-ui/css/shadcn.css';
+/* preset.css FIRST (Fumadocs base + default fd-* colours), THEN shadcn.css so its
+   `--color-fd-*: var(--bpdm-token)` mappings WIN — that's what lets @bpdm/tokens
+   (via data-theme) actually drive Fumadocs' chrome. (Reversed order let preset's
+   hardcoded #f5f5f5/#121212 override the tokens → themes had no effect.) */
 @import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-ui/css/shadcn.css';
 
 /* bpdm design tokens — CSS variables + 4 themes (data-theme). Defines --primary
    (amber), --background, etc. that the shadcn theme above reads via var(). */
@@ -14,39 +18,21 @@
 @source '../../../../packages/react/src';
 @source '../../../../packages/variants/src';
 
-/* ONE dark signal: next-themes toggles `.dark` (which Fumadocs + its shiki code
-   highlighting already key off). Mirror bpdm's "slate" dark palette under `.dark`
-   so the whole UI — background, components AND code — switches together, with no
-   light-bg/dark-code desync. (Sidebar vars below reference these, so they follow.) */
+/* Our full-width <SiteHeader /> is 3.75rem tall and Fumadocs' own nav is disabled.
+   Fumadocs offsets the sticky sidebar via --fd-docs-row-1 (= --fd-banner-height)
+   and the sticky TOC via row-2 (= row-1 + --fd-header-height). Setting the banner
+   height makes BOTH clear our header (no tucking under it on scroll). */
+:root {
+  --fd-banner-height: 3.75rem;
+}
+
+/* The theme selector picks one of the four @bpdm/ui themes via `data-theme`
+   (paper · mist · charcoal · slate) — tokens.css supplies each palette, so
+   charcoal and slate stay distinct. `.dark` (added by the selector for the two
+   dark themes) is ONLY the signal that Fumadocs' chrome + Shiki code highlighting
+   key off; the colours themselves come from the active data-theme. */
 .dark {
   color-scheme: dark;
-  --background: #0d1117;
-  --foreground: #e6e8eb;
-  --card: #161b22;
-  --card-foreground: #e6e8eb;
-  --popover: #161b22;
-  --popover-foreground: #e6e8eb;
-  --muted: #1c2128;
-  --muted-foreground: #8b949e;
-  --border: #2a313c;
-  --input: #30363d;
-  --ring: #f5a623;
-  --primary: #f5a623;
-  --primary-foreground: #1a1205;
-  --secondary: #1c2128;
-  --secondary-foreground: #e6e8eb;
-  --accent: #ff7a3c;
-  --accent-foreground: #1a1205;
-  --destructive: #f0616d;
-  --destructive-foreground: #0d1117;
-  --success: #3fb950;
-  --success-foreground: #052e16;
-  --warning: #d29922;
-  --warning-foreground: #0d1117;
-  --info: #58a6ff;
-  --info-foreground: #0d1117;
-  --help: #a371f7;
-  --help-foreground: #0d1117;
 }
 
 /* @bpdm/tokens has no sidebar tokens; map them onto existing bpdm tokens so the
@@ -69,6 +55,16 @@ html {
 /* ── Side gutters: keep the whole layout off the viewport edges so it breathes
    (modern docs sit in a comfortable frame, not flush to the left). ── */
 #nd-docs-layout {
+  padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
+}
+
+/* Site header content is constrained to the same 1400px layout box + gutter as
+   #nd-docs-layout (bar stays full-bleed). The logo gets the layout gutter PLUS the
+   sidebar's own p-4 (1rem) so it lines up vertically with the sidebar nav items;
+   the right actions sit at the layout gutter (aligned with the content edge). */
+.site-header-inner {
+  max-width: var(--fd-layout-width);
+  margin-inline: auto;
   padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
 }
 
@@ -110,6 +106,31 @@ html {
   padding-top: 0.85rem;
   background-color: var(--background);
   border-bottom-width: 0;
+}
+
+/* The sidebar's top strip carries only the collapse toggle (Fumadocs' own nav is
+   disabled), so it otherwise floats in an empty band above the list. Lift it out
+   of flow — the nav list ("Introduction" …) then starts at the top — and drop the
+   toggle onto that first row, aligned to its end. The strip is click-through
+   except the button itself, so "Introduction" underneath stays clickable. */
+#nd-sidebar > div:first-child {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 10;
+  /* top offset centres the toggle on the first nav item's row (Introduction) */
+  padding: 1.25rem 1rem 0;
+  pointer-events: none;
+}
+#nd-sidebar > div:first-child button {
+  pointer-events: auto;
+}
+/* The toggle floats over the first nav item's row. Reserve space at that item's
+   end so its highlight box — hover AND the active (selected) tint — stops before
+   the toggle instead of bleeding under it. Keeps the selection visibly confined
+   to the Introduction item and leaves the toggle sitting cleanly beside it. */
+#nd-sidebar [data-radix-scroll-area-viewport] > div > :first-child {
+  margin-inline-end: 2.5rem;
 }
 
 /* ── Premium reading typography (Linear / Stripe / Vercel direction): big, tight,
