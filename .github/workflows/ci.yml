@@ -54,31 +54,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: dorny/paths-filter@v3
-        id: pf
-        with:
-          filters: |
-            shared:
-              - 'packages/tokens/**'
-              - 'packages/variants/**'
-              - 'pnpm-lock.yaml'
-              - 'package.json'
-              - 'turbo.json'
-              - '.github/workflows/ci.yml'
-            react:
-              - 'packages/react/**'
-            angular:
-              - 'packages/angular/**'
-
+      # Compute affected frameworks straight from git — no external action or
+      # API token permission (works the same on a personal or org repo). A change
+      # to a shared dep (tokens, variants) or a root / CI file affects both.
       - id: flags
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
         run: |
-          ui=false; ng=false
-          if [ "${{ steps.pf.outputs.shared }}" = "true" ]; then ui=true; ng=true; fi
-          if [ "${{ steps.pf.outputs.react }}" = "true" ]; then ui=true; fi
-          if [ "${{ steps.pf.outputs.angular }}" = "true" ]; then ng=true; fi
+          if [ -n "$BASE" ] && git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            files=$(git diff --name-only "${BASE}...${HEAD}")
+          else
+            # no usable base (first push / force-push) → treat everything as changed
+            files=$(git ls-files)
+          fi
+          echo "changed files:"; echo "$files" | sed 's/^/  /'
+          ui=false; ng=false; shared=false
+          echo "$files" | grep -qE '^(packages/tokens/|packages/variants/|pnpm-lock\.yaml|package\.json|turbo\.json|\.github/workflows/ci\.yml)' && shared=true
+          echo "$files" | grep -qE '^packages/react/' && ui=true
+          echo "$files" | grep -qE '^packages/angular/' && ng=true
+          if [ "$shared" = "true" ]; then ui=true; ng=true; fi
           echo "ui=$ui" >> "$GITHUB_OUTPUT"
           echo "ng=$ng" >> "$GITHUB_OUTPUT"
-          echo "affected → @bpdm/ui=$ui  @bpdm/ng=$ng"
+          echo "affected → @bpdm/ui=$ui  @bpdm/ng=$ng  (shared=$shared)"
 
   # Real-browser colour-contrast gate: builds each Storybook, runs axe-core over
   # every story × 4 themes × LTR/RTL in headless Chromium. jsdom (the unit test
