@@ -52,8 +52,8 @@ html {
   background-color: var(--background);
 }
 
-/* ── Side gutters: keep the whole layout off the viewport edges so it breathes
-   (modern docs sit in a comfortable frame, not flush to the left). ── */
+/* Side gutters: keep the whole layout off the viewport edges so it breathes
+   (modern docs sit in a comfortable frame, not flush to the left). */
 #nd-docs-layout {
   padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
 }
@@ -68,9 +68,9 @@ html {
   padding-inline: clamp(0.5rem, 1.5vw, 1.75rem);
 }
 
-/* ── Seamless sidebar: blend it into the page (no card surface, no divider) for a
+/* Seamless sidebar: blend it into the page (no card surface, no divider) for a
    modern single-surface feel instead of a boxed panel. The active item keeps its
-   amber highlight; the brand glow at top washes across the full width. ── */
+   amber highlight; the brand glow at top washes across the full width. */
 #nd-sidebar {
   /* same colour as the page so it still reads as one seamless surface when
      docked, but OPAQUE — so the collapsed→hover-reveal floating panel doesn't
@@ -133,9 +133,9 @@ html {
   margin-inline-end: 2.5rem;
 }
 
-/* ── Premium reading typography (Linear / Stripe / Vercel direction): big, tight,
+/* Premium reading typography (Linear / Stripe / Vercel direction): big, tight,
    confident headings; generous section rhythm; relaxed body line-height. Clarity
-   over decoration. ── */
+   over decoration. */
 #nd-page h1 {
   font-size: clamp(2rem, 1.4rem + 2vw, 2.6rem);
   font-weight: 700;
@@ -165,10 +165,10 @@ html {
   text-underline-offset: 3px;
 }
 
-/* ── Brand touch: a gently-drifting two-tone aurora (amber + accent) plus a fine
+/* Brand touch: a gently-drifting two-tone aurora (amber + accent) plus a fine
    dotted texture at the top, both fading out before the reading area. On-trend
    (layered radial gradients + subtle motion), brand-consistent with the landing,
-   and decorative only (fixed, pointer-events:none, z-index:-1). ── */
+   and decorative only (fixed, pointer-events:none, z-index:-1). */
 body {
   background-color: transparent;
   position: relative;
@@ -236,7 +236,7 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
-/* ── Always-dark code blocks (PrimeNG / Tailwind-docs style) ──────────────────
+/* Always-dark code blocks (PrimeNG / Tailwind-docs style)
    Block code panels stay dark in BOTH page themes — crisp, high-contrast, and
    consistent. Overrides the figure's themed bg + forces the dark token palette. */
 figure.shiki:not(.not-fumadocs-codeblock *) {
@@ -258,7 +258,7 @@ figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
   color: #e6e8eb;
 }
 
-/* ── Callout accent bar: full edge-to-edge, clipped to the card's corners ─────
+/* Callout accent bar: full edge-to-edge, clipped to the card's corners
    Fumadocs' Callout puts a short inset accent bar (w-0.5, rounded-sm) inside a
    p-3 box, so it floats with gaps top/bottom. Pin it absolutely so it spans the
    full height; the box's overflow-hidden + rounded-xl then curve its corners to
@@ -279,7 +279,7 @@ figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
   opacity: 0.9;
 }
 
-/* ── Smooth sidebar expand/collapse (PrimeNG-style) ──────────────────────────
+/* Smooth sidebar expand/collapse (PrimeNG-style)
    Fumadocs' sidebar folders are Radix Collapsibles but ship without an open/close
    animation, so children appear instantly (harsh). Radix exposes the content
    height as --radix-collapsible-content-height; animate against it for an elegant,

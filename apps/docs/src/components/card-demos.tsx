@@ -7,7 +7,7 @@ import { Tabs } from '@bpdm/ui/tabs';
 
 const MEDIA = 'bg-gradient-to-br from-primary/30 via-primary/10 to-transparent';
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function CardUsageDemo() {
   return (
     <Card className="w-full max-w-sm">

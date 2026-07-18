@@ -34,7 +34,7 @@ export const DEFAULT_STEPPER_MESSAGES: StepperMessages = {
 const stepTabId = (uid: string, value: string) => `${uid}-tab-${value}`;
 const stepPanelId = (uid: string, value: string) => `${uid}-panel-${value}`;
 
-// ── state core ───────────────────────────────────────────────────────────────
+// state core
 interface StepperContextValue {
   value: string;
   orientation: StepperOrientation;
@@ -208,7 +208,7 @@ export function Stepper({
   );
 }
 
-// ── marker ───────────────────────────────────────────────────────────────────
+// marker
 function Marker({
   state,
   index,
@@ -240,7 +240,7 @@ function Marker({
   );
 }
 
-// ── horizontal header list ─────────────────────────────────────────────────────
+// horizontal header list
 export const StepList = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -356,7 +356,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
 StepImpl.__stepperRole = "step";
 export const Step = StepImpl;
 
-// ── panels ─────────────────────────────────────────────────────────────────────
+// panels
 export const StepPanels = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -421,7 +421,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
   );
 }
 
-// ── vertical item (wraps Step + StepPanel, draws the rail) ──────────────────────
+// vertical item (wraps Step + StepPanel, draws the rail)
 export interface StepItemProps {
   value: string | number;
   children: React.ReactNode;

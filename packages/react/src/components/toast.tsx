@@ -51,7 +51,7 @@ interface ToastRecord extends Omit<ToastOptions, "id"> {
   loading?: boolean;
 }
 
-// ── store (module-level, so `toast()` works from anywhere — no hook needed) ──
+// store (module-level, so `toast()` works from anywhere — no hook needed)
 let records: ToastRecord[] = [];
 const listeners = new Set<(r: ToastRecord[]) => void>();
 let seq = 0;
@@ -143,7 +143,7 @@ export const toast = Object.assign(
   },
 );
 
-// ── per-variant look (icon + colored left accent + subtle icon tint) ──
+// per-variant look (icon + colored left accent + subtle icon tint)
 const VARIANTS: Record<
   ToastVariant,
   {

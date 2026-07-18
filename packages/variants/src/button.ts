@@ -55,7 +55,7 @@ export const buttonVariants = cva(
       },
     },
     compoundVariants: [
-      // ── solid (filled) ──
+      // solid (filled)
       { variant: "primary", appearance: "solid", class: "bg-primary text-primary-foreground hover:bg-primary/90" },
       { variant: "secondary", appearance: "solid", class: "bg-secondary text-secondary-foreground hover:bg-secondary/80" },
       { variant: "success", appearance: "solid", class: "bg-success text-success-foreground hover:bg-success/90" },
@@ -66,7 +66,7 @@ export const buttonVariants = cva(
       // high-contrast: flips to the theme's foreground (black on light, white on dark)
       { variant: "contrast", appearance: "solid", class: "bg-foreground text-background hover:bg-foreground/90" },
 
-      // ── outline (border, transparent fill) — secondary/contrast read as a neutral outline ──
+      // outline (border, transparent fill) — secondary/contrast read as a neutral outline
       { variant: "primary", appearance: "outline", class: "border-primary-strong text-primary-strong hover:bg-primary/10" },
       { variant: "secondary", appearance: "outline", class: "border-input text-foreground hover:bg-muted" },
       { variant: "success", appearance: "outline", class: "border-success text-success hover:bg-success/10" },
@@ -76,7 +76,7 @@ export const buttonVariants = cva(
       { variant: "destructive", appearance: "outline", class: "border-destructive text-destructive-strong hover:bg-destructive/10" },
       { variant: "contrast", appearance: "outline", class: "border-foreground/40 text-foreground hover:bg-muted" },
 
-      // ── ghost (no border, transparent fill) — secondary/contrast read as a neutral ghost ──
+      // ghost (no border, transparent fill) — secondary/contrast read as a neutral ghost
       { variant: "primary", appearance: "ghost", class: "text-primary-strong hover:bg-primary/10" },
       { variant: "secondary", appearance: "ghost", class: "text-foreground hover:bg-muted" },
       { variant: "success", appearance: "ghost", class: "text-success hover:bg-success/10" },

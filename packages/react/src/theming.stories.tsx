@@ -182,7 +182,7 @@ export const AllThemes: Story = {
   ),
 };
 
-// ── Downloadable starter for a custom theme ──────────────────────
+// Downloadable starter for a custom theme
 const THEME_TEMPLATE = `/* @bpdm/ui — custom theme starter.
    1. Import the library styles first:   @import "@bpdm/ui/styles.css";
    2. Drop this block in your CSS, rename the selector, set your colors.
@@ -198,7 +198,7 @@ const THEME_TEMPLATE = `/* @bpdm/ui — custom theme starter.
 
   --radius: 0.625rem;               /* optional — corner rounding */
 
-  /* ── REQUIRED: core surface + brand ── */
+  /* REQUIRED: core surface + brand */
   --background: #ffffff;            /* page background        */
   --foreground: #1a1a1f;            /* default text           */
   --primary: #f5a623;              /* brand / accent fill    */
@@ -206,13 +206,13 @@ const THEME_TEMPLATE = `/* @bpdm/ui — custom theme starter.
   --border: #e6e4e1;               /* hairline borders       */
   --ring: #f5a623;                 /* focus ring             */
 
-  /* ── OPTIONAL: surfaces ── */
+  /* OPTIONAL: surfaces */
   --card: #ffffff;                 --card-foreground: #1a1a1f;
   --popover: #ffffff;              --popover-foreground: #1a1a1f;
   --muted: #f1f0ee;                --muted-foreground: #6b6a73;
   --input: #d8d6d2;                /* input/checkbox/switch borders */
 
-  /* ── OPTIONAL: secondary · accent · destructive ── */
+  /* OPTIONAL: secondary · accent · destructive */
   --secondary: #f1f0ee;            --secondary-foreground: #1a1a1f;
   --accent: #ff7a3c;               --accent-foreground: #1a1205;
   --destructive: #ef4444;          --destructive-foreground: #fafafa;

@@ -36,7 +36,7 @@ function Nav({ canNext = true }: { canNext?: boolean }) {
   );
 }
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function StepperUsageDemo() {
   return (
     <Box>

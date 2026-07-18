@@ -92,7 +92,7 @@ async function settle(fixture: { detectChanges: () => void; whenStable: () => Pr
 
 type Row = { id: number; name: string };
 
-// ── inline / static host components ─────────────────────────────────────────
+// inline / static host components
 
 @Component({
   imports: [BpdmAccordion],
@@ -339,7 +339,7 @@ class TreeSelectHost {
   ];
 }
 
-// ── overlay host components (rendered OPEN; content portals into <body>) ─────
+// overlay host components (rendered OPEN; content portals into <body>)
 
 @Component({
   imports: [BpdmDialog, BpdmDialogBody],

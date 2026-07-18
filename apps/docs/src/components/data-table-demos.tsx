@@ -15,7 +15,7 @@ import { Input } from '@bpdm/ui/input';
 import { ProgressBar } from '@bpdm/ui/progress';
 import { Tabs } from '@bpdm/ui/tabs';
 
-// ── shared data + helpers (neutral team dataset — no money/PII) ───────────────
+// shared data + helpers (neutral team dataset — no money/PII)
 type Member = {
   id: string;
   name: string;
@@ -105,7 +105,7 @@ const customizeColumns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
 ];
 
-// ── per-demo variations so each example looks a little different ───────────────
+// per-demo variations so each example looks a little different
 /** Selection — an AvatarGroup of collaborators. */
 const teamColumns: DataTableColumn<Member>[] = [
   { id: 'member', header: 'Member', cell: (r) => <NameCell member={r} /> },
@@ -313,7 +313,7 @@ const usageColumns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function DataTableUsageDemo() {
   return (
     <Box>

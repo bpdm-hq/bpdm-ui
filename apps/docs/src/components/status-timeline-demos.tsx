@@ -23,7 +23,7 @@ function Center({ children }: { children: React.ReactNode }) {
   return <div className="mx-auto w-fit py-1">{children}</div>;
 }
 
-// ── demos (neutral deploy / CI lifecycle) ─────────────────────────────────────
+// demos (neutral deploy / CI lifecycle)
 const DEPLOY: TimelineItem[] = [
   { title: 'Pushed to main', status: 'complete', timestamp: '09:41' },
   { title: 'CI checks passed', status: 'complete', timestamp: '09:46' },

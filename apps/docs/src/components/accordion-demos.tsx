@@ -44,7 +44,7 @@ const FileText = () => (
 );
 const FAQ_ICONS = [<Rocket key="r" />, <Rotate key="o" />, <FileText key="f" />];
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-lg">{children}</div>;
 }

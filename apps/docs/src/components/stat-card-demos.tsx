@@ -2,7 +2,7 @@
 
 import { StatCard } from '@bpdm/ui/stat-card';
 
-// ── small inline icons (any SVG / icon library works) ─────────────────────────
+// small inline icons (any SVG / icon library works)
 const cls = 'size-5';
 const s = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
 const Users = () => (
@@ -47,7 +47,7 @@ function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-72">{children}</div>;
 }
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function StatCardUsageDemo() {
   return (
     <Box>

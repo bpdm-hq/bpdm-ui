@@ -182,7 +182,7 @@ export function StatusTimeline({
       <Marker item={item} status={status} className={placement} />
     );
 
-  // ── Horizontal ──────────────────────────────────────────────────────────────
+  // Horizontal
   if (horizontal) {
     return (
       <ol aria-label={label} className={cn("m-0 flex list-none overflow-x-auto p-0", className)}>
@@ -239,7 +239,7 @@ export function StatusTimeline({
     );
   }
 
-  // ── Vertical ────────────────────────────────────────────────────────────────
+  // Vertical
   const showOpposite = !!renderOpposite || items.some((it) => it.opposite != null);
   const centered = alternate || showOpposite; // center the line so both sides are usable
 

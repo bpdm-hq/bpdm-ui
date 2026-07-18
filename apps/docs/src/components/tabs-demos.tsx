@@ -19,7 +19,7 @@ function Box({ children }: { children: React.ReactNode }) {
   return <div className="w-full self-start">{children}</div>;
 }
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function TabsUsageDemo() {
   return (
     <Box>

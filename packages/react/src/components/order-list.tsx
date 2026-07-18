@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useControllable } from "@/lib/use-controllable";
 
-// ── shared list helpers (also used by PickList later) ────────────────────────
+// shared list helpers (also used by PickList later)
 export type ItemKey = string | number;
 
 function moveItem<T>(arr: T[], from: number, to: number): T[] {
@@ -56,8 +56,8 @@ export function moveSelectedBottom<T>(arr: T[], keyOf: (i: T) => ItemKey, sel: S
   return [...rest, ...picked];
 }
 
-// ── SelectableList — scrollable, selectable, filterable, optionally drag-sortable
-// (PickList will reuse this for both panes) ──────────────────────────────────
+// SelectableList — scrollable, selectable, filterable, optionally drag-sortable
+// (PickList will reuse this for both panes)
 export interface SelectableListProps<T> {
   items: T[];
   keyOf: (item: T) => ItemKey;
@@ -315,7 +315,7 @@ export function SelectableList<T>({
   );
 }
 
-// ── shared square icon button for the control columns ───────────────────────
+// shared square icon button for the control columns
 export function ControlButton({
   label,
   disabled,
@@ -365,7 +365,7 @@ const DEFAULT_REORDER_LABELS: ReorderControlLabels = {
   bottom: "Move to bottom",
 };
 
-// ── ReorderControls — the up/top/down/bottom column (used by OrderList + PickList)
+// ReorderControls — the up/top/down/bottom column (used by OrderList + PickList)
 export function ReorderControls<T>({
   items,
   itemKey,
@@ -465,7 +465,7 @@ export const DEFAULT_ORDER_LIST_MESSAGES: OrderListMessages = {
   listLabel: "Orderable list",
 };
 
-// ── OrderList — SelectableList + a reorder control column ─────────────────────
+// OrderList — SelectableList + a reorder control column
 export interface OrderListProps<T> {
   value?: T[];
   defaultValue?: T[];
