@@ -27,7 +27,7 @@ function FeatureRow({ f }: { f: Feature }) {
   );
 }
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 // PickList is fluid — it fills its container. In the docs stage we give it a
 // comfortable, centered width so the two panes read as a balanced pair.
 function Stage({ children }: { children: ReactNode }) {

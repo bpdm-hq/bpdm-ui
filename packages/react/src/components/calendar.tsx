@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useControllable } from "@/lib/use-controllable";
 import { Popover } from "./popover";
 
-// ── date helpers (local, compared by y/m/d so DST never bites) ───────────────
+// date helpers (local, compared by y/m/d so DST never bites)
 function startOfDay(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -476,7 +476,7 @@ export function Calendar({
   );
 }
 
-// ── DatePicker (trigger + popover calendar) ──────────────────────────────────
+// DatePicker (trigger + popover calendar)
 function fmt(d: Date, locale?: string) {
   return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }

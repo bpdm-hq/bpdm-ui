@@ -27,7 +27,7 @@ function TaskRow({ t }: { t: Task }) {
   );
 }
 
-// ── demos ─────────────────────────────────────────────────────────────────────
+// demos
 export function OrderListUsageDemo() {
   const [items, setItems] = useState(STAGES);
   return (

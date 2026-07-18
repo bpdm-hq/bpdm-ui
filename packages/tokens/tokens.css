@@ -15,7 +15,7 @@
 @custom-variant dark
   (&:where([data-theme="charcoal"], [data-theme="charcoal"] *, [data-theme="slate"], [data-theme="slate"] *));
 
-/* ── tokens shared by every theme ── */
+/* tokens shared by every theme */
 :root {
   --radius: 0.625rem;
 
@@ -38,7 +38,7 @@
   --bpdm-option-active-bar: var(--ring);
 }
 
-/* ── LIGHT · Warm Paper (default) ─────────────────────────────── */
+/* LIGHT · Warm Paper (default) */
 :root,
 [data-theme="paper"] {
   --background: #faf9f6; /* warm paper page */
@@ -89,7 +89,7 @@
   --avatar-teal: #0f6d63;
 }
 
-/* ── LIGHT · Cool Mist ────────────────────────────────────────── */
+/* LIGHT · Cool Mist */
 [data-theme="mist"] {
   --background: #f7f8fa; /* cool grey page */
   --foreground: #1a1d24;
@@ -132,7 +132,7 @@
   --avatar-teal: #0f6d63;
 }
 
-/* ── DARK · Charcoal (default dark) ───────────────────────────── */
+/* DARK · Charcoal (default dark) */
 [data-theme="charcoal"] {
   color-scheme: dark;
   --background: #0e0e11; /* warm near-black */
@@ -178,7 +178,7 @@
   --avatar-teal: #14b8a6;
 }
 
-/* ── DARK · Slate (cool, enterprise) ──────────────────────────── */
+/* DARK · Slate (cool, enterprise) */
 [data-theme="slate"] {
   color-scheme: dark;
   --background: #0d1117; /* deep cool slate */
@@ -400,7 +400,7 @@
   [data-bpdm-countdown] { display: none; }
 }
 
-/* ── Button click feedback: squish-spring (bpdm signature) ─────────────────────
+/* Button click feedback: squish-spring (bpdm signature)
    The press snaps in instantly (:active has no transition) and on release the
    scale/translate spring back with a punchy overshoot — so even a quick click
    shows a satisfying "squish → pop". Plain tactile motion, no glow/ring/colour,

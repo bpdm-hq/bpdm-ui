@@ -22,7 +22,7 @@ import { Overlay } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
 
-// ── public types (mirror the React toast exactly) ──────────────────────────────
+// public types (mirror the React toast exactly)
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
 
 export type ToastPosition =
@@ -70,7 +70,7 @@ interface ToastRecord extends Omit<ToastOptions, "id"> {
   loading?: boolean;
 }
 
-// ── i18n ───────────────────────────────────────────────────────────────────────
+// i18n
 export interface ToastMessages {
   /** aria-label for each toast's close (X) button. */
   dismiss: string;
@@ -93,7 +93,7 @@ export function provideBpdmToastMessages(messages: Partial<ToastMessages>): Prov
   return { provide: BPDM_TOAST_MESSAGES, useValue: messages };
 }
 
-// ── the service: the imperative store + entry point, injectable anywhere ────────
+// the service: the imperative store + entry point, injectable anywhere
 /**
  * Fire toasts from anywhere — inject `BpdmToast` and call `.success(...)`,
  * `.error(...)`, `.promise(p, {...})`, etc. Render `<bpdm-toaster>` once near the
@@ -185,7 +185,7 @@ export class BpdmToast {
   }
 }
 
-// ── per-variant look: icon + colored left accent + subtle icon tint ─────────────
+// per-variant look: icon + colored left accent + subtle icon tint
 interface VariantLook {
   hasIcon: boolean;
   fg: string;
@@ -416,7 +416,7 @@ export class BpdmToastItem {
     );
   }
 
-  // ── auto-dismiss timer (pauses on hover / while swiping) ──
+  // auto-dismiss timer (pauses on hover / while swiping)
   private timerId: ReturnType<typeof setTimeout> | undefined;
   private exitTimer: ReturnType<typeof setTimeout> | undefined;
   private startedAt = 0;
@@ -500,7 +500,7 @@ export class BpdmToastItem {
     }
   }
 
-  // ── swipe-to-dismiss (direction depends on the dock position) ──
+  // swipe-to-dismiss (direction depends on the dock position)
   protected onPointerDown(event: PointerEvent): void {
     if (this.closing()) return;
     if (!this.dismissible() && this.sticky()) return; // loading toasts can't be swiped
@@ -554,7 +554,7 @@ export class BpdmToastItem {
   }
 }
 
-// ── the viewport: render once near the app root ─────────────────────────────────
+// the viewport: render once near the app root
 /**
  * Docks toasts to a corner and renders them. Place once near the app root:
  *
