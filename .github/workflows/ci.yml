@@ -39,13 +39,54 @@ jobs:
           TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           TURBO_SCM_HEAD: ${{ github.sha }}
 
+  # Which framework packages are affected by this change? The browser-axe sweep
+  # below is the expensive part (~15 min per framework), so we only run it for the
+  # frameworks that actually changed. A change to a shared dependency (tokens,
+  # variants) or a root / CI file affects both.
+  changes:
+    name: Detect affected frameworks
+    runs-on: ubuntu-latest
+    outputs:
+      ui: ${{ steps.flags.outputs.ui }}
+      ng: ${{ steps.flags.outputs.ng }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Compute affected frameworks straight from git — no external action or
+      # API token permission (works the same on a personal or org repo). A change
+      # to a shared dep (tokens, variants) or a root / CI file affects both.
+      - id: flags
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: |
+          if [ -n "$BASE" ] && git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            files=$(git diff --name-only "${BASE}...${HEAD}")
+          else
+            # no usable base (first push / force-push) → treat everything as changed
+            files=$(git ls-files)
+          fi
+          echo "changed files:"; echo "$files" | sed 's/^/  /'
+          ui=false; ng=false; shared=false
+          echo "$files" | grep -qE '^(packages/tokens/|packages/variants/|pnpm-lock\.yaml|package\.json|turbo\.json|\.github/workflows/ci\.yml)' && shared=true
+          echo "$files" | grep -qE '^packages/react/' && ui=true
+          echo "$files" | grep -qE '^packages/angular/' && ng=true
+          if [ "$shared" = "true" ]; then ui=true; ng=true; fi
+          echo "ui=$ui" >> "$GITHUB_OUTPUT"
+          echo "ng=$ng" >> "$GITHUB_OUTPUT"
+          echo "affected → @bpdm/ui=$ui  @bpdm/ng=$ng  (shared=$shared)"
+
   # Real-browser colour-contrast gate: builds each Storybook, runs axe-core over
   # every story × 4 themes × LTR/RTL in headless Chromium. jsdom (the unit test
   # suite) can't compute contrast, so this is what actually guards the token /
-  # `-strong` contrast work against regressions. Runs in parallel with `verify`
-  # and per framework, so it never slows the main gate.
+  # `-strong` contrast work against regressions. Per framework, and now gated on
+  # `changes`: an unaffected framework's leg still reports a (fast) green check —
+  # so required-check branch protection never waits on it — but skips the sweep.
   a11y-browser:
     name: Accessibility · browser-axe
+    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -53,28 +94,47 @@ jobs:
       matrix:
         package: ['@bpdm/ui', '@bpdm/ng']
     steps:
+      - id: gate
+        run: |
+          run=false
+          if [ "${{ matrix.package }}" = "@bpdm/ui" ] && [ "${{ needs.changes.outputs.ui }}" = "true" ]; then run=true; fi
+          if [ "${{ matrix.package }}" = "@bpdm/ng" ] && [ "${{ needs.changes.outputs.ng }}" = "true" ]; then run=true; fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          if [ "$run" = "true" ]; then
+            echo "▶ ${{ matrix.package }} affected — running contrast sweep"
+          else
+            echo "⏭ ${{ matrix.package }} unchanged — skipping sweep"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
 
       - name: Install pnpm
+        if: steps.gate.outputs.run == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
+        if: steps.gate.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
       - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Install Chromium (Playwright)
+        if: steps.gate.outputs.run == 'true'
         run: pnpm --filter ${{ matrix.package }} exec playwright install --with-deps chromium
 
       # Storybook builds from source and imports the workspace's built packages
       # (e.g. @bpdm/variants dist) — a fresh install doesn't build them, so do it
       # here before the Storybook build inside the sweep.
       - name: Build workspace dependencies
+        if: steps.gate.outputs.run == 'true'
         run: pnpm exec turbo run build --filter=${{ matrix.package }}^...
 
       - name: Contrast sweep (all themes × dir)
+        if: steps.gate.outputs.run == 'true'
         run: pnpm --filter ${{ matrix.package }} test:a11y:browser
