@@ -55,7 +55,12 @@ let stepperUid = 0;
   selector: "bpdm-stepper",
   exportAs: "bpdmStepper",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { "[attr.data-orientation]": "orientation()", "[class]": "rootClass()" },
+  host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "stepper",
+    "[attr.data-orientation]": "orientation()",
+    "[class]": "rootClass()",
+  },
   template: `<ng-content />`,
 })
 export class BpdmStepper {
@@ -149,6 +154,7 @@ export class BpdmStepper {
   host: {
     role: "list",
     class: "flex items-center",
+    "data-bpdm-slot": "stepper-list",
     "[attr.aria-label]": "ariaLabel()",
   },
   template: `<ng-content />`,
@@ -164,7 +170,7 @@ export class BpdmStepList {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "block" },
   template: `
-    <div class="relative" [class.pb-2]="!isLast()">
+    <div class="relative" data-bpdm-slot="stepper-item" [class.pb-2]="!isLast()">
       @if (!isLast()) {
         <span
           aria-hidden="true"
@@ -204,6 +210,7 @@ export class BpdmStepItem {
     >
       <button
         type="button"
+        data-bpdm-slot="stepper-step"
         [attr.id]="tabId()"
         [attr.aria-controls]="panelId()"
         [attr.aria-current]="active() ? 'step' : null"
@@ -211,7 +218,7 @@ export class BpdmStepItem {
         (click)="onClick()"
         [class]="btnClass()"
       >
-        <span [class]="markerClass()">
+        <span data-bpdm-slot="stepper-marker" [class]="markerClass()">
           @if (state() === "completed" && !icon()) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden="true">
               <path d="M20 6 9 17l-5-5" />
@@ -332,7 +339,7 @@ export class BpdmStep {
 @Component({
   selector: "bpdm-step-panels",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "mt-2 block" },
+  host: { class: "mt-2 block", "data-bpdm-slot": "stepper-panels" },
   template: `<ng-content />`,
 })
 export class BpdmStepPanels {}
@@ -348,6 +355,7 @@ export class BpdmStepPanels {}
   template: `
     <div
       role="region"
+      data-bpdm-slot="stepper-panel"
       [attr.id]="panelId()"
       [attr.aria-labelledby]="tabId()"
       [attr.aria-hidden]="!active()"

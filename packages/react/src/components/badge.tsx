@@ -86,6 +86,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       return (
         <Slot
           ref={ref as React.Ref<HTMLElement>}
+          data-bpdm="" data-bpdm-slot="badge"
           className={cn(
             badgeVariants({ size }),
             toneClass,
@@ -105,6 +106,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       <span
         ref={ref}
         onClick={onClick}
+        data-bpdm="" data-bpdm-slot="badge"
         className={cn(
           badgeVariants({ size }),
           toneClass,
@@ -126,7 +128,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           : {})}
       >
         {dot && (
-          <span className="relative flex size-2 shrink-0">
+          <span data-bpdm-slot="badge-dot" className="relative flex size-2 shrink-0">
             {pulse && (
               <span
                 className={cn(
@@ -148,6 +150,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               e.stopPropagation();
               setRemoving(true);
             }}
+            data-bpdm-slot="badge-remove"
             className="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <svg viewBox="0 0 16 16" fill="none" className="size-2.5" aria-hidden>
@@ -259,7 +262,7 @@ export function NotificationBadge({
   const announced = ariaLabel ?? (dot ? t.dot : label != null ? t.count(label) : undefined);
 
   return (
-    <span className={cn("relative inline-flex", className)}>
+    <span data-bpdm="" data-bpdm-slot="notification-badge" className={cn("relative inline-flex", className)}>
       {children}
       {show && (
         // outer span owns the placement (center sits on the icon's top-right
@@ -277,6 +280,7 @@ export function NotificationBadge({
             key={label ?? "dot"}
             role={announced ? "status" : undefined}
             aria-label={announced}
+            data-bpdm-slot="notification-badge-indicator"
             className={cn(
               "flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
               TONE[variant].solid,

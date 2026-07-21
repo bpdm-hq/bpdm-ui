@@ -108,6 +108,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           aria-disabled={inactive || undefined}
           tabIndex={inactive ? -1 : tabIndex}
           onClick={handleClick as React.MouseEventHandler<HTMLElement>}
+          data-bpdm="" data-bpdm-slot="button"
           className={cn(classes, inactive && "pointer-events-none opacity-50")}
           {...(props as React.HTMLAttributes<HTMLElement>)}
         >
@@ -127,6 +128,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={loading || undefined}
         tabIndex={tabIndex}
         onClick={handleClick}
+        data-bpdm="" data-bpdm-slot="button"
         className={classes}
         {...props}
       >

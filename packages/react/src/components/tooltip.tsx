@@ -86,11 +86,12 @@ export function Tooltip({
   return (
     <TooltipPrimitive.Provider delayDuration={delayDuration}>
       <TooltipPrimitive.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-        <TooltipPrimitive.Trigger asChild ref={triggerRef}>
+        <TooltipPrimitive.Trigger data-bpdm="" data-bpdm-slot="tooltip-trigger" asChild ref={triggerRef}>
           {trigger}
         </TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal container={portalContainer ?? undefined}>
           <TooltipPrimitive.Content
+            data-bpdm="" data-bpdm-slot="tooltip-content"
             side={side}
             align={align}
             sideOffset={sideOffset}

@@ -33,6 +33,8 @@ import { buttonVariants, cn, type ButtonVariants } from "@bpdm/variants";
 @Directive({
   selector: "button[bpdmButton], a[bpdmButton]",
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "button",
     "[class]": "classes()",
     "[attr.type]": "resolvedType()",
     "[attr.aria-busy]": "loading() || null",

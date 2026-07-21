@@ -89,11 +89,11 @@ interface MonthView {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "block w-fit" },
   template: `
-    <div role="group" [attr.aria-label]="t().calendar" [class]="rootClass()">
+    <div role="group" data-bpdm="" data-bpdm-slot="calendar" [attr.aria-label]="t().calendar" [class]="rootClass()">
       @for (m of months(); track m.key) {
-        <div class="w-[17rem]">
+        <div data-bpdm-slot="calendar-month" class="w-[17rem]">
           <!-- header — kept OUTSIDE role="grid" so its nav + selects aren't grid rows -->
-          <div class="mb-2 flex items-center justify-between px-1">
+          <div data-bpdm-slot="calendar-header" class="mb-2 flex items-center justify-between px-1">
             <button
               type="button"
               [attr.aria-label]="t().previousMonth"
@@ -157,22 +157,24 @@ interface MonthView {
           <!-- the grid: weekday header row + week rows are its only (direct) children -->
           <div
             role="grid"
+            data-bpdm-slot="calendar-grid"
             [attr.aria-label]="m.label"
             [attr.aria-multiselectable]="mode() === 'range' ? true : null"
             (keydown)="onKeyDown($event)"
             class="flex flex-col gap-0.5 outline-none"
           >
-            <div role="row" class="grid grid-cols-7">
+            <div role="row" data-bpdm-slot="calendar-weekdays" class="grid grid-cols-7">
               @for (w of headers(); track $index) {
                 <div role="columnheader" [attr.aria-label]="longHeaders()[$index]" class="grid h-8 place-items-center text-xs font-medium text-muted-foreground">{{ w }}</div>
               }
             </div>
             @for (week of m.weeks; track $index) {
-              <div role="row" class="grid grid-cols-7">
+              <div role="row" data-bpdm-slot="calendar-week" class="grid grid-cols-7">
                 @for (d of week; track d.key) {
                   <div role="gridcell" [attr.aria-selected]="d.selected" [class]="d.wrapperClass">
                     <button
                       type="button"
+                      data-bpdm-slot="calendar-day"
                       [attr.data-day]="d.key"
                       [tabindex]="d.focused ? 0 : -1"
                       [disabled]="d.disabled"

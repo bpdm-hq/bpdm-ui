@@ -43,9 +43,10 @@ import {
   host: { class: "block" },
   imports: [BpdmPopover, BpdmCalendar],
   template: `
-    <div class="relative w-full">
+    <div data-bpdm="" data-bpdm-slot="date-picker" class="relative w-full">
       <button
         type="button"
+        data-bpdm-slot="date-picker-trigger"
         [bpdmPopover]="panel"
         [bpdmPopoverOpen]="open()"
         (bpdmPopoverOpenChange)="onOpenChange($event)"
@@ -67,6 +68,7 @@ import {
       @if (showClear()) {
         <button
           type="button"
+          data-bpdm-slot="date-picker-clear"
           [attr.aria-label]="messages().clear || 'Clear'"
           (click)="clear($event)"
           class="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -86,6 +88,7 @@ import {
               @for (p of presets(); track p.label) {
                 <button
                   type="button"
+                  data-bpdm-slot="date-picker-preset"
                   (click)="pick(p.range())"
                   [class]="presetClass(p)"
                 >

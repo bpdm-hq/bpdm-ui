@@ -22,7 +22,8 @@
   ],
   "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "THIRD-PARTY-NOTICES.md"
   ],
   "exports": {
     ".": {

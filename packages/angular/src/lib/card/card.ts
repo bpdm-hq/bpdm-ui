@@ -29,6 +29,8 @@ import { cardVariants, cn, type CardVariants } from "@bpdm/variants";
   selector: "bpdm-card",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "card",
     "[class]": "classes()",
     // An `interactive` card carries hover/press affordances, so it must be a
     // real, keyboard-operable control: focusable + role=button + Enter/Space.
@@ -87,7 +89,7 @@ const ASPECTS: Record<string, string> = {
 @Component({
   selector: "bpdm-card-media",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { "[class]": "hostClass()" },
+  host: { "data-bpdm-slot": "card-media", "[class]": "hostClass()" },
   template: `
     @if (src()) {
       <img
@@ -125,10 +127,10 @@ export class BpdmCardMedia {
 @Component({
   selector: "bpdm-card-header",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "flex items-start justify-between gap-4 px-5 pt-5" },
+  host: { "data-bpdm-slot": "card-header", class: "flex items-start justify-between gap-4 px-5 pt-5" },
   template: `
     <div class="flex min-w-0 flex-col gap-1"><ng-content /></div>
-    <div class="shrink-0"><ng-content select="[bpdmCardAction]" /></div>
+    <div data-bpdm-slot="card-action" class="shrink-0"><ng-content select="[bpdmCardAction]" /></div>
   `,
 })
 export class BpdmCardHeader {}
@@ -136,21 +138,21 @@ export class BpdmCardHeader {}
 /** Card title — apply to a heading element. */
 @Directive({
   selector: "[bpdmCardTitle]",
-  host: { class: "m-0 text-lg font-semibold leading-tight tracking-tight" },
+  host: { "data-bpdm-slot": "card-title", class: "m-0 text-lg font-semibold leading-tight tracking-tight" },
 })
 export class BpdmCardTitle {}
 
 /** Card description — apply to a paragraph. */
 @Directive({
   selector: "[bpdmCardDescription]",
-  host: { class: "m-0 text-sm text-muted-foreground" },
+  host: { "data-bpdm-slot": "card-description", class: "m-0 text-sm text-muted-foreground" },
 })
 export class BpdmCardDescription {}
 
 /** Card body content. */
 @Directive({
   selector: "[bpdmCardContent]",
-  host: { class: "px-5 py-4 text-sm leading-relaxed text-muted-foreground" },
+  host: { "data-bpdm-slot": "card-content", class: "px-5 py-4 text-sm leading-relaxed text-muted-foreground" },
 })
 export class BpdmCardContent {}
 
@@ -158,6 +160,7 @@ export class BpdmCardContent {}
 @Directive({
   selector: "[bpdmCardFooter]",
   host: {
+    "data-bpdm-slot": "card-footer",
     class: "mt-auto flex items-center gap-3 px-5 pb-5 pt-1",
     "[class.border-t]": "divider()",
     "[class.border-border]": "divider()",

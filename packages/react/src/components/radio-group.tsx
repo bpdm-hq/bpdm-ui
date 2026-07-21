@@ -9,6 +9,7 @@ export const RadioGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <RadioGroupPrimitive.Root
     ref={ref}
+    data-bpdm="" data-bpdm-slot="radio-group"
     className={cn(
       "grid gap-3 data-[orientation=horizontal]:flex data-[orientation=horizontal]:flex-wrap data-[orientation=horizontal]:gap-5",
       className,
@@ -28,6 +29,7 @@ export const RadioGroupItem = React.forwardRef<
 >(({ className, size, ...props }, ref) => (
   <RadioGroupPrimitive.Item
     ref={ref}
+    data-bpdm-slot="radio-group-item"
     className={cn(radioItemVariants({ size }), className)}
     {...props}
   >

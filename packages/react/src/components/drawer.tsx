@@ -87,6 +87,7 @@ export const DrawerContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      data-bpdm="" data-bpdm-slot="drawer-content"
       className={cn(drawerVariants({ side }), sizeClass(side ?? "right", size), className)}
       {...props}
     >
@@ -94,6 +95,7 @@ export const DrawerContent = React.forwardRef<
       {showClose && (
         <DialogPrimitive.Close
           aria-label={closeLabel}
+          data-bpdm-slot="drawer-close"
           className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <XIcon />
@@ -149,7 +151,7 @@ export function Drawer({
   const t = React.useMemo(() => ({ ...DEFAULT_DRAWER_MESSAGES, ...messages }), [messages]);
   return (
     <DrawerRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-      {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
+      {trigger && <DrawerTrigger data-bpdm="" data-bpdm-slot="drawer-trigger" asChild>{trigger}</DrawerTrigger>}
       <DrawerContent
         side={side}
         size={size}

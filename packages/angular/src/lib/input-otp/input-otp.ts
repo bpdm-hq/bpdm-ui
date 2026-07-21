@@ -74,6 +74,8 @@ const BASE_CELL =
         [id]="id() || null"
         [attr.aria-label]="ariaLabel()"
         [attr.aria-describedby]="ariaDescribedby() || null"
+        data-bpdm=""
+        data-bpdm-slot="input-otp"
         class="flex flex-wrap items-center gap-3"
       >
         @for (group of groups(); track groupIndex; let groupIndex = $index) {
@@ -84,6 +86,7 @@ const BASE_CELL =
             @for (cell of group; track cell.i) {
               <input
                 #cellInput
+                data-bpdm-slot="input-otp-slot"
                 type="text"
                 [attr.inputmode]="integerOnly() ? 'numeric' : 'text'"
                 [attr.autocomplete]="cell.i === 0 ? 'one-time-code' : 'off'"
@@ -104,7 +107,7 @@ const BASE_CELL =
           </div>
         }
         @if (name()) {
-          <input type="hidden" [attr.name]="name()" [value]="cells().join('')" />
+          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" />
         }
       </div>
     } @else {
@@ -113,11 +116,14 @@ const BASE_CELL =
         [id]="id() || null"
         [attr.aria-label]="ariaLabel()"
         [attr.aria-describedby]="ariaDescribedby() || null"
+        data-bpdm=""
+        data-bpdm-slot="input-otp"
         class="flex flex-wrap items-center gap-2"
       >
         @for (cell of groups()[0]; track cell.i) {
           <input
             #cellInput
+            data-bpdm-slot="input-otp-slot"
             type="text"
             [attr.inputmode]="integerOnly() ? 'numeric' : 'text'"
             [attr.autocomplete]="cell.i === 0 ? 'one-time-code' : 'off'"
@@ -136,7 +142,7 @@ const BASE_CELL =
           />
         }
         @if (name()) {
-          <input type="hidden" [attr.name]="name()" [value]="cells().join('')" />
+          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" />
         }
       </div>
     }

@@ -51,7 +51,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "inline-flex" },
   template: `
-    <div [class]="rootClass()">
+    <div [class]="rootClass()" data-bpdm="" data-bpdm-slot="number-input">
       @if (buttonLayout() === "horizontal") {
         <button
           type="button"
@@ -74,6 +74,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           type="text"
           inputmode="decimal"
           role="spinbutton"
+          data-bpdm-slot="number-input-field"
           [id]="id() || null"
           [attr.name]="name() || null"
           [attr.autocomplete]="autoComplete() || null"

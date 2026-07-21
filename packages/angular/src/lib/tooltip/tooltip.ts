@@ -41,6 +41,8 @@ let uid = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "tooltip-content",
     "[class]": "boxClass()",
     "[attr.id]": "id()",
     role: "tooltip",
@@ -124,6 +126,8 @@ class BpdmTooltipContent {
   selector: "[bpdmTooltip]",
   exportAs: "bpdmTooltip",
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "tooltip-trigger",
     "(mouseenter)": "onEnter()",
     "(mouseleave)": "onLeave()",
     "(focusin)": "onEnter()",

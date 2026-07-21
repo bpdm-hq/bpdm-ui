@@ -163,6 +163,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
 
   return (
     <div
+      data-bpdm="" data-bpdm-slot="secure-field"
       className={cn(
         wrapVariants({ size }),
         disabled && "cursor-not-allowed opacity-50",
@@ -189,6 +190,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
           onBlur?.(e);
         }}
         onChange={onChange}
+        data-bpdm-slot="secure-field-field"
         className="w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
       {copyable && (
@@ -197,6 +199,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
           aria-label={t.copy}
           disabled={disabled || !raw}
           onClick={copy}
+          data-bpdm-slot="secure-field-copy"
           className={cn(btn)}
         >
           <CopyIcon done={copied} />
@@ -209,6 +212,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
           aria-pressed={revealed}
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
+          data-bpdm-slot="secure-field-toggle"
           className={cn(btn)}
         >
           <Eye off={revealed} />
@@ -222,3 +226,4 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
     </div>
   );
 });
+SecureField.displayName = "SecureField";

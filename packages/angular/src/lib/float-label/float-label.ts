@@ -28,10 +28,10 @@ let floatUid = 0;
 @Component({
   selector: "bpdm-float-label",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "relative block" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "float-label", class: "relative block" },
   template: `
     <ng-content />
-    <label [attr.for]="resolvedFor()" [class]="labelClass()">{{ label() }}</label>
+    <label data-bpdm-slot="float-label-label" [attr.for]="resolvedFor()" [class]="labelClass()">{{ label() }}</label>
   `,
 })
 export class BpdmFloatLabel {

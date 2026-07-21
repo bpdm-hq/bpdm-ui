@@ -28,6 +28,8 @@ let counterUid = 0;
 @Directive({
   selector: "textarea[bpdmTextarea]",
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "textarea",
     "[class]": "classes()",
     "[attr.aria-describedby]": "describedBy()",
     "(input)": "onInput()",
@@ -90,6 +92,7 @@ export class BpdmTextarea {
     const el = this.el.nativeElement;
     const counter = this.renderer.createElement("div") as HTMLElement;
     this.renderer.setAttribute(counter, "id", this.countId);
+    this.renderer.setAttribute(counter, "data-bpdm-slot", "textarea-count");
     for (const c of "mt-1 text-end text-xs tabular-nums text-muted-foreground".split(" ")) {
       this.renderer.addClass(counter, c);
     }

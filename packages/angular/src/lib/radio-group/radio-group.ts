@@ -36,6 +36,7 @@ function isRtl(el: HTMLElement): boolean {
     <button
       type="button"
       role="radio"
+      data-bpdm-slot="radio-group-item"
       [id]="id() || null"
       [class]="itemClass()"
       [attr.tabindex]="tabindex()"
@@ -111,6 +112,8 @@ export class BpdmRadio {
   selector: "bpdm-radio-group",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "radio-group",
     role: "radiogroup",
     "[attr.data-orientation]": "orientation()",
     "[attr.aria-disabled]": "disabled() ? 'true' : null",

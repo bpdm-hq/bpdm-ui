@@ -192,6 +192,7 @@ export function InputOtp({
       style={
         mask ? ({ WebkitTextSecurity: "disc" } as React.CSSProperties) : undefined
       }
+      data-bpdm-slot="input-otp-slot"
       className={cn(
         "relative",
         baseCell,
@@ -209,7 +210,7 @@ export function InputOtp({
   );
 
   const hiddenField = name ? (
-    <input type="hidden" name={name} value={cells.join("")} />
+    <input data-bpdm-slot="input-otp-input" type="hidden" name={name} value={cells.join("")} />
   ) : null;
 
   if (!isGrouped) {
@@ -219,6 +220,7 @@ export function InputOtp({
         id={id}
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
+        data-bpdm="" data-bpdm-slot="input-otp"
         className={cn("flex flex-wrap items-center gap-2", className)}
       >
         {cells.map((_, i) => renderCell(i, false, false))}
@@ -236,6 +238,7 @@ export function InputOtp({
       id={id}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
+      data-bpdm="" data-bpdm-slot="input-otp"
       className={cn("flex flex-wrap items-center gap-3", className)}
     >
       {sizes.map((sz, g) => {

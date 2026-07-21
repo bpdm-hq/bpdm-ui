@@ -18,6 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       return (
         <input
           ref={ref}
+          data-bpdm="" data-bpdm-slot="input"
           className={cn(inputVariants({ variant, size }), className)}
           {...props}
         />
@@ -37,6 +38,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
+          data-bpdm="" data-bpdm-slot="input"
           className={cn(
             inputVariants({ variant, size }),
             startIcon && "ps-9",

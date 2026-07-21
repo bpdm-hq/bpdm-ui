@@ -110,9 +110,10 @@ const INTERACTIVE =
   host: { class: "block" },
   imports: [NgTemplateOutlet],
   template: `
-    <ol [class]="rootClass()" [attr.aria-label]="label() || null">
+    <ol data-bpdm="" data-bpdm-slot="status-timeline" [class]="rootClass()" [attr.aria-label]="label() || null">
       @for (row of rows(); track row.key) {
         <li
+          data-bpdm-slot="status-timeline-item"
           [class]="row.liClass"
           [attr.aria-current]="row.status === 'current' ? 'step' : null"
           [attr.role]="interactive() ? 'button' : null"
@@ -126,11 +127,11 @@ const INTERACTIVE =
           }
 
           @if (markerTemplate()) {
-            <span [class]="row.markerWrapClass">
+            <span data-bpdm-slot="status-timeline-marker" [class]="row.markerWrapClass">
               <ng-container [ngTemplateOutlet]="markerTemplate()!" [ngTemplateOutletContext]="ctx(row)" />
             </span>
           } @else {
-            <span [style.background-color]="row.color || null" [class]="row.dotClass">
+            <span data-bpdm-slot="status-timeline-marker" [style.background-color]="row.color || null" [class]="row.dotClass">
               @if (row.status === "current") {
                 <span class="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none" aria-hidden="true"></span>
               }
@@ -148,11 +149,11 @@ const INTERACTIVE =
           }
 
           @if (contentTemplate()) {
-            <div [class]="row.contentPlacement">
+            <div data-bpdm-slot="status-timeline-content" [class]="row.contentPlacement">
               <ng-container [ngTemplateOutlet]="contentTemplate()!" [ngTemplateOutletContext]="ctx(row)" />
             </div>
           } @else if (horizontal()) {
-            <div [class]="row.contentClass">
+            <div data-bpdm-slot="status-timeline-content" [class]="row.contentClass">
               <div class="flex min-h-6 items-center justify-center">
                 <p [class]="row.titleClass">{{ row.title }}</p>
               </div>
@@ -164,7 +165,7 @@ const INTERACTIVE =
               }
             </div>
           } @else {
-            <div [class]="row.contentClass">
+            <div data-bpdm-slot="status-timeline-content" [class]="row.contentClass">
               <div [class]="row.titleRowClass">
                 <p [class]="row.titleClass">{{ row.title }}</p>
                 @if (row.timestamp) {
@@ -179,11 +180,11 @@ const INTERACTIVE =
 
           @if (!horizontal() && showOpposite()) {
             @if (oppositeTemplate()) {
-              <div [class]="row.oppositePlacement">
+              <div data-bpdm-slot="status-timeline-opposite" [class]="row.oppositePlacement">
                 <ng-container [ngTemplateOutlet]="oppositeTemplate()!" [ngTemplateOutletContext]="ctx(row)" />
               </div>
             } @else {
-              <div [class]="row.oppositeClass">{{ row.opposite }}</div>
+              <div data-bpdm-slot="status-timeline-opposite" [class]="row.oppositeClass">{{ row.opposite }}</div>
             }
           }
         </li>

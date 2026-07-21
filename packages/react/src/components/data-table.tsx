@@ -3,6 +3,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { useIsomorphicLayoutEffect } from "./internal/use-isomorphic-layout-effect";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
 import { MultiSelect } from "./multi-select";
@@ -1095,7 +1096,7 @@ function NumberedFooter({
   t: DataTableMessages;
 }) {
   return (
-    <div className={footerClass(align, attached)}>
+    <div data-bpdm-slot="data-table-pagination" className={footerClass(align, attached)}>
       <span className="text-muted-foreground">
         {total === 0 ? t.noResults : t.range(rangeFrom, rangeTo, total)}
       </span>
@@ -1158,7 +1159,7 @@ function CursorFooter({
   t: DataTableMessages;
 }) {
   return (
-    <div className={footerClass(align, attached)}>
+    <div data-bpdm-slot="data-table-pagination" className={footerClass(align, attached)}>
       {rangeLabel ? (
         <span className="text-muted-foreground">{rangeLabel}</span>
       ) : align === "between" ? (
@@ -1301,6 +1302,7 @@ function DataTableRowInner<T>({
               }
             : undefined
         }
+        data-bpdm-slot="data-table-row"
         className={cn(
           "transition-colors",
           // `group` lets pinned cells mirror the row's hover/selected state
@@ -1437,6 +1439,7 @@ function DataTableRowInner<T>({
             <td
               key={col.id}
               style={col.pin ? pinStyleFor(col) : undefined}
+              data-bpdm-slot="data-table-cell"
               className={cn(
                 padCls,
                 alignClass[align],
@@ -2128,7 +2131,7 @@ export function DataTable<T>({
     right: Record<string, number>;
   }>({ left: {}, right: {} });
 
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const row = headRef.current;
     if (!hasPinned || !row) return;
     const measure = () => {
@@ -2283,12 +2286,12 @@ export function DataTable<T>({
   };
 
   return (
-    <div className="w-full">
+    <div data-bpdm="" data-bpdm-slot="data-table" className="w-full">
       <div aria-live="polite" role="status" className="sr-only">
         {liveMessage}
       </div>
       {showToolbar && (
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div data-bpdm-slot="data-table-toolbar" className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             {(query || hasActiveFilters) && (
               <Button
@@ -2351,6 +2354,7 @@ export function DataTable<T>({
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={searchPlaceholder}
                   aria-label={t.search}
+                  data-bpdm-slot="data-table-search"
                   className="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
@@ -2464,6 +2468,7 @@ export function DataTable<T>({
       >
       <div
         ref={setScrollEl}
+        data-bpdm-slot="data-table-viewport"
         className={cn(
           "overflow-auto",
           scrollableX && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
@@ -2487,7 +2492,7 @@ export function DataTable<T>({
         )}
         style={rowSpacing ? { borderSpacing: `0 ${rowSpacing}px` } : undefined}
       >
-        <thead>
+        <thead data-bpdm-slot="data-table-header">
           <tr ref={headRef}>
             {reorderableRows && (
               <th
@@ -2610,6 +2615,7 @@ export function DataTable<T>({
                     ...pinStyleFor(col),
                     ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                   }}
+                  data-bpdm-slot="data-table-head-cell"
                   className={cn(
                     padCls,
                     alignClass[align],
@@ -2712,11 +2718,12 @@ export function DataTable<T>({
           </tr>
         </thead>
 
-        <tbody>
+        <tbody data-bpdm-slot="data-table-body">
           {rows.length === 0 ? (
             <tr>
               <td
                 colSpan={colCount}
+                data-bpdm-slot="data-table-empty"
                 className={cn(
                   padCls,
                   "text-center text-muted-foreground",
@@ -2815,7 +2822,7 @@ export function DataTable<T>({
           )}
         </tbody>
         {hasFooter && (
-          <tfoot>
+          <tfoot data-bpdm-slot="data-table-footer">
             <tr>
               {reorderableRows && (
                 <td className={cn(padCls, "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0")} />

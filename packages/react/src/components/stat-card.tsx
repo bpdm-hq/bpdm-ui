@@ -85,6 +85,7 @@ export function StatCard({
         aria-busy="true"
         aria-live="polite"
         aria-label={`${label} ${t.loading}`}
+        data-bpdm="" data-bpdm-slot="stat-card"
         className={cn(
           "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm",
           className,
@@ -128,6 +129,7 @@ export function StatCard({
       role="group"
       aria-labelledby={labelId}
       style={cardStyle}
+      data-bpdm="" data-bpdm-slot="stat-card"
       className={cn(
         "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
         accent ? "border-transparent" : "border-border bg-card",
@@ -135,14 +137,14 @@ export function StatCard({
       )}
     >
       <div className="min-w-0">
-        <p id={labelId} className="m-0 truncate text-sm text-muted-foreground">
+        <p id={labelId} data-bpdm-slot="stat-card-label" className="m-0 truncate text-sm text-muted-foreground">
           {label}
         </p>
-        <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">
+        <p data-bpdm-slot="stat-card-value" className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">
           {value}
         </p>
         {hasDelta && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-sm">
+          <div data-bpdm-slot="stat-card-delta" className="mt-1.5 flex items-center gap-1.5 text-sm">
             <span
               role="img"
               aria-label={deltaSr}
@@ -160,6 +162,7 @@ export function StatCard({
         <span
           aria-hidden="true"
           style={badgeStyle}
+          data-bpdm-slot="stat-card-icon"
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5",
             !accent && "bg-muted text-muted-foreground",

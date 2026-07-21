@@ -72,12 +72,13 @@ export function Popover({
       onOpenChange={onOpenChange}
       modal={modal}
     >
-      <PopoverPrimitive.Trigger asChild ref={triggerRef}>
+      <PopoverPrimitive.Trigger data-bpdm="" data-bpdm-slot="popover-trigger" asChild ref={triggerRef}>
         {trigger}
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
         <PopoverPrimitive.Content
           aria-label={ariaLabel}
+          data-bpdm="" data-bpdm-slot="popover-content"
           side={side}
           align={align}
           sideOffset={sideOffset}

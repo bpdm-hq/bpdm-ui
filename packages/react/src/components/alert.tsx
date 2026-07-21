@@ -82,6 +82,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       <div
         ref={ref}
         role={liveRole}
+        data-bpdm="" data-bpdm-slot="alert"
         className={cn(
           "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4",
           // soft = tinted inline-message surface (distinct from the white floating Toast)
@@ -110,9 +111,9 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
             </span>
           ))}
         <div className={cn("min-w-0 flex-1", onClose && "pe-6")}>
-          {title && <p className="m-0 text-sm font-semibold">{title}</p>}
+          {title && <p data-bpdm-slot="alert-title" className="m-0 text-sm font-semibold">{title}</p>}
           {children != null && (
-            <div className={cn("text-sm", solid ? "text-current" : "text-muted-foreground", title && "mt-1")}>
+            <div data-bpdm-slot="alert-description" className={cn("text-sm", solid ? "text-current" : "text-muted-foreground", title && "mt-1")}>
               {children}
             </div>
           )}

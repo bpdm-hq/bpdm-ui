@@ -69,11 +69,11 @@ export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
       [messages]="dialogMessages()"
     >
       <ng-template bpdmDialogBody>
-        <div class="flex flex-col gap-8">
-          <ol class="m-0 flex list-none items-center gap-2 p-0">
+        <div data-bpdm-slot="step-dialog-content" class="flex flex-col gap-8">
+          <ol data-bpdm="" data-bpdm-slot="step-dialog-stepper" class="m-0 flex list-none items-center gap-2 p-0">
             <li class="sr-only" aria-live="polite">{{ progressText() }}</li>
             @for (s of steps(); track $index) {
-              <li class="flex shrink-0 items-center gap-2" [attr.aria-current]="$index === step() ? 'step' : null">
+              <li data-bpdm-slot="step-dialog-step" class="flex shrink-0 items-center gap-2" [attr.aria-current]="$index === step() ? 'step' : null">
                 <span [class]="circleClass($index)">
                   @if ($index < step()) {
                     <svg viewBox="0 0 16 16" class="size-3.5" fill="none" aria-hidden="true">

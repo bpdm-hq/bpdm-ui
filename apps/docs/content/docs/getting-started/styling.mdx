@@ -1,0 +1,114 @@
+---
+title: Styling hooks
+description: Target and restyle any part of a component from the outside using its data attributes — data-bpdm, data-bpdm-slot, and data-state.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Preview } from '@/components/preview';
+import { StylingSlotDemo } from '@/components/styling-demos';
+
+Every bpdm component exposes a small, stable set of **data attributes** so you can
+target and restyle its parts from the outside — without forking the component,
+reaching into its internals, or fighting specificity. There are three:
+
+| Attribute | Answers | Value | Changes at runtime? |
+| --- | --- | --- | --- |
+| `data-bpdm` | *Is this a bpdm component root?* | *(empty)* | No |
+| `data-bpdm-slot` | *Which part is this?* | e.g. `card-header` | No |
+| `data-state` | *What state is it in?* | e.g. `open`, `checked` | Yes |
+
+These are the intended styling surface — they stay stable across versions, so CSS
+you write against them won't break when the component's internal classes change.
+
+The attributes are **identical in React (`@bpdm/ui`) and Angular (`@bpdm/ng`)** —
+the same `data-bpdm-slot` names land on the same parts in both, so a stylesheet
+written against them works unchanged across frameworks.
+
+## `data-bpdm` — the component root
+
+Every component tags its root element with an empty `data-bpdm` attribute, so a
+single selector can reach any bpdm root — handy for scoping resets or a page-wide
+tweak:
+
+```css
+/* give every bpdm component root a consistent outline while debugging layout */
+[data-bpdm] { outline: 1px dashed color-mix(in oklab, var(--primary) 40%, transparent); }
+```
+
+## `data-bpdm-slot` — target a specific part
+
+Each meaningful part of a component carries `data-bpdm-slot="<part>"`. This is the
+main hook: style a part by name, from a parent or from global CSS.
+
+<Preview>
+  <StylingSlotDemo />
+</Preview>
+
+The second card above is the same component — only restyled by targeting its slots
+from a wrapper. No props changed, no classes overridden on the component itself:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+{/* Tailwind arbitrary variants, from a parent */}
+<div className="[&_[data-bpdm-slot=card-header]]:bg-muted [&_[data-bpdm-slot=card-title]]:text-primary">
+  <Card>…</Card>
+</div>
+```
+  </Tab>
+  <Tab value="Angular">
+```html
+<!-- same slots, Angular's class binding -->
+<div class="[&_[data-bpdm-slot=card-header]]:bg-muted [&_[data-bpdm-slot=card-title]]:text-primary">
+  <bpdm-card>…</bpdm-card>
+</div>
+```
+  </Tab>
+</Tabs>
+
+Or plain global CSS — framework-agnostic, works the same for both:
+
+```css
+[data-bpdm-slot="dialog-content"] { border-radius: 1rem; }
+[data-bpdm-slot="card-footer"]    { justify-content: flex-end; }
+```
+
+### Common slots
+
+Slots follow a `<component>` / `<component>-<part>` naming pattern. A few examples:
+
+| Component | Slots |
+| --- | --- |
+| Card | `card`, `card-header`, `card-title`, `card-description`, `card-content`, `card-footer` |
+| Dialog | `dialog-trigger`, `dialog-overlay`, `dialog-content`, `dialog-title`, `dialog-description`, `dialog-footer`, `dialog-close` |
+| Tabs | `tabs`, `tabs-list`, `tabs-trigger`, `tabs-content` |
+| Accordion | `accordion`, `accordion-item`, `accordion-trigger`, `accordion-content` |
+| Select | `select-trigger`, `select-value`, `select-content`, `select-option` |
+| Switch | `switch`, `switch-thumb` |
+
+<Callout type="info">
+  Inspect any component in your browser's dev tools to see its exact slots. The
+  root-level slots above are stable; a handful of deeply-internal parts on the
+  composed components (data table, tree select) may change and aren't part of the
+  styling contract yet.
+</Callout>
+
+## `data-state` — style by state
+
+Interactive components (built on Radix in React, the CDK in Angular) reflect their
+current state with `data-state`, so you can style open/closed, checked/unchecked,
+active, and so on. Combine it with a slot to be precise:
+
+```css
+/* the switch, only when it's on — works the same in React and Angular */
+[data-bpdm-slot="switch"][data-state="checked"] { /* … */ }
+
+/* the dialog panel, only while open */
+[data-bpdm-slot="dialog-content"][data-state="open"] { /* … */ }
+```
+
+## Precedence
+
+`data-bpdm-slot` sits before each part's own `className`, so a consumer selector at
+equal-or-higher specificity wins cleanly. Prefer targeting slots over overriding
+classes — it's stable, readable, and survives internal refactors.

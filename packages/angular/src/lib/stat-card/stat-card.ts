@@ -40,6 +40,8 @@ let statCardUid = 0;
   selector: "bpdm-stat-card",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "stat-card",
     "[class]": "cardClass()",
     "[style.background-color]": "cardBg()",
     "[attr.role]": "'group'",
@@ -58,10 +60,10 @@ let statCardUid = 0;
       <div class="size-12 shrink-0 animate-pulse rounded-full bg-muted"></div>
     } @else {
     <div class="min-w-0">
-      <p [id]="labelId" class="m-0 truncate text-sm text-muted-foreground">{{ label() }}</p>
-      <p class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
+      <p data-bpdm-slot="stat-card-label" [id]="labelId" class="m-0 truncate text-sm text-muted-foreground">{{ label() }}</p>
+      <p data-bpdm-slot="stat-card-value" class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
       @if (hasDelta()) {
-        <div class="mt-1.5 flex items-center gap-1.5 text-sm">
+        <div data-bpdm-slot="stat-card-delta" class="mt-1.5 flex items-center gap-1.5 text-sm">
           <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()" role="img" [attr.aria-label]="deltaSr()">
             @if (!neutral()) {
               <svg viewBox="0 0 12 12" fill="none" class="size-3" aria-hidden="true">
@@ -85,6 +87,7 @@ let statCardUid = 0;
 
     <span
       aria-hidden="true"
+      data-bpdm-slot="stat-card-icon"
       [style.background-color]="badgeBg()"
       [style.color]="accent() || null"
       class="grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5 empty:hidden"

@@ -37,6 +37,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         role={keyboardable ? (role ?? "button") : role}
         tabIndex={keyboardable ? (tabIndex ?? 0) : tabIndex}
         onKeyDown={handleKeyDown}
+        data-bpdm="" data-bpdm-slot="card"
         className={cn(cardVariants({ variant, hoverable, interactive }), className)}
         {...props}
       />
@@ -64,7 +65,7 @@ export interface CardMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 /** Edge-to-edge media band at the top of a card; the image zooms on card hover. */
 export const CardMedia = React.forwardRef<HTMLDivElement, CardMediaProps>(
   ({ className, src, alt, aspect = "video", overlay = false, children, ...props }, ref) => (
-    <div ref={ref} className={cn("relative overflow-hidden bg-muted", ASPECT[aspect], className)} {...props}>
+    <div ref={ref} data-bpdm-slot="card-media" className={cn("relative overflow-hidden bg-muted", ASPECT[aspect], className)} {...props}>
       {src ? (
         <img
           src={src}
@@ -91,11 +92,12 @@ export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, action, children, ...props }, ref) => (
     <div
       ref={ref}
+      data-bpdm-slot="card-header"
       className={cn("flex items-start justify-between gap-4 px-5 pt-5", className)}
       {...props}
     >
       <div className="flex min-w-0 flex-col gap-1">{children}</div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div data-bpdm-slot="card-action" className="shrink-0">{action}</div>}
     </div>
   ),
 );
@@ -112,6 +114,7 @@ export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
     // `as` lets you set the level so the card sits correctly in the document outline.
     <Tag
       ref={ref}
+      data-bpdm-slot="card-title"
       className={cn("m-0 text-lg font-semibold leading-tight tracking-tight", className)}
       {...props}
     />
@@ -123,7 +126,7 @@ export const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn("m-0 text-sm text-muted-foreground", className)} {...props} />
+  <p ref={ref} data-bpdm-slot="card-description" className={cn("m-0 text-sm text-muted-foreground", className)} {...props} />
 ));
 CardDescription.displayName = "CardDescription";
 
@@ -133,6 +136,7 @@ export const CardContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
+    data-bpdm-slot="card-content"
     className={cn("px-5 py-4 text-sm leading-relaxed text-muted-foreground", className)}
     {...props}
   />
@@ -148,6 +152,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, divider = false, ...props }, ref) => (
     <div
       ref={ref}
+      data-bpdm-slot="card-footer"
       className={cn(
         "mt-auto flex items-center gap-3 px-5 pb-5 pt-1",
         divider && "border-t border-border pt-4",

@@ -197,6 +197,7 @@ export class BpdmDrawer implements OnDestroy {
     });
 
     const ref = this.overlayRef.attach(new ComponentPortal(BpdmOverlayPanel, this.vcr));
+    ref.setInput("slotBase", "drawer");
     this.panelRef = ref;
     ref.setInput("title", this.title());
     ref.setInput("description", this.description());
@@ -248,7 +249,11 @@ export class BpdmDrawer implements OnDestroy {
 /** Opens the nearest `<bpdm-drawer>` — put it on any trigger button. */
 @Directive({
   selector: "[bpdmDrawerTrigger]",
-  host: { "(click)": "drawer.openDrawer()" },
+  host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "drawer-trigger",
+    "(click)": "drawer.openDrawer()",
+  },
 })
 export class BpdmDrawerTrigger {
   protected readonly drawer = inject(BpdmDrawer);

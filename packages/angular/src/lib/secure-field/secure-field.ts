@@ -49,11 +49,12 @@ function maskValue(formatted: string, tail: number): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "block w-full" },
   template: `
-    <div [class]="wrapClass()">
+    <div [class]="wrapClass()" data-bpdm="" data-bpdm-slot="secure-field">
       <input
         [id]="id() || null"
         type="text"
         autocomplete="off"
+        data-bpdm-slot="secure-field-field"
         data-1p-ignore
         data-lpignore="true"
         [attr.inputmode]="format() === 'grouped' ? 'numeric' : 'text'"
@@ -73,6 +74,7 @@ function maskValue(formatted: string, tail: number): string {
         <button
           type="button"
           [attr.aria-label]="t().copy"
+          data-bpdm-slot="secure-field-copy"
           [disabled]="disabled() || !current()"
           (click)="copy()"
           [class]="btnClass"
@@ -94,6 +96,7 @@ function maskValue(formatted: string, tail: number): string {
           type="button"
           [attr.aria-label]="revealed() ? t().hide : t().reveal"
           [attr.aria-pressed]="revealed()"
+          data-bpdm-slot="secure-field-toggle"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
           [class]="btnClass"

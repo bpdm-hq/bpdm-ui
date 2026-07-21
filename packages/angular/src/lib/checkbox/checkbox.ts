@@ -32,6 +32,8 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
     <button
       type="button"
       role="checkbox"
+      data-bpdm=""
+      data-bpdm-slot="checkbox"
       [id]="id() || null"
       [class]="boxClass()"
       [attr.data-state]="state()"
@@ -46,6 +48,7 @@ import { checkboxVariants, cn, type CheckboxVariants } from "@bpdm/variants";
     >
       @if (checked() || indeterminate()) {
         <span
+          data-bpdm-slot="checkbox-indicator"
           class="flex size-full items-center justify-center text-current animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
         >
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-full p-[14%]">

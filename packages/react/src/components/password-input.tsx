@@ -131,7 +131,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     [ariaDescribedBy, showMeter ? meterId : undefined].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div className={cn("w-full", className)}>
+    <div data-bpdm="" data-bpdm-slot="password-input" className={cn("w-full", className)}>
       <div className={cn(wrapVariants({ size }), disabled && "cursor-not-allowed opacity-50")}>
         <input
           ref={ref}
@@ -142,6 +142,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           aria-invalid={ariaInvalid}
           aria-describedby={describedBy}
           onChange={(e) => setVal(e.target.value)}
+          data-bpdm-slot="password-input-field"
           className="w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed"
         />
         <button
@@ -150,6 +151,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           aria-pressed={revealed}
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
+          data-bpdm-slot="password-input-toggle"
           className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
         >
           <Eye off={revealed} />
@@ -157,7 +159,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
       </div>
 
       {showMeter && (
-        <div className="mt-2">
+        <div data-bpdm-slot="password-input-meter" className="mt-2">
           <div className="flex gap-1" aria-hidden>
             {Array.from({ length: levels }, (_, i) => (
               <span
@@ -177,3 +179,4 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     </div>
   );
 });
+PasswordInput.displayName = "PasswordInput";

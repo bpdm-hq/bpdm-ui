@@ -77,14 +77,15 @@ let accordionUid = 0;
   selector: "bpdm-accordion",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
-  host: { "[class]": "rootClass()" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "accordion", "[class]": "rootClass()" },
   template: `
     @for (row of rows(); track row.item.value) {
-      <div [class]="itemClass()" [attr.data-state]="row.open ? 'open' : 'closed'">
+      <div data-bpdm-slot="accordion-item" [class]="itemClass()" [attr.data-state]="row.open ? 'open' : 'closed'">
         <div role="heading" [attr.aria-level]="headingLevel()" class="flex">
           <button
             type="button"
             data-accordion-trigger
+            data-bpdm-slot="accordion-trigger"
             [id]="row.triggerId"
             [class]="triggerClass()"
             [attr.data-state]="row.open ? 'open' : 'closed'"
@@ -116,6 +117,7 @@ let accordionUid = 0;
         </div>
         <div
           role="region"
+          data-bpdm-slot="accordion-content"
           [id]="row.regionId"
           [attr.aria-labelledby]="row.triggerId"
           [attr.inert]="row.open ? null : ''"

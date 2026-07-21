@@ -60,7 +60,7 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
   selector: "bpdm-tabs",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
-  host: { "[class]": "hostClass()" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "tabs", "[class]": "hostClass()" },
   template: `
     <div [class]="wrapClass()">
     @if (scrollable()) {
@@ -71,6 +71,7 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
     <div
       #list
       role="tablist"
+      data-bpdm-slot="tabs-list"
       [attr.aria-orientation]="orientation()"
       [attr.aria-label]="ariaLabel() || null"
       [class]="listClass()"
@@ -87,6 +88,7 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
           #tab
           type="button"
           role="tab"
+          data-bpdm-slot="tabs-trigger"
           [id]="ids + '-tab-' + t.value"
           [attr.aria-selected]="t.value === active()"
           [attr.aria-controls]="
@@ -117,6 +119,7 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
           <div
             role="tabpanel"
             tabindex="0"
+            data-bpdm-slot="tabs-content"
             [id]="ids + '-panel-' + t.value"
             [attr.aria-labelledby]="ids + '-tab-' + t.value"
             [class]="panelClass()"

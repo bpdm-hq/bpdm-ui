@@ -80,7 +80,7 @@ export const defaultPickListMessages: PickListMessages = {
   host: { class: "block" },
   imports: [BpdmReorderControls, BpdmSelectableList],
   template: `
-    <div [class]="rootClass()">
+    <div data-bpdm="" data-bpdm-slot="pick-list" [class]="rootClass()">
       @if (reorder()) {
         <bpdm-reorder-controls
           class="self-center"
@@ -112,7 +112,7 @@ export const defaultPickListMessages: PickListMessages = {
 
       <!-- transfer controls — a row on mobile, a column on lg+. The horizontal
            arrows flip under RTL so "toward target" always points at the target. -->
-      <div data-transfer-group role="group" [attr.aria-label]="t().transferGroup" class="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+      <div data-transfer-group data-bpdm-slot="pick-list-transfer" role="group" [attr.aria-label]="t().transferGroup" class="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
         <button type="button" [attr.aria-label]="t().moveToTarget" [attr.title]="t().moveToTarget" [class]="btn" [disabled]="sourceSel().size === 0" (click)="toTarget()">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>

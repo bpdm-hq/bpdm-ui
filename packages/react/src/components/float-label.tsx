@@ -55,9 +55,9 @@ export function FloatLabel({
   });
 
   return (
-    <div className={cn("relative", className)} {...rest}>
+    <div data-bpdm="" data-bpdm-slot="float-label" className={cn("relative", className)} {...rest}>
       {control}
-      <label htmlFor={id} className={cn(resting, floated[variant])}>
+      <label htmlFor={id} data-bpdm-slot="float-label-label" className={cn(resting, floated[variant])}>
         {label}
       </label>
     </div>

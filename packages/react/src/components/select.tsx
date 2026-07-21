@@ -289,9 +289,11 @@ export function Select({
           aria-describedby={ariaDescribedBy}
           aria-invalid={ariaInvalid}
           disabled={disabled}
+          data-bpdm="" data-bpdm-slot="select-trigger"
           className={cn(triggerVariants({ size }), "group", className)}
         >
           <span
+            data-bpdm-slot="select-value"
             className={cn("truncate", !selectedLabel && "text-muted-foreground")}
             title={selectedLabel ?? placeholder}
           >
@@ -317,6 +319,7 @@ export function Select({
           // so it never overflows or squishes a small modal (it's portaled to
           // <body>, so opening never resizes the modal either)
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
+          data-bpdm="" data-bpdm-slot="select-content"
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
@@ -337,13 +340,14 @@ export function Select({
                 aria-controls={listboxId}
                 aria-autocomplete="list"
                 aria-activedescendant={activeId}
+                data-bpdm-slot="select-search"
                 className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
             </div>
           )}
 
           {rows.length === 0 ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+            <div data-bpdm-slot="select-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">
               {emptyText}
             </div>
           ) : (
@@ -358,6 +362,7 @@ export function Select({
               tabIndex={-1}
               aria-activedescendant={searchable ? undefined : activeId}
               style={{ maxHeight }}
+              data-bpdm-slot="select-list"
               className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
             >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
@@ -374,6 +379,7 @@ export function Select({
                       <div
                         key={`g-${vi.index}`}
                         aria-hidden="true"
+                        data-bpdm-slot="select-group"
                         className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
                         {...common}
                       >
@@ -395,6 +401,7 @@ export function Select({
                       disabled={o.disabled}
                       onClick={() => !o.disabled && commit(o.value)}
                       onMouseMove={() => setActive(vi.index)}
+                      data-bpdm-slot="select-option"
                       className={cn(
                         "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         // keyboard-active / hovered row: an amber inline-start bar (ring

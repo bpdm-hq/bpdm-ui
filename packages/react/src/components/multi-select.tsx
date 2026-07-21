@@ -252,6 +252,7 @@ export function MultiSelect({
               setSelected(selected.slice(0, -1));
             }
           }}
+          data-bpdm="" data-bpdm-slot="multi-select-trigger"
           className={cn(triggerVariants({ size }), "group", className)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
@@ -264,6 +265,7 @@ export function MultiSelect({
                 {chips.map((o) => (
                   <span
                     key={o.value}
+                    data-bpdm-slot="multi-select-chip"
                     className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs"
                   >
                     <span className="truncate">{o.label}</span>
@@ -304,6 +306,7 @@ export function MultiSelect({
                   e.stopPropagation();
                   clearAll();
                 }}
+                data-bpdm-slot="multi-select-clear"
                 className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <FieldClearX />
@@ -325,6 +328,7 @@ export function MultiSelect({
             (searchable ? searchRef.current : listRef.current)?.focus();
           }}
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
+          data-bpdm="" data-bpdm-slot="multi-select-content"
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
@@ -341,6 +345,7 @@ export function MultiSelect({
                   onClick={toggleAll}
                   aria-label={t.selectAll}
                   title={t.selectAll}
+                  data-bpdm-slot="multi-select-select-all"
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground",
                     !searchable && "w-full",
@@ -376,6 +381,7 @@ export function MultiSelect({
                     aria-controls={listboxId}
                     aria-autocomplete="list"
                     aria-activedescendant={activeId}
+                    data-bpdm-slot="multi-select-search"
                     className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                   />
                 </>
@@ -384,7 +390,7 @@ export function MultiSelect({
           )}
 
           {rows.length === 0 ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
+            <div data-bpdm-slot="multi-select-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
           ) : (
             <div
               ref={(el) => {
@@ -398,6 +404,7 @@ export function MultiSelect({
               tabIndex={-1}
               aria-activedescendant={searchable ? undefined : activeId}
               style={{ maxHeight }}
+              data-bpdm-slot="multi-select-list"
               className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
             >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
@@ -411,6 +418,7 @@ export function MultiSelect({
                       <div
                         key={`g-${vi.index}`}
                         aria-hidden="true"
+                        data-bpdm-slot="multi-select-group"
                         className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
                         {...common}
                       >
@@ -432,6 +440,7 @@ export function MultiSelect({
                       disabled={o.disabled}
                       onClick={() => !o.disabled && toggle(o.value)}
                       onMouseMove={() => setActive(vi.index)}
+                      data-bpdm-slot="multi-select-option"
                       className={cn(
                         "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         // keyboard-active / hovered row: an amber inline-start bar (ring

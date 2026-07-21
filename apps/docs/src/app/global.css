@@ -328,8 +328,21 @@ figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
 #nd-sidebar button,
 #nd-subnav a,
 #nd-subnav button,
-#nd-tocnav a,
+#nd-toc a,
 [role='tab'],
 figure button {
   @apply cursor-pointer;
+}
+
+/* TOC ("On this page"): items are text-only (no hover background), so they rely
+   purely on text colour. Fumadocs' default hover:text-fd-accent-foreground
+   resolves to a dark ink on the dark themes (accent is a light surface) → the
+   label goes invisible on hover. Force a full-contrast, theme-safe hover colour;
+   the active item keeps its primary (amber) colour. */
+#nd-toc a {
+  transition: color 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+#nd-toc a:hover,
+#nd-toc a:hover code {
+  color: var(--foreground);
 }

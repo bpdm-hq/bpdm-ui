@@ -37,7 +37,7 @@ import {
   imports: [NgTemplateOutlet],
   host: { class: "flex min-w-0 flex-1" },
   template: `
-    <div class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+    <div data-bpdm-slot="selectable-list" class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card">
       @if (header()) {
         <div [id]="headerId()" class="border-b border-border px-3 py-2 text-sm font-semibold">{{ header() }}</div>
       }
@@ -49,6 +49,7 @@ import {
             <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
           <input
+            data-bpdm-slot="selectable-list-search"
             [value]="query()"
             (input)="query.set($any($event.target).value)"
             [attr.placeholder]="filterPlaceholder()"
@@ -60,6 +61,7 @@ import {
 
       <div
         role="listbox"
+        data-bpdm-slot="selectable-list-listbox"
         [attr.aria-multiselectable]="multiselectable() ? true : null"
         [attr.aria-labelledby]="headerId()"
         [attr.aria-label]="listAriaLabel()"
@@ -72,12 +74,13 @@ import {
         [style.max-height]="scrollHeight()"
       >
         @if (shown().length === 0) {
-          <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="selectable-list-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
           @for (item of shown(); track keyOf()(item)) {
             @let key = keyOf()(item);
             <div
               [id]="optionId(key)"
+              data-bpdm-slot="selectable-list-option"
               role="option"
               [attr.aria-selected]="selected().has(key)"
               [attr.aria-disabled]="isDisabled(item) ? true : null"

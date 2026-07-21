@@ -100,6 +100,8 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
     <button
       #trigger
       type="button"
+      data-bpdm=""
+      data-bpdm-slot="select-trigger"
       role="combobox"
       aria-haspopup="listbox"
       [attr.id]="id() || null"
@@ -114,7 +116,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span class="truncate" [class.text-muted-foreground]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
+      <span data-bpdm-slot="select-value" class="truncate" [class.text-muted-foreground]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
         {{ selectedLabel() || placeholder() }}
       </span>
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]" [class.rotate-180]="open()">
@@ -123,18 +125,19 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
     </button>
 
     <ng-template #panel>
-      <div #panelRoot tabindex="-1" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown)="onKeydown($event)">
+      <div #panelRoot data-bpdm="" data-bpdm-slot="select-content" tabindex="-1" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown)="onKeydown($event)">
         @if (searchable()) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-            <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+            <input #search data-bpdm-slot="select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
           </div>
         }
         @if (rows().length === 0) {
-          <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="select-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
           <cdk-virtual-scroll-viewport
             #viewport
+            data-bpdm-slot="select-list"
             role="listbox"
             tabindex="-1"
             [attr.id]="listboxId"
@@ -146,10 +149,11 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
           >
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
+                <div data-bpdm-slot="select-group" aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
               } @else {
                 <button
                   type="button"
+                  data-bpdm-slot="select-option"
                   role="option"
                   [attr.id]="optionId(i)"
                   [attr.aria-selected]="r.option.value === selected()"

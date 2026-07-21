@@ -129,6 +129,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
   return (
     <div
       aria-invalid={ariaInvalid}
+      data-bpdm="" data-bpdm-slot="money-input"
       className={cn(
         wrapVariants({ size }),
         disabled && "cursor-not-allowed opacity-50",
@@ -136,7 +137,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
       )}
     >
       {symbolBefore && (
-        <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-muted-foreground">
           {symbol}
         </span>
       )}
@@ -165,13 +166,15 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
           const v = e.target.value;
           if (v === "" || pattern.test(v)) setRaw(v);
         }}
+        data-bpdm-slot="money-input-field"
         className="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
       {!symbolBefore && (
-        <span aria-hidden="true" className="shrink-0 select-none text-muted-foreground">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-muted-foreground">
           {symbol}
         </span>
       )}
     </div>
   );
 });
+MoneyInput.displayName = "MoneyInput";
