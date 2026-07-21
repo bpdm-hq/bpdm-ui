@@ -62,7 +62,7 @@ function Stepper({
   progress: string;
 }) {
   return (
-    <ol className="m-0 flex list-none items-center gap-2 p-0">
+    <ol data-bpdm="" data-bpdm-slot="step-dialog-stepper" className="m-0 flex list-none items-center gap-2 p-0">
       <li className="sr-only" aria-live="polite">
         {progress}
       </li>
@@ -71,7 +71,7 @@ function Stepper({
         const active = i === current;
         return (
           <React.Fragment key={i}>
-            <li className="flex shrink-0 items-center gap-2" aria-current={active ? "step" : undefined}>
+            <li data-bpdm-slot="step-dialog-step" className="flex shrink-0 items-center gap-2" aria-current={active ? "step" : undefined}>
               <span
                 className={cn(
                   "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
@@ -172,7 +172,7 @@ export function StepDialog({
         </>
       }
     >
-      <div className="flex flex-col gap-8">
+      <div data-bpdm-slot="step-dialog-content" className="flex flex-col gap-8">
         <Stepper steps={steps} current={step} progress={progress} />
         <div
           key={step}

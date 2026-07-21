@@ -92,6 +92,7 @@ export const Avatar = React.forwardRef<
     return (
       <AvatarPrimitive.Root
         ref={ref}
+        data-bpdm="" data-bpdm-slot="avatar"
         className={cn(
           "relative inline-flex shrink-0 select-none items-center justify-center overflow-visible",
           SIZE[size],
@@ -109,6 +110,7 @@ export const Avatar = React.forwardRef<
             <AvatarPrimitive.Image
               src={src}
               alt={alt ?? name ?? ""}
+              data-bpdm-slot="avatar-image"
               className="size-full object-cover animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
             />
           )}
@@ -118,6 +120,7 @@ export const Avatar = React.forwardRef<
             // reader announces the full person name, not just the initials
             role={name ? "img" : undefined}
             aria-label={name || undefined}
+            data-bpdm-slot="avatar-fallback"
             className={cn(
               "flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
               tint,
@@ -131,6 +134,7 @@ export const Avatar = React.forwardRef<
         {status && (
           <span
             role="img"
+            data-bpdm-slot="avatar-status"
             className={cn(
               "absolute z-10 rounded-full ring-2 ring-background",
               STATUS_COLOR[status],
@@ -187,7 +191,7 @@ export function AvatarGroup({ children, max, size = "md", messages, className }:
   const t = React.useMemo(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...messages }), [messages]);
 
   return (
-    <div className={cn("flex items-center", className)}>
+    <div data-bpdm="" data-bpdm-slot="avatar-group" className={cn("flex items-center", className)}>
       {shown.map((child, i) => {
         const el = child as React.ReactElement<AvatarProps>;
         return React.cloneElement(el, {
@@ -207,6 +211,7 @@ export function AvatarGroup({ children, max, size = "md", messages, className }:
         <span
           role="img"
           aria-label={t.more.replace("{count}", String(overflow))}
+          data-bpdm-slot="avatar-group-overflow"
           className={cn(
             "relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
             SIZE[size],

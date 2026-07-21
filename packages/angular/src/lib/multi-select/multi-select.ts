@@ -50,6 +50,8 @@ let multiUid = 0;
   template: `
     <div
       #trigger
+      data-bpdm=""
+      data-bpdm-slot="multi-select-trigger"
       role="combobox"
       aria-haspopup="listbox"
       [attr.id]="id() || null"
@@ -72,7 +74,7 @@ let multiUid = 0;
           <span>{{ t().selected(selected().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
-            <span class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
+            <span data-bpdm-slot="multi-select-chip" class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
               <span class="truncate">{{ o.label }}</span>
               <button type="button" [attr.aria-label]="t().remove(o.label)" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); toggle(o.value)" class="grid cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
@@ -86,7 +88,7 @@ let multiUid = 0;
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selected().length > 0 && !disabled()) {
-          <button type="button" [attr.aria-label]="t().clearAll" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <button type="button" data-bpdm-slot="multi-select-clear" [attr.aria-label]="t().clearAll" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -95,11 +97,11 @@ let multiUid = 0;
     </div>
 
     <ng-template #panel>
-      <div #panelRoot tabindex="-1" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown)="onKeydown($event)">
+      <div #panelRoot data-bpdm="" data-bpdm-slot="multi-select-content" tabindex="-1" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown)="onKeydown($event)">
         @if (searchable() || (selectAll() && filteredValues().length > 0)) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             @if (selectAll() && filteredValues().length > 0) {
-              <button type="button" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
+              <button type="button" data-bpdm-slot="multi-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -113,19 +115,19 @@ let multiUid = 0;
             }
             @if (searchable()) {
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-              <input #search [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+              <input #search data-bpdm-slot="multi-select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
             }
           </div>
         }
         @if (rows().length === 0) {
-          <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="multi-select-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
-          <cdk-virtual-scroll-viewport #viewport role="listbox" aria-multiselectable="true" tabindex="-1" [attr.id]="listboxId" [attr.aria-label]="ariaLabel() || placeholder()" [attr.aria-activedescendant]="searchable() ? null : activeDescId()" [itemSize]="36" [style.height.px]="viewportHeight()" class="overflow-auto px-1 focus:outline-none">
+          <cdk-virtual-scroll-viewport #viewport data-bpdm-slot="multi-select-list" role="listbox" aria-multiselectable="true" tabindex="-1" [attr.id]="listboxId" [attr.aria-label]="ariaLabel() || placeholder()" [attr.aria-activedescendant]="searchable() ? null : activeDescId()" [itemSize]="36" [style.height.px]="viewportHeight()" class="overflow-auto px-1 focus:outline-none">
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
+                <div data-bpdm-slot="multi-select-group" aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
               } @else {
-                <button type="button" role="option" [attr.id]="optionId(i)" [attr.aria-selected]="selectedSet().has(r.option.value)" [disabled]="r.option.disabled || null" (click)="toggle(r.option.value)" (mousemove)="active.set(i)" [class]="optionClass(i)">
+                <button type="button" data-bpdm-slot="multi-select-option" role="option" [attr.id]="optionId(i)" [attr.aria-selected]="selectedSet().has(r.option.value)" [disabled]="r.option.disabled || null" (click)="toggle(r.option.value)" (mousemove)="active.set(i)" [class]="optionClass(i)">
                   <span [class]="boxClass(selectedSet().has(r.option.value))">
                     @if (selectedSet().has(r.option.value)) {
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>

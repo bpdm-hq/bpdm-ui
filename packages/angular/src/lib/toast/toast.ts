@@ -255,6 +255,8 @@ const SWIPE_THRESHOLD = 45;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "toast",
     "[attr.data-bpdm-toast]": "''",
     "[attr.data-state]": "closing() ? 'closed' : 'open'",
     "[attr.data-swipe]": "swipe() === 'none' ? null : swipe()",
@@ -322,14 +324,15 @@ const SWIPE_THRESHOLD = 45;
     }
 
     <div class="min-w-0 flex-1">
-      <p class="m-0 text-sm font-semibold">{{ record().title }}</p>
+      <p data-bpdm-slot="toast-title" class="m-0 text-sm font-semibold">{{ record().title }}</p>
       @if (record().description != null) {
-        <p class="m-0 mt-1 text-sm text-muted-foreground">{{ record().description }}</p>
+        <p data-bpdm-slot="toast-description" class="m-0 mt-1 text-sm text-muted-foreground">{{ record().description }}</p>
       }
       @if (record().action; as action) {
         <div class="mt-2.5">
           <button
             type="button"
+            data-bpdm-slot="toast-action"
             (click)="onAction(action)"
             class="inline-flex h-7 items-center rounded-md border border-border bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -342,6 +345,7 @@ const SWIPE_THRESHOLD = 45;
     @if (dismissible()) {
       <button
         type="button"
+        data-bpdm-slot="toast-close"
         [attr.aria-label]="dismissLabel()"
         (click)="beginClose()"
         class="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
@@ -575,7 +579,7 @@ export class BpdmToastItem {
       <!-- region landmark wraps the list; role="region" cannot sit on the <ol> itself
            (it would override the list role and orphan the <li> children). -->
       <div role="region" [attr.aria-label]="msg().regionLabel">
-        <ol [class]="viewportClass()">
+        <ol data-bpdm-slot="toast-viewport" [class]="viewportClass()">
           @for (t of toasts(); track t.id) {
             <li class="contents">
               <bpdm-toast-item

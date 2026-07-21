@@ -25,6 +25,8 @@ export const DEFAULT_SPINNER_MESSAGES: SpinnerMessages = { loading: "Loading" };
   selector: "bpdm-spinner",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "spinner",
     "[attr.role]": "announce() ? 'status' : null",
     "[attr.aria-live]": "announce() ? 'polite' : null",
     "[class]": "hostClass()",
@@ -130,6 +132,8 @@ export class BpdmSpinner {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BpdmSpinner],
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "loading-overlay",
     role: "status",
     "aria-live": "polite",
     "aria-busy": "true",
@@ -143,7 +147,7 @@ export class BpdmSpinner {
          when there's no visible message. -->
     <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [announce]="false" />
     @if (label()) {
-      <p class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
+      <p data-bpdm-slot="loading-overlay-label" class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
     } @else {
       <span class="sr-only">{{ t().loading }}</span>
     }

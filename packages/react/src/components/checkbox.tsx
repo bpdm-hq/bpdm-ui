@@ -13,10 +13,11 @@ export const Checkbox = React.forwardRef<
 >(({ className, size, ...props }, ref) => (
   <CheckboxPrimitive.Root
     ref={ref}
+    data-bpdm="" data-bpdm-slot="checkbox"
     className={cn(checkboxVariants({ size }), className)}
     {...props}
   >
-    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]">
+    <CheckboxPrimitive.Indicator data-bpdm-slot="checkbox-indicator" className="flex items-center justify-center text-current animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden className="size-full p-[14%]">
         {props.checked === "indeterminate" ? (
           <path

@@ -69,6 +69,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             adjust();
             onChange?.(e);
           }}
+          data-bpdm="" data-bpdm-slot="textarea"
           className={cn(
             textareaVariants({ size, resize: autoResize ? "none" : resize }),
             className,
@@ -78,6 +79,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {showCount && (
           <div
             id={countId}
+            data-bpdm-slot="textarea-count"
             className="mt-1 text-end text-xs tabular-nums text-muted-foreground"
           >
             {count}

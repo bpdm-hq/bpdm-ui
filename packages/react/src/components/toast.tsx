@@ -254,6 +254,7 @@ export function Toaster({
       ))}
       <ToastPrimitive.Viewport
         label={regionLabel}
+        data-bpdm-slot="toast-viewport"
         className={cn(
           "pointer-events-none fixed z-[100] m-0 flex w-[min(24rem,calc(100vw-2rem))] list-none flex-col gap-3 p-4 outline-none",
           cfg.viewport,
@@ -319,6 +320,7 @@ function ToastItem({
       style={
         { "--bpdm-toast-in": cfg.in, "--bpdm-toast-out": cfg.out } as React.CSSProperties
       }
+      data-bpdm="" data-bpdm-slot="toast"
       className={cn(
         "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
         compact ? "items-center" : "items-start",
@@ -340,11 +342,11 @@ function ToastItem({
       )}
       {leading}
       <div className="min-w-0 flex-1">
-        <ToastPrimitive.Title className="text-sm font-semibold">
+        <ToastPrimitive.Title data-bpdm-slot="toast-title" className="text-sm font-semibold">
           {record.title}
         </ToastPrimitive.Title>
         {record.description != null && (
-          <ToastPrimitive.Description className="mt-1 text-sm text-muted-foreground">
+          <ToastPrimitive.Description data-bpdm-slot="toast-description" className="mt-1 text-sm text-muted-foreground">
             {record.description}
           </ToastPrimitive.Description>
         )}
@@ -353,6 +355,7 @@ function ToastItem({
             <ToastPrimitive.Action asChild altText={record.action.label}>
               <button
                 onClick={record.action.onClick}
+                data-bpdm-slot="toast-action"
                 className="inline-flex h-7 items-center rounded-md border border-border bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {record.action.label}
@@ -364,6 +367,7 @@ function ToastItem({
       {dismissible && (
         <ToastPrimitive.Close
           aria-label={dismissLabel}
+          data-bpdm-slot="toast-close"
           className="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
         >
           <X className="size-3.5" />

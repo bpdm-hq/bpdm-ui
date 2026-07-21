@@ -189,6 +189,7 @@ export function PickList<T>({
 
   return (
     <div
+      data-bpdm="" data-bpdm-slot="pick-list"
       className={cn(
         "flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch",
         className,
@@ -224,7 +225,7 @@ export function PickList<T>({
 
       {/* transfer controls — a row on mobile, a column on lg+. The horizontal
           arrows flip under RTL so "toward target" always points at the target. */}
-      <div ref={transferRef} role="group" aria-label={t.transferGroup} className="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+      <div ref={transferRef} role="group" aria-label={t.transferGroup} data-bpdm-slot="pick-list-transfer" className="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
         <ControlButton label={t.moveToTarget} disabled={sourceSel.size === 0} onClick={toTarget}>
           <ChevronRight className="rtl:-scale-x-100" />
         </ControlButton>

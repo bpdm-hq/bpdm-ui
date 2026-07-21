@@ -197,6 +197,7 @@ export function SelectableList<T>({
 
   return (
     <div
+      data-bpdm-slot="selectable-list"
       className={cn(
         "flex min-w-0 flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card",
         className,
@@ -216,6 +217,7 @@ export function SelectableList<T>({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={filterPlaceholder}
             aria-label={filterPlaceholder}
+            data-bpdm-slot="selectable-list-search"
             className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
         </div>
@@ -235,11 +237,12 @@ export function SelectableList<T>({
         onKeyDown={onListKeyDown}
         // Focus lives on the container (aria-activedescendant); the keyboard-active
         // accent shows only while the container is :focus-visible (see below).
+        data-bpdm-slot="selectable-list-listbox"
         className="group/lb min-h-0 flex-1 overflow-y-auto p-1 outline-none"
         style={{ maxHeight: scrollHeight }}
       >
         {shown.length === 0 ? (
-          <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
+          <div data-bpdm-slot="selectable-list-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
         ) : (
           shown.map((item) => {
             const key = keyOf(item);
@@ -277,6 +280,7 @@ export function SelectableList<T>({
                   e.preventDefault();
                   handleDrop(key);
                 }}
+                data-bpdm-slot="selectable-list-option"
                 className={cn(
                   "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
                   // gentle settle-in when an item is added / transferred into this list
@@ -334,6 +338,7 @@ export function ControlButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
+      data-bpdm-slot="control-button"
       className="inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border/60 bg-card text-muted-foreground shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4"
     >
       {children}
@@ -411,7 +416,7 @@ export function ReorderControls<T>({
     selected.size > 0 && !sameOrder(fn(items, itemKey, selected), items, itemKey);
 
   return (
-    <div ref={groupRef} role="group" aria-label={l.group} className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
+    <div ref={groupRef} role="group" aria-label={l.group} data-bpdm-slot="reorder-controls" className={cn("flex flex-row gap-1.5 sm:flex-col", className)}>
       <ControlButton label={l.up} disabled={!can(moveSelectedUp)} onClick={() => move("up", moveSelectedUp)}>
         <ChevronUp aria-hidden />
       </ControlButton>
@@ -560,7 +565,7 @@ export function OrderList<T>({
   );
 
   return (
-    <div className={cn("flex flex-col gap-2 sm:flex-row sm:items-center", className)}>
+    <div data-bpdm="" data-bpdm-slot="order-list" className={cn("flex flex-col gap-2 sm:flex-row sm:items-center", className)}>
       <ReorderControls
         items={items}
         itemKey={itemKey}

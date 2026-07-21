@@ -71,7 +71,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
     const valueText = format ? format(value, max) : `${Math.round(pct)}%`;
 
     return (
-      <div ref={ref} className={cn("w-full", className)} {...props}>
+      <div ref={ref} data-bpdm="" data-bpdm-slot="progress" className={cn("w-full", className)} {...props}>
         {hasHeader && (
           <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
             <span className="truncate text-muted-foreground">{label}</span>
@@ -86,6 +86,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
           aria-valuenow={indeterminate ? undefined : Math.round(value)}
           aria-valuetext={indeterminate ? t.loading : (typeof valueText === "string" ? valueText : `${Math.round(pct)}%`)}
           aria-busy={indeterminate ? true : undefined}
+          data-bpdm-slot="progress-track"
           className={cn(
             "relative w-full overflow-hidden rounded-full bg-muted",
             inside ? "h-5" : progressTrack[size],
@@ -100,6 +101,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
 
           {indeterminate ? (
             <span
+              data-bpdm-slot="progress-indicator"
               className={cn(
                 "absolute inset-y-0 start-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]",
                 progressFill[variant],
@@ -109,6 +111,7 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
             </span>
           ) : (
             <span
+              data-bpdm-slot="progress-indicator"
               className={cn(
                 "relative z-[2] block h-full overflow-hidden rounded-full transition-[width] duration-500 ease-[cubic-bezier(0.45,0,0.2,1)]",
                 progressFill[variant],

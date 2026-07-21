@@ -64,7 +64,7 @@ export const DEFAULT_ORDER_LIST_MESSAGES: OrderListMessages = {
   host: { class: "block" },
   imports: [BpdmReorderControls, BpdmSelectableList],
   template: `
-    <div [class]="rootClass()">
+    <div data-bpdm="" data-bpdm-slot="order-list" [class]="rootClass()">
       <bpdm-reorder-controls
         [items]="items()"
         [itemKey]="itemKey()"

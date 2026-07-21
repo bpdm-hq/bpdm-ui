@@ -200,6 +200,7 @@ export function Stepper({
     <StepperContext.Provider value={ctx}>
       <div
         data-orientation={orientation}
+        data-bpdm="" data-bpdm-slot="stepper"
         className={cn(orientation === "vertical" ? "flex flex-col" : "flex flex-col gap-2", className)}
       >
         {children}
@@ -222,6 +223,7 @@ function Marker({
 }) {
   return (
     <span
+      data-bpdm-slot="stepper-marker"
       className={cn(
         "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
         state === "completed" && "border-success bg-success text-success-foreground",
@@ -254,6 +256,7 @@ export const StepList = React.forwardRef<
       ref={ref}
       role="list"
       aria-label={ctx.messages.ariaLabel}
+      data-bpdm-slot="stepper-list"
       className={cn("flex items-center", className)}
       {...props}
     >
@@ -307,6 +310,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
       aria-current={active ? "step" : undefined}
       disabled={disabled || (!clickable && !active)}
       onClick={() => clickable && ctx.activate(value)}
+      data-bpdm-slot="stepper-step"
       className={cn(
         "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         clickable && !active && "cursor-pointer",
@@ -361,7 +365,7 @@ export const StepPanels = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mt-2", className)} {...props} />
+  <div ref={ref} data-bpdm-slot="stepper-panels" className={cn("mt-2", className)} {...props} />
 ));
 StepPanels.displayName = "StepPanels";
 
@@ -389,6 +393,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
         // inactive panels stay mounted for the collapse animation, so take them out
         // of the tab order + AT tree (mirrors Accordion) — not just aria-hidden.
         inert={!active}
+        data-bpdm-slot="stepper-panel"
         className={cn(
           "grid transition-[grid-template-rows,opacity] duration-[360ms] ease-[var(--bpdm-ease-out)]",
           active ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
@@ -411,6 +416,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
       role="region"
       id={stepPanelId(ctx.uid, value)}
       aria-labelledby={stepTabId(ctx.uid, value)}
+      data-bpdm-slot="stepper-panel"
       className={cn(
         "animate-[bpdm-step-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] pt-2 text-sm text-foreground",
         className,
@@ -437,7 +443,7 @@ function StepItemImpl({ value, children, className }: StepItemProps) {
 
   return (
     <StepValueContext.Provider value={v}>
-      <div className={cn("relative", !isLast && "pb-2", className)}>
+      <div data-bpdm-slot="stepper-item" className={cn("relative", !isLast && "pb-2", className)}>
         {!isLast && (
           // track + a primary fill that grows top→bottom as the step completes
           <span

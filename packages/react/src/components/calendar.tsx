@@ -317,9 +317,9 @@ export function Calendar({
     const isFirst = index === 0;
     const isLast = index === months - 1;
     return (
-      <div key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`} className="w-[17rem]">
+      <div key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`} data-bpdm-slot="calendar-month" className="w-[17rem]">
         {/* header — kept OUTSIDE role="grid" so its nav + selects aren't grid rows */}
-        <div className="mb-2 flex items-center justify-between px-1">
+        <div data-bpdm-slot="calendar-header" className="mb-2 flex items-center justify-between px-1">
           <button
             type="button"
             aria-label={t.previousMonth}
@@ -388,9 +388,10 @@ export function Calendar({
           aria-label={captionFmt.format(monthDate)}
           aria-multiselectable={mode === "range" ? true : undefined}
           onKeyDown={onKeyDown}
+          data-bpdm-slot="calendar-grid"
           className="flex flex-col gap-0.5 outline-none"
         >
-          <div role="row" className="grid grid-cols-7">
+          <div role="row" data-bpdm-slot="calendar-weekdays" className="grid grid-cols-7">
             {headers.map((w, i) => (
               <div
                 key={i}
@@ -403,7 +404,7 @@ export function Calendar({
             ))}
           </div>
           {Array.from({ length: 6 }, (_, wk) => (
-            <div key={wk} role="row" className="grid grid-cols-7">
+            <div key={wk} role="row" data-bpdm-slot="calendar-week" className="grid grid-cols-7">
               {grid.slice(wk * 7, wk * 7 + 7).map((d) => {
                 const outside = d.getMonth() !== monthDate.getMonth();
                 const selected = isSelected(d);
@@ -437,6 +438,7 @@ export function Calendar({
                       onMouseLeave={mode === "range" ? () => setHover(null) : undefined}
                       aria-label={dayLabelFmt.format(d)}
                       aria-current={isToday ? "date" : undefined}
+                      data-bpdm-slot="calendar-day"
                       className={cn(
                     "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                     round,
@@ -466,6 +468,7 @@ export function Calendar({
       ref={rootRef}
       role="group"
       aria-label={t.calendar}
+      data-bpdm="" data-bpdm-slot="calendar"
       className={cn(
         "flex w-fit select-none gap-5 rounded-[var(--radius)] p-3",
         className,
@@ -629,7 +632,7 @@ export function DatePicker({
   );
 
   return (
-    <div className="relative w-full">
+    <div data-bpdm="" data-bpdm-slot="date-picker" className="relative w-full">
       <Popover
         open={open}
         onOpenChange={handleOpenChange}
@@ -641,6 +644,7 @@ export function DatePicker({
             id={id}
             disabled={disabledInput}
             aria-invalid={invalid || undefined}
+            data-bpdm-slot="date-picker-trigger"
             className={cn(
               "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-input bg-background ps-3 text-start text-sm transition-colors hover:border-ring/60 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
               showClear ? "pe-9" : "pe-3",
@@ -667,6 +671,7 @@ export function DatePicker({
                       key={p.label}
                       type="button"
                       onClick={() => pick(p.range())}
+                      data-bpdm-slot="date-picker-preset"
                       className={cn(
                         "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
@@ -708,6 +713,7 @@ export function DatePicker({
           type="button"
           aria-label={messages?.clear ?? "Clear"}
           onClick={() => commit(mode === "single" ? null : { from: null, to: null })}
+          data-bpdm-slot="date-picker-clear"
           className="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
         >
           <X aria-hidden="true" />

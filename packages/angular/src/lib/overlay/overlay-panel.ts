@@ -30,6 +30,8 @@ import { cn } from "@bpdm/variants";
       #root
       role="dialog"
       aria-modal="true"
+      data-bpdm=""
+      [attr.data-bpdm-slot]="slotBase() + '-content'"
       tabindex="-1"
       [attr.aria-labelledby]="labelId()"
       [attr.aria-describedby]="description() ? descId() : null"
@@ -37,15 +39,16 @@ import { cn } from "@bpdm/variants";
       [cdkTrapFocus]="true"
       (keydown.escape)="dismiss.emit()"
     >
-      <div class="flex flex-col gap-1.5 p-6 pb-2">
+      <div [attr.data-bpdm-slot]="slotBase() + '-header'" class="flex flex-col gap-1.5 p-6 pb-2">
         <h2
+          [attr.data-bpdm-slot]="slotBase() + '-title'"
           [attr.id]="labelId()"
           [class]="title() ? 'm-0 text-lg font-semibold tracking-tight' : 'sr-only'"
         >
           {{ title() || fallbackTitle() }}
         </h2>
         @if (description()) {
-          <p [attr.id]="descId()" class="m-0 text-sm text-muted-foreground">{{ description() }}</p>
+          <p [attr.data-bpdm-slot]="slotBase() + '-description'" [attr.id]="descId()" class="m-0 text-sm text-muted-foreground">{{ description() }}</p>
         }
       </div>
       @if (body()) {
@@ -54,13 +57,14 @@ import { cn } from "@bpdm/variants";
         </div>
       }
       @if (footer()) {
-        <div class="flex flex-col-reverse gap-2 p-6 pt-2 sm:flex-row sm:justify-end">
+        <div [attr.data-bpdm-slot]="slotBase() + '-footer'" class="flex flex-col-reverse gap-2 p-6 pt-2 sm:flex-row sm:justify-end">
           <ng-container [ngTemplateOutlet]="footer()!" [ngTemplateOutletContext]="ctx()" />
         </div>
       }
       @if (showClose()) {
         <button
           type="button"
+          [attr.data-bpdm-slot]="slotBase() + '-close'"
           [attr.aria-label]="closeLabel()"
           (click)="dismiss.emit()"
           class="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -102,6 +106,10 @@ export class BpdmOverlayPanel {
   readonly exitAnim = input("");
   /** Title used only for the screen-reader label when no visible title is set. */
   readonly fallbackTitle = input("Dialog");
+  /** Slot namespace for the styling hooks — "dialog" (default) or "drawer" — so
+   *  the shared panel emits data-bpdm-slot="dialog-content" vs "drawer-content"
+   *  matching its consumer (React ships two separate components). */
+  readonly slotBase = input("dialog");
   readonly dismiss = output<void>();
 
   private readonly root = viewChild<ElementRef<HTMLElement>>("root");

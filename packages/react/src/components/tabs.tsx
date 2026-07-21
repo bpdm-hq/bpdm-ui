@@ -3,6 +3,7 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { useIsomorphicLayoutEffect } from "./internal/use-isomorphic-layout-effect";
 
 // --- composable primitives ---
 export const TabsRoot = TabsPrimitive.Root;
@@ -19,6 +20,7 @@ export const TabsList = React.forwardRef<
 >(({ className, variant = "underline", baseline = "full", scrollable = false, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
+    data-bpdm-slot="tabs-list"
     className={cn(
       "relative flex items-center gap-1",
       // vertical: stack the tabs; the underline track runs down the inline-end edge
@@ -63,6 +65,7 @@ export const TabsTrigger = React.forwardRef<
 >(({ className, variant, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
+    data-bpdm-slot="tabs-trigger"
     className={cn(triggerVariants({ variant }), className)}
     {...props}
   />
@@ -75,6 +78,7 @@ export const TabsContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Content
     ref={ref}
+    data-bpdm-slot="tabs-content"
     className={cn(
       "pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       // vertical: the panel sits beside the list instead of below it
@@ -204,7 +208,7 @@ export function Tabs({
       ind.dataset.ready = "1";
     }
   }, []);
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!slide) return;
     measure();
     const el = listRef.current;
@@ -261,6 +265,7 @@ export function Tabs({
   return (
     <TabsRoot
       ref={rootRef}
+      data-bpdm="" data-bpdm-slot="tabs"
       value={value}
       defaultValue={defaultValue ?? items[0]?.value}
       onValueChange={onValueChange}

@@ -193,7 +193,11 @@ export class BpdmDialog implements OnDestroy {
 /** Opens the nearest `<bpdm-dialog>` — put it on any trigger button. */
 @Directive({
   selector: "[bpdmDialogTrigger]",
-  host: { "(click)": "dialog.openDialog()" },
+  host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "dialog-trigger",
+    "(click)": "dialog.openDialog()",
+  },
 })
 export class BpdmDialogTrigger {
   protected readonly dialog = inject(BpdmDialog);

@@ -55,7 +55,7 @@ export class BpdmAlertActions {}
   },
   template: `
     <div class="min-h-0 overflow-hidden">
-      <div [attr.role]="liveRole()" [class]="boxClass()">
+      <div data-bpdm="" data-bpdm-slot="alert" [attr.role]="liveRole()" [class]="boxClass()">
         @if (showIcon()) {
           <span [class]="iconWrapClass()">
             <svg
@@ -91,9 +91,9 @@ export class BpdmAlertActions {}
 
         <div class="min-w-0 flex-1" [class.pe-6]="dismissible()">
           @if (title()) {
-            <p class="m-0 text-sm font-semibold">{{ title() }}</p>
+            <p data-bpdm-slot="alert-title" class="m-0 text-sm font-semibold">{{ title() }}</p>
           }
-          <div class="text-sm empty:hidden" [class]="bodyClass()" [class.mt-1]="!!title()">
+          <div data-bpdm-slot="alert-description" class="text-sm empty:hidden" [class]="bodyClass()" [class.mt-1]="!!title()">
             <ng-content />
           </div>
           <ng-content select="[bpdmAlertActions]" />

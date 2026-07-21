@@ -25,6 +25,7 @@ export const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
+    data-bpdm-slot="dialog-overlay"
     className={cn(
       "fixed inset-0 z-50 bg-black/50 backdrop-blur-[1px]",
       "data-[state=open]:animate-[bpdm-fade-in_150ms_ease-out] data-[state=closed]:animate-[bpdm-fade-out_120ms_ease-in]",
@@ -65,11 +66,12 @@ export const DialogContent = React.forwardRef<
 >(({ className, size, showClose = true, closeLabel = "Close", children, ...props }, ref) => (
   <DialogPrimitive.Portal>
     <DialogOverlay />
-    <DialogPrimitive.Content ref={ref} className={cn(contentVariants({ size }), className)} {...props}>
+    <DialogPrimitive.Content ref={ref} data-bpdm="" data-bpdm-slot="dialog-content" className={cn(contentVariants({ size }), className)} {...props}>
       {children}
       {showClose && (
         <DialogPrimitive.Close
           aria-label={closeLabel}
+          data-bpdm-slot="dialog-close"
           className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <XIcon />
@@ -81,12 +83,13 @@ export const DialogContent = React.forwardRef<
 DialogContent.displayName = "DialogContent";
 
 export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-col gap-1.5 p-6 pb-2", className)} {...props} />;
+  return <div data-bpdm-slot="dialog-header" className={cn("flex flex-col gap-1.5 p-6 pb-2", className)} {...props} />;
 }
 
 export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      data-bpdm-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 p-6 pt-2 sm:flex-row sm:justify-end",
         className,
@@ -102,6 +105,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
+    data-bpdm-slot="dialog-title"
     className={cn("m-0 text-lg font-semibold tracking-tight", className)}
     {...props}
   />
@@ -114,6 +118,7 @@ export const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
+    data-bpdm-slot="dialog-description"
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
@@ -174,7 +179,7 @@ export function Dialog({
   const t = { ...DEFAULT_DIALOG_MESSAGES, ...messages };
   return (
     <DialogRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      {trigger && <DialogTrigger data-bpdm="" data-bpdm-slot="dialog-trigger" asChild>{trigger}</DialogTrigger>}
       <DialogContent
         size={size}
         showClose={showClose}

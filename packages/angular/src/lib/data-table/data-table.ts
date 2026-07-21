@@ -97,7 +97,7 @@ interface BodyRow<T> extends RenderRow<T> {
 @Component({
   selector: "bpdm-data-table",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "block w-full" },
+  host: { class: "block w-full", "data-bpdm": "", "data-bpdm-slot": "data-table" },
   imports: [NgTemplateOutlet, BpdmButton, BpdmCheckbox, BpdmMultiSelect, BpdmColumnFilterMenu, BpdmColumnPinMenu],
   template: `
     @let cols = orderedColumns();
@@ -106,7 +106,7 @@ interface BodyRow<T> extends RenderRow<T> {
     <div role="status" aria-live="polite" class="sr-only">{{ liveMessage() }}</div>
 
     @if (showToolbar()) {
-      <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <div data-bpdm-slot="data-table-toolbar" class="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           @if (query() || hasActiveFilters()) {
             <button bpdmButton variant="secondary" appearance="outline" size="sm" class="gap-1.5" (click)="clearAll()">
@@ -148,6 +148,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 (input)="setQuery($any($event.target).value)"
                 [attr.placeholder]="searchPlaceholder()"
                 [attr.aria-label]="t().search"
+                data-bpdm-slot="data-table-search"
                 class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
@@ -219,6 +220,7 @@ interface BodyRow<T> extends RenderRow<T> {
       <div [class]="frameClass()">
         <div
           #scrollEl
+          data-bpdm-slot="data-table-viewport"
           [class]="scrollWrapClass()"
           [attr.role]="scrollableX() ? 'region' : null"
           [attr.tabindex]="scrollableX() ? 0 : null"
@@ -227,7 +229,7 @@ interface BodyRow<T> extends RenderRow<T> {
           (scroll)="onScroll(scrollEl)"
         >
           <table [attr.aria-label]="label() || null" [class]="tableClass()" [style.border-spacing]="rowSpacing() ? '0 ' + rowSpacing() + 'px' : null">
-            <thead>
+            <thead data-bpdm-slot="data-table-header">
               <tr #headRow>
                 @if (reorderableRows()) {
                   <th scope="col" [class]="leadHeadClass(false)"
@@ -259,6 +261,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 @for (col of cols; track col.id; let ci = $index) {
                   <th
                     scope="col"
+                    data-bpdm-slot="data-table-head-cell"
                     [attr.data-pin-id]="col.id"
                     [attr.draggable]="reorderableColumns() ? true : null"
                     (dragstart)="reorderableColumns() ? dragColId.set(col.id) : null"
@@ -319,15 +322,16 @@ interface BodyRow<T> extends RenderRow<T> {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody data-bpdm-slot="data-table-body">
               @if (rows.length === 0) {
-                <tr><td [attr.colspan]="colCount()" [class]="cellPad() + ' text-center text-muted-foreground'">{{ emptyContent() }}</td></tr>
+                <tr><td [attr.colspan]="colCount()" data-bpdm-slot="data-table-empty" [class]="cellPad() + ' text-center text-muted-foreground'">{{ emptyContent() }}</td></tr>
               } @else {
                 @if (virtualized() && padTop() > 0) {
                   <tr [style.height.px]="padTop()"><td [attr.colspan]="colCount()"></td></tr>
                 }
                 @for (rr of renderRows(); track rr.key) {
                   <tr
+                    data-bpdm-slot="data-table-row"
                     [attr.data-selected]="selectedSet().has(rr.key) ? '' : null"
                     [attr.data-expanded]="expandedSet().has(rr.key) ? '' : null"
                     (dragover)="onRowDragOver($event, rr.key)"
@@ -376,6 +380,7 @@ interface BodyRow<T> extends RenderRow<T> {
                     }
                     @for (cell of rr.cells; track cell.col.id) {
                       <td
+                        data-bpdm-slot="data-table-cell"
                         [style.position]="cell.col.pin ? 'sticky' : null"
                         [style.inset-inline-start.px]="cell.col.pin === 'left' ? pinPx().left[cell.col.id] : null"
                         [style.inset-inline-end.px]="cell.col.pin === 'right' ? pinPx().right[cell.col.id] : null"
@@ -411,7 +416,7 @@ interface BodyRow<T> extends RenderRow<T> {
             </tbody>
 
             @if (hasFooter()) {
-              <tfoot>
+              <tfoot data-bpdm-slot="data-table-footer">
                 <tr>
                   @if (reorderableRows()) {
                     <td [class]="cellPad() + ' w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0'"></td>
@@ -448,7 +453,7 @@ interface BodyRow<T> extends RenderRow<T> {
     <!-- shared pagination footer -->
     <ng-template #footerTpl>
       @let fm = footerModel()!;
-      <div [class]="footerClass(fm.align, fm.attached)">
+      <div data-bpdm-slot="data-table-pagination" [class]="footerClass(fm.align, fm.attached)">
         @if (fm.kind === "numbered") {
           <span class="text-muted-foreground">{{ fm.total === 0 ? t().noResults : t().range(fm.rangeFrom, fm.rangeTo, fm.total) }}</span>
           <div class="flex items-center gap-3">

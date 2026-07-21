@@ -32,6 +32,8 @@ import { cn, switchVariants, thumbVariants, type SwitchVariants } from "@bpdm/va
     <button
       type="button"
       role="switch"
+      data-bpdm=""
+      data-bpdm-slot="switch"
       [id]="id() || null"
       [class]="trackClass()"
       [attr.data-state]="state()"
@@ -43,7 +45,7 @@ import { cn, switchVariants, thumbVariants, type SwitchVariants } from "@bpdm/va
       (click)="toggle()"
       (blur)="onTouched()"
     >
-      <span [class]="thumbClass()" [attr.data-state]="state()">
+      <span data-bpdm-slot="switch-thumb" [class]="thumbClass()" [attr.data-state]="state()">
         @if (icon()) {
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-primary group-data-[state=checked]:block">
             <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />

@@ -19,6 +19,7 @@ export const AccordionItem = React.forwardRef<
   return (
     <AccordionPrimitive.Item
       ref={ref}
+      data-bpdm-slot="accordion-item"
       className={cn(
         variant === "separated"
           ? "rounded-[var(--radius)] border border-border bg-card transition-shadow data-[state=open]:shadow-sm"
@@ -44,6 +45,7 @@ export const AccordionTrigger = React.forwardRef<
   const trigger = (
     <AccordionPrimitive.Trigger
       ref={ref}
+      data-bpdm-slot="accordion-trigger"
       className={cn(
         // `text-start` (logical) so the header aligns correctly under `dir="rtl"`
         "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
@@ -82,6 +84,7 @@ export const AccordionContent = React.forwardRef<
   return (
     <AccordionPrimitive.Content
       ref={ref}
+      data-bpdm-slot="accordion-content"
       className="overflow-hidden data-[state=open]:animate-[bpdm-accordion-down_var(--bpdm-duration-base)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-accordion-up_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
       {...props}
     >
@@ -163,6 +166,7 @@ export function Accordion(props: AccordionProps) {
       <HeadingLevelContext.Provider value={headingLevel}>
         <AccordionPrimitive.Root
           {...(rootProps as React.ComponentProps<typeof AccordionPrimitive.Root>)}
+          data-bpdm="" data-bpdm-slot="accordion"
           className={cn(
             variant === "separated"
               ? "flex flex-col gap-2"

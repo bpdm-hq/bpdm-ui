@@ -207,6 +207,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             onKeyDown?.(e);
           }}
           onBlur={() => commit(current)}
+          data-bpdm-slot="number-input-field"
           className={cn(
             "w-full min-w-0 border-0 bg-transparent text-foreground tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
             buttonLayout === "horizontal" ? "text-center" : "text-start",
@@ -223,6 +224,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div
         key={buttonLayout}
+        data-bpdm="" data-bpdm-slot="number-input"
         className={cn(
           "inline-flex items-stretch overflow-hidden rounded-[var(--radius)] border border-input bg-background shadow-sm focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
           d.h,

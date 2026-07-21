@@ -343,6 +343,7 @@ export function TreeSelect({
     return (
       <div
         key={node.value}
+        data-bpdm-slot="tree-select-item"
         id={itemId(node.value)}
         role="treeitem"
         aria-level={depth + 1}
@@ -404,7 +405,7 @@ export function TreeSelect({
           </button>
         </div>
         {hasChildren && isOpen && (
-          <div role="group">
+          <div data-bpdm-slot="tree-select-group" role="group">
             {node.children!.map((c, i) => renderNode(c, depth + 1, i + 1, node.children!.length))}
           </div>
         )}
@@ -434,6 +435,7 @@ export function TreeSelect({
               setOpen((o) => !o);
             }
           }}
+          data-bpdm="" data-bpdm-slot="tree-select-trigger"
           className={cn(triggerVariants({ size }), "group", className)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
@@ -446,6 +448,7 @@ export function TreeSelect({
                 {chips.map((o, i) => (
                   <span
                     key={i}
+                    data-bpdm-slot="tree-select-chip"
                     className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs"
                   >
                     <span className="truncate">{o.label}</span>
@@ -466,6 +469,7 @@ export function TreeSelect({
                   e.stopPropagation();
                   setSelected([]);
                 }}
+                data-bpdm-slot="tree-select-clear"
                 className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
               >
                 <FieldClearX />
@@ -488,6 +492,7 @@ export function TreeSelect({
             (searchable ? searchRef.current : treeRef.current)?.focus();
           }}
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
+          data-bpdm="" data-bpdm-slot="tree-select-content"
           className={cn(
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
@@ -504,6 +509,7 @@ export function TreeSelect({
                   onClick={toggleAll}
                   aria-label={t.selectAll}
                   title={t.selectAll}
+                  data-bpdm-slot="tree-select-select-all"
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground",
                     !searchable && "w-full",
@@ -534,6 +540,7 @@ export function TreeSelect({
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={searchPlaceholder}
                     aria-label={searchPlaceholder}
+                    data-bpdm-slot="tree-select-search"
                     className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                   />
                 </>
@@ -541,7 +548,7 @@ export function TreeSelect({
             </div>
           )}
           {visibleTree.length === 0 ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
+            <div data-bpdm-slot="tree-select-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
           ) : (
             <div
               ref={treeRef}
@@ -553,6 +560,7 @@ export function TreeSelect({
               aria-activedescendant={activeId}
               onKeyDown={onTreeKeyDown}
               style={{ maxHeight }}
+              data-bpdm-slot="tree-select-tree"
               className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
             >
               {visibleTree.map((n, i) => renderNode(n, 0, i + 1, visibleTree.length))}

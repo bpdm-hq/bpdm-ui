@@ -33,7 +33,7 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
 @Component({
   selector: "bpdm-progress-bar",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "block w-full" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "progress", class: "block w-full" },
   template: `
     @if (hasHeader()) {
       <div class="mb-1.5 flex items-center justify-between gap-3 text-sm">
@@ -49,6 +49,7 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
       [attr.aria-valuenow]="indeterminate() ? null : round(value())"
       [attr.aria-valuetext]="indeterminate() ? t().loading : valueText()"
       [attr.aria-busy]="indeterminate() ? true : null"
+      data-bpdm-slot="progress-track"
       class="relative w-full overflow-hidden rounded-full bg-muted"
       [class]="inside() ? 'h-5' : track()"
     >
@@ -62,6 +63,7 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
         <span
           class="absolute inset-y-0 start-0 w-2/5 overflow-hidden rounded-full animate-[bpdm-progress-indeterminate_1.4s_ease-in-out_infinite]"
           [class]="fill()"
+          data-bpdm-slot="progress-indicator"
         >
           <span aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></span>
         </span>
@@ -70,6 +72,7 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
           class="relative z-[2] block h-full overflow-hidden rounded-full transition-[width] duration-500 ease-[cubic-bezier(0.45,0,0.2,1)]"
           [class]="fill()"
           [style.width.%]="pct()"
+          data-bpdm-slot="progress-indicator"
         >
           <span aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></span>
           @if (inside() && pct() > 0) {

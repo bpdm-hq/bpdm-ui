@@ -48,7 +48,7 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
 @Component({
   selector: "bpdm-avatar",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { "[class]": "hostClass()" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "avatar", "[class]": "hostClass()" },
   template: `
     <span
       class="flex size-full items-center justify-center overflow-hidden"
@@ -61,12 +61,14 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
           [src]="src()"
           [alt]="alt() ?? name() ?? ''"
           (error)="failed.set(true)"
+          data-bpdm-slot="avatar-image"
           class="size-full object-cover animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
         />
       } @else {
         <span
           class="flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] [&_svg]:size-[55%]"
           [class]="tint()"
+          data-bpdm-slot="avatar-fallback"
           [attr.role]="name() ? 'img' : null"
           [attr.aria-label]="name() || null"
         >
@@ -87,6 +89,7 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
         role="img"
         class="absolute z-10 rounded-full ring-2 ring-background size-[28%] min-h-2 min-w-2"
         [class]="statusDotClass()"
+        data-bpdm-slot="avatar-status"
         [attr.aria-label]="statusLabel()"
       ></span>
     }
@@ -157,7 +160,7 @@ export interface AvatarGroupUser {
   selector: "bpdm-avatar-group",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BpdmAvatar],
-  host: { class: "flex items-center" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "avatar-group", class: "flex items-center" },
   template: `
     @for (u of shown(); track $index) {
       <bpdm-avatar
@@ -175,6 +178,7 @@ export interface AvatarGroupUser {
       <span
         role="img"
         [attr.aria-label]="overflowLabel()"
+        data-bpdm-slot="avatar-group-overflow"
         class="relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
         [class]="sizeClass()"
       >+{{ overflow() }}</span>

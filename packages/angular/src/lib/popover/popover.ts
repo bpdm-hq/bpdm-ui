@@ -70,6 +70,8 @@ export class BpdmPopoverClose {
     <div
       #panel
       role="dialog"
+      data-bpdm=""
+      data-bpdm-slot="popover-content"
       tabindex="-1"
       [attr.id]="id()"
       [attr.aria-label]="ariaLabel() || null"
@@ -163,6 +165,8 @@ class BpdmPopoverPanel {
   selector: "[bpdmPopover]",
   exportAs: "bpdmPopover",
   host: {
+    "data-bpdm": "",
+    "data-bpdm-slot": "popover-trigger",
     "(click)": "toggle()",
     "(keydown.escape)": "close()",
     "[attr.aria-haspopup]": "'dialog'",

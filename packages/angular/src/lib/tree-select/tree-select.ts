@@ -81,6 +81,8 @@ let treeUid = 0;
   template: `
     <div
       #trigger
+      data-bpdm=""
+      data-bpdm-slot="tree-select-trigger"
       role="combobox"
       aria-haspopup="tree"
       [attr.id]="id() || null"
@@ -103,7 +105,7 @@ let treeUid = 0;
           <span>{{ t().selected(selectedLeaves().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
-            <span class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
+            <span data-bpdm-slot="tree-select-chip" class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
               <span class="truncate">{{ o.label }}</span>
             </span>
           }
@@ -114,7 +116,7 @@ let treeUid = 0;
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selectedLeaves().length > 0 && !disabled()) {
-          <button type="button" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+          <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -123,11 +125,11 @@ let treeUid = 0;
     </div>
 
     <ng-template #panel>
-      <div [class]="panelClass()" [style.width.px]="panelWidth()" (keydown.escape)="close()">
+      <div data-bpdm="" data-bpdm-slot="tree-select-content" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown.escape)="close()">
         @if (searchable() || (selectAll() && visibleLeaves().length > 0)) {
           <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
             @if (selectAll() && visibleLeaves().length > 0) {
-              <button type="button" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
+              <button type="button" data-bpdm-slot="tree-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -141,15 +143,16 @@ let treeUid = 0;
             }
             @if (searchable()) {
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-              <input #search [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+              <input #search data-bpdm-slot="tree-select-search" [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
             }
           </div>
         }
         @if (visibleTree().length === 0) {
-          <div class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="tree-select-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
         } @else {
           <div
             #tree
+            data-bpdm-slot="tree-select-tree"
             role="tree"
             [attr.id]="treeId"
             [attr.aria-label]="ariaLabel() || placeholder()"
@@ -170,6 +173,7 @@ let treeUid = 0;
 
     <ng-template #nodeTpl let-n let-depth="depth" let-pos="pos" let-size="size">
       <div
+        data-bpdm-slot="tree-select-item"
         [attr.id]="itemId(n.value)"
         role="treeitem"
         [attr.aria-level]="depth + 1"
@@ -200,7 +204,7 @@ let treeUid = 0;
           </button>
         </div>
         @if (n.children?.length && isExpanded(n)) {
-          <div role="group">
+          <div data-bpdm-slot="tree-select-group" role="group">
             @for (c of n.children; track c.value; let i = $index) {
               <ng-container [ngTemplateOutlet]="nodeTpl" [ngTemplateOutletContext]="{ $implicit: c, depth: depth + 1, pos: i + 1, size: n.children.length }" />
             }

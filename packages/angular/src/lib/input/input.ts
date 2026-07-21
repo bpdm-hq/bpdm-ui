@@ -15,7 +15,7 @@ import { cn, inputVariants, type InputVariants } from "@bpdm/variants";
  */
 @Directive({
   selector: "input[bpdmInput]",
-  host: { "[class]": "classes()" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "input", "[class]": "classes()" },
 })
 export class BpdmInput {
   readonly variant = input<NonNullable<InputVariants["variant"]>>("outline");

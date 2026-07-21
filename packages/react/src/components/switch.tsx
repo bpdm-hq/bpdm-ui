@@ -16,10 +16,11 @@ export const Switch = React.forwardRef<
 >(({ className, size, shape, icon = false, ...props }, ref) => (
   <SwitchPrimitive.Root
     ref={ref}
+    data-bpdm="" data-bpdm-slot="switch"
     className={cn(switchVariants({ size, shape }), className)}
     {...props}
   >
-    <SwitchPrimitive.Thumb className={cn(thumbVariants({ size, shape }))}>
+    <SwitchPrimitive.Thumb data-bpdm-slot="switch-thumb" className={cn(thumbVariants({ size, shape }))}>
       {icon && (
         <>
           <svg

@@ -62,12 +62,14 @@ export const DEFAULT_NOTIFICATION_BADGE_MESSAGES: NotificationBadgeMessages = {
     <span [class]="removable() ? 'block min-w-0 overflow-hidden' : 'contents'">
       <span
         [class]="badgeClass()"
+        data-bpdm
+        data-bpdm-slot="badge"
         [attr.role]="interactive() ? 'button' : null"
         [attr.tabindex]="interactive() ? 0 : null"
         (keydown)="onKeyDown($event)"
       >
         @if (dot()) {
-          <span class="relative flex size-2 shrink-0">
+          <span class="relative flex size-2 shrink-0" data-bpdm-slot="badge-dot">
             @if (pulse()) {
               <span
                 class="absolute inset-0 rounded-full animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite]"
@@ -82,6 +84,7 @@ export const DEFAULT_NOTIFICATION_BADGE_MESSAGES: NotificationBadgeMessages = {
         @if (removable()) {
           <button
             type="button"
+            data-bpdm-slot="badge-remove"
             [attr.aria-label]="t().remove"
             (click)="remove($event)"
             class="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -184,7 +187,7 @@ export class BpdmBadge {
 @Component({
   selector: "bpdm-notification-badge",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "relative inline-flex" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "notification-badge", class: "relative inline-flex" },
   template: `
     <ng-content />
     @if (show()) {
@@ -195,6 +198,7 @@ export class BpdmBadge {
         <span
           class="flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
           [class]="indicatorClass()"
+          data-bpdm-slot="notification-badge-indicator"
           [attr.role]="announced() ? 'status' : null"
           [attr.aria-label]="announced()"
         >{{ label() }}</span>

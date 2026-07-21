@@ -98,6 +98,7 @@ function Marker({ item, status, className }: { item: TimelineItem; status: Timel
   return (
     <span
       style={item.color ? { backgroundColor: item.color } : undefined}
+      data-bpdm-slot="status-timeline-marker"
       className={cn(
         "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5",
         item.color ? "text-white" : dotByStatus[status],
@@ -175,7 +176,7 @@ export function StatusTimeline({
 
   const marker = (item: TimelineItem, status: TimelineStatus, placement: string) =>
     renderMarker ? (
-      <span className={cn("relative z-10 flex shrink-0 items-center justify-center", placement)}>
+      <span data-bpdm-slot="status-timeline-marker" className={cn("relative z-10 flex shrink-0 items-center justify-center", placement)}>
         {renderMarker(item, status)}
       </span>
     ) : (
@@ -185,7 +186,7 @@ export function StatusTimeline({
   // Horizontal
   if (horizontal) {
     return (
-      <ol aria-label={label} className={cn("m-0 flex list-none overflow-x-auto p-0", className)}>
+      <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("m-0 flex list-none overflow-x-auto p-0", className)}>
         {items.map((item, i) => {
           const status = item.status ?? "pending";
           const last = i === items.length - 1;
@@ -197,6 +198,7 @@ export function StatusTimeline({
               key={item.id ?? i}
               aria-current={status === "current" ? "step" : undefined}
               {...clickProps(item, i)}
+              data-bpdm-slot="status-timeline-item"
               className={cn(
                 "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
                 interactive && interactiveClasses,
@@ -217,7 +219,7 @@ export function StatusTimeline({
 
               {marker(item, status, "row-start-2")}
 
-              <div className={cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", !renderContent && "text-center")}>
+              <div data-bpdm-slot="status-timeline-content" className={cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", !renderContent && "text-center")}>
                 {renderContent ? (
                   renderContent(item, i)
                 ) : (
@@ -244,7 +246,7 @@ export function StatusTimeline({
   const centered = alternate || showOpposite; // center the line so both sides are usable
 
   return (
-    <ol aria-label={label} className={cn("relative m-0 list-none p-0", className)}>
+    <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("relative m-0 list-none p-0", className)}>
       {items.map((item, i) => {
         const status = item.status ?? "pending";
         const last = i === items.length - 1;
@@ -257,6 +259,7 @@ export function StatusTimeline({
             key={item.id ?? i}
             aria-current={status === "current" ? "step" : undefined}
             {...clickProps(item, i)}
+            data-bpdm-slot="status-timeline-item"
             className={cn(
               // gap is a margin (not padding) so the interactive hover/ring hugs the
               // step content instead of bleeding into the connector gap
@@ -287,6 +290,7 @@ export function StatusTimeline({
             {marker(item, status, cn(centered && "col-start-2 row-start-1"))}
 
             <div
+              data-bpdm-slot="status-timeline-content"
               className={cn(
                 "min-w-0",
                 centered
@@ -323,6 +327,7 @@ export function StatusTimeline({
 
             {showOpposite && (
               <div
+                data-bpdm-slot="status-timeline-opposite"
                 className={cn(
                   "min-w-0",
                   contentRight

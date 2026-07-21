@@ -47,17 +47,17 @@ const DEFAULT_REORDER_LABELS: ReorderControlLabels = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "contents" },
   template: `
-    <div role="group" [attr.aria-label]="t().group" [class]="rootClass()">
-      <button type="button" [attr.aria-label]="t().up" [attr.title]="t().up" [class]="btn" [disabled]="!canUp()" (click)="apply('up')">
+    <div role="group" data-bpdm-slot="reorder-controls" [attr.aria-label]="t().group" [class]="rootClass()">
+      <button type="button" data-bpdm-slot="control-button" [attr.aria-label]="t().up" [attr.title]="t().up" [class]="btn" [disabled]="!canUp()" (click)="apply('up')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" [attr.aria-label]="t().top" [attr.title]="t().top" [class]="btn" [disabled]="!canTop()" (click)="apply('top')">
+      <button type="button" data-bpdm-slot="control-button" [attr.aria-label]="t().top" [attr.title]="t().top" [class]="btn" [disabled]="!canTop()" (click)="apply('top')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 17 5-5 5 5M7 11l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" [attr.aria-label]="t().down" [attr.title]="t().down" [class]="btn" [disabled]="!canDown()" (click)="apply('down')">
+      <button type="button" data-bpdm-slot="control-button" [attr.aria-label]="t().down" [attr.title]="t().down" [class]="btn" [disabled]="!canDown()" (click)="apply('down')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" [attr.aria-label]="t().bottom" [attr.title]="t().bottom" [class]="btn" [disabled]="!canBottom()" (click)="apply('bottom')">
+      <button type="button" data-bpdm-slot="control-button" [attr.aria-label]="t().bottom" [attr.title]="t().bottom" [class]="btn" [disabled]="!canBottom()" (click)="apply('bottom')">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 5 5 5-5M7 13l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
     </div>

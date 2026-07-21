@@ -47,11 +47,12 @@ let meterUid = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: "block w-full" },
   template: `
-    <div [class]="rootClass()">
+    <div [class]="rootClass()" data-bpdm="" data-bpdm-slot="password-input">
       <div [class]="wrapClass()">
         <input
           [id]="id() || null"
           [type]="revealed() ? 'text' : 'password'"
+          data-bpdm-slot="password-input-field"
           [attr.name]="name() || null"
           [attr.autocomplete]="autoComplete() || null"
           [disabled]="disabled()"
@@ -67,6 +68,7 @@ let meterUid = 0;
           type="button"
           [attr.aria-label]="revealed() ? t().hide : t().show"
           [attr.aria-pressed]="revealed()"
+          data-bpdm-slot="password-input-toggle"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
           class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
@@ -82,7 +84,7 @@ let meterUid = 0;
       </div>
 
       @if (showMeter()) {
-        <div class="mt-2">
+        <div data-bpdm-slot="password-input-meter" class="mt-2">
           <div class="flex gap-1" aria-hidden="true">
             @for (i of segments(); track i) {
               <span [class]="'h-1 flex-1 rounded-full transition-colors ' + (i < filled() ? barColor() : 'bg-muted')"></span>
