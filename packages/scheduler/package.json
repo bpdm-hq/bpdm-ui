@@ -1,0 +1,78 @@
+{
+  "name": "@bpdm/scheduler",
+  "version": "0.1.0",
+  "description": "React scheduler/calendar for the bpdm design system — day, week and month views over one shared headless core. Typed, themeable, accessible.",
+  "type": "module",
+  "license": "MIT",
+  "author": "bpdm (https://bpdm.dev)",
+  "homepage": "https://bpdm.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "directory": "packages/scheduler"
+  },
+  "keywords": [
+    "scheduler",
+    "calendar",
+    "react",
+    "design-system",
+    "events",
+    "typescript"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup && node scripts/add-use-client.mjs && cp src/scheduler.css dist/styles.css",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "size": "size-limit",
+    "lint": "eslint .",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@bpdm/scheduler-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "@bpdm/scheduler-core": "workspace:*",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "size-limit": "^12.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
