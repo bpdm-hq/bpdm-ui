@@ -79,6 +79,8 @@ type ViewType = 'day' | 'week' | 'month';
  */
 function LiveScheduler({ view, minHeight }: { view: ViewType; minHeight: number }) {
   const [now, setNow] = useState<Date | null>(null);
+  // client-only date read after mount — avoids an SSR/first-paint hydration mismatch
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setNow(new Date()), []);
 
   if (!now) {
@@ -234,6 +236,8 @@ function CreateDemoInner({ now }: { now: Date }) {
 
 export function SchedulerCreateDemo() {
   const [now, setNow] = useState<Date | null>(null);
+  // client-only date read after mount — avoids an SSR/first-paint hydration mismatch
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setNow(new Date()), []);
   if (!now) return <div className="not-prose w-full" style={{ minHeight: 680 }} aria-hidden="true" />;
   return <CreateDemoInner now={now} />;

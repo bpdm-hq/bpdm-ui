@@ -23,7 +23,7 @@ export function useEvents(source: DataSource, range: DateRange, refreshKey = 0):
 
   useEffect(() => {
     let active = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- external data subscription, not derivable state
+    // external data subscription (server/in-memory fetch), not derivable state
     Promise.resolve(source.fetch({ start: new Date(startMs), end: new Date(endMs) })).then((result) => {
       if (active) setEvents(result as CalendarEvent[]);
     });
