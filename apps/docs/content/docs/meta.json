@@ -8,6 +8,8 @@
     "panel",
     "overlay",
     "messages",
-    "misc"
+    "misc",
+    "---Packages---",
+    "scheduler"
   ]
 }
