@@ -12,6 +12,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@bpdm/scheduler": "workspace:*",
     "@bpdm/tokens": "workspace:*",
     "@bpdm/ui": "workspace:*",
     "fumadocs-core": "16.10.5",

@@ -1,0 +1,63 @@
+{
+  "name": "@bpdm/scheduler-core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic core for the bpdm Scheduler — date math, an overlap layout engine, a data-source contract, and state. Zero runtime dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "author": "bpdm (https://bpdm.dev)",
+  "homepage": "https://bpdm.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "directory": "packages/scheduler-core"
+  },
+  "keywords": [
+    "scheduler",
+    "calendar",
+    "layout-engine",
+    "design-system",
+    "headless",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "size": "size-limit",
+    "lint": "eslint .",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "size-limit": "^12.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9"
+  }
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "name": "import { Scheduler } (tree-shaken)",
+    "path": "dist/index.js",
+    "import": "{ Scheduler }",
+    "ignore": ["react", "react-dom"],
+    "limit": "5.5 kB"
+  }
+]

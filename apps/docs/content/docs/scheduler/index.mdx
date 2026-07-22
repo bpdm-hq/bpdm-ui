@@ -1,0 +1,705 @@
+---
+title: Scheduler
+description: A themeable, accessible day/week/month calendar for events and appointments — one headless core, many views, client- or server-driven, in React (@bpdm/scheduler).
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { SchedulerDemo, SchedulerDayDemo, SchedulerMonthDemo, SchedulerCreateDemo } from '@/components/scheduler-demos';
+import { Preview } from '@/components/preview';
+
+The **Scheduler** lays events onto a time grid or month grid. Overlapping events
+cascade automatically, the current time is marked, and every view is driven by one
+framework-agnostic core (`@bpdm/scheduler-core`). It reads events from a **data
+source** — an in-memory array on the client, or your own source that fetches a
+visible range from a server. Zero runtime dependencies in the core; the whole
+React binding is a few kilobytes.
+
+<Callout type="info">
+  Early preview. **React** (`@bpdm/scheduler`) ships Day, Week and Month today.
+  **Angular** (`@bpdm/ng-scheduler`) is on the roadmap — it wraps the same core, so
+  the model, views and options match. The Angular tabs below show the intended API.
+</Callout>
+
+## Install
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```bash
+pnpm add @bpdm/scheduler
+```
+Import the stylesheet once (it reads the `@bpdm/tokens` CSS variables, so the four
+themes and RTL come for free):
+```ts
+// e.g. in your root layout or main entry
+import '@bpdm/scheduler/styles.css';
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; this is the intended API._
+
+```bash
+pnpm add @bpdm/ng-scheduler
+```
+Add the stylesheet once in `angular.json` (or import it in your global `styles.css`):
+```json
+{
+  "styles": ["@bpdm/ng-scheduler/styles.css", "src/styles.css"]
+}
+```
+Same core, same options — the Angular binding is not published yet.
+  </Tab>
+</Tabs>
+
+## Quick start — client-side events
+
+Pass an array of events. Each event needs `id`, `title`, `start` and `end`; an
+optional `category` picks a themeable colour, and `location` / `description` show in
+the built-in detail dialog.
+
+<Preview>
+  <SchedulerDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { Scheduler, type CalendarEvent } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+const events: CalendarEvent[] = [
+  {
+    id: '1',
+    title: 'Sprint planning',
+    start: new Date(2026, 6, 20, 10, 0),
+    end: new Date(2026, 6, 20, 11, 30),
+    category: 'amber',
+    location: 'Room Aster',
+    description: 'Plan the sprint backlog and lock the two-week goal.',
+  },
+  {
+    id: '2',
+    title: 'Design review',
+    start: new Date(2026, 6, 21, 11, 0),
+    end: new Date(2026, 6, 21, 12, 30),
+    category: 'teal',
+  },
+  {
+    id: '3',
+    title: 'Standup',
+    start: new Date(2026, 6, 22, 9, 30),
+    end: new Date(2026, 6, 22, 9, 45),
+    category: 'blue',
+  },
+];
+
+export function TeamCalendar() {
+  return (
+    <Scheduler
+      events={events}
+      defaultView="week"
+      onEventClick={(event) => console.log('clicked', event.id)}
+    />
+  );
+}
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; this is the intended API._
+
+```ts
+import { Component } from '@angular/core';
+import { BpdmScheduler, type CalendarEvent } from '@bpdm/ng-scheduler';
+
+@Component({
+  selector: 'app-team-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `
+    <bpdm-scheduler
+      [events]="events"
+      defaultView="week"
+      (eventClick)="onEventClick($event)"
+    />
+  `,
+})
+export class TeamCalendarComponent {
+  events: CalendarEvent[] = [
+    {
+      id: '1',
+      title: 'Sprint planning',
+      start: new Date(2026, 6, 20, 10, 0),
+      end: new Date(2026, 6, 20, 11, 30),
+      category: 'amber',
+      location: 'Room Aster',
+      description: 'Plan the sprint backlog and lock the two-week goal.',
+    },
+    {
+      id: '2',
+      title: 'Design review',
+      start: new Date(2026, 6, 21, 11, 0),
+      end: new Date(2026, 6, 21, 12, 30),
+      category: 'teal',
+    },
+    {
+      id: '3',
+      title: 'Standup',
+      start: new Date(2026, 6, 22, 9, 30),
+      end: new Date(2026, 6, 22, 9, 45),
+      category: 'blue',
+    },
+  ];
+
+  onEventClick(event: CalendarEvent) {
+    console.log('clicked', event.id);
+  }
+}
+```
+  </Tab>
+</Tabs>
+
+## Views
+
+Set `defaultView` and choose which the toolbar offers via `views`. Navigate with
+**Today / ‹ ›** — each step moves by the view's period (a day, a week, a month).
+
+### Day and Week
+
+The time grid holds the whole day (00:00–24:00); it opens scrolled to `scrollToHour`
+(7 AM by default) and scrolls to reach early-morning or evening events. Overlapping
+events cascade — wider cards, offset and stacked, with the hovered one on top.
+
+<Preview>
+  <SchedulerDayDemo />
+</Preview>
+
+### Month
+
+The month grid spans only the weeks the month actually covers (5 or 6), with event
+chips per day and a “+N more” overflow. Scroll the grid up/down to move between
+months.
+
+<Preview>
+  <SchedulerMonthDemo />
+</Preview>
+
+## Data source — server-side events
+
+`events` builds an in-memory source for you. For server data, pass a `dataSource`
+whose `fetch` returns the events for a **visible range** — it may return an array or a
+promise, so a real API call drops straight in. The scheduler re-fetches whenever the
+visible range changes, so the server only sends what's on screen. The same component
+handles both; nothing else changes.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { Scheduler, type CalendarEvent, type DataSource } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+// The API sends dates as ISO strings; revive them into Date objects on the way in.
+interface EventRow {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  category?: string;
+}
+
+const remote: DataSource = {
+  async fetch(range) {
+    const params = new URLSearchParams({
+      from: range.start.toISOString(),
+      to: range.end.toISOString(),
+    });
+    const res = await fetch(`/api/events?${params}`);
+    const rows: EventRow[] = await res.json();
+
+    return rows.map(
+      (row): CalendarEvent => ({
+        ...row,
+        start: new Date(row.start),
+        end: new Date(row.end),
+      }),
+    );
+  },
+};
+
+export function ServerCalendar() {
+  return <Scheduler dataSource={remote} defaultView="week" />;
+}
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; the `DataSource` contract is identical._
+
+```ts
+import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { BpdmScheduler, type CalendarEvent, type DataSource } from '@bpdm/ng-scheduler';
+
+interface EventRow {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  category?: string;
+}
+
+@Component({
+  selector: 'app-server-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `<bpdm-scheduler [dataSource]="remote" defaultView="week" />`,
+})
+export class ServerCalendarComponent {
+  private http = inject(HttpClient);
+
+  remote: DataSource = {
+    fetch: async (range) => {
+      const rows = await firstValueFrom(
+        this.http.get<EventRow[]>('/api/events', {
+          params: {
+            from: range.start.toISOString(),
+            to: range.end.toISOString(),
+          },
+        }),
+      );
+
+      return rows.map(
+        (row): CalendarEvent => ({
+          ...row,
+          start: new Date(row.start),
+          end: new Date(row.end),
+        }),
+      );
+    },
+  };
+}
+```
+  </Tab>
+</Tabs>
+
+## Event details
+
+By default, clicking an event opens a built-in detail dialog (title, time,
+`location`, `description`). Supply `onEventClick` to handle clicks yourself — the
+built-in dialog is then suppressed, so you can open your own editor or navigate.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { useState } from 'react';
+import { Scheduler, type CalendarEvent } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+export function EditableCalendar({ events }: { events: CalendarEvent[] }) {
+  const [selected, setSelected] = useState<CalendarEvent | null>(null);
+
+  return (
+    <>
+      <Scheduler events={events} onEventClick={setSelected} />
+
+      {selected && (
+        <div role="dialog" aria-label={selected.title}>
+          <h2>{selected.title}</h2>
+          {/* your own editor, navigation, delete button, … */}
+          <button onClick={() => setSelected(null)}>Close</button>
+        </div>
+      )}
+    </>
+  );
+}
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; this is the intended API._
+
+```ts
+import { Component, signal } from '@angular/core';
+import { BpdmScheduler, type CalendarEvent } from '@bpdm/ng-scheduler';
+
+@Component({
+  selector: 'app-editable-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `
+    <bpdm-scheduler [events]="events" (eventClick)="selected.set($event)" />
+
+    @if (selected(); as event) {
+      <div role="dialog" [attr.aria-label]="event.title">
+        <h2>{{ event.title }}</h2>
+        <!-- your own editor, navigation, delete button, … -->
+        <button (click)="selected.set(null)">Close</button>
+      </div>
+    }
+  `,
+})
+export class EditableCalendarComponent {
+  events: CalendarEvent[] = [];
+  selected = signal<CalendarEvent | null>(null);
+}
+```
+  </Tab>
+</Tabs>
+
+## Creating events
+
+The scheduler ships **no form of its own** — it stays dependency-free. Clicking an
+empty slot (a time in day/week, a day in month) hands you the clicked range; you
+render **your own fields** via `renderCreateForm` — any inputs, any component
+library — and `onCreate` receives the finished event, which appears immediately.
+The exact same wiring works client- or server-side.
+
+<Preview>
+  <SchedulerCreateDemo />
+</Preview>
+
+Click an empty slot above to open the create popup. That form is built with
+`@bpdm/ui` controls — but the scheduler itself needs nothing; you could use plain
+inputs, as below.
+
+**Where does the time come from?** A **day/week** click carries the exact clicked
+time (snapped to `snapMinutes`). A **month** cell has no time axis, so a click there
+proposes `createDefaultHour` (9 AM by default — set it to whatever you like). Either
+way, `slot.start`/`slot.end` are just defaults — add a time field to your form (a
+`<select>` below, the two dropdowns in the live demo above) and pass explicit
+`start`/`end` to `submit` to override them.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { useState } from 'react';
+import { Scheduler, type CalendarEvent, type CreateFormArgs } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+// Your own form — plain inputs here; swap in any component library you like.
+function CreateForm({ slot, submit, cancel }: CreateFormArgs) {
+  const [title, setTitle] = useState('');
+  // seed the time picker from the clicked slot (HH:MM)
+  const [time, setTime] = useState(
+    () => slot.start.toTimeString().slice(0, 5),
+  );
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!title.trim()) return;
+        // override the slot's default time with the chosen one (1-hour event)
+        const [h, m] = time.split(':').map(Number);
+        const start = new Date(slot.start);
+        start.setHours(h, m, 0, 0);
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        submit({ title: title.trim(), start, end, category: 'violet' });
+      }}
+    >
+      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
+      <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+      <button type="button" onClick={cancel}>Cancel</button>
+      <button type="submit">Create</button>
+    </form>
+  );
+}
+
+export function EditableCalendar() {
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  return (
+    <Scheduler
+      events={events}
+      renderCreateForm={(args) => <CreateForm {...args} />}
+      onCreate={(event) => setEvents((prev) => [...prev, event])}
+      createDefaultHour={9} // month clicks propose 9 AM (day/week use the clicked time)
+    />
+  );
+}
+```
+
+For **server-side** persistence, do the write in `onCreate` (e.g. via your
+`dataSource.create`); once it resolves the scheduler refetches the visible range, so
+the server's authoritative record (assigned id, normalized times) is what shows:
+
+```tsx
+import { Scheduler, type CalendarEvent, type DataSource } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+const remote: DataSource = {
+  async fetch(range) {
+    const params = new URLSearchParams({
+      from: range.start.toISOString(),
+      to: range.end.toISOString(),
+    });
+    const res = await fetch(`/api/events?${params}`);
+    const rows: CalendarEvent[] = await res.json();
+    return rows.map((r) => ({ ...r, start: new Date(r.start), end: new Date(r.end) }));
+  },
+  async create(event) {
+    const res = await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(event),
+    });
+    return res.json();
+  },
+};
+
+export function ServerCalendar() {
+  return (
+    <Scheduler
+      dataSource={remote}
+      renderCreateForm={(args) => <CreateForm {...args} />}
+      onCreate={(event) => remote.create?.(event)}
+    />
+  );
+}
+```
+
+Prefer to own the whole popup? Skip `renderCreateForm` and use
+`onSelectSlot(slot)` to open your own dialog anywhere in your app.
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; this is the intended API (a content-projected form template)._
+
+```ts
+import { Component, signal } from '@angular/core';
+import { BpdmScheduler, type CalendarEvent } from '@bpdm/ng-scheduler';
+
+@Component({
+  selector: 'app-editable-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `
+    <bpdm-scheduler [events]="events()" (create)="onCreate($event)">
+      <ng-template #createForm let-slot="slot" let-submit="submit" let-cancel="cancel">
+        <!-- your own fields — call submit({ title, location, … }) or cancel() -->
+      </ng-template>
+    </bpdm-scheduler>
+  `,
+})
+export class EditableCalendarComponent {
+  events = signal<CalendarEvent[]>([]);
+
+  onCreate(event: CalendarEvent) {
+    this.events.update((prev) => [...prev, event]);
+  }
+}
+```
+  </Tab>
+</Tabs>
+
+## Theming
+
+The scheduler is styled entirely with `@bpdm/tokens` CSS variables, so it adopts
+whichever of the four themes (`paper`, `mist`, `charcoal`, `slate`) is active on an
+ancestor via `data-theme` — no configuration. Event categories (`amber`, `violet`,
+`teal`, `blue`, `rose`) mix with the surface colour, so they read on light and dark.
+Try the theme switcher at the top of this page.
+
+## Internationalization
+
+Every user-facing string is overridable, dates and times follow a `locale`, and the
+layout is fully RTL via logical CSS.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { Scheduler, type CalendarEvent } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+const events: CalendarEvent[] = [
+  {
+    id: '1',
+    title: 'Sprintplanung',
+    start: new Date(2026, 6, 20, 10, 0),
+    end: new Date(2026, 6, 20, 11, 30),
+    category: 'amber',
+  },
+];
+
+export function GermanCalendar() {
+  return (
+    <Scheduler
+      events={events}
+      locale="de-DE"
+      weekStartsOn={1}
+      messages={{
+        today: 'Heute',
+        previous: 'Zurück',
+        next: 'Weiter',
+        day: 'Tag',
+        week: 'Woche',
+        month: 'Monat',
+        close: 'Schließen',
+      }}
+    />
+  );
+}
+```
+`locale` drives day names, dates and the 12/24-hour clock; `messages` overrides the
+labels. In an RTL document (`dir="rtl"`) the grid, columns and dialog mirror
+automatically.
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; the same `messages` + `locale` inputs apply._
+
+```ts
+import { Component } from '@angular/core';
+import { BpdmScheduler, type CalendarEvent } from '@bpdm/ng-scheduler';
+
+@Component({
+  selector: 'app-german-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `
+    <bpdm-scheduler
+      [events]="events"
+      locale="de-DE"
+      [weekStartsOn]="1"
+      [messages]="messages"
+    />
+  `,
+})
+export class GermanCalendarComponent {
+  events: CalendarEvent[] = [
+    {
+      id: '1',
+      title: 'Sprintplanung',
+      start: new Date(2026, 6, 20, 10, 0),
+      end: new Date(2026, 6, 20, 11, 30),
+      category: 'amber',
+    },
+  ];
+
+  messages = {
+    today: 'Heute',
+    previous: 'Zurück',
+    next: 'Weiter',
+    day: 'Tag',
+    week: 'Woche',
+    month: 'Monat',
+    close: 'Schließen',
+  };
+}
+```
+  </Tab>
+</Tabs>
+
+## Accessibility
+
+- The grid uses ARIA `grid` / `row` / `gridcell` roles; the view switcher is a
+  `tablist`; the detail dialog is a labelled `role="dialog"` with `aria-modal`.
+- Every event and chip is a real `<button>` — keyboard-focusable, with a visible
+  focus ring, and `Enter` / `Space` open it.
+- The dialog takes focus on open and closes on `Escape` or a backdrop click.
+- Motion respects `prefers-reduced-motion`.
+
+## Performance & scale
+
+- **Range-based data.** Only the visible window is ever fetched and laid out. A
+  `dataSource` receives just `{ from, to }`, so a calendar backed by millions of
+  stored rows stays light — the server returns only what's on screen, and the grid
+  refetches when you navigate.
+- **Overlap engine.** Dense days are laid out by a cluster-detecting, lane-packing
+  algorithm in the core (`packEvents` / `layoutDay`) — overlapping events cascade
+  automatically; you never position anything by hand.
+- **Small and tree-shakeable.** The core (`@bpdm/scheduler-core`) has **zero runtime
+  dependencies**; the React binding is a few kilobytes brotli, ESM + CJS, and the
+  budget is enforced in CI with `size-limit`.
+- **SSR-safe.** Renders on the server and hydrates cleanly. Read "now"/live dates on
+  the client (e.g. in an effect) to avoid a server/client mismatch; the component
+  itself does no non-deterministic work during render.
+
+## API
+
+### `<Scheduler>` props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `events` | `CalendarEvent[]` | `[]` | Client-side events (ignored if `dataSource` is set). |
+| `dataSource` | `DataSource` | — | Custom source, e.g. server-backed. |
+| `defaultView` | `'day' \| 'week' \| 'month'` | `'week'` | Initial view. |
+| `defaultDate` | `Date` | today | Initial focused date. |
+| `views` | `ViewType[]` | `['day','week','month']` | Views the toolbar offers. |
+| `dayStartHour` | `number` | `0` | First hour rendered (day/week). |
+| `dayEndHour` | `number` | `24` | Last hour rendered (day/week). |
+| `scrollToHour` | `number` | `7` | Hour the viewport opens at. |
+| `maxHeight` | `number` | `600` | Day/week viewport height (px) before it scrolls. |
+| `weekStartsOn` | `0`–`6` | `1` | First day of the week (Monday). |
+| `now` | `Date` | `new Date()` | Reference time (today marker + now line). |
+| `locale` | `string` | runtime | BCP-47 locale for dates/times. |
+| `messages` | `Partial<SchedulerMessages>` | English | Override UI strings. |
+| `onEventClick` | `(event) => void` | — | Handle clicks yourself; suppresses the built-in dialog. |
+| `onSelectSlot` | `(slot: SlotSelection) => void` | — | Fires when an empty slot is clicked (its `start`/`end`). |
+| `renderCreateForm` | `(args: CreateFormArgs) => ReactNode` | — | Render your own create form in the popup on slot click. |
+| `onCreate` | `(event) => void \| Promise<void>` | — | Persist a created event (update state, or POST); the grid refetches after. |
+| `createDuration` | `number` | `60` | Minutes a click proposes for the new slot. |
+| `snapMinutes` | `number` | `30` | Snap a clicked day/week time to this many minutes. |
+| `createDefaultHour` | `number` | `9` | Month cells have no time axis — a click there proposes this hour (0–23). |
+| `className` | `string` | — | Extra class on the root. |
+
+### `CalendarEvent`
+
+```ts
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  resourceId?: string;   // multi-resource views (roadmap)
+  category?: string;     // 'amber' | 'violet' | 'teal' | 'blue' | 'rose'
+  location?: string;     // shown in the dialog
+  description?: string;  // shown in the dialog
+  data?: unknown;        // your own payload, untouched
+}
+```
+
+### `DataSource`
+
+```ts
+interface DataSource<E = CalendarEvent> {
+  fetch(range: { start: Date; end: Date }, options?: { resourceIds?: string[] }): E[] | Promise<E[]>;
+  create?(event: E): E | Promise<E>;
+  update?(event: E): E | Promise<E>;
+  remove?(id: string): void | Promise<void>;
+}
+```
+
+`InMemoryDataSource` implements this for client-side arrays and is what `events`
+uses under the hood.
+
+### Create types
+
+```ts
+interface SlotSelection {
+  start: Date;
+  end: Date;
+}
+
+// what a renderCreateForm submits — id is generated if omitted; start/end
+// default to the clicked slot; the rest map onto CalendarEvent.
+interface CreateEventInput {
+  id?: string;
+  title: string;
+  start?: Date;
+  end?: Date;
+  category?: string;
+  location?: string;
+  description?: string;
+  data?: unknown;
+}
+
+interface CreateFormArgs {
+  slot: SlotSelection;
+  submit: (input: CreateEventInput) => void;
+  cancel: () => void;
+}
+```
+
+<Callout type="info">
+  Roadmap: drag to create / move / resize, resources (multi-person columns),
+  Timeline / Agenda / Year views, recurrence (RRULE) and time zones — all on the
+  same core, plus the Angular binding and a `pnpm create` / `@bpdm/cli add scheduler`
+  installer.
+</Callout>
