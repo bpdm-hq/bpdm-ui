@@ -1,12 +1,11 @@
-import { useEffect, useRef, type CSSProperties } from "react";
-import { isSameDay, type CalendarEvent } from "@bpdm/scheduler-core";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { isSameDay, startOfDay, type CalendarEvent } from "@bpdm/scheduler-core";
 import { categoryColor } from "./category";
 import type { SlotSelection } from "./types";
 import { dowLabel } from "./format";
 
 const MS_PER_MINUTE = 60_000;
 
-const MAX_CHIPS = 3;
 // Wheel-to-navigate tuning: accumulate delta so a small trackpad nudge doesn't
 // flip a month, and cool down so one flick can't skip several.
 const WHEEL_THRESHOLD = 48;
@@ -23,6 +22,10 @@ export interface MonthViewProps {
   onSelect?: (event: CalendarEvent) => void;
   /** Clicking an empty cell picks that day (for creating an event). */
   onSelectSlot?: (slot: SlotSelection) => void;
+  /** Clicking "+N more" opens the full-day list for that date. */
+  onOpenDay?: (day: Date) => void;
+  /** Max event chips shown per day cell before "+N more". */
+  monthMaxChips: number;
   /** A month cell has no time axis, so a click proposes this hour (0–23). */
   createDefaultHour: number;
   /** Length (minutes) of the proposed slot. */
@@ -41,6 +44,8 @@ export function MonthView({
   locale,
   onSelect,
   onSelectSlot,
+  onOpenDay,
+  monthMaxChips,
   createDefaultHour,
   createDuration,
   onNext,
@@ -48,6 +53,20 @@ export function MonthView({
 }: MonthViewProps) {
   const headerDays = weeks[0] ?? [];
   const month = monthDate.getMonth();
+
+  // Group events by day once (sorted) so each of the ~42 cells is an O(1) lookup
+  // instead of filtering the whole event list — keeps month view fast at scale.
+  const eventsByDay = useMemo(() => {
+    const map = new Map<number, CalendarEvent[]>();
+    for (const e of events) {
+      const key = startOfDay(e.start).getTime();
+      const bucket = map.get(key);
+      if (bucket) bucket.push(e);
+      else map.set(key, [e]);
+    }
+    for (const bucket of map.values()) bucket.sort((a, b) => a.start.getTime() - b.start.getTime());
+    return map;
+  }, [events]);
 
   const rootRef = useRef<HTMLDivElement>(null);
   // Keep the latest callbacks without re-attaching the native listener.
@@ -93,10 +112,8 @@ export function MonthView({
           {week.map((day) => {
             const inMonth = day.getMonth() === month;
             const today = isSameDay(day, now);
-            const dayEvents = events
-              .filter((e) => isSameDay(e.start, day))
-              .sort((a, b) => a.start.getTime() - b.start.getTime());
-            const shown = dayEvents.slice(0, MAX_CHIPS);
+            const dayEvents = eventsByDay.get(startOfDay(day).getTime()) ?? [];
+            const shown = dayEvents.slice(0, monthMaxChips);
             const extra = dayEvents.length - shown.length;
 
             return (
@@ -136,7 +153,16 @@ export function MonthView({
                     {e.title}
                   </button>
                 ))}
-                {extra > 0 && <span className="bpdm-sch-more">+{extra} more</span>}
+                {extra > 0 && (
+                  <button
+                    type="button"
+                    className="bpdm-sch-more"
+                    onClick={() => onOpenDay?.(day)}
+                    aria-label={`Show all ${dayEvents.length} events`}
+                  >
+                    +{extra} more
+                  </button>
+                )}
               </div>
             );
           })}

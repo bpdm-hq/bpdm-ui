@@ -20,6 +20,19 @@ React binding is a few kilobytes.
   the model, views and options match. The Angular tabs below show the intended API.
 </Callout>
 
+## What you can configure
+
+Everything below is built in — you opt into the interactive bits with a prop:
+
+- **Data** — a client array (`events`) or a server source (`dataSource`, range-based). → [Quick start](#quick-start--client-side-events) · [Data source](#data-source--server-side-events)
+- **Views** — `defaultView`, which views the toolbar offers (`views`), the visible hours (`dayStartHour` / `dayEndHour` / `scrollToHour`), first day of week (`weekStartsOn`), viewport height (`maxHeight`), row density (`hourHeight`), month chips per day (`monthMaxChips`). → [Views](#views)
+- **Creating events** — click an empty slot to open your own form (`renderCreateForm`), persist with `onCreate`; tune the proposed slot (`createDuration`, `snapMinutes`, `createDefaultHour`) or just get the raw slot (`onSelectSlot`). → [Creating events](#creating-events)
+- **Opening events** — a built-in detail dialog by default, or take over with `onEventClick`. The month **“+N more” day peek** and its **‹ Back** navigation are automatic. → [Event details](#event-details) · [Month](#month)
+- **Internationalization** — every string via `messages`, dates/times via `locale`, RTL automatically. → [Internationalization](#internationalization)
+- **Theming** — the four `@bpdm/tokens` themes via `data-theme`; event colours via `category`. → [Theming](#theming)
+
+See the [full prop table](#scheduler-props) for defaults and types.
+
 ## Install
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
@@ -181,6 +194,12 @@ months.
 <Preview>
   <SchedulerMonthDemo />
 </Preview>
+
+When a day has more events than fit, **“+N more”** opens a **day peek** — a scrollable
+popup listing every event on that day (its background is locked, so wheeling scrolls
+the list, not the page). Clicking an event there opens its [detail dialog](#event-details)
+with a **‹ Back** control that returns you to the list. All of this is built in and
+keyboard-accessible — nothing to wire up.
 
 ## Data source — server-side events
 
@@ -636,6 +655,8 @@ export class GermanCalendarComponent {
 | `createDuration` | `number` | `60` | Minutes a click proposes for the new slot. |
 | `snapMinutes` | `number` | `30` | Snap a clicked day/week time to this many minutes. |
 | `createDefaultHour` | `number` | `9` | Month cells have no time axis — a click there proposes this hour (0–23). |
+| `hourHeight` | `number` | `52` | Pixel height of one hour row in day/week (row density). |
+| `monthMaxChips` | `number` | `3` | Event chips shown per day cell in month view before “+N more”. |
 | `className` | `string` | — | Extra class on the root. |
 
 ### `CalendarEvent`

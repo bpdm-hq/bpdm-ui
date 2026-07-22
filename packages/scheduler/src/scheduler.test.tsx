@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
@@ -101,6 +101,46 @@ describe("Scheduler", () => {
     );
     // form closes after submit
     expect(screen.queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
+  });
+
+  it("month '+N more' opens a day peek listing every event", async () => {
+    const onEventClick = vi.fn();
+    // four events on the same Monday → month cell shows 3 chips + "+1 more"
+    const many: CalendarEvent[] = [
+      { id: "m1", title: "Standup", start: new Date(2026, 6, 20, 9, 0), end: new Date(2026, 6, 20, 9, 30) },
+      { id: "m2", title: "Sprint planning", start: new Date(2026, 6, 20, 10, 0), end: new Date(2026, 6, 20, 11, 0) },
+      { id: "m3", title: "Lunch", start: new Date(2026, 6, 20, 12, 30), end: new Date(2026, 6, 20, 13, 30) },
+      { id: "m4", title: "Retro", start: new Date(2026, 6, 20, 16, 0), end: new Date(2026, 6, 20, 17, 0) },
+    ];
+    render(
+      <Scheduler events={many} defaultDate={now} now={now} defaultView="month" views={["month"]} onEventClick={onEventClick} />,
+    );
+    const more = await screen.findByRole("button", { name: /show all 4 events/i });
+    await userEvent.click(more);
+    // peek dialog lists all four, including the one hidden behind "+N more"
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("Retro")).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByText("Retro"));
+    expect(onEventClick).toHaveBeenCalledWith(expect.objectContaining({ id: "m4" }));
+  });
+
+  it("an event opened from the day peek can go back to the list", async () => {
+    const many: CalendarEvent[] = [
+      { id: "m1", title: "Standup", start: new Date(2026, 6, 20, 9, 0), end: new Date(2026, 6, 20, 9, 30) },
+      { id: "m2", title: "Sprint planning", start: new Date(2026, 6, 20, 10, 0), end: new Date(2026, 6, 20, 11, 0) },
+      { id: "m3", title: "Lunch", start: new Date(2026, 6, 20, 12, 30), end: new Date(2026, 6, 20, 13, 30) },
+      { id: "m4", title: "Retro", start: new Date(2026, 6, 20, 16, 0), end: new Date(2026, 6, 20, 17, 0) },
+    ];
+    // no onEventClick → the built-in detail dialog is used
+    render(<Scheduler events={many} defaultDate={now} now={now} defaultView="month" views={["month"]} />);
+    await userEvent.click(await screen.findByRole("button", { name: /show all 4 events/i }));
+    await userEvent.click(within(await screen.findByRole("dialog")).getByText("Retro"));
+    // detail dialog shows a Back control
+    const back = await screen.findByRole("button", { name: "Back" });
+    await userEvent.click(back);
+    // returned to the peek list — Back is gone, the full day's events are listed again
+    expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
+    expect(within(screen.getByRole("dialog")).getByText("Standup")).toBeInTheDocument();
   });
 
   it("closes the create form on cancel without creating", async () => {

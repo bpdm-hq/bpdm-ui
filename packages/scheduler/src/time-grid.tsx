@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import {
   defaultAccessor,
   isSameDay,
@@ -12,8 +12,6 @@ import { EventBlock } from "./event-block";
 import type { SlotSelection } from "./types";
 import { dowLabel, formatHour } from "./format";
 
-const HOUR_HEIGHT = 52;
-
 export interface TimeGridProps {
   days: Date[];
   events: CalendarEvent[];
@@ -25,6 +23,8 @@ export interface TimeGridProps {
   scrollToHour: number;
   /** Max viewport height in px; the grid scrolls beyond it. */
   maxHeight: number;
+  /** Pixel height of one hour row (row density). */
+  hourHeight: number;
   now: Date;
   locale?: string;
   onSelect?: (event: CalendarEvent) => void;
@@ -44,6 +44,7 @@ export function TimeGrid({
   dayEndHour,
   scrollToHour,
   maxHeight,
+  hourHeight,
   now,
   locale,
   onSelect,
@@ -54,15 +55,22 @@ export function TimeGrid({
   const gridRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = gridRef.current;
-    if (el) el.scrollTop = Math.max(0, (scrollToHour - dayStartHour) * HOUR_HEIGHT);
-  }, [scrollToHour, dayStartHour]);
+    if (el) el.scrollTop = Math.max(0, (scrollToHour - dayStartHour) * hourHeight);
+  }, [scrollToHour, dayStartHour, hourHeight]);
 
   const startMin = dayStartHour * 60;
   const endMin = dayEndHour * 60;
-  const pxPerMinute = HOUR_HEIGHT / 60;
+  const pxPerMinute = hourHeight / 60;
+
+  // Lay out each day once per (events, range) change — not on every render — so
+  // memoized EventBlocks only re-render when their position actually changes.
+  const positionedByDay = useMemo(
+    () => days.map((d) => layoutDay(events, d, startMin, endMin, defaultAccessor)),
+    [days, events, startMin, endMin],
+  );
   // one extra row past the last hour so the closing label (12 AM) has a row
   // beneath it, mirroring the empty row above the first (1 AM) label.
-  const bodyHeight = (endMin - startMin) * pxPerMinute + HOUR_HEIGHT;
+  const bodyHeight = (endMin - startMin) * pxPerMinute + hourHeight;
   const columns = `56px repeat(${days.length}, minmax(0, 1fr))`;
 
   // skip the top edge label (collides with the sticky header) but keep the
@@ -88,17 +96,20 @@ export function TimeGrid({
         ))}
       </div>
 
-      <div className="bpdm-sch-body" style={{ gridTemplateColumns: columns, height: bodyHeight }}>
+      <div
+        className="bpdm-sch-body"
+        style={{ gridTemplateColumns: columns, height: bodyHeight, "--sch-hour-h": `${hourHeight}px` } as CSSProperties}
+      >
         <div className="bpdm-sch-gutter" aria-hidden="true">
           {hours.map((h) => (
-            <div key={h} className="bpdm-sch-hour" style={{ top: (h - dayStartHour) * HOUR_HEIGHT }}>
+            <div key={h} className="bpdm-sch-hour" style={{ top: (h - dayStartHour) * hourHeight }}>
               {formatHour(h, locale)}
             </div>
           ))}
         </div>
 
-        {days.map((d) => {
-          const positioned = layoutDay(events, d, startMin, endMin, defaultAccessor);
+        {days.map((d, dayIndex) => {
+          const positioned = positionedByDay[dayIndex] ?? [];
           const today = isSameDay(d, now);
           const showNow = today && nowMinutes >= startMin && nowMinutes <= endMin;
           return (

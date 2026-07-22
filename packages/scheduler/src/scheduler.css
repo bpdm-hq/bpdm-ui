@@ -114,17 +114,32 @@
 .bpdm-sch-chip { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; cursor: pointer; text-align: start; border: 0; width: 100%; background: color-mix(in oklab, var(--c) 14%, var(--card, #fff)); color: color-mix(in oklab, var(--c) 50%, var(--foreground, #111)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: transform 0.12s; }
 .bpdm-sch-chip:hover { transform: translateX(2px); }
 .bpdm-sch-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c); flex: none; }
-.bpdm-sch-more { font-size: 0.68rem; color: var(--muted-foreground, #777); padding-inline: 6px; text-align: start; background: none; border: 0; cursor: pointer; }
+.bpdm-sch-more { font-size: 0.68rem; color: var(--muted-foreground, #777); padding: 1px 6px; text-align: start; background: none; border: 0; border-radius: 5px; cursor: pointer; transition: background 0.12s, color 0.12s; }
+.bpdm-sch-more:hover { background: var(--muted, #f2f2f2); color: var(--foreground, #111); }
+
+/* Day peek — the "+N more" overflow list */
+.bpdm-sch-peek { width: min(360px, 100%); background: var(--card, #fff); border: 1px solid var(--border, #e5e5e5); border-radius: 16px; box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.5); overflow: hidden; }
+.bpdm-sch-peek-head { display: flex; align-items: center; gap: 8px; padding: 14px 12px 10px 18px; border-bottom: 1px solid var(--border, #e5e5e5); }
+.bpdm-sch-peek-dow { font-size: 0.72rem; font-weight: 560; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted-foreground, #777); }
+.bpdm-sch-peek-dnum { font-size: 1.25rem; font-weight: 640; letter-spacing: -0.01em; margin-inline-end: auto; }
+.bpdm-sch-peek-list { display: flex; flex-direction: column; gap: 2px; padding: 8px; max-height: 320px; overflow-y: auto; overscroll-behavior: contain; }
+.bpdm-sch-peek-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 0; border-radius: 9px; background: none; cursor: pointer; text-align: start; width: 100%; color: var(--foreground, #111); transition: background 0.12s; }
+.bpdm-sch-peek-item:hover { background: color-mix(in oklab, var(--c) 12%, var(--card, #fff)); }
+.bpdm-sch-peek-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--c); }
+.bpdm-sch-peek-time { font-size: 0.78rem; color: var(--muted-foreground, #777); font-variant-numeric: tabular-nums; min-width: 62px; }
+.bpdm-sch-peek-title { font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* event dialog */
 .bpdm-sch-ov { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: color-mix(in oklab, #05040a 55%, transparent); backdrop-filter: blur(3px); }
 .bpdm-sch-dlg { width: min(440px, 100%); background: var(--card, #fff); border: 1px solid var(--border, #e5e5e5); border-radius: 16px; box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.5); overflow: hidden; }
-.bpdm-sch-dlg-head { display: flex; align-items: flex-start; gap: 12px; padding: 18px 18px 14px; }
+.bpdm-sch-dlg-head { display: flex; align-items: center; gap: 12px; padding: 18px 18px 14px; }
 .bpdm-sch-dlg-titlewrap { display: flex; align-items: stretch; gap: 12px; flex: 1; min-width: 0; }
 .bpdm-sch-dlg-bar { width: 4px; align-self: stretch; border-radius: 3px; background: var(--c); flex: none; }
 .bpdm-sch-dlg-title { margin: 0; font-size: 1.12rem; font-weight: 640; letter-spacing: -0.01em; line-height: 1.3; }
 .bpdm-sch-dlg-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 560; color: var(--muted-foreground, #777); background: color-mix(in oklab, var(--c) 12%, var(--card, #fff)); border: 1px solid color-mix(in oklab, var(--c) 26%, var(--border, #e5e5e5)); border-radius: 999px; padding: 2px 9px; }
 .bpdm-sch-dlg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.bpdm-sch-dlg-back { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-inline-end: -2px; border-radius: 8px; border: 0; background: transparent; color: var(--muted-foreground, #777); font-size: 22px; line-height: 1; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.bpdm-sch-dlg-back:hover { background: var(--muted, #f2f2f2); color: var(--foreground, #111); }
 .bpdm-sch-dlg-x { flex: none; width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent; color: var(--muted-foreground, #777); font-size: 15px; cursor: pointer; transition: background 0.15s, color 0.15s; }
 .bpdm-sch-dlg-x:hover { background: var(--muted, #f2f2f2); color: var(--foreground, #111); }
 .bpdm-sch-dlg-body { padding: 2px 18px 16px; display: flex; flex-direction: column; gap: 11px; }
