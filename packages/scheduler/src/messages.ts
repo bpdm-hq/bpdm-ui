@@ -9,6 +9,7 @@ export interface SchedulerMessages {
   agenda: string;
   noEvents: string;
   close: string;
+  back: string;
   createTitle: string;
 }
 
@@ -22,5 +23,6 @@ export const defaultMessages: SchedulerMessages = {
   agenda: "Agenda",
   noEvents: "No events",
   close: "Close",
+  back: "Back",
   createTitle: "New event",
 };

@@ -62,6 +62,12 @@ function buildWeek(monday: Date, weekIndex: number): CalendarEvent[] {
   events.push({ id: `${wk}-demo`, title: 'Demo', start: at(mon, 4, 11), end: at(mon, 4, 12), category: 'violet' });
   events.push({ id: `${wk}-retro`, title: 'Retro', start: at(mon, 4, 15), end: at(mon, 4, 16), category: 'rose' });
 
+  // a deliberately busy Monday afternoon — so the month "+N more" peek overflows
+  // and demonstrates its own internal scroll
+  events.push({ id: `${wk}-review2`, title: 'Code review', start: at(mon, 0, 15), end: at(mon, 0, 15, 30), category: 'blue' });
+  events.push({ id: `${wk}-vendor`, title: 'Vendor sync', start: at(mon, 0, 16), end: at(mon, 0, 16, 45), category: 'teal' });
+  events.push({ id: `${wk}-wrap`, title: 'Day wrap-up', start: at(mon, 0, 17, 15), end: at(mon, 0, 17, 45), category: 'rose' });
+
   // early and evening items — the grid holds the full day, scroll to reach them
   events.push({ id: `${wk}-early`, title: 'Early review', start: at(mon, 0, 6, 45), end: at(mon, 0, 7, 30), category: 'blue' });
   events.push({ id: `${wk}-oncall`, title: 'On-call handoff', start: at(mon, 3, 20), end: at(mon, 3, 20, 30), category: 'rose' });

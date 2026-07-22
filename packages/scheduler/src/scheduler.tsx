@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   addDays,
   createSchedulerStore,
   eachDayOfInterval,
   endOfMonth,
   InMemoryDataSource,
+  isSameDay,
   startOfMonth,
   startOfWeek,
   type CalendarEvent,
@@ -14,6 +15,7 @@ import {
   type WeekStart,
 } from "@bpdm/scheduler-core";
 import { CreateDialog } from "./create-dialog";
+import { DayPeek } from "./day-peek";
 import { EventDialog } from "./event-dialog";
 import { formatDayLabel, formatMonthLabel, formatRangeLabel } from "./format";
 import { useEvents, useSchedulerState } from "./hooks";
@@ -72,6 +74,10 @@ export interface SchedulerProps {
   snapMinutes?: number;
   /** Month cells have no time axis, so a click there proposes this hour, 0–23 (default 9). */
   createDefaultHour?: number;
+  /** Pixel height of one hour row in day/week (row density; default 52). */
+  hourHeight?: number;
+  /** Max event chips per day cell in month view before "+N more" (default 3). */
+  monthMaxChips?: number;
   className?: string;
 }
 
@@ -96,6 +102,8 @@ export function Scheduler({
   createDuration = 60,
   snapMinutes = 30,
   createDefaultHour = 9,
+  hourHeight = 52,
+  monthMaxChips = 3,
   className,
 }: SchedulerProps) {
   const storeRef = useRef<SchedulerStore | null>(null);
@@ -135,31 +143,67 @@ export function Scheduler({
   const mergedMessages = { ...defaultMessages, ...messages };
 
   const [selected, setSelected] = useState<CalendarEvent | null>(null);
-  const handleSelect = onEventClick ?? ((event: CalendarEvent) => setSelected(event));
+  // stable identity so memoized EventBlocks don't re-render on unrelated updates
+  const handleSelect = useCallback(
+    (event: CalendarEvent) => {
+      if (onEventClick) onEventClick(event);
+      else setSelected(event);
+    },
+    [onEventClick],
+  );
+
+  // month "+N more" → a day peek listing every event on that day
+  const [peekDay, setPeekDay] = useState<Date | null>(null);
+  const peekEvents = useMemo(
+    () =>
+      peekDay
+        ? visibleEvents
+            .filter((e) => isSameDay(e.start, peekDay))
+            .sort((a, b) => a.start.getTime() - b.start.getTime())
+        : [],
+    [peekDay, visibleEvents],
+  );
+  const handlePeekSelect = useCallback(
+    (event: CalendarEvent) => {
+      if (onEventClick) {
+        onEventClick(event);
+        setPeekDay(null);
+      } else {
+        setSelected(event); // keep peekDay so the dialog can go back to the list
+      }
+    },
+    [onEventClick],
+  );
 
   // create flow — a clicked slot opens the consumer's form in the popup
   const [slot, setSlot] = useState<SlotSelection | null>(null);
-  const handleSelectSlot = (picked: SlotSelection) => {
-    onSelectSlot?.(picked);
-    if (renderCreateForm) setSlot(picked);
-  };
-  const submitCreate = async (input: CreateEventInput) => {
-    const event: CalendarEvent = {
-      id: input.id ?? generateId(),
-      title: input.title,
-      start: input.start ?? (slot ? slot.start : new Date()),
-      end: input.end ?? (slot ? slot.end : new Date()),
-      ...(input.category !== undefined ? { category: input.category } : {}),
-      ...(input.location !== undefined ? { location: input.location } : {}),
-      ...(input.description !== undefined ? { description: input.description } : {}),
-      ...(input.data !== undefined ? { data: input.data } : {}),
-    };
-    setSlot(null);
-    await onCreate?.(event);
-    // refetch so a server-backed source shows the new event (client sources
-    // already re-render via their updated `events` prop, but this is harmless).
-    setRefreshKey((k) => k + 1);
-  };
+  const handleSelectSlot = useCallback(
+    (picked: SlotSelection) => {
+      onSelectSlot?.(picked);
+      if (renderCreateForm) setSlot(picked);
+    },
+    [onSelectSlot, renderCreateForm],
+  );
+  const submitCreate = useCallback(
+    async (input: CreateEventInput) => {
+      const event: CalendarEvent = {
+        id: input.id ?? generateId(),
+        title: input.title,
+        start: input.start ?? (slot ? slot.start : new Date()),
+        end: input.end ?? (slot ? slot.end : new Date()),
+        ...(input.category !== undefined ? { category: input.category } : {}),
+        ...(input.location !== undefined ? { location: input.location } : {}),
+        ...(input.description !== undefined ? { description: input.description } : {}),
+        ...(input.data !== undefined ? { data: input.data } : {}),
+      };
+      setSlot(null);
+      await onCreate?.(event);
+      // refetch so a server-backed source shows the new event (client sources
+      // already re-render via their updated `events` prop, but this is harmless).
+      setRefreshKey((k) => k + 1);
+    },
+    [slot, onCreate],
+  );
 
   return (
     <div className={"bpdm-sch" + (className ? " " + className : "")}>
@@ -174,6 +218,8 @@ export function Scheduler({
           locale={locale}
           onSelect={handleSelect}
           onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
+          onOpenDay={setPeekDay}
+          monthMaxChips={monthMaxChips}
           createDefaultHour={createDefaultHour}
           createDuration={createDuration}
           onNext={() => store.next()}
@@ -187,6 +233,7 @@ export function Scheduler({
           dayEndHour={dayEndHour}
           scrollToHour={scrollToHour}
           maxHeight={maxHeight}
+          hourHeight={hourHeight}
           now={now}
           locale={locale}
           onSelect={handleSelect}
@@ -196,12 +243,26 @@ export function Scheduler({
         />
       )}
 
+      {peekDay && !selected && (
+        <DayPeek
+          day={peekDay}
+          events={peekEvents}
+          locale={locale}
+          onSelect={handlePeekSelect}
+          onClose={() => setPeekDay(null)}
+        />
+      )}
+
       {selected && (
         <EventDialog
           event={selected}
           messages={mergedMessages}
           locale={locale}
-          onClose={() => setSelected(null)}
+          onClose={() => {
+            setSelected(null);
+            setPeekDay(null);
+          }}
+          onBack={peekDay ? () => setSelected(null) : undefined}
         />
       )}
 

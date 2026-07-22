@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { memo, type CSSProperties } from "react";
 import type { CalendarEvent, PositionedEvent } from "@bpdm/scheduler-core";
 import { categoryColor } from "./category";
 import { formatTime } from "./format";
@@ -10,7 +10,9 @@ export interface EventBlockProps {
   onSelect?: (event: CalendarEvent) => void;
 }
 
-export function EventBlock({ positioned, pxPerMinute, locale, onSelect }: EventBlockProps) {
+/** memo'd: with a stable `onSelect` and memoized layout, only the events whose
+ *  position actually changed re-render. */
+export const EventBlock = memo(function EventBlock({ positioned, pxPerMinute, locale, onSelect }: EventBlockProps) {
   const { event, lane, columns, topMinutes, heightMinutes } = positioned;
   const style = {
     "--c": categoryColor(event.category),
@@ -39,4 +41,4 @@ export function EventBlock({ positioned, pxPerMinute, locale, onSelect }: EventB
       )}
     </button>
   );
-}
+});

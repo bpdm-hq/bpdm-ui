@@ -9,6 +9,8 @@ export interface EventDialogProps {
   messages: SchedulerMessages;
   locale?: string;
   onClose: () => void;
+  /** When opened from the day peek, returns to that list instead of closing. */
+  onBack?: () => void;
 }
 
 function ClockIcon() {
@@ -31,17 +33,17 @@ function PinIcon() {
 
 /** A self-contained, token-styled detail dialog. Bypassed when the consumer
  *  supplies their own `onEventClick`. */
-export function EventDialog({ event, messages, locale, onClose }: EventDialogProps) {
+export function EventDialog({ event, messages, locale, onClose, onBack }: EventDialogProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") (onBack ?? onClose)();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, onBack]);
 
   const style = { "--c": categoryColor(event.category) } as CSSProperties;
   const when = `${formatDayLabel(event.start, locale)} · ${formatTime(event.start, locale)} – ${formatTime(event.end, locale)}`;
@@ -58,6 +60,11 @@ export function EventDialog({ event, messages, locale, onClose }: EventDialogPro
     >
       <div className="bpdm-sch-dlg" style={style}>
         <div className="bpdm-sch-dlg-head">
+          {onBack && (
+            <button type="button" className="bpdm-sch-dlg-back" aria-label={messages.back} onClick={onBack}>
+              ‹
+            </button>
+          )}
           <div className="bpdm-sch-dlg-titlewrap">
             <span className="bpdm-sch-dlg-bar" aria-hidden="true" />
             <div className="bpdm-sch-dlg-title" role="heading" aria-level={3}>
