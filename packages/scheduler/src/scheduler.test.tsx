@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, within } from "@testing-library/react";
+import { render, screen, cleanup, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
@@ -141,6 +141,49 @@ describe("Scheduler", () => {
     // returned to the peek list — Back is gone, the full day's events are listed again
     expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
     expect(within(screen.getByRole("dialog")).getByText("Standup")).toBeInTheDocument();
+  });
+
+  it("moves an event later with ArrowDown (keyboard editing — WCAG 2.1.1)", async () => {
+    const onEventChange = vi.fn();
+    render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: "ArrowDown" });
+    expect(onEventChange).toHaveBeenCalledTimes(1);
+    const next = onEventChange.mock.calls[0]![0];
+    expect(next.start.getTime()).toBeGreaterThan(events[0]!.start.getTime()); // moved later
+    expect(next.end.getTime() - next.start.getTime()).toBe(
+      events[0]!.end.getTime() - events[0]!.start.getTime(), // duration preserved on a move
+    );
+  });
+
+  it("resizes an event with Shift+ArrowDown (keyboard editing)", async () => {
+    const onEventChange = vi.fn();
+    render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: "ArrowDown", shiftKey: true });
+    const next = onEventChange.mock.calls[0]![0];
+    expect(next.start.getTime()).toBe(events[0]!.start.getTime()); // start unchanged on a resize
+    expect(next.end.getTime()).toBeGreaterThan(events[0]!.end.getTime()); // longer
+  });
+
+  it("opens an editable event with Enter", async () => {
+    const onEventClick = vi.fn();
+    render(
+      <Scheduler
+        events={events}
+        defaultDate={now}
+        now={now}
+        views={["day"]}
+        onEventChange={() => {}}
+        onEventClick={onEventClick}
+      />,
+    );
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: "Enter" });
+    expect(onEventClick).toHaveBeenCalledWith(expect.objectContaining({ id: "a" }));
   });
 
   it("closes the create form on cancel without creating", async () => {

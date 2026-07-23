@@ -11,6 +11,12 @@ export interface SchedulerMessages {
   close: string;
   back: string;
   createTitle: string;
+  /** aria-roledescription for an event that can be moved/resized. */
+  eventAdjustable: string;
+  /** Screen-reader announcement prefix after a move (followed by the new time range). */
+  movedTo: string;
+  /** Screen-reader announcement prefix after a resize (followed by the new end time). */
+  resizedTo: string;
 }
 
 export const defaultMessages: SchedulerMessages = {
@@ -25,4 +31,7 @@ export const defaultMessages: SchedulerMessages = {
   close: "Close",
   back: "Back",
   createTitle: "New event",
+  eventAdjustable: "adjustable event",
+  movedTo: "Moved to",
+  resizedTo: "Resized, now ends at",
 };

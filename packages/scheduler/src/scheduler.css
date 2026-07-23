@@ -92,6 +92,14 @@
   transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.16s;
 }
 .bpdm-sch-event:hover { transform: translateY(-2px) scale(1.008); box-shadow: 0 10px 24px -8px color-mix(in oklab, var(--c) 60%, transparent); z-index: 30; }
+.bpdm-sch-event--editable { cursor: grab; touch-action: none; }
+.bpdm-sch-event--dragging { cursor: grabbing; opacity: 0.9; z-index: 50; box-shadow: 0 14px 30px -8px color-mix(in oklab, var(--c) 70%, transparent); transition: none; }
+.bpdm-sch-event--dragging:hover { transform: none; }
+.bpdm-sch-event-resize { position: absolute; inset-inline: 0; bottom: 0; height: 7px; cursor: ns-resize; touch-action: none; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
+.bpdm-sch-event-resize:hover { background: color-mix(in oklab, var(--c) 40%, transparent); }
+.bpdm-sch-event:focus-visible { outline: 2px solid var(--ring, #f5a623); outline-offset: 1px; z-index: 40; }
+/* visually-hidden live region (screen-reader announcements for move/resize) */
+.bpdm-sch-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .bpdm-sch-event-title { display: block; font-size: 0.78rem; font-weight: 620; color: color-mix(in oklab, var(--c) 52%, var(--foreground, #111)); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bpdm-sch-event-time { display: block; font-size: 0.68rem; color: var(--muted-foreground, #777); font-variant-numeric: tabular-nums; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
