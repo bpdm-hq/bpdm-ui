@@ -9,6 +9,7 @@ import {
   type CalendarEvent,
 } from "@bpdm/scheduler-core";
 import { EventBlock } from "./event-block";
+import type { SchedulerMessages } from "./messages";
 import type { SlotSelection } from "./types";
 import { dowLabel, formatHour } from "./format";
 
@@ -32,8 +33,15 @@ export interface TimeGridProps {
   onSelectSlot?: (slot: SlotSelection) => void;
   /** Default length (minutes) of a slot created by clicking. */
   createDuration: number;
-  /** Snap the clicked time to this many minutes. */
+  /** Snap the clicked time (and a dragged move/resize) to this many minutes. */
   snapMinutes: number;
+  /** Enable drag-to-move / drag-to-resize of events. */
+  editable: boolean;
+  /** Called with the moved/resized event when a drag commits. */
+  onEventChange?: (event: CalendarEvent) => void;
+  messages: SchedulerMessages;
+  /** Announce a move/resize to assistive tech. */
+  announce?: (message: string) => void;
 }
 
 /** The day/week time-grid: a time gutter plus one column per day. */
@@ -51,6 +59,10 @@ export function TimeGrid({
   onSelectSlot,
   createDuration,
   snapMinutes,
+  editable,
+  onEventChange,
+  messages,
+  announce,
 }: TimeGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -142,8 +154,14 @@ export function TimeGrid({
                   key={p.event.id}
                   positioned={p}
                   pxPerMinute={pxPerMinute}
+                  spanMinutes={endMin - startMin}
+                  snapMinutes={snapMinutes}
+                  editable={editable}
+                  messages={messages}
                   locale={locale}
                   onSelect={onSelect}
+                  onChange={onEventChange}
+                  announce={announce}
                 />
               ))}
               {showNow && (

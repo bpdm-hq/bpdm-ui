@@ -78,6 +78,11 @@ export interface SchedulerProps {
   hourHeight?: number;
   /** Max event chips per day cell in month view before "+N more" (default 3). */
   monthMaxChips?: number;
+  /** Enable drag-to-move / drag-to-resize in day/week. Defaults on when `onEventChange` is set. */
+  editable?: boolean;
+  /** Persist a moved/resized event — update your `events` state, or `dataSource.update`; the grid
+   *  refetches after it resolves. */
+  onEventChange?: (event: CalendarEvent) => void | Promise<void>;
   className?: string;
 }
 
@@ -104,6 +109,8 @@ export function Scheduler({
   createDefaultHour = 9,
   hourHeight = 52,
   monthMaxChips = 3,
+  editable,
+  onEventChange,
   className,
 }: SchedulerProps) {
   const storeRef = useRef<SchedulerStore | null>(null);
@@ -140,7 +147,12 @@ export function Scheduler({
   const [refreshKey, setRefreshKey] = useState(0);
   const range = useMemo(() => ({ start: layout.start, end: layout.end }), [layout.start, layout.end]);
   const visibleEvents = useEvents(source, range, refreshKey);
-  const mergedMessages = { ...defaultMessages, ...messages };
+  // stable identity so memoized children (EventBlock) don't re-render every parent render
+  const mergedMessages = useMemo(() => ({ ...defaultMessages, ...messages }), [messages]);
+
+  // a polite live region announces keyboard/pointer move+resize results to screen readers
+  const [liveMessage, setLiveMessage] = useState("");
+  const announce = useCallback((message: string) => setLiveMessage(message), []);
 
   const [selected, setSelected] = useState<CalendarEvent | null>(null);
   // stable identity so memoized EventBlocks don't re-render on unrelated updates
@@ -205,8 +217,21 @@ export function Scheduler({
     [slot, onCreate],
   );
 
+  // drag move/resize commit — persist, then refetch (same pattern as create)
+  const canEdit = editable ?? onEventChange != null;
+  const handleEventChange = useCallback(
+    async (changed: CalendarEvent) => {
+      await onEventChange?.(changed);
+      setRefreshKey((k) => k + 1);
+    },
+    [onEventChange],
+  );
+
   return (
     <div className={"bpdm-sch" + (className ? " " + className : "")}>
+      <div className="bpdm-sch-sr" role="status" aria-live="polite">
+        {liveMessage}
+      </div>
       <Toolbar store={store} view={state.view} label={layout.label} views={views} messages={mergedMessages} />
 
       {layout.kind === "month" ? (
@@ -240,6 +265,10 @@ export function Scheduler({
           onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
           createDuration={createDuration}
           snapMinutes={snapMinutes}
+          editable={canEdit}
+          onEventChange={onEventChange ? handleEventChange : undefined}
+          messages={mergedMessages}
+          announce={announce}
         />
       )}
 

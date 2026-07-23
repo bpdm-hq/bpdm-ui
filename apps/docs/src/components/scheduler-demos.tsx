@@ -83,6 +83,27 @@ type ViewType = 'day' | 'week' | 'month';
  * mount (client-only) so the server render and first client paint agree; until
  * then a fixed-height placeholder holds the space to avoid a layout shift.
  */
+function LiveInner({ now, view }: { now: Date; view: ViewType }) {
+  const monday = mondayOf(now);
+  const [events, setEvents] = useState<CalendarEvent[]>(() =>
+    [-2, -1, 0, 1, 2].flatMap((w) => buildWeek(monday, w)),
+  );
+  return (
+    <div className="not-prose w-full">
+      <Scheduler
+        events={events}
+        defaultDate={now}
+        now={now}
+        defaultView={view}
+        views={['day', 'week', 'month']}
+        onEventChange={(changed) =>
+          setEvents((prev) => prev.map((e) => (e.id === changed.id ? changed : e)))
+        }
+      />
+    </div>
+  );
+}
+
 function LiveScheduler({ view, minHeight }: { view: ViewType; minHeight: number }) {
   const [now, setNow] = useState<Date | null>(null);
   // client-only date read after mount — avoids an SSR/first-paint hydration mismatch
@@ -92,15 +113,7 @@ function LiveScheduler({ view, minHeight }: { view: ViewType; minHeight: number 
   if (!now) {
     return <div className="not-prose w-full" style={{ minHeight }} aria-hidden="true" />;
   }
-
-  const monday = mondayOf(now);
-  const events = [-2, -1, 0, 1, 2].flatMap((w) => buildWeek(monday, w));
-
-  return (
-    <div className="not-prose w-full">
-      <Scheduler events={events} defaultDate={now} now={now} defaultView={view} views={['day', 'week', 'month']} />
-    </div>
-  );
+  return <LiveInner now={now} view={view} />;
 }
 
 export function SchedulerDemo() {
@@ -234,6 +247,9 @@ function CreateDemoInner({ now }: { now: Date }) {
             : [event];
           setEvents((prev) => [...prev, ...created]);
         }}
+        onEventChange={(changed) =>
+          setEvents((prev) => prev.map((e) => (e.id === changed.id ? changed : e)))
+        }
         renderCreateForm={(args) => <CreateForm {...args} />}
       />
     </div>

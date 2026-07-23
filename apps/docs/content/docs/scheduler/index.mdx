@@ -28,6 +28,7 @@ Everything below is built in — you opt into the interactive bits with a prop:
 - **Views** — `defaultView`, which views the toolbar offers (`views`), the visible hours (`dayStartHour` / `dayEndHour` / `scrollToHour`), first day of week (`weekStartsOn`), viewport height (`maxHeight`), row density (`hourHeight`), month chips per day (`monthMaxChips`). → [Views](#views)
 - **Creating events** — click an empty slot to open your own form (`renderCreateForm`), persist with `onCreate`; tune the proposed slot (`createDuration`, `snapMinutes`, `createDefaultHour`) or just get the raw slot (`onSelectSlot`). → [Creating events](#creating-events)
 - **Opening events** — a built-in detail dialog by default, or take over with `onEventClick`. The month **“+N more” day peek** and its **‹ Back** navigation are automatic. → [Event details](#event-details) · [Month](#month)
+- **Editing events** — set `onEventChange` to enable drag-to-move / drag-to-resize (keyboard-operable + announced); `editable` toggles it. → [Editing events](#editing-events)
 - **Internationalization** — every string via `messages`, dates/times via `locale`, RTL automatically. → [Internationalization](#internationalization)
 - **Theming** — the four `@bpdm/tokens` themes via `data-theme`; event colours via `category`. → [Theming](#theming)
 
@@ -507,6 +508,60 @@ export class EditableCalendarComponent {
   </Tab>
 </Tabs>
 
+## Editing events
+
+Pass `onEventChange` and events become **draggable** in day/week — drag the body to move (snapped to
+`snapMinutes`), drag the bottom edge to resize. On drop you get the updated event to persist; the
+grid refetches after, so a client array or a server `dataSource.update` both work.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { useState } from 'react';
+import { Scheduler, type CalendarEvent } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+export function EditableCalendar({ initial }: { initial: CalendarEvent[] }) {
+  const [events, setEvents] = useState(initial);
+
+  return (
+    <Scheduler
+      events={events}
+      onEventChange={(changed) =>
+        setEvents((prev) => prev.map((e) => (e.id === changed.id ? changed : e)))
+      }
+    />
+  );
+}
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; the same `(eventChange)` output applies._
+
+```ts
+import { Component, signal } from '@angular/core';
+import { BpdmScheduler, type CalendarEvent } from '@bpdm/ng-scheduler';
+
+@Component({
+  selector: 'app-editable-calendar',
+  standalone: true,
+  imports: [BpdmScheduler],
+  template: `<bpdm-scheduler [events]="events()" (eventChange)="onChange($event)" />`,
+})
+export class EditableCalendarComponent {
+  events = signal<CalendarEvent[]>([]);
+  onChange(changed: CalendarEvent) {
+    this.events.update((prev) => prev.map((e) => (e.id === changed.id ? changed : e)));
+  }
+}
+```
+  </Tab>
+</Tabs>
+
+**Fully keyboard-operable** (no mouse required): focus an event, then **↑ / ↓** move it and
+**Shift + ↑ / ↓** resize it — each step snaps and is announced to screen readers. This satisfies
+WCAG 2.1.1 (Keyboard) and 2.5.7 (Dragging Movements).
+
 ## Theming
 
 The scheduler is styled entirely with `@bpdm/tokens` CSS variables, so it adopts
@@ -611,6 +666,7 @@ export class GermanCalendarComponent {
 - Every event and chip is a real `<button>` — keyboard-focusable, with a visible
   focus ring, and `Enter` / `Space` open it.
 - The dialog takes focus on open and closes on `Escape` or a backdrop click.
+- **Editing is fully keyboard-operable** — arrow keys move a focused event, `Shift`+arrows resize it, and each change is announced via a polite live region (a complete alternative to dragging; WCAG 2.1.1 + 2.5.7).
 - Motion respects `prefers-reduced-motion`.
 
 ## Performance & scale
@@ -649,6 +705,8 @@ export class GermanCalendarComponent {
 | `locale` | `string` | runtime | BCP-47 locale for dates/times. |
 | `messages` | `Partial<SchedulerMessages>` | English | Override UI strings. |
 | `onEventClick` | `(event) => void` | — | Handle clicks yourself; suppresses the built-in dialog. |
+| `editable` | `boolean` | `!!onEventChange` | Enable drag-to-move / drag-to-resize in day/week. |
+| `onEventChange` | `(event) => void \| Promise<void>` | — | Persist a moved/resized event (update state, or `dataSource.update`); the grid refetches after. |
 | `onSelectSlot` | `(slot: SlotSelection) => void` | — | Fires when an empty slot is clicked (its `start`/`end`). |
 | `renderCreateForm` | `(args: CreateFormArgs) => ReactNode` | — | Render your own create form in the popup on slot click. |
 | `onCreate` | `(event) => void \| Promise<void>` | — | Persist a created event (update state, or POST); the grid refetches after. |
