@@ -4,7 +4,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { HeroPreview } from "./hero-preview";
 
 const DOCS = "https://docs.ui.bpdm.dev/docs";
-const REPO = "https://github.com/BDev-9/bpdm-ui";
+const REPO = "https://github.com/bpdm-hq/bpdm-ui";
 
 const STATS = [
   { value: "38", label: "components" },
@@ -58,9 +58,8 @@ export default function Home() {
               <span className="amber">React &amp; Angular.</span>
             </h1>
             <p className="tagline">
-              An accessible, themeable, shadcn-style component library on one shared set of design
-              tokens — built natively for React and Angular, so they look and move exactly the same
-              everywhere.
+              An accessible, themeable component library on one shared set of design tokens — built
+              natively for React and Angular, so they look and move exactly the same everywhere.
             </p>
             <div className="cta-row">
               <a className="btn btn-primary" href={DOCS}>
@@ -134,7 +133,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>Looks right, out of the box</h2>
-              <p>Polished, consistent components — every one keyboard-accessible and theme-aware.</p>
+              <p>Polished, consistent components — every one keyboard-accessible and theme-aware, built following WCAG 2.1 AA and WAI-ARIA patterns.</p>
             </div>
             <div className="showcase">
               {/* buttons */}
@@ -413,17 +412,17 @@ export function Example() {
         <section id="faq">
           <div className="wrap">
             <div className="section-head">
-              <h2>shadcn-style — now for Angular too</h2>
-              <p>The shadcn approach (Radix + Tailwind on React), extended to Angular on one shared token set.</p>
+              <h2>Native React and Angular — one design system</h2>
+              <p>Accessible primitives (Radix on React, the Angular CDK on Angular), styled with Tailwind, on one shared token set.</p>
             </div>
             <div className="faq">
               <div className="faq-item">
-                <h3>Is bpdm/ui like shadcn/ui?</h3>
-                <p>Yes — on React, bpdm/ui is built on the same foundation as shadcn/ui (Radix UI primitives + Tailwind CSS), with the same accessible, themeable philosophy. It then brings that same approach to Angular.</p>
+                <h3>What is bpdm/ui built on?</h3>
+                <p>On React, Radix UI primitives + Tailwind CSS; on Angular, the Angular CDK + Tailwind CSS. Both are accessible and themeable, and both are driven by one shared set of design tokens.</p>
               </div>
               <div className="faq-item">
-                <h3>Is there a shadcn for Angular?</h3>
-                <p>shadcn/ui itself is React-only. bpdm/ui&apos;s Angular library fills that gap — the same components and design tokens, built natively with Angular standalone components and the Angular CDK.</p>
+                <h3>Does bpdm/ui provide a native Angular component library?</h3>
+                <p>Yes — the Angular library is built natively with standalone components and the Angular CDK: the same components, design tokens, and look as the React library, not a wrapper.</p>
               </div>
               <div className="faq-item">
                 <h3>React or Angular — which does it support?</h3>
@@ -455,7 +454,7 @@ export function Example() {
           <div className="foot-grid">
             <div className="foot-brand">
               <span className="brand-mark"><span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span></span>
-              <p>An open-source, shadcn-style design system for React and Angular — one token set, both frameworks.</p>
+              <p>An open-source design system for React and Angular — one token set, both frameworks.</p>
             </div>
             <div className="foot-col">
               <h4>Documentation</h4>

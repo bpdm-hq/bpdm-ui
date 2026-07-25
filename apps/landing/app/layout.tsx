@@ -3,9 +3,9 @@ import "./globals.css";
 import { ScrollTop } from "./scroll-top";
 
 const SITE = "https://ui.bpdm.dev";
-const TITLE = "bpdm/ui — a shadcn-style component library for React & Angular";
+const TITLE = "bpdm/ui — an accessible component library for React & Angular";
 const DESCRIPTION =
-  "An accessible, themeable, shadcn-style component library on one shared set of design tokens — built natively for React (Radix + Tailwind) and Angular (CDK + Tailwind). The same components, the same look, in both frameworks.";
+  "An accessible, themeable component library on one shared set of design tokens — built natively for React (Radix + Tailwind) and Angular (CDK + Tailwind). The same components, the same look, in both frameworks.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     "design system",
     "react component library",
     "angular component library",
-    "shadcn-style",
-    "shadcn alternative",
-    "shadcn for angular",
+    "react and angular component library",
+    "one design system for react and angular",
+    "angular component library tailwind",
     "tailwind components",
     "radix ui",
     "angular cdk",
@@ -102,18 +102,18 @@ const jsonLd = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "Is bpdm/ui like shadcn/ui?",
+          name: "What is bpdm/ui built on?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes — on React, bpdm/ui is built on the same foundation as shadcn/ui (Radix UI primitives + Tailwind CSS), with the same accessible, themeable philosophy. It then brings that same approach to Angular.",
+            text: "On React, bpdm/ui is built on Radix UI primitives + Tailwind CSS; on Angular, the Angular CDK + Tailwind CSS. Both are accessible and themeable, and both are driven by one shared set of design tokens.",
           },
         },
         {
           "@type": "Question",
-          name: "Is there a shadcn for Angular?",
+          name: "Does bpdm/ui provide a native Angular component library?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "shadcn/ui itself is React-only. bpdm/ui's Angular library fills that gap — the same components and design tokens, built natively with Angular standalone components and the Angular CDK.",
+            text: "Yes. The Angular library is built natively with standalone components and the Angular CDK — the same components, design tokens, and look as the React library, not a wrapper.",
           },
         },
         {

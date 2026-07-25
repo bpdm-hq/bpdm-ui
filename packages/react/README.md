@@ -10,15 +10,18 @@ built-in themes (light & dark), and one consistent motion language.
 
 **[Live demo & docs → ui.bpdm.dev](https://ui.bpdm.dev)** — interactive Storybook with every component, variant, and theme.
 
-> The React implementation of the **bpdm design system**. One set of design tokens,
-> built for every framework — see the [monorepo overview](https://github.com/BDev-9/bpdm-ui).
+> The React implementation of the **bpdm design system** — one shared set of design
+> tokens, built natively for **React _and_ Angular** so the same components look and
+> behave identically in both. Using Angular? Install
+> [`@bpdm/ng`](https://www.npmjs.com/package/@bpdm/ng). See the
+> [monorepo overview](https://github.com/bpdm-hq/bpdm-ui).
 
 ---
 
 ## Features
 
 - **38 components** across forms, selection, data display, overlays, feedback, and navigation.
-- **Accessible by default** — keyboard, focus, and ARIA handled via Radix primitives (`role`, `aria-*`, roving focus).
+- **Accessible by default** — keyboard, focus, and ARIA handled via Radix primitives (`role`, `aria-*`, roving focus); built following **WCAG 2.1 AA** + WAI-ARIA patterns and checked with `axe` on every release. (A design goal, not a conformance claim — see the [accessibility notes](https://docs.ui.bpdm.dev/docs/getting-started/accessibility).)
 - **Themeable** — every component reads semantic CSS variables; switch the whole UI with one `data-theme` attribute, or override variables to match your brand.
 - **Four built-in themes** — `paper` & `mist` (light), `charcoal` & `slate` (dark).
 - **One motion language** — shared easing/duration tokens drive every transition; honors `prefers-reduced-motion`.
@@ -140,7 +143,7 @@ the **Theming → Custom Theme Template** page in the docs.
 
 ## Local development
 
-This package lives in the [bpdm-ui monorepo](https://github.com/BDev-9/bpdm-ui).
+This package lives in the [bpdm-ui monorepo](https://github.com/bpdm-hq/bpdm-ui).
 From the repo root:
 
 ```bash

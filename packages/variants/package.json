@@ -5,10 +5,10 @@
   "type": "module",
   "license": "MIT",
   "author": "bpdm (https://bpdm.dev)",
-  "homepage": "https://bpdm.dev",
+  "homepage": "https://ui.bpdm.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "url": "git+https://github.com/bpdm-hq/bpdm-ui.git",
     "directory": "packages/variants"
   },
   "keywords": [
