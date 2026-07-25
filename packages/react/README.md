@@ -162,6 +162,6 @@ Conventions, project structure, and how to add a component are in
 
 ## License
 
-[MIT](./LICENSE) © [Bhavin P. Devamorari](https://bpdm.dev)
+[MIT](./LICENSE) © [bpdm](https://bpdm.dev)
 </content>
 </invoke>

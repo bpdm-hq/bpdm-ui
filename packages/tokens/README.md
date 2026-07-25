@@ -50,5 +50,5 @@ Re-brand by overriding any token, globally or scoped:
 
 ## License
 
-[MIT](../../LICENSE) © [Bhavin P. Devamorari](https://bpdm.dev)
+[MIT](../../LICENSE) © [bpdm](https://bpdm.dev)
 </content>

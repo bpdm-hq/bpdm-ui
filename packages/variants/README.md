@@ -30,5 +30,5 @@ components on the same design system.
 
 ## License
 
-[MIT](../../LICENSE) © [Bhavin P. Devamorari](https://bpdm.dev)
+[MIT](../../LICENSE) © [bpdm](https://bpdm.dev)
 </content>
