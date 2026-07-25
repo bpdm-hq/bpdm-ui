@@ -54,6 +54,7 @@ export const metadata: Metadata = {
   authors: [{ name: "bpdm", url: SITE }],
   creator: "bpdm",
   alternates: { canonical: "/" },
+  verification: { other: { "msvalidate.01": "2E1DEF168829A5C243DFECAFFB5DB526" } },
   openGraph: {
     type: "website",
     url: SITE,
