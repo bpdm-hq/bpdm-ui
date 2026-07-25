@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/variants",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Framework-agnostic styling primitives for the bpdm design system — class-merge (cn) and cva variant maps shared by every framework package.",
   "type": "module",
   "license": "MIT",
