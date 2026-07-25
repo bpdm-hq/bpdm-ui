@@ -52,14 +52,15 @@ export default function Home() {
         <section className="hero">
           <div className="wrap hero-grid">
             <div className="hero-copy">
-            <span className="eyebrow">bpdm · design system</span>
+            <span className="eyebrow">bpdm/ui · React &amp; Angular component library</span>
             <h1>
               One design system for<br />
               <span className="amber">React &amp; Angular.</span>
             </h1>
             <p className="tagline">
-              An accessible, themeable component library on one shared set of design tokens — built
-              natively for React and Angular, so they look and move exactly the same everywhere.
+              <strong>bpdm/ui</strong> is an accessible, themeable component library on one shared set of
+              design tokens — built natively for React and Angular, so they look and move exactly the
+              same everywhere.
             </p>
             <div className="cta-row">
               <a className="btn btn-primary" href={DOCS}>
@@ -230,7 +231,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>One system, both frameworks</h2>
-              <p>The same components and design tokens, implemented natively in React and Angular — documented together in one place.</p>
+              <p>bpdm/ui is a React and Angular component library — the same components and design tokens, implemented natively in both and documented together in one place.</p>
             </div>
             <div className="cards">
               <div className="card" style={{ "--accent": "var(--react)" } as CSSProperties}>
