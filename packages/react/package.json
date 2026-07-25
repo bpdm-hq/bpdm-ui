@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A modern, themeable, accessible React component library — Radix primitives, Tailwind 4, and a warm amber design system.",
   "type": "module",
   "license": "MIT",

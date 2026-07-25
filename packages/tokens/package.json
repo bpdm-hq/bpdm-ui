@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/tokens",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Framework-agnostic design tokens for the bpdm design system — CSS variables, four themes, and one motion language.",
   "license": "MIT",
   "author": "bpdm (https://bpdm.dev)",
