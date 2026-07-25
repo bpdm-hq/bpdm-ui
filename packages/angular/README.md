@@ -12,7 +12,7 @@ design system, four built-in themes, and one consistent motion language.
 > The Angular implementation of the **bpdm design system**. It shares the exact same
 > design tokens (`@bpdm/tokens`) and variant definitions (`@bpdm/variants`) as the
 > React package (`@bpdm/ui`), so components look and move identically across frameworks.
-> See the [monorepo overview](https://github.com/BDev-9/bpdm-ui).
+> See the [monorepo overview](https://github.com/bpdm-hq/bpdm-ui).
 
 ---
 
@@ -115,7 +115,7 @@ Components never hardcode colors — they read CSS variables (`--primary`,
 
 ## Local development
 
-This package lives in the [bpdm-ui monorepo](https://github.com/BDev-9/bpdm-ui).
+This package lives in the [bpdm-ui monorepo](https://github.com/bpdm-hq/bpdm-ui).
 From the repo root:
 
 ```bash

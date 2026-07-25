@@ -4,20 +4,26 @@
   "description": "A modern, themeable, accessible Angular component library — Angular CDK, Tailwind 4, and the bpdm design system.",
   "license": "MIT",
   "author": "bpdm (https://bpdm.dev)",
-  "homepage": "https://bpdm.dev",
+  "homepage": "https://ui.bpdm.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BDev-9/bpdm-ui.git",
+    "url": "git+https://github.com/bpdm-hq/bpdm-ui.git",
     "directory": "packages/angular"
   },
   "keywords": [
     "angular",
+    "react",
     "component-library",
+    "angular-component-library",
     "design-system",
+    "design-tokens",
+    "cross-framework",
     "ui",
     "tailwindcss",
     "angular-cdk",
-    "accessible"
+    "accessible",
+    "themeable",
+    "typescript"
   ],
   "sideEffects": false,
   "publishConfig": {

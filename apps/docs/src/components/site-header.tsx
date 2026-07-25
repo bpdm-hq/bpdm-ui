@@ -3,7 +3,7 @@ import { ThemeSelect } from './theme-select';
 
 const LANDING = 'https://ui.bpdm.dev';
 // Hidden until the repo moves to a public org — re-enable with the GitHub link below.
-// const REPO = 'https://github.com/BDev-9/bpdm-ui';
+// const REPO = 'https://github.com/bpdm-hq/bpdm-ui';
 const VERSION = '0.1.0';
 
 /**

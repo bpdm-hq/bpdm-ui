@@ -1,16 +1,39 @@
 @import 'tailwindcss';
-/* shadcn theme: maps every --color-fd-* to shadcn-style vars (--primary,
-   --background, --border, --ring…) — exactly what @bpdm/tokens defines. */
-/* preset.css FIRST (Fumadocs base + default fd-* colours), THEN shadcn.css so its
-   `--color-fd-*: var(--bpdm-token)` mappings WIN — that's what lets @bpdm/tokens
-   (via data-theme) actually drive Fumadocs' chrome. (Reversed order let preset's
-   hardcoded #f5f5f5/#121212 override the tokens → themes had no effect.) */
+/* Fumadocs base chrome + its full default colour set (registers every --color-fd-*
+   as a Tailwind theme colour, incl. the code-diff tokens). preset.css is imported
+   FIRST so the token bridge below WINS over its hardcoded defaults — reversed order
+   lets preset's #f5f5f5/#121212 override the tokens and themes stop working. */
 @import 'fumadocs-ui/css/preset.css';
-@import 'fumadocs-ui/css/shadcn.css';
+@import 'fumadocs-ui/css/lib/default-colors.css';
 
 /* bpdm design tokens — CSS variables + 4 themes (data-theme). Defines --primary
-   (amber), --background, etc. that the shadcn theme above reads via var(). */
+   (amber), --background, etc. that the bridge below reads via var(). */
 @import '@bpdm/tokens/tokens.css';
+
+/* Token bridge: point every Fumadocs chrome token (--color-fd-*) at the matching
+   bpdm design token, so @bpdm/tokens — via data-theme — owns the docs palette. */
+:root,
+.dark {
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-muted: var(--muted);
+  --color-fd-muted-foreground: var(--muted-foreground);
+  --color-fd-popover: var(--popover);
+  --color-fd-popover-foreground: var(--popover-foreground);
+  --color-fd-card: var(--card);
+  --color-fd-card-foreground: var(--card-foreground);
+  --color-fd-border: var(--border);
+  --color-fd-primary: var(--primary);
+  --color-fd-primary-foreground: var(--primary-foreground);
+  --color-fd-secondary: var(--secondary);
+  --color-fd-secondary-foreground: var(--secondary-foreground);
+  --color-fd-accent: var(--accent);
+  --color-fd-accent-foreground: var(--accent-foreground);
+  --color-fd-ring: var(--ring);
+}
+@theme static {
+  --color-fd-error: var(--destructive);
+}
 
 /* Tailwind v4 doesn't scan workspace packages by default. Point it at the bpdm
    source so the utility classes used by @bpdm/ui components (bg-primary,
@@ -36,7 +59,7 @@
 }
 
 /* @bpdm/tokens has no sidebar tokens; map them onto existing bpdm tokens so the
-   Fumadocs shadcn theme renders a correct, on-brand sidebar in every theme. */
+   docs sidebar chrome renders correct + on-brand in every theme, then apply them. */
 :root {
   --sidebar: var(--card);
   --sidebar-foreground: var(--foreground);
@@ -45,6 +68,15 @@
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-ring: var(--ring);
   --sidebar-primary-foreground: var(--primary-foreground);
+}
+#nd-sidebar {
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-color: var(--sidebar-border);
+  --color-fd-accent: var(--sidebar-accent);
+  --color-fd-accent-foreground: var(--sidebar-accent-foreground);
+  --color-fd-ring: var(--sidebar-ring);
+  --color-fd-primary-foreground: var(--sidebar-primary-foreground);
 }
 
 html {

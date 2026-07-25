@@ -1,17 +1,19 @@
 ---
 title: Accessibility
-description: The accessibility patterns bpdm/ui follows, and how every release is verified.
+description: The accessibility and WCAG 2.1 AA patterns bpdm/ui follows (without asserting conformance), and how every release is verified.
 ---
 
-Accessibility is handled at build time, not bolted on afterward. This page describes
-**what the library does** and **how each release is checked**, so you can evaluate it
-against your own requirements.
+Accessibility is handled at build time, not bolted on afterward — components are built
+following the **WCAG 2.1 AA** guidelines and the **WAI-ARIA** authoring practices. This
+page describes **what the library does** and **how each release is checked**, so you can
+evaluate it against your own requirements.
 
 <Callout type="info">
-  bpdm/ui does not assert a formal conformance level. Whether a screen is accessible
-  depends on how components are composed, themed, and used in your product — so what
-  we can responsibly share is what the components *do* and how we *verify* them, below.
-  Verification in your own context stays with you.
+  bpdm/ui does **not** assert a formal WCAG conformance level. Whether a screen actually
+  conforms depends on how components are composed, themed, and used in your product — so
+  what we can responsibly share is what the components *do* and how we *verify* them,
+  below. Following the WCAG 2.1 AA patterns is a design goal, not a certification;
+  conformance in your own context stays with you.
 </Callout>
 
 ## What the components do
@@ -22,8 +24,8 @@ against your own requirements.
   open, close on `Esc`, and return focus to their trigger. No keyboard traps.
 - **Focus visibility** — a visible focus ring (with offset) on every focusable element,
   shown for keyboard focus via `focus-visible`.
-- **Colour contrast** — text is chosen against a **≥4.5:1** target and non-text indicators
-  against **≥3:1**, across all four built-in themes. A vivid brand hue like the amber
+- **Colour contrast** — text is chosen against the **WCAG 2.1 AA** thresholds (**≥4.5:1**
+  for text, **≥3:1** for non-text indicators), across all four built-in themes. A vivid brand hue like the amber
   `--primary` is auto-darkened to a `-strong` step for text and indicator use — see
   [Configuration](/docs/getting-started/configuration).
 - **Motion** — animations honour `prefers-reduced-motion`.

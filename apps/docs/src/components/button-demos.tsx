@@ -152,7 +152,7 @@ export function ButtonLinkDemo() {
         <a href="https://ui.bpdm.dev">Open docs</a>
       </Button>
       <Button asChild variant="secondary" appearance="outline">
-        <a href="https://github.com/BDev-9/bpdm-ui">GitHub</a>
+        <a href="https://github.com/bpdm-hq/bpdm-ui">GitHub</a>
       </Button>
     </Row>
   );

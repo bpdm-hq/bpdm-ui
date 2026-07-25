@@ -41,7 +41,7 @@ The docs app has **no landing of its own** — `apps/docs` `/` redirects to `/do
 `apps/docs` is a dynamic Next app (SSR + OG images + `llms.txt`), so it deploys as
 its **own Vercel project** (do NOT try to bundle it into the static `site/`).
 
-1. **New Vercel project** `bpdm-ui-docs`, import `BDev-9/bpdm-ui`.
+1. **New Vercel project** `bpdm-ui-docs`, import `bpdm-hq/bpdm-ui`.
 2. **Root Directory** = `apps/docs`. Framework preset = **Next.js**.
 3. **Build command** (build workspace deps first, from the repo root):
    ```
