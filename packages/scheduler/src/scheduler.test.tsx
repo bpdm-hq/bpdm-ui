@@ -1,12 +1,28 @@
 // @vitest-environment jsdom
+import { useState } from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, within, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup, within, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
 afterEach(cleanup);
 import { Scheduler } from "./scheduler";
 import type { CalendarEvent } from "@bpdm/scheduler-core";
+
+/** A controlled harness that persists moves, so a keyboard move actually remounts the event. */
+function StatefulScheduler({ initial, view }: { initial: CalendarEvent[]; view: "month" | "day" }) {
+  const [evs, setEvs] = useState(initial);
+  return (
+    <Scheduler
+      events={evs}
+      defaultDate={now}
+      now={now}
+      defaultView={view}
+      views={[view]}
+      onEventChange={(e) => setEvs((prev) => prev.map((x) => (x.id === e.id ? e : x)))}
+    />
+  );
+}
 
 const now = new Date(2026, 6, 20, 11, 20); // Mon 20 Jul 2026
 const events: CalendarEvent[] = [
@@ -124,6 +140,38 @@ describe("Scheduler", () => {
     expect(onEventClick).toHaveBeenCalledWith(expect.objectContaining({ id: "m4" }));
   });
 
+  it("month view: moves a chip to another day with ArrowRight (keyboard drag)", async () => {
+    const onEventChange = vi.fn();
+    render(
+      <Scheduler events={events} defaultDate={now} now={now} defaultView="month" views={["month"]} onEventChange={onEventChange} />,
+    );
+    const chip = await screen.findByRole("button", { name: /Sprint planning/ });
+    chip.focus();
+    fireEvent.keyDown(chip, { key: " " }); // pick up (grab mode) so arrows move rather than navigate
+    fireEvent.keyDown(chip, { key: "ArrowRight" });
+    expect(onEventChange).toHaveBeenCalledTimes(1);
+    const next = onEventChange.mock.calls[0]![0];
+    expect(next.start.getDate()).toBe(events[0]!.start.getDate() + 1); // moved one day later
+    expect(next.start.getHours()).toBe(events[0]!.start.getHours()); // time of day kept
+  });
+
+  it("keeps focus (and the grab) on the event after a cross-cell keyboard move", async () => {
+    // The real bug: moving to another cell remounts the button, dropping focus + grab, so the next
+    // Space fell through to the page (scroll). Focus must follow the moved event and stay grabbed.
+    render(<StatefulScheduler initial={events} view="month" />);
+    const chip = await screen.findByRole("button", { name: /Sprint planning/ });
+    chip.focus();
+    fireEvent.keyDown(chip, { key: " " }); // pick up
+    fireEvent.keyDown(chip, { key: "ArrowRight" }); // move to the next day → remounts in another cell
+    // focus is restored (next frame) to the moved, remounted same event
+    await waitFor(() => expect(document.activeElement?.getAttribute("data-event-id")).toBe("a"));
+    // still grabbed → a second arrow moves again without pressing Space
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowRight" });
+    await waitFor(() => expect(document.activeElement?.getAttribute("data-event-id")).toBe("a"));
+    const moved = screen.getByRole("button", { name: /Sprint planning/ }) as HTMLElement;
+    expect(moved.getAttribute("data-event-id")).toBe("a");
+  });
+
   it("an event opened from the day peek can go back to the list", async () => {
     const many: CalendarEvent[] = [
       { id: "m1", title: "Standup", start: new Date(2026, 6, 20, 9, 0), end: new Date(2026, 6, 20, 9, 30) },
@@ -148,6 +196,7 @@ describe("Scheduler", () => {
     render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
     const btn = await screen.findByRole("button", { name: /Sprint planning/ });
     btn.focus();
+    fireEvent.keyDown(btn, { key: " " }); // pick up (grab mode)
     fireEvent.keyDown(btn, { key: "ArrowDown" });
     expect(onEventChange).toHaveBeenCalledTimes(1);
     const next = onEventChange.mock.calls[0]![0];
@@ -162,10 +211,61 @@ describe("Scheduler", () => {
     render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
     const btn = await screen.findByRole("button", { name: /Sprint planning/ });
     btn.focus();
+    fireEvent.keyDown(btn, { key: " " }); // pick up (grab mode)
     fireEvent.keyDown(btn, { key: "ArrowDown", shiftKey: true });
     const next = onEventChange.mock.calls[0]![0];
     expect(next.start.getTime()).toBe(events[0]!.start.getTime()); // start unchanged on a resize
     expect(next.end.getTime()).toBeGreaterThan(events[0]!.end.getTime()); // longer
+  });
+
+  it("moves an event to another day with ArrowRight (cross-day, keyboard)", async () => {
+    const onEventChange = vi.fn();
+    render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: " " }); // pick up (grab mode)
+    fireEvent.keyDown(btn, { key: "ArrowRight" });
+    const next = onEventChange.mock.calls[0]![0];
+    expect(next.start.getDate()).toBe(events[0]!.start.getDate() + 1); // one day later
+    expect(next.start.getHours()).toBe(events[0]!.start.getHours()); // same time of day
+  });
+
+  it("Escape releases a grab without moving the event", async () => {
+    const onEventChange = vi.fn();
+    render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: " " }); // pick up
+    fireEvent.keyDown(btn, { key: "Escape" }); // release
+    fireEvent.keyDown(btn, { key: "ArrowDown" }); // no longer grabbed → ignored
+    expect(onEventChange).not.toHaveBeenCalled();
+  });
+
+  it("honours overridden messages (i18n) for labels and announcements", async () => {
+    const messages = { viewLabel: "Vista", showAll: "Ver los {count}", grabbed: "Cogido" };
+    const many: CalendarEvent[] = Array.from({ length: 5 }, (_, i) => ({
+      id: "x" + i,
+      title: "Ev " + i,
+      start: new Date(2026, 6, 20, 9 + i, 0),
+      end: new Date(2026, 6, 20, 10 + i, 0),
+    }));
+    render(
+      <Scheduler events={many} defaultDate={now} now={now} defaultView="month" views={["month"]} messages={messages} monthMaxChips={2} />,
+    );
+    // the "+N more" affordance uses the translated, count-interpolated label
+    expect(await screen.findByRole("button", { name: "Ver los 5" })).toBeInTheDocument();
+  });
+
+  it("does not move on an arrow key until picked up with Space (grab mode)", async () => {
+    const onEventChange = vi.fn();
+    render(<Scheduler events={events} defaultDate={now} now={now} views={["day"]} onEventChange={onEventChange} />);
+    const btn = await screen.findByRole("button", { name: /Sprint planning/ });
+    btn.focus();
+    fireEvent.keyDown(btn, { key: "ArrowDown" }); // not grabbed → arrow left for grid navigation
+    expect(onEventChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(btn, { key: " " }); // pick up
+    fireEvent.keyDown(btn, { key: "ArrowDown" }); // now it moves
+    expect(onEventChange).toHaveBeenCalledTimes(1);
   });
 
   it("opens an editable event with Enter", async () => {

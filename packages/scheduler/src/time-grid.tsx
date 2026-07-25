@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react";
 import {
   defaultAccessor,
   isSameDay,
@@ -12,6 +12,8 @@ import { EventBlock } from "./event-block";
 import type { SchedulerMessages } from "./messages";
 import type { SlotSelection } from "./types";
 import { dowLabel, formatHour } from "./format";
+
+const GUTTER_PX = 56; // width of the time-label gutter (the grid's first column)
 
 export interface TimeGridProps {
   days: Date[];
@@ -42,6 +44,12 @@ export interface TimeGridProps {
   messages: SchedulerMessages;
   /** Announce a move/resize to assistive tech. */
   announce?: (message: string) => void;
+  /** Id of the event currently picked up for keyboard move (grab mode), or null. */
+  grabbedId: string | null;
+  /** Toggle grab (pick up / drop) for an event. */
+  onGrabToggle?: (eventId: string) => void;
+  /** Restore focus to an event after a keyboard move remounts it. */
+  keepFocus?: (eventId: string) => void;
 }
 
 /** The day/week time-grid: a time gutter plus one column per day. */
@@ -63,12 +71,36 @@ export function TimeGrid({
   onEventChange,
   messages,
   announce,
+  grabbedId,
+  onGrabToggle,
+  keepFocus,
 }: TimeGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = gridRef.current;
     if (el) el.scrollTop = Math.max(0, (scrollToHour - dayStartHour) * hourHeight);
   }, [scrollToHour, dayStartHour, hourHeight]);
+
+  // Map a pointer's X to the day column under it (for cross-day drag). Columns are equal-width after
+  // the fixed gutter, so no per-column refs are needed. Returns the target day + the px offset from
+  // the event's own column (for a live translateX preview).
+  const resolveDayShift = useCallback(
+    (clientX: number, originDay: Date): { targetDay: Date; dx: number } | null => {
+      const el = bodyRef.current;
+      if (!el || days.length === 0) return null;
+      const rect = el.getBoundingClientRect();
+      const colsWidth = rect.width - GUTTER_PX;
+      if (colsWidth <= 0) return null;
+      const colW = colsWidth / days.length;
+      const raw = Math.floor((clientX - rect.left - GUTTER_PX) / colW);
+      const targetIdx = Math.max(0, Math.min(raw, days.length - 1));
+      const originIdx = days.findIndex((d) => isSameDay(d, originDay));
+      const targetDay = days[targetIdx]!;
+      return { targetDay, dx: originIdx < 0 ? 0 : (targetIdx - originIdx) * colW };
+    },
+    [days],
+  );
 
   const startMin = dayStartHour * 60;
   const endMin = dayEndHour * 60;
@@ -83,7 +115,7 @@ export function TimeGrid({
   // one extra row past the last hour so the closing label (12 AM) has a row
   // beneath it, mirroring the empty row above the first (1 AM) label.
   const bodyHeight = (endMin - startMin) * pxPerMinute + hourHeight;
-  const columns = `56px repeat(${days.length}, minmax(0, 1fr))`;
+  const columns = `${GUTTER_PX}px repeat(${days.length}, minmax(0, 1fr))`;
 
   // skip the top edge label (collides with the sticky header) but keep the
   // closing bottom label (e.g. 12 AM after 11 PM).
@@ -93,7 +125,7 @@ export function TimeGrid({
   const nowMinutes = minutesFromDayStart(now, startOfDay(now));
 
   return (
-    <div className="bpdm-sch-grid" role="grid" aria-label="Schedule" ref={gridRef} style={{ maxHeight }}>
+    <div className="bpdm-sch-grid" role="grid" aria-label={messages.gridLabel} ref={gridRef} style={{ maxHeight }}>
       <div className="bpdm-sch-head" style={{ gridTemplateColumns: columns }}>
         <div className="bpdm-sch-head-cell" aria-hidden="true" />
         {days.map((d) => (
@@ -110,6 +142,7 @@ export function TimeGrid({
 
       <div
         className="bpdm-sch-body"
+        ref={bodyRef}
         style={{ gridTemplateColumns: columns, height: bodyHeight, "--sch-hour-h": `${hourHeight}px` } as CSSProperties}
       >
         <div className="bpdm-sch-gutter" aria-hidden="true">
@@ -157,11 +190,15 @@ export function TimeGrid({
                   spanMinutes={endMin - startMin}
                   snapMinutes={snapMinutes}
                   editable={editable}
+                  grabbed={grabbedId === p.event.id}
+                  onGrabToggle={onGrabToggle}
+                  keepFocus={keepFocus}
                   messages={messages}
                   locale={locale}
                   onSelect={onSelect}
                   onChange={onEventChange}
                   announce={announce}
+                  resolveDayShift={resolveDayShift}
                 />
               ))}
               {showNow && (

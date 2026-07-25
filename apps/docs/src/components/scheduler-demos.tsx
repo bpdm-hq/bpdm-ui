@@ -90,6 +90,11 @@ function LiveInner({ now, view }: { now: Date; view: ViewType }) {
   );
   return (
     <div className="not-prose w-full">
+      <p className="m-0 mb-2 text-sm text-fd-muted-foreground">
+        Drag an event to move or resize it. Keyboard: <kbd>Tab</kbd> to an event, <kbd>Space</kbd> to
+        pick it up, arrow keys to move (<kbd>Shift</kbd>+arrows to resize), then <kbd>Space</kbd> to
+        drop or <kbd>Esc</kbd> to cancel.
+      </p>
       <Scheduler
         events={events}
         defaultDate={now}

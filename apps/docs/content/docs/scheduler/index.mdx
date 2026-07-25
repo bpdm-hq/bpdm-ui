@@ -510,9 +510,10 @@ export class EditableCalendarComponent {
 
 ## Editing events
 
-Pass `onEventChange` and events become **draggable** in day/week — drag the body to move (snapped to
-`snapMinutes`), drag the bottom edge to resize. On drop you get the updated event to persist; the
-grid refetches after, so a client array or a server `dataSource.update` both work.
+Pass `onEventChange` and events become **draggable** everywhere: in day/week drag the body to move
+(snapped to `snapMinutes`; in week view, drag **across days** too) and the bottom edge to resize; in
+**month** view drag a chip to another day. On drop you get the updated event to persist; the grid
+refetches after, so a client array or a server `dataSource.update` both work.
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
@@ -558,9 +559,15 @@ export class EditableCalendarComponent {
   </Tab>
 </Tabs>
 
-**Fully keyboard-operable** (no mouse required): focus an event, then **↑ / ↓** move it and
-**Shift + ↑ / ↓** resize it — each step snaps and is announced to screen readers. This satisfies
-WCAG 2.1.1 (Keyboard) and 2.5.7 (Dragging Movements).
+**Fully keyboard-operable** (no mouse required) via a **grab mode**, so the arrow keys never fight
+grid navigation. Focus an event and press **Space** to pick it up (announced), then:
+
+- day/week — **↑ / ↓** move its time, **← / →** move it to another day, **Shift + ↑ / ↓** resize it
+- month — **← / →** move by a day, **↑ / ↓** by a week
+
+Press **Space** (or **Enter**) to drop, or **Escape** to cancel. **Enter** on an event that isn't
+grabbed opens it. Each step snaps and is announced to screen readers — satisfying WCAG 2.1.1
+(Keyboard) and 2.5.7 (Dragging Movements).
 
 ## Theming
 
@@ -613,6 +620,23 @@ export function GermanCalendar() {
 `locale` drives day names, dates and the 12/24-hour clock; `messages` overrides the
 labels. In an RTL document (`dir="rtl"`) the grid, columns and dialog mirror
 automatically.
+
+**Every** string is translatable — not only the visible ones but also the assistive-tech
+labels and announcements, so a localized calendar is fully localized for screen-reader users
+too. Notable keys beyond the obvious `today`/`day`/`week`/`month`:
+
+| Key | Used for |
+| --- | --- |
+| `viewLabel` | `aria-label` of the view switcher |
+| `gridLabel` / `monthLabel` | `aria-label` of the time grid / month grid |
+| `allDay` | an all-day event's time slot |
+| `more` / `showAll` | the "+N more" chip text / its `aria-label` (`showAll` interpolates `{count}`) |
+| `grabbed` / `dropped` | announced when a keyboard drag picks up / releases an event |
+| `movedTo` / `resizedTo` | announced (with the new time) after a keyboard move / resize |
+| `eventAdjustable` | `aria-roledescription` of an editable event |
+
+`messages` is a partial override — anything you omit falls back to the built-in English default,
+so you only supply the strings you translate.
   </Tab>
   <Tab value="Angular">
 _Roadmap — the Angular binding isn't published yet; the same `messages` + `locale` inputs apply._
@@ -661,13 +685,30 @@ export class GermanCalendarComponent {
 
 ## Accessibility
 
-- The grid uses ARIA `grid` / `row` / `gridcell` roles; the view switcher is a
-  `tablist`; the detail dialog is a labelled `role="dialog"` with `aria-modal`.
-- Every event and chip is a real `<button>` — keyboard-focusable, with a visible
-  focus ring, and `Enter` / `Space` open it.
-- The dialog takes focus on open and closes on `Escape` or a backdrop click.
-- **Editing is fully keyboard-operable** — arrow keys move a focused event, `Shift`+arrows resize it, and each change is announced via a polite live region (a complete alternative to dragging; WCAG 2.1.1 + 2.5.7).
-- Motion respects `prefers-reduced-motion`.
+Built to WCAG 2.1 AA. What that means concretely:
+
+- **Structure (1.3.1 Info & Relationships).** The grid uses ARIA `grid` / `row` /
+  `gridcell` roles; the view switcher is a `tablist`; the detail dialog is a labelled
+  `role="dialog"` with `aria-modal`. Every interactive label is driven by `messages`, so it
+  localizes with the rest of the UI.
+- **Name, role, value (4.1.2).** Every event and chip is a real `<button>`; editable events
+  carry `aria-roledescription` and `aria-keyshortcuts`.
+- **Keyboard (2.1.1) — no mouse required, and no trap (2.1.2).** Full editing runs through a
+  **grab mode**: focus an event, `Space` to pick it up, arrow keys to move (↑/↓ time,
+  ←/→ day; month: ←/→ day, ↑/↓ week), `Shift`+arrows to resize, `Space`/`Enter` to drop,
+  `Escape` to cancel. `Enter` on an ungrabbed event opens it. Dialogs close on `Escape` and
+  take/restore focus. Arrow keys are inert until an event is grabbed, so they never fight grid
+  navigation.
+- **Dragging movements (2.5.7).** The keyboard grab mode is a complete, single-pointer-free
+  alternative to drag-and-drop.
+- **Status messages (4.1.3).** Moves, resizes and pick-up/drop are announced through a polite
+  `role="status"` live region — nothing relies on seeing the drag.
+- **Focus visible (2.4.7).** Every control has a visible focus ring; after a keyboard move the
+  moved event keeps focus so you can keep going.
+- **Contrast (1.4.3 / 1.4.11).** Colors come from `@bpdm/tokens`, which ship AA-contrast pairs
+  across all four themes.
+- **Reflow & motion (1.4.10 / 2.3.3).** Layout is responsive, and all motion respects
+  `prefers-reduced-motion`.
 
 ## Performance & scale
 
@@ -684,6 +725,62 @@ export class GermanCalendarComponent {
 - **SSR-safe.** Renders on the server and hydrates cleanly. Read "now"/live dates on
   the client (e.g. in an effect) to avoid a server/client mismatch; the component
   itself does no non-deterministic work during render.
+
+## Testing
+
+The scheduler is tested at two levels, and you can test your own integration the same way.
+
+**How it's tested internally**
+
+- **`@bpdm/scheduler-core`** — pure unit tests for the date/time math, the overlap →
+  lane-packing layout engine, and the observable store. No DOM, fully deterministic.
+- **`@bpdm/scheduler`** — component tests with [Vitest](https://vitest.dev) +
+  [Testing Library](https://testing-library.com) in a `jsdom` environment. Coverage includes
+  view rendering, the create/detail dialogs, the "+N more" day peek, **the full keyboard
+  grab-mode** (pick up, move, resize, cross-cell move, `Escape` release, and that arrows are
+  inert until grabbed), **focus restoration after a move remounts the event**, and
+  **`messages` overrides** (i18n).
+- Every change is gated in CI: `pnpm test` (unit + component), `pnpm lint`, `pnpm build`, and
+  a `size-limit` budget so the bundle can't silently grow.
+
+**Testing your own usage**
+
+Because events and chips are real buttons with accessible names, you query and drive the
+scheduler the way a user would — by role and name, then keyboard:
+
+```tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { useState } from 'react';
+import { Scheduler, type CalendarEvent } from '@bpdm/scheduler';
+
+function Harness() {
+  const [events, setEvents] = useState<CalendarEvent[]>([
+    { id: 'a', title: 'Sprint planning', start: new Date(2026, 6, 20, 9, 0), end: new Date(2026, 6, 20, 10, 0) },
+  ]);
+  return (
+    <Scheduler
+      events={events}
+      defaultDate={new Date(2026, 6, 20)}
+      views={['day']}
+      onEventChange={(changed) =>
+        setEvents((prev) => prev.map((e) => (e.id === changed.id ? changed : e)))
+      }
+    />
+  );
+}
+
+test('an event can be moved later with the keyboard', () => {
+  render(<Harness />);
+  const event = screen.getByRole('button', { name: /Sprint planning/ });
+  event.focus();
+  fireEvent.keyDown(event, { key: ' ' });         // pick up (grab mode)
+  fireEvent.keyDown(event, { key: 'ArrowDown' }); // move to a later time
+  // assert against your own persisted state / onEventChange spy
+});
+```
+
+Note the `Space` before the arrow — nothing moves until an event is grabbed, exactly as a
+keyboard user experiences it.
 
 ## API
 

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   addDays,
   createSchedulerStore,
@@ -24,6 +24,10 @@ import { MonthView } from "./month-view";
 import { TimeGrid } from "./time-grid";
 import { Toolbar } from "./toolbar";
 import type { CreateEventInput, CreateFormArgs, SlotSelection } from "./types";
+
+// useLayoutEffect on the client (fires synchronously in commit, needed for focus restore), useEffect
+// on the server (React warns about useLayoutEffect during SSR).
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /** Generate an id for a created event (interaction-time only — never during SSR). */
 function generateId(): string {
@@ -154,6 +158,29 @@ export function Scheduler({
   const [liveMessage, setLiveMessage] = useState("");
   const announce = useCallback((message: string) => setLiveMessage(message), []);
 
+  // Keyboard "grab mode" lives here (not in the event) so it survives the remount a move causes when
+  // an event lands in another column/cell — otherwise focus + grab would reset after one move and
+  // the next key would fall through to the page (scrolling on Space).
+  const [grabbedId, setGrabbedId] = useState<string | null>(null);
+  const toggleGrab = useCallback((id: string) => setGrabbedId((prev) => (prev === id ? null : id)), []);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const refocusRef = useRef<string | null>(null);
+  const keepFocus = useCallback((id: string) => {
+    refocusRef.current = id;
+  }, []);
+  // Moving an event remounts it in its new column/cell, which drops DOM focus to the body. We restore
+  // focus in a layout effect — it runs synchronously in React's commit, right after the move lands and
+  // before paint, independent of tab visibility (unlike rAF/timers, which pause in hidden tabs) — so
+  // the grab stays live and the next key isn't lost to the page (scrolling on Space).
+  useIsomorphicLayoutEffect(() => {
+    const id = refocusRef.current;
+    if (!id) return;
+    const nodes = rootRef.current?.querySelectorAll<HTMLElement>("[data-event-id]");
+    const node = nodes && Array.from(nodes).find((n) => n.dataset.eventId === id);
+    if (node && document.activeElement !== node) node.focus();
+    refocusRef.current = null; // the move has committed by now; clear whether or not it stayed in view
+  });
+
   const [selected, setSelected] = useState<CalendarEvent | null>(null);
   // stable identity so memoized EventBlocks don't re-render on unrelated updates
   const handleSelect = useCallback(
@@ -222,13 +249,15 @@ export function Scheduler({
   const handleEventChange = useCallback(
     async (changed: CalendarEvent) => {
       await onEventChange?.(changed);
-      setRefreshKey((k) => k + 1);
+      // Only a server-backed source needs a refetch; an in-memory source already re-renders via its
+      // updated `events` prop, and a second commit here would remount (and unfocus) the moved event.
+      if (dataSource) setRefreshKey((k) => k + 1);
     },
-    [onEventChange],
+    [onEventChange, dataSource],
   );
 
   return (
-    <div className={"bpdm-sch" + (className ? " " + className : "")}>
+    <div ref={rootRef} className={"bpdm-sch" + (className ? " " + className : "")}>
       <div className="bpdm-sch-sr" role="status" aria-live="polite">
         {liveMessage}
       </div>
@@ -249,6 +278,13 @@ export function Scheduler({
           createDuration={createDuration}
           onNext={() => store.next()}
           onPrevious={() => store.previous()}
+          editable={canEdit}
+          onEventChange={onEventChange ? handleEventChange : undefined}
+          messages={mergedMessages}
+          announce={announce}
+          grabbedId={grabbedId}
+          onGrabToggle={toggleGrab}
+          keepFocus={keepFocus}
         />
       ) : (
         <TimeGrid
@@ -269,6 +305,9 @@ export function Scheduler({
           onEventChange={onEventChange ? handleEventChange : undefined}
           messages={mergedMessages}
           announce={announce}
+          grabbedId={grabbedId}
+          onGrabToggle={toggleGrab}
+          keepFocus={keepFocus}
         />
       )}
 
@@ -277,6 +316,7 @@ export function Scheduler({
           day={peekDay}
           events={peekEvents}
           locale={locale}
+          messages={mergedMessages}
           onSelect={handlePeekSelect}
           onClose={() => setPeekDay(null)}
         />

@@ -81,6 +81,10 @@
 .bpdm-sch-col--selectable { cursor: pointer; }
 .bpdm-sch-col--selectable:hover { background-color: color-mix(in oklab, var(--primary, #f5a623) 4%, transparent); }
 .bpdm-sch-cell--selectable { cursor: pointer; }
+.bpdm-sch-cell--dragover { background: color-mix(in oklab, var(--primary, #f5a623) 14%, transparent); outline: 2px solid color-mix(in oklab, var(--primary, #f5a623) 50%, transparent); outline-offset: -2px; }
+.bpdm-sch-chip--editable { cursor: grab; touch-action: none; }
+.bpdm-sch-chip--editable:focus-visible { outline: 2px solid var(--ring, #f5a623); outline-offset: 1px; }
+.bpdm-sch-chip--grabbed { outline: 2px dashed var(--ring, #f5a623); outline-offset: 1px; box-shadow: 0 8px 18px -6px color-mix(in oklab, var(--c) 60%, transparent); cursor: grabbing; }
 
 .bpdm-sch-event {
   position: absolute; z-index: var(--z, 1); border-radius: 8px; padding: 5px 8px; overflow: hidden; cursor: pointer;
@@ -95,6 +99,7 @@
 .bpdm-sch-event--editable { cursor: grab; touch-action: none; }
 .bpdm-sch-event--dragging { cursor: grabbing; opacity: 0.9; z-index: 50; box-shadow: 0 14px 30px -8px color-mix(in oklab, var(--c) 70%, transparent); transition: none; }
 .bpdm-sch-event--dragging:hover { transform: none; }
+.bpdm-sch-event--grabbed { outline: 2px dashed var(--ring, #f5a623); outline-offset: 1px; z-index: 45; box-shadow: 0 12px 26px -8px color-mix(in oklab, var(--c) 65%, transparent); cursor: grabbing; }
 .bpdm-sch-event-resize { position: absolute; inset-inline: 0; bottom: 0; height: 7px; cursor: ns-resize; touch-action: none; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
 .bpdm-sch-event-resize:hover { background: color-mix(in oklab, var(--c) 40%, transparent); }
 .bpdm-sch-event:focus-visible { outline: 2px solid var(--ring, #f5a623); outline-offset: 1px; z-index: 40; }
