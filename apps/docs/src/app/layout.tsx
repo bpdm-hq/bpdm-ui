@@ -68,6 +68,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
+  verification: { other: { 'msvalidate.01': '2E1DEF168829A5C243DFECAFFB5DB526' } },
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {
