@@ -2,12 +2,14 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import type { CalendarEvent } from "@bpdm/scheduler-core";
 import { categoryColor } from "./category";
 import { formatDayLabel, formatTime } from "./format";
+import type { SchedulerMessages } from "./messages";
 
 export interface DayPeekProps {
   day: Date;
   /** All events on that day (already sorted). */
   events: CalendarEvent[];
   locale?: string;
+  messages: SchedulerMessages;
   onSelect?: (event: CalendarEvent) => void;
   onClose: () => void;
 }
@@ -16,7 +18,7 @@ export interface DayPeekProps {
  * The full list of a day's events, opened from a month cell's "+N more". A
  * self-contained popup (no deps); each row opens that event's detail dialog.
  */
-export function DayPeek({ day, events, locale, onSelect, onClose }: DayPeekProps) {
+export function DayPeek({ day, events, locale, messages, onSelect, onClose }: DayPeekProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function DayPeek({ day, events, locale, onSelect, onClose }: DayPeekProps
         <div className="bpdm-sch-peek-head">
           <div className="bpdm-sch-peek-dow">{day.toLocaleDateString(locale, { weekday: "short" })}</div>
           <div className="bpdm-sch-peek-dnum">{day.getDate()}</div>
-          <button ref={closeRef} type="button" className="bpdm-sch-dlg-x" aria-label="Close" onClick={onClose}>
+          <button ref={closeRef} type="button" className="bpdm-sch-dlg-x" aria-label={messages.close} onClick={onClose}>
             ✕
           </button>
         </div>
@@ -64,7 +66,7 @@ export function DayPeek({ day, events, locale, onSelect, onClose }: DayPeekProps
             >
               <span className="bpdm-sch-peek-dot" aria-hidden="true" />
               <span className="bpdm-sch-peek-time">
-                {e.allDay ? "All day" : formatTime(e.start, locale)}
+                {e.allDay ? messages.allDay : formatTime(e.start, locale)}
               </span>
               <span className="bpdm-sch-peek-title">{e.title}</span>
             </button>

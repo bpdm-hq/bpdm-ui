@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { CalendarEvent, DataSource, DateRange, SchedulerState, SchedulerStore } from "@bpdm/scheduler-core";
 
 /** Tear-free subscription to the scheduler store. */
@@ -14,23 +14,29 @@ export function useEvents(source: DataSource, range: DateRange, refreshKey = 0):
   const startMs = range.start.getTime();
   const endMs = range.end.getTime();
 
-  // Seed synchronously from an in-memory source so events render on first paint
-  // (and during SSR); a promise-returning (server) source seeds empty then fills.
-  const [events, setEvents] = useState<CalendarEvent[]>(() => {
+  // A synchronous (in-memory) source is read *during render* — so a move applies in a single commit,
+  // rather than lagging a frame behind an effect (which would remount, and unfocus, the moved event a
+  // commit later). A promise-returning (server) source resolves via the effect below.
+  const sync = useMemo<CalendarEvent[] | null>(() => {
     const result = source.fetch({ start: new Date(startMs), end: new Date(endMs) });
-    return Array.isArray(result) ? (result as CalendarEvent[]) : [];
-  });
+    return Array.isArray(result) ? (result as CalendarEvent[]) : null;
+    // refreshKey is an explicit "refetch" trigger, so a re-read is intended even though it isn't read here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source, startMs, endMs, refreshKey]);
+
+  const [asyncEvents, setAsyncEvents] = useState<CalendarEvent[]>(sync ?? []);
 
   useEffect(() => {
+    if (sync) return; // synchronous source is already read during render
     let active = true;
-    // external data subscription (server/in-memory fetch), not derivable state
+    // external data subscription (server fetch), not derivable state
     Promise.resolve(source.fetch({ start: new Date(startMs), end: new Date(endMs) })).then((result) => {
-      if (active) setEvents(result as CalendarEvent[]);
+      if (active) setAsyncEvents(result as CalendarEvent[]);
     });
     return () => {
       active = false;
     };
-  }, [source, startMs, endMs, refreshKey]);
+  }, [source, startMs, endMs, refreshKey, sync]);
 
-  return events;
+  return sync ?? asyncEvents;
 }

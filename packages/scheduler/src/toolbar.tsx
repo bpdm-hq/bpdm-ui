@@ -48,7 +48,7 @@ export function Toolbar({ store, view, label, views, messages }: ToolbarProps) {
       <span className="bpdm-sch-date">{label}</span>
       <span className="bpdm-sch-spacer" />
 
-      <div className="bpdm-sch-seg" role="tablist" aria-label="View">
+      <div className="bpdm-sch-seg" role="tablist" aria-label={messages.viewLabel}>
         {views.map((v) => (
           <button
             key={v}
