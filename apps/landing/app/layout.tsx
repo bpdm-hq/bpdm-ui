@@ -5,7 +5,7 @@ import { ScrollTop } from "./scroll-top";
 const SITE = "https://ui.bpdm.dev";
 const TITLE = "bpdm/ui — an accessible component library for React & Angular";
 const DESCRIPTION =
-  "An accessible, themeable component library on one shared set of design tokens — built natively for React (Radix + Tailwind) and Angular (CDK + Tailwind). The same components, the same look, in both frameworks.";
+  "An accessible, themeable component library for React and Angular, built from one shared set of design tokens. The same components in both.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
