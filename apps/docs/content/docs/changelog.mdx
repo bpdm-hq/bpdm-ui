@@ -3,11 +3,16 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: **v0.1.2** (React `@bpdm/ui`, Angular `@bpdm/ng`, tokens `@bpdm/tokens`, variants `@bpdm/variants`).
+Notable changes to bpdm/ui. Current release: Angular `@bpdm/ng` **0.1.3**; React `@bpdm/ui`, tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
 
 <Callout type="info">
   bpdm/ui is pre-1.0. Minor versions may still contain breaking changes while the API settles.
 </Callout>
+
+## 0.1.3 — `@bpdm/ng` (July 2026)
+
+- **Angular 22 support.** Widened the peer range to `^21.0.0 || ^22.0.0` (was Angular 21 only), so `npm install @bpdm/ng` resolves cleanly on the current Angular. No component changes — the same library, now installable on Angular 21 and 22.
+- **Installation docs fixed.** The [installation guide](/docs/getting-started/installation) now covers the full Tailwind v4 setup — the `@tailwindcss/postcss` plugin, the `.postcssrc.json`, and the required `@source` directives that point Tailwind at the bpdm packages (without them, components render unstyled).
 
 ## 0.1.x — July 2026
 
