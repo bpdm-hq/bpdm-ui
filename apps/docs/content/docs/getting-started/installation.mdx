@@ -27,26 +27,87 @@ npm install @bpdm/ui
   <Tab value="Angular">
 
 ```bash
-npm install @bpdm/ng
+npm install @bpdm/ng @angular/cdk
+```
+
+`@angular/cdk` is a peer dependency (used by the overlay-based components).
+
+  </Tab>
+</Tabs>
+
+## 2. Set up Tailwind v4
+
+bpdm/ui is built on **Tailwind CSS v4**, so your app needs Tailwind wired into its
+build. Install it and the PostCSS plugin:
+
+```bash
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+If you use Vite, add the Tailwind plugin (`@tailwindcss/vite`) to `vite.config.ts`.
+For a PostCSS-based setup (e.g. Next.js), add a `postcss.config.mjs`:
+
+```js title="postcss.config.mjs"
+export default { plugins: { '@tailwindcss/postcss': {} } };
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+Angular builds CSS through PostCSS — add a `.postcssrc.json` at the project root:
+
+```json title=".postcssrc.json"
+{ "plugins": { "@tailwindcss/postcss": {} } }
 ```
 
   </Tab>
 </Tabs>
 
-## 2. Set up Tailwind + tokens
+## 3. Import Tailwind, the components, and the tokens
 
-bpdm/ui is built on **Tailwind CSS v4** and the `@bpdm/tokens` package. Import
-Tailwind first, then the bpdm tokens, in your global stylesheet:
+In your global stylesheet, import Tailwind, point it at the bpdm packages, then load
+the tokens:
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
 
 ```css title="globals.css"
 @import 'tailwindcss';
+/* Tailwind v4 doesn't scan node_modules by default — tell it to look at the
+   bpdm packages, or the components render unstyled. Adjust the path to your node_modules. */
+@source '../node_modules/@bpdm/ui';
+@source '../node_modules/@bpdm/variants';
 @import '@bpdm/tokens/tokens.css';
 ```
 
-That's it — the tokens register the design system's colours, radius and motion
-as CSS variables and Tailwind utilities (`bg-primary`, `text-foreground`, …).
+  </Tab>
+  <Tab value="Angular">
 
-## 3. Verify
+```css title="styles.css"
+@import 'tailwindcss';
+/* Tailwind v4 doesn't scan node_modules by default — tell it to look at the
+   bpdm packages, or the components render unstyled. Adjust the path to your node_modules. */
+@source '../node_modules/@bpdm/ng';
+@source '../node_modules/@bpdm/variants';
+@import '@bpdm/tokens/tokens.css';
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warn">
+  The `@source` lines are required. The components apply Tailwind utility classes
+  (`bg-primary`, `h-10`, …); without pointing Tailwind at the packages it won't generate
+  that CSS and everything renders unstyled.
+</Callout>
+
+The tokens register the design system's colours, radius and motion as CSS variables
+and Tailwind utilities (`bg-primary`, `text-foreground`, …).
+
+## 4. Verify
 
 Drop a button into your app to confirm everything is wired up.
 
