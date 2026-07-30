@@ -1,0 +1,32 @@
+name: No external contributions
+
+# This project is maintained solo and does not accept outside contributions.
+# Anyone may fork it under the license, but pull requests opened against this
+# repo are closed automatically. Uses pull_request_target (runs in the base-repo
+# context, so it has permission to act on fork PRs); it never checks out or runs
+# any PR code, so there is no code-injection risk.
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close:
+    # Skip maintainers (owner / org member / collaborator); close everyone else.
+    if: >-
+      github.event.pull_request.author_association != 'OWNER' &&
+      github.event.pull_request.author_association != 'MEMBER' &&
+      github.event.pull_request.author_association != 'COLLABORATOR'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close with a polite note
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR" --repo "$REPO" --body "Thanks for your interest in bpdm/ui! This project is maintained solo and does not accept external pull requests, so this one is being closed automatically. You're welcome to open an issue, or to fork it for your own use under the license."
+          gh pr close "$PR" --repo "$REPO"
