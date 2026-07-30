@@ -1,9 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X } from 'lucide-react';
 import { useSidebar } from 'fumadocs-ui/components/sidebar/base';
+
+/** `false` during SSR + the first client render, `true` thereafter — without a
+ *  state-in-effect write. Defers the (client-only) portal to after mount. */
+const useMounted = () =>
+  useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
 /**
  * Mobile-only sidebar toggle. Our custom <SiteHeader /> replaces Fumadocs' nav —
@@ -15,12 +24,10 @@ import { useSidebar } from 'fumadocs-ui/components/sidebar/base';
  */
 export function MobileNavTrigger() {
   const { open, setOpen } = useSidebar();
-  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  const mounted = useMounted();
+  if (!mounted) return null;
 
-  useEffect(() => {
-    setSlot(document.getElementById('fd-sidebar-trigger-slot'));
-  }, []);
-
+  const slot = document.getElementById('fd-sidebar-trigger-slot');
   if (!slot) return null;
 
   return createPortal(
