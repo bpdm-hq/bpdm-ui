@@ -2286,7 +2286,7 @@ export function DataTable<T>({
   };
 
   return (
-    <div data-bpdm="" data-bpdm-slot="data-table" className="w-full">
+    <div data-bpdm="" data-bpdm-slot="data-table" className="w-full min-w-0 max-w-full">
       <div aria-live="polite" role="status" className="sr-only">
         {liveMessage}
       </div>
@@ -2470,7 +2470,9 @@ export function DataTable<T>({
         ref={setScrollEl}
         data-bpdm-slot="data-table-viewport"
         className={cn(
-          "overflow-auto",
+          // contain-content keeps a wide/pinned table from inflating the mobile
+          // layout viewport (window.innerWidth) instead of scrolling inside here
+          "overflow-auto contain-content",
           scrollableX && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
         )}
         role={scrollableX ? "region" : undefined}

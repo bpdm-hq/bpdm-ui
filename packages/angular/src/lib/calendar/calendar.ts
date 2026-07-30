@@ -320,7 +320,10 @@ export class BpdmCalendar {
   });
 
   protected readonly rootClass = computed(() =>
-    cn("flex w-fit select-none gap-5 rounded-[var(--radius)] p-3", this.classInput()),
+    cn(
+      "flex w-fit select-none flex-col gap-5 rounded-[var(--radius)] p-3 sm:flex-row",
+      this.classInput(),
+    ),
   );
 
   private isDisabled(d: Date): boolean {
@@ -345,8 +348,16 @@ export class BpdmCalendar {
     const shape = this.dayShape();
     const round = shape === "circle" ? "rounded-full" : "rounded-lg";
 
-    // live range preview while picking the second endpoint
-    const previewTo = mode === "range" && range.from && !range.to ? hover : range.to;
+    // live range preview while picking the second endpoint. Only preview once the
+    // pointer is on a *different* day than `from` — a same-day preview paints a
+    // pointless one-cell band, and on touch the tap's hover sticks there, leaving a
+    // stray box behind the selected day.
+    const previewTo =
+      mode === "range" && range.from && !range.to
+        ? hover && !sameDay(hover, range.from)
+          ? hover
+          : null
+        : range.to;
 
     const out: MonthView[] = [];
     for (let index = 0; index < count; index++) {

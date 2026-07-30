@@ -297,8 +297,16 @@ export function Calendar({
   const isSelected = (d: Date) =>
     mode === "single" ? sameDay(single, d) : sameDay(range.from, d) || sameDay(range.to, d);
 
-  // live range preview while picking the second endpoint
-  const previewTo = mode === "range" && range.from && !range.to ? hover : range.to;
+  // live range preview while picking the second endpoint. Only preview once the
+  // pointer is on a *different* day than `from` — a same-day preview paints a
+  // pointless one-cell band, and on touch the tap's hover sticks there, leaving a
+  // stray box behind the selected day.
+  const previewTo =
+    mode === "range" && range.from && !range.to
+      ? hover && !sameDay(hover, range.from)
+        ? hover
+        : null
+      : range.to;
   const isInRange = (d: Date) =>
     mode === "range" && inRange(d, range.from, previewTo);
 
@@ -470,7 +478,7 @@ export function Calendar({
       aria-label={t.calendar}
       data-bpdm="" data-bpdm-slot="calendar"
       className={cn(
-        "flex w-fit select-none gap-5 rounded-[var(--radius)] p-3",
+        "flex w-fit select-none flex-col gap-5 rounded-[var(--radius)] p-3 sm:flex-row",
         className,
       )}
     >
@@ -660,8 +668,8 @@ export function DatePicker({
       >
         <div className="flex flex-col">
           {mode === "range" && presets && presets.length > 0 ? (
-            <div className="flex flex-col sm:flex-row">
-              <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-border p-2 sm:max-w-[9rem] sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-b-0 sm:border-e">
+            <div className="flex w-fit flex-col sm:w-auto sm:flex-row">
+              <div className="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-border p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
                 {presets.map((p) => {
                   const r = calValue as DateRange | null;
                   const pr = p.range();

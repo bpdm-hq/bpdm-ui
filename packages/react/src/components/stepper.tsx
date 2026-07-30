@@ -327,6 +327,10 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
           className={cn(
             "whitespace-nowrap text-sm transition-colors duration-[var(--bpdm-duration-base)]",
             active ? "font-semibold text-foreground" : completed ? "font-medium text-foreground" : "text-muted-foreground",
+            // horizontal on mobile: only the active step keeps its label (markers +
+            // connectors stay), so the row never overflows a narrow screen; from sm up
+            // every label shows. Vertical always shows labels (no width pressure).
+            !vertical && !active && "hidden sm:inline",
           )}
         >
           {children}
@@ -345,7 +349,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
       {trigger}
       {!isLast && (
         // track + a primary fill that grows left→right as the step completes
-        <span aria-hidden className="relative mx-3 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
+        <span aria-hidden className="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-border sm:mx-3">
           <span
             className={cn(
               "absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",

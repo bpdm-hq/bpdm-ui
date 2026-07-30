@@ -3,11 +3,19 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: Angular `@bpdm/ng` **0.1.3**; React `@bpdm/ui`, tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.3**, Angular `@bpdm/ng` **0.1.4**; tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
 
 <Callout type="info">
   bpdm/ui is pre-1.0. Minor versions may still contain breaking changes while the API settles.
 </Callout>
+
+## 0.1.3 `@bpdm/ui` · 0.1.4 `@bpdm/ng` — Responsive fixes (July 2026)
+
+Mobile and small-screen fixes across three components — the same fixes in both React and Angular. No API changes.
+
+- **Data table.** A wide or pinned table no longer inflates the mobile layout viewport — it scrolls inside its own container as intended, so drawers and other fixed-position overlays size to the real screen width again. The docs also now spell out that responsiveness is on by default (contained horizontal scroll), with `responsive` as an opt-in that stacks each row into a label/value card.
+- **Stepper.** No more horizontal overflow on narrow screens — non-active step labels collapse on mobile (the active step keeps its label) and the connectors tighten, so a multi-step header fits a phone without sideways scrolling.
+- **Calendar & date picker.** The calendar stacks vertically on mobile and switches to a row on larger screens; range-picker presets wrap to fit instead of forcing a horizontal scroll; and the live range preview no longer leaves a stray highlight behind the start day (most visible on touch).
 
 ## 0.1.3 — `@bpdm/ng` (July 2026)
 

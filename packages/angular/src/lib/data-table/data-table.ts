@@ -97,7 +97,7 @@ interface BodyRow<T> extends RenderRow<T> {
 @Component({
   selector: "bpdm-data-table",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "block w-full", "data-bpdm": "", "data-bpdm-slot": "data-table" },
+  host: { class: "block w-full min-w-0 max-w-full", "data-bpdm": "", "data-bpdm-slot": "data-table" },
   imports: [NgTemplateOutlet, BpdmButton, BpdmCheckbox, BpdmMultiSelect, BpdmColumnFilterMenu, BpdmColumnPinMenu],
   template: `
     @let cols = orderedColumns();
@@ -590,7 +590,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
   protected scrollWrapClass(): string {
     return cn(
-      "overflow-auto",
+      // contain-content keeps a wide/pinned table from inflating the mobile
+      // layout viewport (window.innerWidth) instead of scrolling inside here
+      "overflow-auto contain-content",
       this.scrollableX() && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
     );
   }
