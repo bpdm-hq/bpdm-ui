@@ -123,6 +123,26 @@ html {
 [data-sidebar-panel] {
   inset-inline-start: 2rem;
 }
+/* The mobile drawer (#nd-sidebar-mobile) meets the screen's right edge, while its
+   left is cushioned by the dimmed page peek — so its right-edge controls (search,
+   theme, nav chevrons) sat tight against the edge. A small extra inline-end gutter
+   gives them breathing room to match the left. Mobile-only: the docked desktop
+   sidebar is #nd-sidebar, untouched. */
+#nd-sidebar-mobile {
+  padding-inline-end: 0.5rem;
+  /* Clip horizontal spill: the drawer is a fixed-width, right-anchored panel, so
+     an expanded submenu must never push its content (search, controls, chevrons)
+     off the right edge. `clip` (not `hidden`) leaves vertical scroll untouched. */
+  overflow-x: clip;
+}
+/* Drop Fumadocs' nested-folder indent guide (the thin vertical rule beside an
+   expanded folder's children) for a cleaner tree. Scoped to the collapsible
+   content element ([data-state].relative); the amber active-item marker lives on
+   items (data-active, no data-state), so it stays. */
+#nd-sidebar [data-state].relative::before,
+#nd-sidebar-mobile [data-state].relative::before {
+  display: none;
+}
 /* sidebar section labels — small uppercase, tracked, muted (clean hierarchy) */
 #nd-sidebar p {
   text-transform: uppercase;
@@ -204,7 +224,7 @@ html {
 body {
   background-color: transparent;
   position: relative;
-  /* Lock the page horizontally (PrimeNG-style): the drifting aurora below is the
+  /* Lock the page horizontally: the drifting aurora below is the
      only thing that overflows sideways, and it lives inside <body>, so clipping
      here contains it — the sticky sidebar/header never shift on a trackpad swipe.
      `clip` (not `hidden`) creates no scroll container, so sticky keeps working;
@@ -249,11 +269,18 @@ body::after {
 }
 
 @keyframes bpdm-aurora-drift {
+  /* Vertical drift + opacity only. The old horizontal translate (±1.5rem) and
+     scale(1.08) pushed this full-width layer past the viewport edge, causing a
+     slow, animation-driven horizontal overflow (worst on mobile with the drawer
+     open, where body's overflow-x:clip didn't contain the transformed pseudo).
+     No x-translate and no scale>1 → it can never exceed the viewport width. */
   from {
-    transform: translate3d(-1.5rem, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
+    opacity: 0.85;
   }
   to {
-    transform: translate3d(1.5rem, 0.5rem, 0) scale(1.08);
+    transform: translate3d(0, 0.5rem, 0);
+    opacity: 1;
   }
 }
 
@@ -268,7 +295,7 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
-/* Always-dark code blocks (PrimeNG / Tailwind-docs style)
+/* Always-dark code blocks (docs-style)
    Block code panels stay dark in BOTH page themes — crisp, high-contrast, and
    consistent. Overrides the figure's themed bg + forces the dark token palette. */
 figure.shiki:not(.not-fumadocs-codeblock *) {
@@ -311,7 +338,7 @@ figure.shiki:not(.not-fumadocs-codeblock *) button:hover {
   opacity: 0.9;
 }
 
-/* Smooth sidebar expand/collapse (PrimeNG-style)
+/* Smooth sidebar expand/collapse
    Fumadocs' sidebar folders are Radix Collapsibles but ship without an open/close
    animation, so children appear instantly (harsh). Radix exposes the content
    height as --radix-collapsible-content-height; animate against it for an elegant,

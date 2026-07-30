@@ -12,15 +12,42 @@ const VERSION = '0.1.0';
  * and a theme selector (the 4 @bpdm/ui themes) that re-themes the whole docs.
  * Replaces Fumadocs' default navbar (via DocsLayout `nav.component`).
  */
+/**
+ * The controls that live on the right of <SiteHeader /> on desktop (search,
+ * version, theme) — relocated into the mobile sidebar drawer via the Fumadocs
+ * `sidebar.banner` slot, so the mobile header stays down to just the hamburger
+ * and wordmark. `md:hidden` keeps this out of the desktop docked sidebar (where
+ * the header already carries these), leaving it only in the mobile drawer.
+ */
+export function MobileMenuBanner() {
+  return (
+    <div className="mb-1 flex flex-col gap-3 border-b border-fd-border pb-3 md:hidden">
+      <SearchBox block />
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-flex h-9 items-center rounded-full border border-fd-border px-3 font-mono text-xs leading-none text-fd-muted-foreground">
+          v{VERSION}
+        </span>
+        <ThemeSelect />
+      </div>
+    </div>
+  );
+}
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-fd-border bg-fd-background/70 backdrop-blur-md">
       <div className="site-header-inner flex h-[3.75rem] items-center justify-between">
-        {/* wordmark → landing (same tab) */}
-        <a
-          href={LANDING}
-          className="inline-flex items-center gap-2 ps-4 font-mono text-[1.05rem] font-semibold tracking-tight text-fd-foreground no-underline"
-        >
+        {/* left: wordmark, plus — on mobile — the sidebar toggle that <MobileNavTrigger />
+            portals into the slot below. Our header replaces Fumadocs' nav, which is where
+            that trigger normally lives, so without it phones have no way to open the
+            component nav. */}
+        <div className="flex min-w-0 items-center gap-2 ps-4">
+          <span id="fd-sidebar-trigger-slot" className="md:hidden" />
+          {/* wordmark → landing (same tab) */}
+          <a
+            href={LANDING}
+            className="inline-flex items-center gap-2 whitespace-nowrap font-mono text-[1.05rem] font-semibold tracking-tight text-fd-foreground no-underline"
+          >
           <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
             <rect width="32" height="32" rx="7" fill="#f5a623" />
             <path d="M20 8 L12 24" stroke="#1a1205" strokeWidth="3.5" strokeLinecap="round" />
@@ -30,15 +57,16 @@ export function SiteHeader() {
             <span className="text-fd-primary">/ui</span>
             <span className="text-fd-primary"> /&gt;</span>
           </span>
-        </a>
+          </a>
+        </div>
 
         {/* right — one consistent control family: every item is h-9, rounded-full
             and shares the same border. Search (primary) · divider · version chip
             (quiet metadata) · GitHub · theme. */}
-        <nav className="flex items-center gap-2 pe-4">
+        <nav className="hidden items-center gap-2 pe-4 md:flex">
           <SearchBox />
-          <span aria-hidden className="mx-1 h-5 w-px bg-fd-border" />
-          <span className="inline-flex h-9 items-center rounded-full border border-fd-border px-3 font-mono text-xs leading-none text-fd-muted-foreground">
+          <span aria-hidden className="mx-1 hidden h-5 w-px bg-fd-border md:block" />
+          <span className="hidden h-9 items-center rounded-full border border-fd-border px-3 font-mono text-xs leading-none text-fd-muted-foreground md:inline-flex">
             v{VERSION}
           </span>
           {/* GitHub link hidden until the repo moves to a public org (see REPO const above).
