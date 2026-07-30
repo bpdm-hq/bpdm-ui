@@ -2013,6 +2013,19 @@ scrolling horizontally. Everything else still works together — **sorting**, **
 narrow screens they all collapse into the card. **Resize the preview** to see it switch;
 on a wide view, scroll sideways and expand a row.
 
+<Callout type="info">
+  **You don't configure responsiveness — the table is responsive out of the box.**
+  On any screen too narrow for its columns, the table **scrolls horizontally inside its
+  own bounds** by default: no prop, no wrapper, no CSS on your side. It never breaks the
+  page layout or spills past the viewport — the scroll is contained to the table.
+
+  `responsive` is the **opt-in upgrade** for when horizontal scroll isn't the experience
+  you want: it swaps the scroll for the stacked **label/value cards** above. Both are
+  first-class responsive patterns — dense, data-heavy tables often read better with a
+  horizontal scroll; lighter tables read better as cards. Pick per table with one boolean;
+  either way there's nothing else to wire up.
+</Callout>
+
 <Preview>
   <DataTableResponsiveDemo />
 </Preview>
@@ -2313,7 +2326,7 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 | `searchPlaceholder` | `string` | `'Search…'` | Placeholder text for the search box. |
 | `searchValue` | `string` | — | Controlled search value — set for **server-side** search. Angular `[searchValue]`. |
 | `onSearchChange` | `(value) => void` | — | Fired when the search value changes. Angular `(searchChange)`. |
-| `responsive` | `boolean` | `false` | On narrow screens, stack each row into a label/value card. |
+| `responsive` | `boolean` | `false` | Opt-in: on narrow screens, stack each row into a label/value card instead of the default contained horizontal scroll (which needs no prop). |
 | `virtualized` | `boolean` | `false` | Render only visible rows (uses `maxHeight`, default 440); ignores pagination. |
 | `reorderableColumns` | `boolean` | `false` | Let users drag column headers to reorder columns. |
 | `onColumnOrderChange` | `(order) => void` | — | Fired with the new column-id order. Angular `(columnOrderChange)`. |

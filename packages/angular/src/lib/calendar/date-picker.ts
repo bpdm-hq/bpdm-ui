@@ -83,8 +83,8 @@ import {
     <ng-template #panel>
       <div class="flex flex-col">
         @if (mode() === "range" && presets() && presets()!.length > 0) {
-          <div class="flex flex-col sm:flex-row">
-            <div class="flex shrink-0 gap-1 overflow-x-auto border-b border-border p-2 sm:max-w-[9rem] sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-b-0 sm:border-e">
+          <div class="flex w-fit flex-col sm:w-auto sm:flex-row">
+            <div class="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-border p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
               @for (p of presets(); track p.label) {
                 <button
                   type="button"

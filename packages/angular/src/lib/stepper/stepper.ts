@@ -237,7 +237,7 @@ export class BpdmStepItem {
         <span class="sr-only">{{ srStatus() }}</span>
       </button>
       @if (!vertical() && !isLast()) {
-        <span aria-hidden="true" class="relative mx-3 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
+        <span aria-hidden="true" class="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-border sm:mx-3">
           <span
             class="absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
             [class]="completed() ? 'scale-x-100' : 'scale-x-0'"
@@ -327,6 +327,10 @@ export class BpdmStep {
         : this.completed()
           ? "font-medium text-foreground"
           : "text-muted-foreground",
+      // horizontal on mobile: only the active step keeps its label (markers +
+      // connectors stay), so the row never overflows a narrow screen; from sm up
+      // every label shows. Vertical always shows labels (no width pressure).
+      !this.vertical() && !this.active() && "hidden sm:inline",
     ),
   );
 
