@@ -3,11 +3,20 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.3**, Angular `@bpdm/ng` **0.1.4**; tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.3**, Angular `@bpdm/ng` **0.1.4**, Scheduler `@bpdm/scheduler` **0.2.0**; tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
 
 <Callout type="info">
   bpdm/ui is pre-1.0. Minor versions may still contain breaking changes while the API settles.
 </Callout>
+
+## 0.2.0 `@bpdm/scheduler` — Responsive scheduler (July 2026)
+
+The scheduler now adapts to **its own container's width** (not just the window), entirely in CSS — so it works the same on a phone as embedded in a narrow panel. No breaking changes; the API is a superset.
+
+- **Day / week / month** all reflow on narrow widths: day-and-week columns keep a usable width and scroll horizontally (time gutter + day headers stay pinned) rather than squishing; the month shortens cells and collapses event chips to dots; the toolbar wraps its view switcher; touch pointers get larger hit areas.
+- **`collapseToDayBelow`** (new, opt-in) — below a container width you choose, a week becomes a **single day with a week strip** (two-letter day + date, tap to switch, ‹ › steps by day) and the month caps its dots (≤2). It measures the scheduler's own width, keeps the store on `week` (so the toolbar still reads Week and widening is seamless), and restores the week when it widens.
+- **Dialogs & the day peek** become **bottom sheets** on phones — docked, rounded, with a grab handle and a scrollable body so a tall form (or the keyboard) never hides the actions. Background scroll is locked while any overlay is open.
+- **Self-contained stacking** — the grid's internal z-indexes are isolated, so a sticky header/event layer can never leak above a host app's own navbar.
 
 ## 0.1.3 `@bpdm/ui` · 0.1.4 `@bpdm/ng` — Responsive fixes (July 2026)
 

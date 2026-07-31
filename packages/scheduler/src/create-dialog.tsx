@@ -1,4 +1,5 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useScrollLock } from "./hooks";
 
 export interface CreateDialogProps {
   /** Heading for the create popup (from `messages.createTitle`). */
@@ -16,6 +17,7 @@ export interface CreateDialogProps {
  */
 export function CreateDialog({ title, children, onCancel }: CreateDialogProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  useScrollLock();
 
   useEffect(() => {
     // focus the first focusable control in the consumer's form

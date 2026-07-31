@@ -2,6 +2,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import type { CalendarEvent } from "@bpdm/scheduler-core";
 import { categoryColor } from "./category";
 import { formatDayLabel, formatTime } from "./format";
+import { useScrollLock } from "./hooks";
 import type { SchedulerMessages } from "./messages";
 
 export interface EventDialogProps {
@@ -35,6 +36,7 @@ function PinIcon() {
  *  supplies their own `onEventClick`. */
 export function EventDialog({ event, messages, locale, onClose, onBack }: EventDialogProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  useScrollLock();
 
   useEffect(() => {
     closeRef.current?.focus();

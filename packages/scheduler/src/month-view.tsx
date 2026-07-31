@@ -269,38 +269,42 @@ export function MonthView({
                 }
               >
                 <span className="bpdm-sch-cell-d">{day.getDate()}</span>
-                {shown.map((e) => (
-                  <button
-                    key={e.id}
-                    type="button"
-                    data-event-id={e.id}
-                    className={
-                      "bpdm-sch-chip" +
-                      (canDrag ? " bpdm-sch-chip--editable" : "") +
-                      (grabbedId === e.id ? " bpdm-sch-chip--grabbed" : "")
-                    }
-                    style={{ "--c": categoryColor(e.category) } as CSSProperties}
-                    title={e.title}
-                    aria-roledescription={canDrag ? messages.eventAdjustable : undefined}
-                    aria-keyshortcuts={canDrag ? "Enter Space ArrowLeft ArrowRight ArrowUp ArrowDown Escape" : undefined}
-                    onPointerDown={canDrag ? beginChipDrag(e) : undefined}
-                    onKeyDown={canDrag ? chipKeyDown(e) : undefined}
-                    onClick={canDrag ? undefined : () => onSelect?.(e)}
-                  >
-                    <span className="bpdm-sch-chip-dot" aria-hidden="true" />
-                    {e.title}
-                  </button>
-                ))}
-                {extra > 0 && (
-                  <button
-                    type="button"
-                    className="bpdm-sch-more"
-                    onClick={() => onOpenDay?.(day)}
-                    aria-label={messages.showAll.replace("{count}", String(dayEvents.length))}
-                  >
-                    +{extra} {messages.more}
-                  </button>
-                )}
+                {/* On narrow screens a container query collapses these chips to dots and lays
+                    them out in a wrapping row — see .bpdm-sch-cell-events in scheduler.css. */}
+                <div className="bpdm-sch-cell-events">
+                  {shown.map((e) => (
+                    <button
+                      key={e.id}
+                      type="button"
+                      data-event-id={e.id}
+                      className={
+                        "bpdm-sch-chip" +
+                        (canDrag ? " bpdm-sch-chip--editable" : "") +
+                        (grabbedId === e.id ? " bpdm-sch-chip--grabbed" : "")
+                      }
+                      style={{ "--c": categoryColor(e.category) } as CSSProperties}
+                      title={e.title}
+                      aria-roledescription={canDrag ? messages.eventAdjustable : undefined}
+                      aria-keyshortcuts={canDrag ? "Enter Space ArrowLeft ArrowRight ArrowUp ArrowDown Escape" : undefined}
+                      onPointerDown={canDrag ? beginChipDrag(e) : undefined}
+                      onKeyDown={canDrag ? chipKeyDown(e) : undefined}
+                      onClick={canDrag ? undefined : () => onSelect?.(e)}
+                    >
+                      <span className="bpdm-sch-chip-dot" aria-hidden="true" />
+                      <span className="bpdm-sch-chip-label">{e.title}</span>
+                    </button>
+                  ))}
+                  {extra > 0 && (
+                    <button
+                      type="button"
+                      className="bpdm-sch-more"
+                      onClick={() => onOpenDay?.(day)}
+                      aria-label={messages.showAll.replace("{count}", String(dayEvents.length))}
+                    >
+                      +{extra} {messages.more}
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}

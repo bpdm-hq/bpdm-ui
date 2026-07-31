@@ -50,6 +50,8 @@ export interface TimeGridProps {
   onGrabToggle?: (eventId: string) => void;
   /** Restore focus to an event after a keyboard move remounts it. */
   keepFocus?: (eventId: string) => void;
+  /** Hide the day-of-week/date header row (the compact week supplies its own strip above). */
+  hideHeader?: boolean;
 }
 
 /** The day/week time-grid: a time gutter plus one column per day. */
@@ -74,6 +76,7 @@ export function TimeGrid({
   grabbedId,
   onGrabToggle,
   keepFocus,
+  hideHeader,
 }: TimeGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -115,7 +118,10 @@ export function TimeGrid({
   // one extra row past the last hour so the closing label (12 AM) has a row
   // beneath it, mirroring the empty row above the first (1 AM) label.
   const bodyHeight = (endMin - startMin) * pxPerMinute + hourHeight;
-  const columns = `${GUTTER_PX}px repeat(${days.length}, minmax(0, 1fr))`;
+  // --sch-col-min is 0 by default (columns fill the width); a container query raises it on
+  // narrow screens so the columns keep a usable width and the grid scrolls horizontally
+  // instead of squishing a 7-day week into unreadable slivers.
+  const columns = `${GUTTER_PX}px repeat(${days.length}, minmax(var(--sch-col-min, 0px), 1fr))`;
 
   // skip the top edge label (collides with the sticky header) but keep the
   // closing bottom label (e.g. 12 AM after 11 PM).
@@ -126,19 +132,21 @@ export function TimeGrid({
 
   return (
     <div className="bpdm-sch-grid" role="grid" aria-label={messages.gridLabel} ref={gridRef} style={{ maxHeight }}>
-      <div className="bpdm-sch-head" style={{ gridTemplateColumns: columns }}>
-        <div className="bpdm-sch-head-cell" aria-hidden="true" />
-        {days.map((d) => (
-          <div
-            key={d.toISOString()}
-            className={"bpdm-sch-head-cell" + (isSameDay(d, now) ? " bpdm-sch-today" : "")}
-            role="columnheader"
-          >
-            <div className="bpdm-sch-dow">{dowLabel(d, locale)}</div>
-            <div className="bpdm-sch-dnum">{d.getDate()}</div>
-          </div>
-        ))}
-      </div>
+      {!hideHeader && (
+        <div className="bpdm-sch-head" style={{ gridTemplateColumns: columns }}>
+          <div className="bpdm-sch-head-cell" aria-hidden="true" />
+          {days.map((d) => (
+            <div
+              key={d.toISOString()}
+              className={"bpdm-sch-head-cell" + (isSameDay(d, now) ? " bpdm-sch-today" : "")}
+              role="columnheader"
+            >
+              <div className="bpdm-sch-dow">{dowLabel(d, locale)}</div>
+              <div className="bpdm-sch-dnum">{d.getDate()}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div
         className="bpdm-sch-body"

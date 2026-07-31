@@ -23,6 +23,7 @@ import { defaultMessages, type SchedulerMessages } from "./messages";
 import { MonthView } from "./month-view";
 import { TimeGrid } from "./time-grid";
 import { Toolbar } from "./toolbar";
+import { WeekStrip } from "./week-strip";
 import type { CreateEventInput, CreateFormArgs, SlotSelection } from "./types";
 
 // useLayoutEffect on the client (fires synchronously in commit, needed for focus restore), useEffect
@@ -87,6 +88,13 @@ export interface SchedulerProps {
   /** Persist a moved/resized event — update your `events` state, or `dataSource.update`; the grid
    *  refetches after it resolves. */
   onEventChange?: (event: CalendarEvent) => void | Promise<void>;
+  /**
+   * Opt-in responsive collapse: below this width **(measured on the scheduler's own container, not
+   * the window)** a week view renders as a single day — the phone-friendly layout most calendar apps
+   * use. Unset = off (and zero runtime cost). Widening the container restores the week; a view you
+   * pick manually while collapsed is respected. Only applies when `day` is an available view.
+   */
+  collapseToDayBelow?: number;
   className?: string;
 }
 
@@ -115,6 +123,7 @@ export function Scheduler({
   monthMaxChips = 3,
   editable,
   onEventChange,
+  collapseToDayBelow,
   className,
 }: SchedulerProps) {
   const storeRef = useRef<SchedulerStore | null>(null);
@@ -256,60 +265,118 @@ export function Scheduler({
     [onEventChange, dataSource],
   );
 
+  // --- Opt-in responsive collapse (collapseToDayBelow) ---
+  // Watch the viewport's OWN inline width (consistent with the CSS container queries), not the
+  // window, so it also collapses inside a narrow panel. Off (and free) unless the prop is set.
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  useEffect(() => {
+    if (!collapseToDayBelow) return;
+    const el = viewportRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      setContainerWidth(entries[0]?.contentRect.width ?? el.clientWidth);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [collapseToDayBelow]);
+
+  // Phone layout: below the opt-in `collapseToDayBelow` width, switch to phone-optimized rendering.
+  // A week becomes a single day plus a strip (the store stays on "week", so the toolbar still reads
+  // Week and widening is seamless — derived, no view mutation, SSR-safe); and the month caps its event
+  // dots lower so a phone-width cell stays readable. Measured on the container's OWN width, so it also
+  // applies inside a narrow panel, not just on a small window.
+  const phoneMode = !!collapseToDayBelow && containerWidth !== null && containerWidth < collapseToDayBelow;
+  const compactWeek =
+    phoneMode && views.includes("day") && (state.view === "week" || state.view === "workWeek");
+  const monthChips = phoneMode ? Math.min(2, monthMaxChips) : monthMaxChips;
+
   return (
     <div ref={rootRef} className={"bpdm-sch" + (className ? " " + className : "")}>
       <div className="bpdm-sch-sr" role="status" aria-live="polite">
         {liveMessage}
       </div>
-      <Toolbar store={store} view={state.view} label={layout.label} views={views} messages={mergedMessages} />
+      {/* Viewport wrapper owns the container-query context (see scheduler.css). It must NOT
+          wrap the fixed-position dialogs below — `container-type` makes an element a containing
+          block for fixed descendants, which would trap them inside the scheduler box. */}
+      <div className="bpdm-sch-viewport" ref={viewportRef}>
+        <Toolbar
+          store={store}
+          view={state.view}
+          label={compactWeek ? formatDayLabel(state.date, locale) : layout.label}
+          views={views}
+          messages={mergedMessages}
+          {...(compactWeek
+            ? {
+                // in the compact week, ‹ › step one day (the strip switches days too)
+                onPrev: () => store.setDate(addDays(state.date, -1)),
+                onNext: () => store.setDate(addDays(state.date, 1)),
+              }
+            : {})}
+        />
 
-      {layout.kind === "month" ? (
-        <MonthView
-          weeks={layout.weeks}
-          monthDate={state.date}
-          events={visibleEvents}
-          now={now}
-          locale={locale}
-          onSelect={handleSelect}
-          onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
-          onOpenDay={setPeekDay}
-          monthMaxChips={monthMaxChips}
-          createDefaultHour={createDefaultHour}
-          createDuration={createDuration}
-          onNext={() => store.next()}
-          onPrevious={() => store.previous()}
-          editable={canEdit}
-          onEventChange={onEventChange ? handleEventChange : undefined}
-          messages={mergedMessages}
-          announce={announce}
-          grabbedId={grabbedId}
-          onGrabToggle={toggleGrab}
-          keepFocus={keepFocus}
-        />
-      ) : (
-        <TimeGrid
-          days={layout.days}
-          events={visibleEvents}
-          dayStartHour={dayStartHour}
-          dayEndHour={dayEndHour}
-          scrollToHour={scrollToHour}
-          maxHeight={maxHeight}
-          hourHeight={hourHeight}
-          now={now}
-          locale={locale}
-          onSelect={handleSelect}
-          onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
-          createDuration={createDuration}
-          snapMinutes={snapMinutes}
-          editable={canEdit}
-          onEventChange={onEventChange ? handleEventChange : undefined}
-          messages={mergedMessages}
-          announce={announce}
-          grabbedId={grabbedId}
-          onGrabToggle={toggleGrab}
-          keepFocus={keepFocus}
-        />
-      )}
+        {layout.kind === "month" ? (
+          <MonthView
+            weeks={layout.weeks}
+            monthDate={state.date}
+            events={visibleEvents}
+            now={now}
+            locale={locale}
+            onSelect={handleSelect}
+            onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
+            onOpenDay={setPeekDay}
+            monthMaxChips={monthChips}
+            createDefaultHour={createDefaultHour}
+            createDuration={createDuration}
+            onNext={() => store.next()}
+            onPrevious={() => store.previous()}
+            editable={canEdit}
+            onEventChange={onEventChange ? handleEventChange : undefined}
+            messages={mergedMessages}
+            announce={announce}
+            grabbedId={grabbedId}
+            onGrabToggle={toggleGrab}
+            keepFocus={keepFocus}
+          />
+        ) : (
+          <>
+            {compactWeek && (
+              <WeekStrip
+                days={layout.days}
+                selected={state.date}
+                now={now}
+                events={visibleEvents}
+                locale={locale}
+                onSelect={(d) => store.setDate(d)}
+                messages={mergedMessages}
+              />
+            )}
+            <TimeGrid
+              days={compactWeek ? [state.date] : layout.days}
+              events={visibleEvents}
+              dayStartHour={dayStartHour}
+              dayEndHour={dayEndHour}
+              scrollToHour={scrollToHour}
+              maxHeight={maxHeight}
+              hourHeight={hourHeight}
+              now={now}
+              locale={locale}
+              onSelect={handleSelect}
+              onSelectSlot={onSelectSlot || renderCreateForm ? handleSelectSlot : undefined}
+              createDuration={createDuration}
+              snapMinutes={snapMinutes}
+              editable={canEdit}
+              onEventChange={onEventChange ? handleEventChange : undefined}
+              messages={mergedMessages}
+              announce={announce}
+              grabbedId={grabbedId}
+              onGrabToggle={toggleGrab}
+              keepFocus={keepFocus}
+              hideHeader={compactWeek}
+            />
+          </>
+        )}
+      </div>
 
       {peekDay && !selected && (
         <DayPeek

@@ -101,6 +101,7 @@ function LiveInner({ now, view }: { now: Date; view: ViewType }) {
         now={now}
         defaultView={view}
         views={['day', 'week', 'month']}
+        collapseToDayBelow={640}
         onEventChange={(changed) =>
           setEvents((prev) => prev.map((e) => (e.id === changed.id ? changed : e)))
         }
@@ -181,7 +182,7 @@ function CreateForm({ slot, submit, cancel }: CreateFormArgs) {
 
   return (
     <form
-      className="flex min-w-[20rem] flex-col gap-3"
+      className="flex w-full min-w-0 flex-col gap-3 sm:min-w-[20rem]"
       onSubmit={(e) => {
         e.preventDefault();
         if (!title.trim()) return;
@@ -238,6 +239,7 @@ function CreateDemoInner({ now }: { now: Date }) {
         now={now}
         defaultView="week"
         views={['day', 'week', 'month']}
+        collapseToDayBelow={640}
         onCreate={(event) => {
           // Real recurrence (RRULE) is a core roadmap feature; for the demo we
           // expand a "weekly" event into a few visible occurrences client-side.

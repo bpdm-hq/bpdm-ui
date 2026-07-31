@@ -9,6 +9,10 @@
   --sch-cat-rose: #f2557a;
   --sch-hour-h: 52px;
   --sch-overlap: 14px;
+  /* Floor a day column shrinks to before the day/week grid scrolls horizontally.
+     0 = columns fill the width (default); a container query raises it on narrow
+     screens so a 7-day week scrolls instead of squishing. Override to retune. */
+  --sch-col-min: 0px;
 
   display: flex;
   flex-direction: column;
@@ -18,6 +22,22 @@
   border-radius: 14px;
   overflow: hidden;
   font-family: inherit;
+}
+
+/* Query container for the responsive rules at the bottom of this file. It must NOT wrap the
+   fixed-position dialogs (container-type makes an element a containing block for fixed
+   descendants) — the React/Angular bindings render dialogs as siblings of this element. */
+.bpdm-sch-viewport {
+  container-type: inline-size;
+  container-name: bpdm-sch;
+  /* Own stacking context so the grid's internal z-indexes (sticky header, event hover/drag layers)
+     stay CONTAINED and never leak above the host's chrome (page navbars etc.). The dialogs render
+     outside this wrapper, so they still overlay the page. */
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* toolbar */
@@ -54,18 +74,38 @@
 .bpdm-sch :where(button):focus-visible,
 .bpdm-sch [tabindex]:focus-visible { outline: 2px solid var(--ring, #f5a623); outline-offset: 2px; }
 
+/* compact-week day strip (phone layout, rendered above a single-day grid) */
+.bpdm-sch-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; padding: 6px 8px 8px; border-bottom: 1px solid var(--border, #e5e5e5); }
+.bpdm-sch-strip-day { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 0 4px; border: 0; background: transparent; border-radius: 12px; cursor: pointer; color: var(--muted-foreground, #777); font: inherit; transition: background 0.15s; }
+.bpdm-sch-strip-day:hover { background: var(--muted, #f2f2f2); }
+.bpdm-sch-strip-dow { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 640; }
+.bpdm-sch-strip-date { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font-size: 0.95rem; font-weight: 620; font-variant-numeric: tabular-nums; color: var(--foreground, #111); }
+.bpdm-sch-strip-day--today .bpdm-sch-strip-dow { color: var(--primary, #f5a623); }
+.bpdm-sch-strip-day--today:not(.bpdm-sch-strip-day--sel) .bpdm-sch-strip-date { color: var(--primary, #f5a623); }
+.bpdm-sch-strip-day--sel .bpdm-sch-strip-date { background: var(--primary, #f5a623); color: #1a1205; }
+.bpdm-sch-strip-dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+.bpdm-sch-strip-dot[data-has] { background: color-mix(in oklab, var(--muted-foreground, #777) 70%, transparent); }
+.bpdm-sch-strip-day--sel .bpdm-sch-strip-dot[data-has] { background: var(--primary, #f5a623); }
+
 /* time grid (day + week) */
 .bpdm-sch-grid { overflow: auto; }
-.bpdm-sch-head { display: grid; position: sticky; top: 0; z-index: 7; background: var(--card, #fff); }
+/* z-index sits above resting + hovered events (base 1, hover 30) so day columns scroll cleanly
+   under the sticky header instead of poking over it (a grabbed/dragging event, z45/50, may ride
+   above during that active interaction — desirable, it's what's being moved). */
+.bpdm-sch-head { display: grid; position: sticky; top: 0; z-index: 42; background: var(--card, #fff); }
 .bpdm-sch-head-cell { padding: 9px 6px 11px; text-align: center; border-inline-start: 1px solid var(--border, #e5e5e5); }
-.bpdm-sch-head-cell:first-child { border: 0; }
+/* the empty gutter header stays pinned to the start edge when the grid scrolls horizontally */
+.bpdm-sch-head-cell:first-child { border: 0; position: sticky; inset-inline-start: 0; z-index: 2; background: var(--card, #fff); }
 .bpdm-sch-dow { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground, #777); font-weight: 600; }
 .bpdm-sch-dnum { font-size: 1.1rem; font-weight: 620; font-variant-numeric: tabular-nums; margin-top: 2px; }
 .bpdm-sch-today .bpdm-sch-dow { color: var(--primary, #f5a623); }
 .bpdm-sch-today .bpdm-sch-dnum { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--primary, #f5a623); color: #1a1205; margin-inline: auto; }
 
 .bpdm-sch-body { position: relative; display: grid; border-top: 1px solid var(--border, #e5e5e5); }
-.bpdm-sch-gutter { position: relative; }
+/* sticky so the time labels stay pinned during horizontal scroll; z-index sits above events
+   (max ~50) so a day column scrolling under it never bleeds over the labels. Still a
+   positioned element, so the absolutely-placed hour labels anchor to it as before. */
+.bpdm-sch-gutter { position: sticky; inset-inline-start: 0; z-index: 41; background: var(--card, #fff); }
 .bpdm-sch-hour { position: absolute; inset-inline-end: 8px; font-size: 0.66rem; color: var(--muted-foreground, #777); font-variant-numeric: tabular-nums; transform: translateY(-50%); }
 .bpdm-sch-col {
   position: relative;
@@ -124,6 +164,7 @@
 .bpdm-sch-cell-d { align-self: flex-end; font-size: 0.8rem; font-weight: 560; font-variant-numeric: tabular-nums; }
 .bpdm-sch-cell--out .bpdm-sch-cell-d { color: color-mix(in oklab, var(--muted-foreground, #777) 60%, transparent); }
 .bpdm-sch-cell--today .bpdm-sch-cell-d { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--primary, #f5a623); color: #1a1205; }
+.bpdm-sch-cell-events { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .bpdm-sch-chip { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; cursor: pointer; text-align: start; border: 0; width: 100%; background: color-mix(in oklab, var(--c) 14%, var(--card, #fff)); color: color-mix(in oklab, var(--c) 50%, var(--foreground, #111)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: transform 0.12s; }
 .bpdm-sch-chip:hover { transform: translateX(2px); }
 .bpdm-sch-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c); flex: none; }
@@ -166,4 +207,97 @@
   .bpdm-sch-event { animation: bpdm-sch-in 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
   @keyframes bpdm-sch-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary, #f5a623) 55%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
   .bpdm-sch-now::before { animation: bpdm-sch-pulse 2.4s ease-in-out infinite; }
+}
+
+/* ==========================================================================
+   Responsive — the scheduler adapts to its OWN container width (not just the
+   window), entirely in CSS: zero JS, SSR-safe, and it works the same embedded
+   in a narrow panel as on a phone. Every threshold/size derives from the vars
+   at the top, so a consumer can retune without forking.
+   ========================================================================== */
+
+/* Narrow: give day/week columns a floor so a 7-day week keeps a usable width and
+   the grid scrolls horizontally (gutter + headers stay pinned) instead of
+   squishing into unreadable slivers. Set on .bpdm-sch-grid — a DESCENDANT of the
+   query container — so .bpdm-sch-head / .bpdm-sch-body inherit it (a container query
+   can only style descendants of its container, never the container/its ancestors). */
+@container bpdm-sch (max-width: 640px) {
+  .bpdm-sch-grid { --sch-col-min: 120px; }
+}
+
+/* Compact toolbar: the view switcher drops to its own full-width row. */
+@container bpdm-sch (max-width: 520px) {
+  .bpdm-sch-toolbar { gap: 8px 10px; padding: 10px 12px; }
+  .bpdm-sch-spacer { display: none; }
+  .bpdm-sch-date { flex: 1 1 auto; font-size: 0.95rem; }
+  .bpdm-sch-seg { flex: 1 1 100%; }
+  .bpdm-sch-seg button { flex: 1; }
+}
+
+/* Month: shorter cells on small screens. */
+@container bpdm-sch (max-width: 560px) {
+  .bpdm-sch-cell { min-height: 78px; padding: 5px; }
+  .bpdm-sch-mhead > div { padding: 8px 4px; }
+}
+
+/* Month, very narrow: event chips collapse to dots in a wrapping row (each keeps a
+   ~24px tap target), so a phone-width cell stays legible; "+N more" still opens the
+   day peek for the full list. */
+@container bpdm-sch (max-width: 440px) {
+  .bpdm-sch-cell { min-height: 64px; gap: 3px; }
+  .bpdm-sch-cell-events { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 2px; }
+  .bpdm-sch-chip { width: auto; min-width: 24px; min-height: 22px; padding: 0; gap: 0; justify-content: center; background: transparent; }
+  .bpdm-sch-chip:hover { transform: none; }
+  .bpdm-sch-chip-dot { width: 8px; height: 8px; }
+  .bpdm-sch-chip-label { display: none; }
+  .bpdm-sch-more { min-height: 22px; padding: 0 4px; }
+}
+
+/* Touch pointers: enlarge hit areas (WCAG 2.5.8), independent of width. */
+@media (pointer: coarse) {
+  .bpdm-sch-btn { height: 40px; }
+  .bpdm-sch-btn--icon { width: 40px; }
+  .bpdm-sch-seg button { padding: 9px 14px; }
+  .bpdm-sch-more { min-height: 24px; }
+  .bpdm-sch-peek-item { padding: 11px 12px; }
+  .bpdm-sch-event-resize { height: 12px; }
+}
+
+/* Phone: the dialogs and the day peek become bottom sheets — full-width, docked to the bottom, with a
+   scrollable body so a tall form (or the on-screen keyboard) never pushes the actions out of reach.
+   These overlays are position:fixed (outside the query container), so they key off the viewport. */
+@media (max-width: 520px) {
+  /* a floating card near the bottom with breathing room on both sides */
+  .bpdm-sch-ov { align-items: end; padding: 0 14px 14px; }
+  .bpdm-sch-dlg,
+  .bpdm-sch-peek {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    max-height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+  }
+  .bpdm-sch-dlg-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .bpdm-sch-peek-list { flex: 1; max-height: none; }
+  /* grab-handle: the pill that reads "bottom sheet" rather than a fixed panel */
+  .bpdm-sch-dlg::before,
+  .bpdm-sch-peek::before {
+    content: "";
+    flex: none;
+    align-self: center;
+    width: 36px;
+    height: 4px;
+    margin: 9px 0 2px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--muted-foreground, #777) 42%, transparent);
+  }
+  .bpdm-sch-dlg-head { padding-top: 8px; }
+  .bpdm-sch-peek-head { padding-top: 8px; }
+}
+@media (max-width: 520px) and (prefers-reduced-motion: no-preference) {
+  @keyframes bpdm-sch-sheet { from { transform: translateY(100%); } to { transform: none; } }
+  .bpdm-sch-dlg,
+  .bpdm-sch-peek { animation: bpdm-sch-sheet 0.3s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 }
