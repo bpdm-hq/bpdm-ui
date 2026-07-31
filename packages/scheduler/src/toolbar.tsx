@@ -18,9 +18,12 @@ export interface ToolbarProps {
   label: string;
   views: ViewType[];
   messages: SchedulerMessages;
+  /** Override the ‹ › step (e.g. the compact week steps by a day, not a week). */
+  onPrev?: () => void;
+  onNext?: () => void;
 }
 
-export function Toolbar({ store, view, label, views, messages }: ToolbarProps) {
+export function Toolbar({ store, view, label, views, messages, onPrev, onNext }: ToolbarProps) {
   return (
     <div className="bpdm-sch-toolbar">
       <div className="bpdm-sch-nav">
@@ -31,7 +34,7 @@ export function Toolbar({ store, view, label, views, messages }: ToolbarProps) {
           type="button"
           className="bpdm-sch-btn bpdm-sch-btn--icon"
           aria-label={messages.previous}
-          onClick={() => store.previous()}
+          onClick={onPrev ?? (() => store.previous())}
         >
           ‹
         </button>
@@ -39,7 +42,7 @@ export function Toolbar({ store, view, label, views, messages }: ToolbarProps) {
           type="button"
           className="bpdm-sch-btn bpdm-sch-btn--icon"
           aria-label={messages.next}
-          onClick={() => store.next()}
+          onClick={onNext ?? (() => store.next())}
         >
           ›
         </button>

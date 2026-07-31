@@ -4,6 +4,6 @@
     "path": "dist/index.js",
     "import": "{ Scheduler }",
     "ignore": ["react", "react-dom"],
-    "limit": "6.9 kB"
+    "limit": "7.6 kB"
   }
 ]

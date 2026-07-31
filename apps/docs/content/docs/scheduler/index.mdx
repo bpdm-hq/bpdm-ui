@@ -202,6 +202,45 @@ the list, not the page). Clicking an event there opens its [detail dialog](#even
 with a **‹ Back** control that returns you to the list. All of this is built in and
 keyboard-accessible — nothing to wire up.
 
+## Responsive
+
+The scheduler adapts to **its own container's width** — not just the browser window — entirely in CSS
+(container queries, zero JavaScript, SSR-safe), so it behaves the same on a phone as it does embedded in
+a narrow panel. Nothing to configure:
+
+- **Day / week** keep a usable column width and scroll horizontally rather than squishing to slivers; the
+  time gutter and day headers stay pinned.
+- **Month** cells shorten and event chips collapse to dots on small widths — "+N more" still opens the day
+  peek. With `collapseToDayBelow` set, a phone-width month also caps the dots (≤2) so cells stay compact.
+- **Toolbar** wraps the view switcher onto its own row, and touch pointers get larger hit areas.
+
+A seven-column week is inherently cramped on a phone, so — like most calendar apps — you can have a week
+become a **single day with a week strip** below a width you choose with **`collapseToDayBelow`**. The strip
+shows the week's seven days (two-letter name + date, with a dot for days that have events); tap one to
+switch, or step a day at a time with **‹ ›**. It is opt-in (off by default, zero cost), keeps the store on
+`week` (so the toolbar still reads Week and widening is seamless), and measures the scheduler's own
+container, not the window. The demos on this page use `collapseToDayBelow={640}`; narrow the page (or view
+it on a phone) to watch the compact week.
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+```tsx
+import { Scheduler } from '@bpdm/scheduler';
+import '@bpdm/scheduler/styles.css';
+
+// On a container narrower than 640px, "week" renders as a single day.
+<Scheduler events={events} defaultView="week" collapseToDayBelow={640} />;
+```
+  </Tab>
+  <Tab value="Angular">
+_Roadmap — the Angular binding isn't published yet; the same `collapseToDayBelow` input applies._
+
+```ts
+// <bpdm-scheduler [events]="events" defaultView="week" [collapseToDayBelow]="640" />
+```
+  </Tab>
+</Tabs>
+
 ## Data source — server-side events
 
 `events` builds an in-memory source for you. For server data, pass a `dataSource`
@@ -812,6 +851,7 @@ keyboard user experiences it.
 | `createDefaultHour` | `number` | `9` | Month cells have no time axis — a click there proposes this hour (0–23). |
 | `hourHeight` | `number` | `52` | Pixel height of one hour row in day/week (row density). |
 | `monthMaxChips` | `number` | `3` | Event chips shown per day cell in month view before “+N more”. |
+| `collapseToDayBelow` | `number` | — | Opt-in phone layout: below this **container** width (px), a week becomes a single day with a week strip, and the month caps its event dots lower (≤2). Measures the scheduler's own width, not the window. Off (and free) when unset. |
 | `className` | `string` | — | Extra class on the root. |
 
 ### `CalendarEvent`

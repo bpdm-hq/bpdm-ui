@@ -6,6 +6,36 @@ export function useSchedulerState(store: SchedulerStore): SchedulerState {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
 
+// Module-level so overlapping overlays (e.g. a detail dialog opened over a day peek) don't
+// unlock the page prematurely — the lock lifts only when the last one closes.
+let scrollLockCount = 0;
+let savedOverflow = "";
+let savedPaddingRight = "";
+
+/** Lock background scrolling while a modal overlay is mounted (ref-counted, SSR-safe). */
+export function useScrollLock(): void {
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const body = document.body;
+    if (scrollLockCount === 0) {
+      savedOverflow = body.style.overflow;
+      savedPaddingRight = body.style.paddingRight;
+      // pad for the scrollbar we're about to hide so the page behind doesn't shift
+      const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+      body.style.overflow = "hidden";
+    }
+    scrollLockCount++;
+    return () => {
+      scrollLockCount--;
+      if (scrollLockCount === 0) {
+        body.style.overflow = savedOverflow;
+        body.style.paddingRight = savedPaddingRight;
+      }
+    };
+  }, []);
+}
+
 /**
  * Load the events for a visible range from a data source. Handles both a
  * synchronous (in-memory) and an asynchronous (server) source uniformly.

@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/scheduler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React scheduler/calendar for the bpdm design system — day, week and month views over one shared headless core. Typed, themeable, accessible.",
   "type": "module",
   "license": "MIT",

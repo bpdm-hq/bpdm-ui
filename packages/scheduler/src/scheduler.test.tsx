@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { useState } from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, within, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, cleanup, within, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
@@ -55,6 +55,46 @@ describe("Scheduler", () => {
     expect(screen.getByRole("tab", { name: "Day" })).toHaveAttribute("aria-selected", "true");
     expect(await screen.findByText("Sprint planning")).toBeInTheDocument();
     expect(screen.queryByText("Design review")).not.toBeInTheDocument(); // Tuesday, out of a Monday day-view
+  });
+
+  it("collapses a week to a compact day + strip below collapseToDayBelow; the strip switches days; widening restores the week", async () => {
+    let roCb: ResizeObserverCallback | null = null;
+    class MockResizeObserver {
+      constructor(cb: ResizeObserverCallback) {
+        roCb = cb;
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+    vi.stubGlobal("ResizeObserver", MockResizeObserver);
+    const fire = (width: number) =>
+      act(() => {
+        roCb?.([{ contentRect: { width } }] as unknown as ResizeObserverEntry[], {} as ResizeObserver);
+      });
+
+    render(<Scheduler events={events} defaultDate={now} now={now} defaultView="week" collapseToDayBelow={480} />);
+
+    // Wide by default: the full week shows both days' events.
+    expect(await screen.findByText("Sprint planning")).toBeInTheDocument();
+    expect(screen.getByText("Design review")).toBeInTheDocument();
+
+    // Narrow → the compact week shows a single day (Monday); Tuesday's event is out of that day.
+    fire(400);
+    expect(screen.getByText("Sprint planning")).toBeInTheDocument();
+    expect(screen.queryByText("Design review")).not.toBeInTheDocument();
+
+    // Tapping a day in the week strip switches the shown day, still within the compact week.
+    await userEvent.click(screen.getByText("21")); // Tuesday 21 Jul
+    expect(await screen.findByText("Design review")).toBeInTheDocument();
+    expect(screen.queryByText("Sprint planning")).not.toBeInTheDocument();
+
+    // Widen again → the full week returns with both days, nothing lost.
+    fire(800);
+    expect(await screen.findByText("Sprint planning")).toBeInTheDocument();
+    expect(screen.getByText("Design review")).toBeInTheDocument();
+
+    vi.unstubAllGlobals();
   });
 
   it("navigates forward a week with Next", async () => {
