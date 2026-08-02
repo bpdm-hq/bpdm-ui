@@ -1,6 +1,6 @@
 ---
 title: Scheduler
-description: A themeable, accessible day/week/month calendar for events and appointments — one headless core, many views, client- or server-driven, in React (@bpdm/scheduler).
+description: A themeable, accessible day/week/month calendar for events and appointments — one headless core, many views, client- or server-driven, in React (@bpdm/scheduler) and Angular (@bpdm/ng-scheduler).
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
@@ -11,13 +11,13 @@ The **Scheduler** lays events onto a time grid or month grid. Overlapping events
 cascade automatically, the current time is marked, and every view is driven by one
 framework-agnostic core (`@bpdm/scheduler-core`). It reads events from a **data
 source** — an in-memory array on the client, or your own source that fetches a
-visible range from a server. Zero runtime dependencies in the core; the whole
-React binding is a few kilobytes.
+visible range from a server. Zero runtime dependencies in the core; each binding is
+a few kilobytes.
 
 <Callout type="info">
-  Early preview. **React** (`@bpdm/scheduler`) ships Day, Week and Month today.
-  **Angular** (`@bpdm/ng-scheduler`) is on the roadmap — it wraps the same core, so
-  the model, views and options match. The Angular tabs below show the intended API.
+  Ships for **React** (`@bpdm/scheduler`) and **Angular** (`@bpdm/ng-scheduler`) — the
+  same headless core, so the model, views, options and responsive behaviour match. The
+  tabs below show each. Still pre-1.0: minor versions may adjust the API.
 </Callout>
 
 ## What you can configure
@@ -49,7 +49,6 @@ import '@bpdm/scheduler/styles.css';
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; this is the intended API._
 
 ```bash
 pnpm add @bpdm/ng-scheduler
@@ -60,7 +59,6 @@ Add the stylesheet once in `angular.json` (or import it in your global `styles.c
   "styles": ["@bpdm/ng-scheduler/styles.css", "src/styles.css"]
 }
 ```
-Same core, same options — the Angular binding is not published yet.
   </Tab>
 </Tabs>
 
@@ -118,7 +116,6 @@ export function TeamCalendar() {
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; this is the intended API._
 
 ```ts
 import { Component } from '@angular/core';
@@ -233,7 +230,6 @@ import '@bpdm/scheduler/styles.css';
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; the same `collapseToDayBelow` input applies._
 
 ```ts
 // <bpdm-scheduler [events]="events" defaultView="week" [collapseToDayBelow]="640" />
@@ -289,7 +285,6 @@ export function ServerCalendar() {
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; the `DataSource` contract is identical._
 
 ```ts
 import { Component, inject } from '@angular/core';
@@ -372,7 +367,6 @@ export function EditableCalendar({ events }: { events: CalendarEvent[] }) {
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; this is the intended API._
 
 ```ts
 import { Component, signal } from '@angular/core';
@@ -518,7 +512,6 @@ Prefer to own the whole popup? Skip `renderCreateForm` and use
 `onSelectSlot(slot)` to open your own dialog anywhere in your app.
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; this is the intended API (a content-projected form template)._
 
 ```ts
 import { Component, signal } from '@angular/core';
@@ -576,7 +569,6 @@ export function EditableCalendar({ initial }: { initial: CalendarEvent[] }) {
 ```
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; the same `(eventChange)` output applies._
 
 ```ts
 import { Component, signal } from '@angular/core';
@@ -678,7 +670,6 @@ too. Notable keys beyond the obvious `today`/`day`/`week`/`month`:
 so you only supply the strings you translate.
   </Tab>
   <Tab value="Angular">
-_Roadmap — the Angular binding isn't published yet; the same `messages` + `locale` inputs apply._
 
 ```ts
 import { Component } from '@angular/core';

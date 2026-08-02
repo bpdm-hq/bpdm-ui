@@ -3,11 +3,21 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.3**, Angular `@bpdm/ng` **0.1.4**, Scheduler `@bpdm/scheduler` **0.2.0**; tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.3**, Angular `@bpdm/ng` **0.1.4**, Scheduler `@bpdm/scheduler` **0.2.0** (React) / `@bpdm/ng-scheduler` **0.1.0** (Angular); tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
 
 <Callout type="info">
   bpdm/ui is pre-1.0. Minor versions may still contain breaking changes while the API settles.
 </Callout>
+
+## 0.1.0 `@bpdm/ng-scheduler` — Angular scheduler (August 2026)
+
+The scheduler now ships for **Angular** too — a 1:1 twin of the React `@bpdm/scheduler`, built on the same headless `@bpdm/scheduler-core` and the same stylesheet, so both frameworks stay pixel-identical and theme from one token set.
+
+- **Day / week / month views** with the same layout engine, event packing, drag-to-move, drag-to-resize, cross-day drag and click-to-create as React.
+- **Keyboard & accessibility** parity — roving focus, Space to grab an event and arrows to move it, ARIA grid semantics and live-region announcements.
+- **Responsive** — the same container-width reflow (horizontal-scroll week, dot-collapsed month, bottom-sheet dialogs) plus opt-in `collapseToDayBelow`.
+- **i18n / RTL** — locale-driven date and time formatting and a translatable `messages` input.
+- Standalone components, signals and `OnPush` throughout; `@angular/common` and `@angular/core` are the only peer dependencies.
 
 ## 0.2.0 `@bpdm/scheduler` — Responsive scheduler (July 2026)
 
