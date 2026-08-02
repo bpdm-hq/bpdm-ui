@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/ng",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A modern, themeable, accessible Angular component library — Angular CDK, Tailwind 4, and the bpdm design system.",
   "license": "MIT",
   "author": "bpdm (https://bpdm.dev)",
