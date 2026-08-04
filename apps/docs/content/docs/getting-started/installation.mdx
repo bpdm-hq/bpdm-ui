@@ -27,10 +27,21 @@ npm install @bpdm/ui
   <Tab value="Angular">
 
 ```bash
-npm install @bpdm/ng @angular/cdk
+npm install @bpdm/ng
+# @angular/cdk is a peer dependency — install the version matching your Angular major
+# (Angular 21 → @angular/cdk@^21, Angular 22 → @angular/cdk@^22):
+npm install @angular/cdk@^21
 ```
 
-`@angular/cdk` is a peer dependency (used by the overlay-based components).
+`@angular/cdk` is a peer dependency (used by the overlay-based components — dialogs,
+selects, tooltips, popovers).
+
+<Callout type="warn">
+  Match `@angular/cdk` to your Angular **major** version. A bare `npm install @angular/cdk`
+  pulls the latest CDK, whose Angular peer range may be ahead of yours, and npm fails with an
+  `ERESOLVE` conflict. Pin the major (`@angular/cdk@^21`), or run `ng add @angular/cdk`, which
+  picks the version matching your workspace.
+</Callout>
 
   </Tab>
 </Tabs>
@@ -38,17 +49,29 @@ npm install @bpdm/ng @angular/cdk
 ## 2. Set up Tailwind v4
 
 bpdm/ui is built on **Tailwind CSS v4**, so your app needs Tailwind wired into its
-build. Install it and the PostCSS plugin:
-
-```bash
-npm install -D tailwindcss @tailwindcss/postcss
-```
+build. Install Tailwind and the plugin for your build tool:
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-If you use Vite, add the Tailwind plugin (`@tailwindcss/vite`) to `vite.config.ts`.
-For a PostCSS-based setup (e.g. Next.js), add a `postcss.config.mjs`:
+With Vite, use the Tailwind Vite plugin:
+
+```bash
+npm install -D tailwindcss @tailwindcss/vite
+```
+
+Add it to `vite.config.ts`:
+
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({ plugins: [react(), tailwindcss()] });
+```
+
+For a PostCSS-based setup (e.g. Next.js) install `@tailwindcss/postcss` instead and add a
+`postcss.config.mjs`:
 
 ```js title="postcss.config.mjs"
 export default { plugins: { '@tailwindcss/postcss': {} } };
@@ -57,7 +80,13 @@ export default { plugins: { '@tailwindcss/postcss': {} } };
   </Tab>
   <Tab value="Angular">
 
-Angular builds CSS through PostCSS — add a `.postcssrc.json` at the project root:
+Angular builds CSS through PostCSS — install the PostCSS plugin:
+
+```bash
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+Add a `.postcssrc.json` at the project root:
 
 ```json title=".postcssrc.json"
 { "plugins": { "@tailwindcss/postcss": {} } }
