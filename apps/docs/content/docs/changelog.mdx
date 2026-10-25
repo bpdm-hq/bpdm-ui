@@ -3,11 +3,19 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.4**, Angular `@bpdm/ng` **0.1.5**, Scheduler `@bpdm/scheduler` **0.2.1** (React) / `@bpdm/ng-scheduler` **0.1.0** (Angular); tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.4**, Angular `@bpdm/ng` **0.1.6**, Scheduler `@bpdm/scheduler` **0.2.1** (React) / `@bpdm/ng-scheduler` **0.1.0** (Angular); tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
 
 <Callout type="info">
   bpdm/ui is pre-1.0. Minor versions may still contain breaking changes while the API settles.
 </Callout>
+
+## 0.1.6 `@bpdm/ng` — Select, Multi-select & Tree-select: ARIA + i18n (October 2026)
+
+Richer ARIA semantics and internationalization for the three Angular selection components (React twins unchanged):
+
+- **Select / Multi-select** — combobox + listbox roles with `aria-activedescendant`, stable option ids and `aria-controls`; keyboard navigation (type-ahead, arrow / Home / End, Enter / Escape); a translatable `messages` input; multi-select adds a tri-state select-all.
+- **Tree-select** — `role="tree"` / `treeitem` / `group` with `aria-level`, `aria-expanded` and `aria-checked`, and RTL-aware indentation.
+- **Docs** — every example is a complete, copy-pasteable snippet (import → usage), plus per-component Internationalization sections.
 
 ## 0.1.4 `@bpdm/ui` · 0.1.5 `@bpdm/ng` — Packaging fix (August 2026)
 
