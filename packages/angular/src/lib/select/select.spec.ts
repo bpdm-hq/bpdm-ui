@@ -1,5 +1,6 @@
 import { ApplicationRef, Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { BpdmSelect, type SelectItems } from "./select";
 
 @Component({
@@ -35,6 +36,18 @@ class KeyboardHost {
     { value: "in", label: "India" },
     { value: "jp", label: "Japan" },
   ];
+}
+
+@Component({
+  imports: [BpdmSelect, ReactiveFormsModule],
+  template: `<bpdm-select [options]="opts" [formControl]="ctrl" />`,
+})
+class FormHost {
+  opts: SelectItems = [
+    { value: "a", label: "Apple" },
+    { value: "b", label: "Banana" },
+  ];
+  ctrl = new FormControl("a");
 }
 
 // jsdom has no Element.prototype.scrollTo — CDK's virtual viewport calls it when
@@ -150,5 +163,43 @@ describe("BpdmSelect", () => {
     await macrotask();
     const option = document.querySelector('[role="option"] span.truncate') as HTMLElement;
     expect(option.getAttribute("title")).toBeTruthy();
+  });
+});
+
+describe("BpdmSelect + Reactive Forms (formControl)", () => {
+  afterEach(() => {
+    document.querySelectorAll(".cdk-overlay-container").forEach((n) => n.remove());
+  });
+
+  it("reflects the control's value in the trigger (form → component)", () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    expect(trigger.textContent).toContain("Apple");
+    fixture.componentInstance.ctrl.setValue("b");
+    fixture.detectChanges();
+    expect(trigger.textContent).toContain("Banana");
+  });
+
+  it("writes the selected option back to the control (component → form)", async () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    trigger.click();
+    TestBed.inject(ApplicationRef).tick();
+    await macrotask();
+    const options = document.querySelectorAll('[role="option"]');
+    (options[1] as HTMLElement).click(); // Banana
+    fixture.detectChanges();
+    expect(fixture.componentInstance.ctrl.value).toBe("b");
+  });
+
+  it("disables the trigger when the control is disabled (setDisabledState)", () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    fixture.componentInstance.ctrl.disable();
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLButtonElement;
+    expect(trigger.disabled).toBe(true);
   });
 });

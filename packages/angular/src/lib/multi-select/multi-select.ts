@@ -5,6 +5,7 @@ import {
   computed,
   effect,
   ElementRef,
+  forwardRef,
   inject,
   input,
   model,
@@ -15,6 +16,7 @@ import {
   viewChild,
   ViewContainerRef,
 } from "@angular/core";
+import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import {
   CdkFixedSizeVirtualScroll,
   CdkVirtualForOf,
@@ -47,6 +49,9 @@ let multiUid = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf],
   host: { class: "block" },
+  providers: [
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BpdmMultiSelect), multi: true },
+  ],
   template: `
     <div
       #trigger
@@ -60,11 +65,11 @@ let multiUid = 0;
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
-      [attr.aria-disabled]="disabled() || null"
-      [attr.data-disabled]="disabled() ? '' : null"
-      [tabindex]="disabled() ? -1 : 0"
+      [attr.aria-disabled]="isDisabled() || null"
+      [attr.data-disabled]="isDisabled() ? '' : null"
+      [tabindex]="isDisabled() ? -1 : 0"
       [class]="triggerClass()"
-      (click)="!disabled() && toggle()"
+      (click)="!isDisabled() && toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
       <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
@@ -87,7 +92,7 @@ let multiUid = 0;
         }
       </div>
       <div class="flex shrink-0 items-center gap-1">
-        @if (selected().length > 0 && !disabled()) {
+        @if (selected().length > 0 && !isDisabled()) {
           <button type="button" data-bpdm-slot="multi-select-clear" [attr.aria-label]="t().clearAll" (pointerdown)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
@@ -143,7 +148,7 @@ let multiUid = 0;
     </ng-template>
   `,
 })
-export class BpdmMultiSelect implements OnDestroy {
+export class BpdmMultiSelect implements OnDestroy, ControlValueAccessor {
   private readonly overlay = inject(Overlay);
   private readonly vcr = inject(ViewContainerRef);
 
@@ -163,6 +168,9 @@ export class BpdmMultiSelect implements OnDestroy {
   readonly maxHeight = input(256);
   readonly size = input<FieldSize>("md");
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Disabled state pushed by a form via `setDisabledState` (Reactive Forms). OR-ed with `disabled`. */
+  private readonly cvaDisabled = signal(false);
+  protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
@@ -288,24 +296,24 @@ export class BpdmMultiSelect implements OnDestroy {
       return;
     }
     const has = this.selectedSet().has(val);
-    this.value.set(has ? this.value().filter((v) => v !== val) : [...this.value(), val]);
+    this.commitValue(has ? this.value().filter((v) => v !== val) : [...this.value(), val]);
   }
 
   protected clearAll(): void {
-    this.value.set([]);
+    this.commitValue([]);
   }
 
   protected toggleAll(): void {
     const f = this.filteredValues();
     if (this.allSel()) {
-      this.value.set(this.value().filter((v) => !f.includes(v)));
+      this.commitValue(this.value().filter((v) => !f.includes(v)));
     } else {
-      this.value.set(Array.from(new Set([...this.value(), ...f])));
+      this.commitValue(Array.from(new Set([...this.value(), ...f])));
     }
   }
 
   private openPanel(): void {
-    if (this.disabled() || this.overlayRef) return;
+    if (this.isDisabled() || this.overlayRef) return;
     const trigger = this.triggerEl().nativeElement;
     this.panelWidth.set(trigger.offsetWidth);
     const positionStrategy = this.overlay
@@ -342,7 +350,28 @@ export class BpdmMultiSelect implements OnDestroy {
     this.overlayRef = undefined;
     this.open.set(false);
     this.query.set("");
+    this.onTouched();
     this.triggerEl().nativeElement.focus();
+  }
+
+  // ControlValueAccessor — lets `<bpdm-multi-select>` bind via `formControlName` / `ngModel`.
+  private onChange: (value: string[]) => void = () => {};
+  private onTouched: () => void = () => {};
+  private commitValue(next: string[]): void {
+    this.value.set(next);
+    this.onChange(next);
+  }
+  writeValue(value: string[] | null): void {
+    this.value.set(value ?? []);
+  }
+  registerOnChange(fn: (value: string[]) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
   }
 
   protected onSearch(v: string): void {
@@ -367,14 +396,14 @@ export class BpdmMultiSelect implements OnDestroy {
   }
 
   protected onTriggerKeydown(e: KeyboardEvent): void {
-    if (this.disabled()) return;
+    if (this.isDisabled()) return;
     if (!this.open() && (e.key === "Enter" || e.key === " " || e.key === "ArrowDown")) {
       e.preventDefault();
       this.openPanel();
     } else if ((e.key === "Backspace" || e.key === "Delete") && this.value().length > 0) {
       // remove the last selected chip straight from the (focused) trigger
       e.preventDefault();
-      this.value.set(this.value().slice(0, -1));
+      this.commitValue(this.value().slice(0, -1));
     }
   }
 

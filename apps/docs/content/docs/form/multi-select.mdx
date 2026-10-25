@@ -426,7 +426,7 @@ export class ControlledMultiComponent {
 | --- | --- | --- | --- |
 | `options` | `SelectItems` (flat or grouped) | — | **Required.** Data-driven options. |
 | `value` / `defaultValue` | `string[]` | — | Controlled / uncontrolled selection. |
-| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]`. |
+| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]` or binds via `formControlName` / `[(ngModel)]` (see [Forms](#forms)). |
 | `placeholder` | `string` | `Select…` | Text when nothing is selected. |
 | `maxDisplay` | `number` | `3` | Chips shown before "+N"; `0` → "N selected" count. |
 | `selectAll` | `boolean` | `true` | Show a "Select all" row. |
@@ -441,6 +441,38 @@ export class ControlledMultiComponent {
 | `messages` | `{ selectAll, clearAll, remove(label), selected(count) }` | English | Override the built-in labels + count text for i18n. |
 
 `maxHeight` (px) caps the list; in React `contentClassName` styles the panel.
+
+## Forms
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+Fully controlled through `value` (`string[]`) + `onValueChange`, so it drops into any form
+library. With react-hook-form, wrap it in a `<Controller>`:
+
+```tsx title="react-hook-form"
+<Controller
+  name="tags"
+  control={control}
+  render={({ field }) => (
+    <MultiSelect options={tags} value={field.value} onValueChange={field.onChange} />
+  )}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`<bpdm-multi-select>` is a `ControlValueAccessor`, so it binds directly with `formControlName`,
+`[formControl]`, or `[(ngModel)]` — the `string[]` value, disabled state, and touched/dirty status
+all sync automatically:
+
+```html title="Reactive form"
+<bpdm-multi-select [options]="tags" formControlName="tags" />
+```
+
+  </Tab>
+</Tabs>
 
 ## Accessibility
 

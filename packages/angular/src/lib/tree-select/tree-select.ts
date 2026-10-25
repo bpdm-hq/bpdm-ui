@@ -6,6 +6,7 @@ import {
   computed,
   effect,
   ElementRef,
+  forwardRef,
   inject,
   input,
   model,
@@ -16,6 +17,7 @@ import {
   viewChild,
   ViewContainerRef,
 } from "@angular/core";
+import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
 import { cn } from "@bpdm/variants";
@@ -78,6 +80,9 @@ let treeUid = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
   host: { class: "block" },
+  providers: [
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BpdmTreeSelect), multi: true },
+  ],
   template: `
     <div
       #trigger
@@ -91,11 +96,11 @@ let treeUid = 0;
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
-      [attr.aria-disabled]="disabled() || null"
-      [attr.data-disabled]="disabled() ? '' : null"
-      [tabindex]="disabled() ? -1 : 0"
+      [attr.aria-disabled]="isDisabled() || null"
+      [attr.data-disabled]="isDisabled() ? '' : null"
+      [tabindex]="isDisabled() ? -1 : 0"
       [class]="triggerClass()"
-      (click)="!disabled() && toggleOpen()"
+      (click)="!isDisabled() && toggleOpen()"
       (keydown)="onTriggerKeydown($event)"
     >
       <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
@@ -115,7 +120,7 @@ let treeUid = 0;
         }
       </div>
       <div class="flex shrink-0 items-center gap-1">
-        @if (selectedLeaves().length > 0 && !disabled()) {
+        @if (selectedLeaves().length > 0 && !isDisabled()) {
           <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
@@ -214,7 +219,7 @@ let treeUid = 0;
     </ng-template>
   `,
 })
-export class BpdmTreeSelect implements OnDestroy {
+export class BpdmTreeSelect implements OnDestroy, ControlValueAccessor {
   private readonly overlay = inject(Overlay);
   private readonly vcr = inject(ViewContainerRef);
 
@@ -233,6 +238,9 @@ export class BpdmTreeSelect implements OnDestroy {
   readonly maxHeight = input(280);
   readonly size = input<FieldSize>("md");
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Disabled state pushed by a form via `setDisabledState` (Reactive Forms). OR-ed with `disabled`. */
+  private readonly cvaDisabled = signal(false);
+  protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
@@ -396,9 +404,9 @@ export class BpdmTreeSelect implements OnDestroy {
     const allSel = leaves.every((v) => this.selectedSet().has(v));
     if (allSel) {
       const rm = new Set(leaves);
-      this.value.set(this.value().filter((v) => !rm.has(v)));
+      this.commitValue(this.value().filter((v) => !rm.has(v)));
     } else {
-      this.value.set(Array.from(new Set([...this.value(), ...leaves])));
+      this.commitValue(Array.from(new Set([...this.value(), ...leaves])));
     }
   }
 
@@ -406,14 +414,14 @@ export class BpdmTreeSelect implements OnDestroy {
     const l = this.visibleLeaves();
     if (this.allSel()) {
       const rm = new Set(l);
-      this.value.set(this.value().filter((v) => !rm.has(v)));
+      this.commitValue(this.value().filter((v) => !rm.has(v)));
     } else {
-      this.value.set(Array.from(new Set([...this.value(), ...l])));
+      this.commitValue(Array.from(new Set([...this.value(), ...l])));
     }
   }
 
   protected clearAll(): void {
-    this.value.set([]);
+    this.commitValue([]);
   }
 
   protected toggleOpen(): void {
@@ -422,7 +430,7 @@ export class BpdmTreeSelect implements OnDestroy {
   }
 
   private openPanel(): void {
-    if (this.disabled() || this.overlayRef) return;
+    if (this.isDisabled() || this.overlayRef) return;
     const trigger = this.triggerEl().nativeElement;
     this.panelWidth.set(trigger.offsetWidth);
     const positionStrategy = this.overlay
@@ -460,11 +468,32 @@ export class BpdmTreeSelect implements OnDestroy {
     this.open.set(false);
     this.query.set("");
     this.activeValue.set(null);
+    this.onTouched();
     this.triggerEl().nativeElement.focus();
   }
 
+  // ControlValueAccessor — lets `<bpdm-tree-select>` bind via `formControlName` / `ngModel`.
+  private onChange: (value: string[]) => void = () => {};
+  private onTouched: () => void = () => {};
+  private commitValue(next: string[]): void {
+    this.value.set(next);
+    this.onChange(next);
+  }
+  writeValue(value: string[] | null): void {
+    this.value.set(value ?? []);
+  }
+  registerOnChange(fn: (value: string[]) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+
   protected onTriggerKeydown(e: KeyboardEvent): void {
-    if (this.disabled()) return;
+    if (this.isDisabled()) return;
     if (!this.open() && (e.key === "Enter" || e.key === " " || e.key === "ArrowDown")) {
       e.preventDefault();
       this.openPanel();

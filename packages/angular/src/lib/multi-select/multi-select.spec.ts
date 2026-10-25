@@ -1,7 +1,21 @@
 import { ApplicationRef, Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { BpdmMultiSelect } from "./multi-select";
 import type { SelectItems } from "../select/select";
+
+@Component({
+  imports: [BpdmMultiSelect, ReactiveFormsModule],
+  template: `<bpdm-multi-select [options]="opts" [formControl]="ctrl" />`,
+})
+class FormHost {
+  opts: SelectItems = [
+    { value: "a", label: "Apple" },
+    { value: "b", label: "Banana" },
+    { value: "c", label: "Cherry" },
+  ];
+  ctrl = new FormControl<string[]>(["a"]);
+}
 
 @Component({
   imports: [BpdmMultiSelect],
@@ -122,5 +136,43 @@ describe("BpdmMultiSelect", () => {
     fixture.detectChanges();
     expect(trigger.textContent).toContain("Apple");
     expect(trigger.textContent).not.toContain("Banana");
+  });
+});
+
+describe("BpdmMultiSelect + Reactive Forms (formControl)", () => {
+  afterEach(() => {
+    document.querySelectorAll(".cdk-overlay-container").forEach((n) => n.remove());
+  });
+
+  it("reflects the control's value in the trigger chips (form → component)", () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    expect(trigger.textContent).toContain("Apple");
+    fixture.componentInstance.ctrl.setValue(["a", "b"]);
+    fixture.detectChanges();
+    expect(trigger.textContent).toContain("Banana");
+  });
+
+  it("writes toggled options back to the control (component → form)", async () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    trigger.click();
+    TestBed.inject(ApplicationRef).tick();
+    await macrotask();
+    const options = document.querySelectorAll('[role="option"]');
+    (options[2] as HTMLElement).click(); // Cherry → adds "c"
+    fixture.detectChanges();
+    expect(fixture.componentInstance.ctrl.value).toEqual(["a", "c"]);
+  });
+
+  it("marks the trigger disabled when the control is disabled (setDisabledState)", () => {
+    const fixture = TestBed.createComponent(FormHost);
+    fixture.detectChanges();
+    fixture.componentInstance.ctrl.disable();
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+    expect(trigger.getAttribute("aria-disabled")).toBe("true");
   });
 });

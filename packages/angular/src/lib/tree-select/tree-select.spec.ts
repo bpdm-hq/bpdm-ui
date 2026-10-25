@@ -1,5 +1,6 @@
 import { ApplicationRef, Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { BpdmTreeSelect, type TreeNode } from "./tree-select";
 
 const TREE: TreeNode[] = [
@@ -27,6 +28,15 @@ class Host {
 })
 class LabelledHost {
   tree = TREE;
+}
+
+@Component({
+  imports: [BpdmTreeSelect, ReactiveFormsModule],
+  template: `<bpdm-tree-select [options]="tree" [formControl]="ctrl" />`,
+})
+class FormHost {
+  tree = TREE;
+  ctrl = new FormControl<string[]>([]);
 }
 
 const macrotask = () => new Promise<void>((r) => setTimeout(r, 0));
@@ -166,6 +176,35 @@ describe("BpdmTreeSelect", () => {
       key(tree, " "); // select
       const child1 = document.querySelector('[role="group"] [role="treeitem"]') as HTMLElement;
       expect(child1.getAttribute("aria-checked")).toBe("true");
+    });
+  });
+
+  describe("Reactive Forms (formControl)", () => {
+    it("writes selected leaves back to the control (component → form)", async () => {
+      const fixture = TestBed.createComponent(FormHost);
+      await open(fixture);
+      btnByText("Parent").click(); // selects both leaves
+      tick();
+      expect(fixture.componentInstance.ctrl.value).toEqual(["c1", "c2"]);
+    });
+
+    it("reflects the control's value in the trigger chips (form → component)", () => {
+      const fixture = TestBed.createComponent(FormHost);
+      fixture.detectChanges();
+      fixture.componentInstance.ctrl.setValue(["c1"]);
+      fixture.detectChanges();
+      const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+      expect(trigger.textContent).toContain("Child 1");
+      expect(trigger.textContent).not.toContain("Child 2");
+    });
+
+    it("marks the trigger disabled when the control is disabled (setDisabledState)", () => {
+      const fixture = TestBed.createComponent(FormHost);
+      fixture.detectChanges();
+      fixture.componentInstance.ctrl.disable();
+      fixture.detectChanges();
+      const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
+      expect(trigger.getAttribute("aria-disabled")).toBe("true");
     });
   });
 });

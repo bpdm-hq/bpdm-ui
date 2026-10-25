@@ -275,7 +275,7 @@ export class StatesComponent {
 | --- | --- | --- | --- |
 | `options` | `TreeNode[]` (`{ value, label, disabled?, children? }`) | — | **Required.** The hierarchy. |
 | `value` / `defaultValue` | `string[]` | — | Selected **leaf** values (controlled / uncontrolled). |
-| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]`. |
+| `onValueChange` | `(value: string[]) => void` | — | **React** — fires on change. Angular uses `[(value)]` or binds via `formControlName` / `[(ngModel)]` (see [Forms](#forms)). |
 | `placeholder` | `string` | `Select…` | Text when nothing is selected. |
 | `maxDisplay` | `number` | `3` | Chips before "+N"; `0` → "N selected". |
 | `selectAll` | `boolean` | `true` | Show a "Select all" row. |
@@ -288,6 +288,38 @@ export class StatesComponent {
 | `id` | `string` | — | Trigger id (for `<label>` association / testing). |
 | `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + tree. |
 | `messages` | `{ expand, collapse, selectAll, clearAll, selected(count) }` | English | Override the built-in labels + count text for i18n. |
+
+## Forms
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+Fully controlled through `value` (the array of selected leaf values) + `onValueChange`, so it
+drops into any form library. With react-hook-form, wrap it in a `<Controller>`:
+
+```tsx title="react-hook-form"
+<Controller
+  name="teams"
+  control={control}
+  render={({ field }) => (
+    <TreeSelect options={tree} value={field.value} onValueChange={field.onChange} />
+  )}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`<bpdm-tree-select>` is a `ControlValueAccessor`, so it binds directly with `formControlName`,
+`[formControl]`, or `[(ngModel)]` — the leaf-value array, disabled state, and touched/dirty status
+all sync automatically:
+
+```html title="Reactive form"
+<bpdm-tree-select [options]="tree" formControlName="teams" />
+```
+
+  </Tab>
+</Tabs>
 
 ## Accessibility
 

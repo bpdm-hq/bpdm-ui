@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   ElementRef,
+  forwardRef,
   inject,
   input,
   model,
@@ -13,6 +14,7 @@ import {
   viewChild,
   ViewContainerRef,
 } from "@angular/core";
+import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import {
   CdkFixedSizeVirtualScroll,
   CdkVirtualForOf,
@@ -96,6 +98,9 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf],
   host: { class: "block" },
+  providers: [
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BpdmSelect), multi: true },
+  ],
   template: `
     <button
       #trigger
@@ -111,7 +116,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       [attr.aria-describedby]="ariaDescribedby() || null"
       [attr.aria-invalid]="ariaInvalid() || null"
       [attr.data-state]="open() ? 'open' : 'closed'"
-      [disabled]="disabled() || null"
+      [disabled]="isDisabled() || null"
       [class]="triggerClass()"
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
@@ -177,7 +182,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
     </ng-template>
   `,
 })
-export class BpdmSelect implements OnDestroy {
+export class BpdmSelect implements OnDestroy, ControlValueAccessor {
   private readonly overlay = inject(Overlay);
   private readonly vcr = inject(ViewContainerRef);
 
@@ -193,6 +198,9 @@ export class BpdmSelect implements OnDestroy {
   readonly maxHeight = input(256);
   readonly size = input<FieldSize>("md");
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Disabled state pushed by a form via `setDisabledState` (Reactive Forms). OR-ed with `disabled`. */
+  private readonly cvaDisabled = signal(false);
+  protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
   readonly id = input("");
@@ -257,7 +265,7 @@ export class BpdmSelect implements OnDestroy {
   }
 
   private openPanel(): void {
-    if (this.disabled() || this.overlayRef) return;
+    if (this.isDisabled() || this.overlayRef) return;
     const trigger = this.triggerEl().nativeElement;
     this.panelWidth.set(trigger.offsetWidth);
     const positionStrategy = this.overlay
@@ -296,13 +304,31 @@ export class BpdmSelect implements OnDestroy {
     this.overlayRef = undefined;
     this.open.set(false);
     this.query.set("");
+    this.onTouched();
     this.triggerEl().nativeElement.focus();
   }
 
   protected commit(option: SelectOption): void {
     if (option.disabled) return;
     this.value.set(option.value);
+    this.onChange(option.value);
     this.close();
+  }
+
+  // ControlValueAccessor — lets `<bpdm-select>` bind via `formControlName` / `ngModel`.
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
+  writeValue(value: string | null): void {
+    this.value.set(value ?? "");
+  }
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
   }
 
   protected onSearch(v: string): void {

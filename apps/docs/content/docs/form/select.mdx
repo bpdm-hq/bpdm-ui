@@ -486,7 +486,7 @@ export class SelectControlledComponent {
 | --- | --- | --- | --- |
 | `options` | `SelectItems` (flat `{ value, label, icon?, disabled? }[]` or grouped `{ label, icon?, options }[]`) | — | **Required.** Data-driven options; each option/group may carry an `icon`. |
 | `value` / `defaultValue` | `string` | — | Controlled / uncontrolled selection. |
-| `onValueChange` | `(value: string) => void` | — | **React** — fires on selection. Angular uses two-way `[(value)]`. |
+| `onValueChange` | `(value: string) => void` | — | **React** — fires on selection. Angular uses two-way `[(value)]` or binds via `formControlName` / `[(ngModel)]` (see [Forms](#forms)). |
 | `placeholder` | `string` | `Select…` | Text when nothing is selected. |
 | `searchable` | `boolean` | `false` | Show a filter box. |
 | `searchPlaceholder` | `string` | `Search…` | Placeholder for the filter box. |
@@ -500,6 +500,39 @@ export class SelectControlledComponent {
 `maxHeight` (px) caps the scrollable list. In React, `contentClassName` styles the dropdown
 panel. Both frameworks accept `aria-label` / `aria-describedby` (forwarded to the trigger and used
 to name the listbox).
+
+## Forms
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+There's no `ControlValueAccessor` in React — the component is fully controlled through
+`value` + `onValueChange`, so it drops into any form library. With react-hook-form, wrap
+it in a `<Controller>`:
+
+```tsx title="react-hook-form"
+<Controller
+  name="fruit"
+  control={control}
+  render={({ field }) => (
+    <Select options={fruits} value={field.value} onValueChange={field.onChange} />
+  )}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+`<bpdm-select>` is a `ControlValueAccessor`, so it binds directly with `formControlName`,
+`[formControl]`, or `[(ngModel)]` — the value, disabled state, and touched/dirty status all
+sync automatically:
+
+```html title="Reactive form"
+<bpdm-select [options]="fruits" formControlName="fruit" />
+```
+
+  </Tab>
+</Tabs>
 
 ## Accessibility
 
