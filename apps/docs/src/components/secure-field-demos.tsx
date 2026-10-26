@@ -5,7 +5,7 @@ import { SecureField } from '@bpdm/ui/secure-field';
 
 // Neutral, clearly-not-payment sample secrets (alphanumeric keys / serials).
 const LICENSE = 'XJ4K9F2C7A4E1D8B';
-const API_KEY = 'prj_live_9f2c7a4e1d8b3a6f';
+const API_KEY = 'demo_9f2c7a4e1d8b3a6f';
 const SERIAL = 'SN8842019930AB45';
 
 function Frame({ children }: { children: ReactNode }) {
