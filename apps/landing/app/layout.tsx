@@ -3,7 +3,7 @@ import "./globals.css";
 import { ScrollTop } from "./scroll-top";
 
 const SITE = "https://ui.bpdm.dev";
-const TITLE = "bpdm/ui — an accessible component library for React & Angular";
+const TITLE = "bpdm/ui: an accessible component library for React & Angular";
 const DESCRIPTION =
   "An accessible, themeable component library for React and Angular, built from one shared set of design tokens. The same components in both.";
 
@@ -135,12 +135,12 @@ const jsonLd = {
           name: "Does bpdm/ui provide a native Angular component library?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. The Angular library is built natively with standalone components and the Angular CDK — the same components, design tokens, and look as the React library, not a wrapper.",
+            text: "Yes. The Angular library is built natively with standalone components and the Angular CDK: the same components, design tokens, and look as the React library, not a wrapper.",
           },
         },
         {
           "@type": "Question",
-          name: "Which frameworks does it support — React or Angular?",
+          name: "Which frameworks does it support, React or Angular?",
           acceptedAnswer: {
             "@type": "Answer",
             text: "Both. One design system and one shared set of design tokens, with native React and Angular implementations, so the components look and behave identically across frameworks.",

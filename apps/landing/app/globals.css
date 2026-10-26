@@ -98,6 +98,7 @@ section { padding: 3.25rem 0; }
 /* framework cards */
 .cards { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 960px) { .cards { grid-template-columns: repeat(3, 1fr); } }
 .card {
   position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.85rem;
   padding: 1.75rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card);
@@ -112,7 +113,7 @@ section { padding: 3.25rem 0; }
 .card h3 { font-size: 1.4rem; font-weight: 650; }
 .card p { color: var(--muted); font-size: 0.95rem; }
 .row { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
-.cta { margin-top: 0.35rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.95rem; color: var(--accent); }
+.cta { margin-top: auto; padding-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.95rem; color: var(--accent); }
 .card--active:hover .cta .arrow { transform: translateX(4px); }
 .fw-cta { margin-top: 2.25rem; display: flex; justify-content: center; }
 .fw-cta .btn:hover .arrow { transform: translateX(4px); }

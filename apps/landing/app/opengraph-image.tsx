@@ -4,7 +4,7 @@ export const dynamic = "force-static";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "bpdm/ui — one design system for React & Angular";
+export const alt = "bpdm/ui: one design system for React & Angular";
 
 // Branded 1200×630 social card, generated at build time (static export).
 export default function OpengraphImage() {
@@ -32,7 +32,7 @@ export default function OpengraphImage() {
           <span style={{ color: "#f5a623" }}>React &amp; Angular.</span>
         </div>
         <div style={{ display: "flex", marginTop: 36, fontSize: 32, color: "#a5a3ad", maxWidth: 900 }}>
-          Accessible, themeable components on one shared token set — React &amp; Angular.
+          Accessible, themeable components on one shared token set, for React &amp; Angular.
         </div>
         <div style={{ display: "flex", marginTop: 48, gap: 28, fontSize: 26, color: "#a5a3ad" }}>
           <span style={{ color: "#61dafb" }}>React</span>

@@ -20,7 +20,6 @@ type BpdmButtonAttrs = DetailedHTMLProps<
   HTMLElement
 >;
 declare module 'react' {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       'bpdm-button': BpdmButtonAttrs;

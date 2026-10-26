@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 
-type Pkg = { key: "react" | "angular"; label: string; pkg: string };
+type Pkg = { key: "react" | "angular" | "wc"; label: string; pkg: string };
 
 const PKGS: Pkg[] = [
   { key: "react", label: "React", pkg: "@bpdm/ui" },
   { key: "angular", label: "Angular", pkg: "@bpdm/ng" },
+  { key: "wc", label: "Web Components", pkg: "@bpdm/wc" },
 ];
 
 /** Install command with framework tabs + copy-to-clipboard (client component). */

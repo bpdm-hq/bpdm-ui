@@ -59,7 +59,7 @@ export default function Home() {
             </h1>
             <p className="tagline">
               <strong>bpdm/ui</strong> is an accessible, themeable component library on one shared set of
-              design tokens — built natively for React and Angular, so they look and move exactly the
+              design tokens, built natively for React and Angular, so they look and move exactly the
               same everywhere.
             </p>
             <div className="cta-row">
@@ -134,7 +134,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>Looks right, out of the box</h2>
-              <p>Polished, consistent components — every one keyboard-accessible and theme-aware, built following WCAG 2.1 AA and WAI-ARIA patterns.</p>
+              <p>Polished, consistent components, every one keyboard-accessible and theme-aware, built following WCAG 2.1 AA and WAI-ARIA patterns.</p>
             </div>
             <div className="showcase">
               {/* buttons */}
@@ -230,11 +230,11 @@ export default function Home() {
         <section id="frameworks" className="soft">
           <div className="wrap">
             <div className="section-head">
-              <h2>One system, both frameworks</h2>
-              <p>bpdm/ui is a React and Angular component library — the same components and design tokens, implemented natively in both and documented together in one place.</p>
+              <h2>One system, any stack</h2>
+              <p>bpdm/ui is a native React and Angular library, plus a standards-based Web Components build, so the same components and design tokens drop into any stack.</p>
             </div>
             <div className="cards">
-              <div className="card" style={{ "--accent": "var(--react)" } as CSSProperties}>
+              <a className="card card--active" href={`${DOCS}?framework=react`} style={{ "--accent": "var(--react)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="-11.5 -10.23 23 20.46" fill="none">
@@ -250,9 +250,10 @@ export default function Home() {
                 </div>
                 <h3>React</h3>
                 <p>38 components built on Radix primitives, Tailwind 4, and four themes.</p>
-              </div>
+                <span className="cta">Read the docs <span className="arrow">→</span></span>
+              </a>
 
-              <div className="card" style={{ "--accent": "var(--angular)" } as CSSProperties}>
+              <a className="card card--active" href={`${DOCS}?framework=angular`} style={{ "--accent": "var(--angular)" } as CSSProperties}>
                 <div className="row">
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="0 0 256 272" fill="none">
@@ -265,11 +266,22 @@ export default function Home() {
                 </div>
                 <h3>Angular</h3>
                 <p>38 components built with Angular standalone components, the CDK, and four themes.</p>
-              </div>
-            </div>
-            <div className="fw-cta">
-              <a className="btn btn-primary" href={DOCS}>
-                Explore the docs <span className="arrow">→</span>
+                <span className="cta">Read the docs <span className="arrow">→</span></span>
+              </a>
+
+              <a className="card card--active" href={`${DOCS}/web-components`} style={{ "--accent": "var(--primary)" } as CSSProperties}>
+                <div className="row">
+                  <span className="logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m8 7-5 5 5 5" />
+                      <path d="m16 7 5 5-5 5" />
+                    </svg>
+                  </span>
+                  <span className="badge" style={{ background: "color-mix(in srgb, var(--primary) 18%, transparent)", color: "var(--primary)" }}>New</span>
+                </div>
+                <h3>Web Components</h3>
+                <p>Standards-based custom elements (<code>@bpdm/wc</code>). Use bpdm/ui in PHP, Rails, Phoenix/LiveView, Django or plain HTML. Button available now, more components landing.</p>
+                <span className="cta">Read the docs <span className="arrow">→</span></span>
               </a>
             </div>
           </div>
@@ -280,13 +292,13 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>Built for production</h2>
-              <p>The things you&apos;d expect from a serious component library — by default.</p>
+              <p>The things you&apos;d expect from a serious component library, by default.</p>
             </div>
             <div className="features">
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg></span>
                 <h3>Accessible by default</h3>
-                <p>Keyboard, focus and ARIA handled via Radix (React) and the Angular CDK — not bolted on later.</p>
+                <p>Keyboard, focus and ARIA handled via Radix (React) and the Angular CDK, not bolted on later.</p>
               </div>
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12.5" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg></span>
@@ -296,7 +308,7 @@ export default function Home() {
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6" /></svg></span>
                 <h3>Tree-shakeable</h3>
-                <p>Standalone components, ESM and <code>sideEffects: false</code> — only what you import ships.</p>
+                <p>Standalone components, ESM and <code>sideEffects: false</code>, so only what you import ships.</p>
               </div>
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg></span>
@@ -306,12 +318,12 @@ export default function Home() {
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg></span>
                 <h3>One motion language</h3>
-                <p>Shared easing and duration tokens drive every transition — and honor <code>prefers-reduced-motion</code>.</p>
+                <p>Shared easing and duration tokens drive every transition, and honor <code>prefers-reduced-motion</code>.</p>
               </div>
               <div className="feature">
                 <span className="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" /><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" /><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" /></svg></span>
                 <h3>Shared design tokens</h3>
-                <p>One source of truth (<code>@bpdm/tokens</code>) powers both frameworks — re-brand by overriding variables.</p>
+                <p>One source of truth (<code>@bpdm/tokens</code>) powers both frameworks, so you re-brand by overriding variables.</p>
               </div>
             </div>
           </div>
@@ -322,7 +334,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>38 components, fully documented</h2>
-              <p>From buttons to data tables — each with live Storybook docs in both frameworks.</p>
+              <p>From buttons to data tables, each with live Storybook docs in both frameworks.</p>
             </div>
             <div className="catalog">
               {CATALOG.map((group) => (
@@ -344,7 +356,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>Four themes, one token set</h2>
-              <p>Every component reads semantic variables — these are the built-in palettes.</p>
+              <p>Every component reads semantic variables. These are the built-in palettes.</p>
             </div>
             <div className="themes">
               <div className="theme" style={{ background: "#faf9f6", color: "#1c1a17", borderColor: "#e7e3dc" }}>
@@ -384,7 +396,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <h2>Up and running in minutes</h2>
-              <p>Install, import, ship. No config, no wrappers — the components just work.</p>
+              <p>Install, import, ship. No config, no wrappers. The components just work.</p>
             </div>
             <div className="quickstart">
               <InstallTabs />
@@ -413,7 +425,7 @@ export function Example() {
         <section id="faq">
           <div className="wrap">
             <div className="section-head">
-              <h2>Native React and Angular — one design system</h2>
+              <h2>Native React and Angular, one design system</h2>
               <p>Accessible primitives (Radix on React, the Angular CDK on Angular), styled with Tailwind, on one shared token set.</p>
             </div>
             <div className="faq">
@@ -423,15 +435,15 @@ export function Example() {
               </div>
               <div className="faq-item">
                 <h3>Does bpdm/ui provide a native Angular component library?</h3>
-                <p>Yes — the Angular library is built natively with standalone components and the Angular CDK: the same components, design tokens, and look as the React library, not a wrapper.</p>
+                <p>Yes, the Angular library is built natively with standalone components and the Angular CDK: the same components, design tokens, and look as the React library, not a wrapper.</p>
               </div>
               <div className="faq-item">
-                <h3>React or Angular — which does it support?</h3>
+                <h3>React or Angular: which does it support?</h3>
                 <p>Both. One design system and one shared set of design tokens, with native React and Angular implementations, so the components look and behave identically across frameworks.</p>
               </div>
               <div className="faq-item">
                 <h3>Is bpdm/ui free and open source?</h3>
-                <p>Yes — bpdm/ui is MIT-licensed and open source on <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a> for both the React and Angular libraries.</p>
+                <p>Yes, bpdm/ui is MIT-licensed and open source on <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a> for both the React and Angular libraries.</p>
               </div>
             </div>
           </div>
@@ -441,7 +453,7 @@ export function Example() {
         <section className="cta-band">
           <div className="wrap">
             <h2>Build your next interface on bpdm</h2>
-            <p>One design system, React and Angular, accessible and themeable — ready today.</p>
+            <p>One design system, React and Angular, accessible and themeable, ready today.</p>
             <div className="cta-row">
               <a className="btn btn-primary" href={DOCS}>Explore the docs <span className="arrow">→</span></a>
               <a className="btn btn-ghost" href={REPO} target="_blank" rel="noopener noreferrer">Star on GitHub</a>
@@ -455,7 +467,7 @@ export function Example() {
           <div className="foot-grid">
             <div className="foot-brand">
               <span className="brand-mark"><span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span></span>
-              <p>An open-source design system for React and Angular — one token set, both frameworks.</p>
+              <p>An open-source design system for React and Angular, one token set, both frameworks.</p>
             </div>
             <div className="foot-col">
               <h4>Documentation</h4>
