@@ -1,0 +1,66 @@
+{
+  "name": "@bpdm/wc",
+  "version": "0.0.0",
+  "description": "Framework-agnostic Web Components for bpdm/ui — standards-based custom elements that run in any stack (React, Angular, Vue, PHP, Rails, Elixir/Phoenix + LiveView, Django, vanilla). Built on Lit, themed with @bpdm/tokens.",
+  "type": "module",
+  "license": "MIT",
+  "author": "bpdm (https://bpdm.dev)",
+  "homepage": "https://ui.bpdm.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpdm-hq/bpdm-ui.git",
+    "directory": "packages/wc"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "lit",
+    "design-system",
+    "framework-agnostic",
+    "typescript"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./button": {
+      "types": "./dist/button/bpdm-button.d.ts",
+      "default": "./dist/button/bpdm-button.js"
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "size": "size-limit",
+    "lint": "eslint .",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "jsdom": "^28.0.0",
+    "size-limit": "^12.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9"
+  }
+}

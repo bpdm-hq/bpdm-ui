@@ -1,0 +1,60 @@
+---
+title: Web Components
+description: Framework-agnostic bpdm/ui elements (@bpdm/wc) — standards-based custom elements that run in any stack, from React and Angular to PHP, Rails, Elixir/Phoenix LiveView, Django, WordPress and plain HTML.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+`@bpdm/wc` ships bpdm/ui as **standards-based Web Components** (Custom Elements) —
+the same design and tokens as the React (`@bpdm/ui`) and Angular (`@bpdm/ng`)
+libraries, but as plain `<bpdm-*>` elements that the browser understands natively.
+
+Because custom elements are a **browser standard**, they don't care what renders
+the HTML. One build runs everywhere:
+
+- **Any backend** — PHP / Laravel, Ruby on Rails, Java / Spring, Go, Node, Python /
+  Django, **Elixir / Phoenix (+ LiveView)**.
+- **Any framework** — React, Angular, Vue, Svelte, Solid, or no framework at all.
+- **Any CMS** — WordPress, Drupal, Shopify, Ghost, Webflow, or a headless CMS.
+
+<Callout type="info">
+  Built on [Lit](https://lit.dev) — the same foundation as Google's Material Web,
+  Adobe Spectrum and Shoelace. Shadow DOM encapsulates each element (host-page CSS
+  can't break it), while theming still flows in through the `@bpdm/tokens` CSS
+  custom properties, which pierce the shadow boundary.
+</Callout>
+
+## Install
+
+```bash
+npm i @bpdm/wc
+# or load from a CDN — no build step:
+# <script type="module" src="https://cdn.jsdelivr.net/npm/@bpdm/wc/dist/button/bpdm-button.js"></script>
+```
+
+Then import the element once (anywhere in your app's JS) to register it, and load
+the design tokens so it picks up a theme:
+
+```js
+import '@bpdm/wc/button';      // registers <bpdm-button>
+import '@bpdm/tokens/tokens.css'; // the palette (or set the CSS variables yourself)
+```
+
+```html
+<bpdm-button variant="primary">Save changes</bpdm-button>
+```
+
+## What's here
+
+- **[Button](/docs/web-components/button)** — the first element, with full
+  end-to-end examples (HTML, React, Angular, PHP, Phoenix LiveView), native
+  `<form>` submit, theming and accessibility.
+
+More elements are being ported from the React/Angular set. The interactive
+components (Select, Dialog, …) follow once the presentational set lands.
+
+## Requirements
+
+- A modern browser (all evergreen browsers support Custom Elements v1 + Shadow DOM).
+- The ability to load a `<script type="module">` and allow its source in your
+  Content-Security-Policy. That's the only thing a locked-down CMS might restrict.

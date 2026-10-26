@@ -24,3 +24,5 @@ yarn-error.log*
 .env*.local
 .vercel
 next-env.d.ts
+# fumadocs auto-generates this on build
+AGENTS.md

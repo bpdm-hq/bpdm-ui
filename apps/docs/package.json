@@ -15,6 +15,7 @@
     "@bpdm/scheduler": "workspace:*",
     "@bpdm/tokens": "workspace:*",
     "@bpdm/ui": "workspace:*",
+    "@bpdm/wc": "workspace:*",
     "fumadocs-core": "16.10.5",
     "fumadocs-mdx": "15.0.12",
     "fumadocs-ui": "16.10.5",
