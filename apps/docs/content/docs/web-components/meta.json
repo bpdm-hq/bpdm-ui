@@ -1,4 +1,8 @@
 {
   "title": "Web Components",
-  "pages": ["index", "button"]
+  "icon": "CodeXml",
+  "pages": [
+    "index",
+    "button"
+  ]
 }

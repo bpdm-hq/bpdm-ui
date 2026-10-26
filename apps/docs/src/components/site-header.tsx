@@ -1,10 +1,10 @@
 import { SearchBox } from './search-box';
 import { ThemeSelect } from './theme-select';
+import { FrameworkPicker } from './framework';
 
 const LANDING = 'https://ui.bpdm.dev';
 // Hidden until the repo moves to a public org — re-enable with the GitHub link below.
 // const REPO = 'https://github.com/bpdm-hq/bpdm-ui';
-const VERSION = '0.1.0';
 
 /**
  * The docs site header — mirrors the marketing landing's look (full-bleed bar,
@@ -23,10 +23,8 @@ export function MobileMenuBanner() {
   return (
     <div className="mb-1 flex flex-col gap-3 border-b border-fd-border pb-3 md:hidden">
       <SearchBox block />
-      <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex h-9 items-center rounded-full border border-fd-border px-3 font-mono text-xs leading-none text-fd-muted-foreground">
-          v{VERSION}
-        </span>
+      <FrameworkPicker className="w-full" />
+      <div className="flex items-center justify-end gap-2">
         <ThemeSelect />
       </div>
     </div>
@@ -65,10 +63,8 @@ export function SiteHeader() {
             (quiet metadata) · GitHub · theme. */}
         <nav className="hidden items-center gap-2 pe-4 md:flex">
           <SearchBox />
+          <FrameworkPicker className="w-36" />
           <span aria-hidden className="mx-1 hidden h-5 w-px bg-fd-border md:block" />
-          <span className="hidden h-9 items-center rounded-full border border-fd-border px-3 font-mono text-xs leading-none text-fd-muted-foreground md:inline-flex">
-            v{VERSION}
-          </span>
           {/* GitHub link hidden until the repo moves to a public org (see REPO const above).
               Re-enable this block + the REPO const, and point REPO at the new org URL. */}
           {/* <a

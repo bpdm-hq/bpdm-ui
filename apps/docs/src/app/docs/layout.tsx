@@ -4,10 +4,11 @@ import { baseOptions } from '@/lib/layout.shared';
 import { CopyToast } from '@/components/copy-toast';
 import { SiteHeader, MobileMenuBanner } from '@/components/site-header';
 import { MobileNavTrigger } from '@/components/mobile-nav-trigger';
+import { FrameworkProvider } from '@/components/framework';
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
-    <>
+    <FrameworkProvider>
       {/* full-width site header above the docs layout (Fumadocs' own nav is disabled) */}
       <SiteHeader />
       <DocsLayout
@@ -21,6 +22,6 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
             so mobile can open the component nav (Fumadocs' own trigger is disabled) */}
         <MobileNavTrigger />
       </DocsLayout>
-    </>
+    </FrameworkProvider>
   );
 }
