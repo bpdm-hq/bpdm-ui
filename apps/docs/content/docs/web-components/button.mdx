@@ -1,0 +1,348 @@
+---
+title: Button (Web Component)
+description: <bpdm-button> — the bpdm/ui Button as a standards-based custom element. Works in React, Angular, Vue, PHP, Rails, Elixir/Phoenix LiveView, Django, WordPress and plain HTML, with native <form> submit.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Preview } from '@/components/preview';
+import {
+  WcButtonBasicDemo,
+  WcButtonVariantsDemo,
+  WcButtonAppearancesDemo,
+  WcButtonSizesDemo,
+  WcButtonShapeDemo,
+  WcButtonLoadingDemo,
+  WcButtonFormDemo,
+} from '@/components/wc-button-demos';
+
+`<bpdm-button>` is the bpdm/ui Button delivered as a framework-agnostic **Web
+Component**. It renders a real `<button>` inside its shadow root (so focus and
+keyboard behaviour stay native), is themed by the `@bpdm/tokens` CSS variables,
+and is **form-associated** — `type="submit"` / `type="reset"` drive the
+surrounding native `<form>` exactly like a built-in button, with no extra JS.
+
+## Setup
+
+Register the element once, and load the tokens so it picks up a theme. After that
+you just write the tag — in a template, a component, or straight HTML.
+
+<Tabs groupId="wc-stack" items={['HTML', 'React', 'Angular', 'PHP / Laravel', 'Phoenix LiveView']}>
+  <Tab value="HTML">
+
+```html title="index.html"
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@bpdm/tokens/tokens.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@bpdm/wc/dist/button/bpdm-button.js"></script>
+  </head>
+  <body>
+    <bpdm-button variant="primary">Save changes</bpdm-button>
+  </body>
+</html>
+```
+
+  </Tab>
+  <Tab value="React">
+
+```tsx title="app.tsx"
+import '@bpdm/wc/button';
+import '@bpdm/tokens/tokens.css';
+
+export function App() {
+  return (
+    <bpdm-button variant="primary" onClick={() => console.log('saved')}>
+      Save changes
+    </bpdm-button>
+  );
+}
+```
+
+React 19 passes attributes and listens to events on custom elements natively. For
+TypeScript, declare the tag once (see [TypeScript](#typescript)).
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="app.component.ts"
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import '@bpdm/wc/button';
+
+@Component({
+  selector: 'app-root',
+  template: `<bpdm-button variant="primary" (click)="save()">Save changes</bpdm-button>`,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // allow custom element tags
+})
+export class AppComponent {
+  save() {
+    console.log('saved');
+  }
+}
+```
+
+  </Tab>
+  <Tab value="PHP / Laravel">
+
+```php title="welcome.blade.php"
+{{-- once, in your layout <head> --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@bpdm/tokens/tokens.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@bpdm/wc/dist/button/bpdm-button.js"></script>
+
+{{-- anywhere in a view --}}
+<form method="POST" action="/save">
+  @csrf
+  <bpdm-button type="submit">Save changes</bpdm-button>
+</form>
+```
+
+  </Tab>
+  <Tab value="Phoenix LiveView">
+
+```html title="in your root layout"
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@bpdm/tokens/tokens.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@bpdm/wc/dist/button/bpdm-button.js"></script>
+```
+
+```html title="some_live.html.heex"
+<form phx-submit="save">
+  <bpdm-button type="submit" phx-update="ignore" id="save-btn">Save changes</bpdm-button>
+</form>
+```
+
+Because `<bpdm-button>` emits a native submit, LiveView's `phx-submit` fires
+without a hook. Add `phx-update="ignore"` so LiveView's DOM patching leaves the
+element's shadow content alone.
+
+  </Tab>
+</Tabs>
+
+<Preview>
+  <WcButtonBasicDemo />
+</Preview>
+
+## Variants
+
+The `variant` attribute sets the semantic colour: `primary`, `secondary`,
+`success`, `info`, `warning`, `help`, `destructive`, or `contrast`.
+
+<Preview>
+  <WcButtonVariantsDemo />
+</Preview>
+
+```html title="variants.html"
+<div style="display:flex; flex-wrap:wrap; gap:0.75rem">
+  <bpdm-button variant="primary">Primary</bpdm-button>
+  <bpdm-button variant="secondary">Secondary</bpdm-button>
+  <bpdm-button variant="success">Success</bpdm-button>
+  <bpdm-button variant="info">Info</bpdm-button>
+  <bpdm-button variant="warning">Warning</bpdm-button>
+  <bpdm-button variant="help">Help</bpdm-button>
+  <bpdm-button variant="destructive">Destructive</bpdm-button>
+  <bpdm-button variant="contrast">Contrast</bpdm-button>
+</div>
+```
+
+## Appearances
+
+The `appearance` attribute sets the style — `solid` (default, filled), `outline`
+(bordered, transparent fill), and `ghost` (no border or fill). It composes with
+every `variant`.
+
+<Preview>
+  <WcButtonAppearancesDemo />
+</Preview>
+
+```html title="appearances.html"
+<bpdm-button appearance="solid">Solid</bpdm-button>
+<bpdm-button appearance="outline">Outline</bpdm-button>
+<bpdm-button appearance="ghost">Ghost</bpdm-button>
+```
+
+## Sizes
+
+The `size` attribute offers `sm`, `md` (default), and `lg` for text buttons, plus
+square `iconSm` / `icon` / `iconLg` for icon-only buttons, and `none` to opt out.
+
+<Preview>
+  <WcButtonSizesDemo />
+</Preview>
+
+```html title="sizes.html"
+<bpdm-button size="sm">Small</bpdm-button>
+<bpdm-button size="md">Medium</bpdm-button>
+<bpdm-button size="lg">Large</bpdm-button>
+```
+
+## Shape
+
+`shape="round"` makes a text button a pill, or an icon button a circle.
+
+<Preview>
+  <WcButtonShapeDemo />
+</Preview>
+
+```html title="shape.html"
+<bpdm-button shape="round">Pill button</bpdm-button>
+<bpdm-button shape="round" variant="success">Success</bpdm-button>
+```
+
+## Loading
+
+Add the `loading` attribute to show a spinner, mark the element `aria-busy`, and
+block activation while a request is in flight. Toggle it from your own code.
+
+<Preview>
+  <WcButtonLoadingDemo />
+</Preview>
+
+```html title="loading.html"
+<bpdm-button id="save" type="submit">Save changes</bpdm-button>
+
+<script type="module">
+  const btn = document.getElementById('save');
+  btn.closest('form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.loading = true;
+    await fetch('/save', { method: 'POST' });
+    btn.loading = false;
+  });
+</script>
+```
+
+## Native form submit
+
+This is the headline feature: `<bpdm-button>` is a **form-associated custom
+element**, so `type="submit"` and `type="reset"` work inside a real `<form>` —
+the browser (and your server, Rails, Laravel or LiveView) sees an ordinary
+submit. No click handlers, no JS glue.
+
+<Preview>
+  <WcButtonFormDemo />
+</Preview>
+
+<Tabs groupId="wc-stack" items={['HTML', 'Phoenix LiveView']}>
+  <Tab value="HTML">
+
+```html title="form.html"
+<form method="POST" action="/subscribe">
+  <select name="plan">
+    <option value="starter">Starter</option>
+    <option value="pro">Pro</option>
+  </select>
+  <bpdm-button type="submit">Subscribe</bpdm-button>
+  <bpdm-button type="reset" variant="secondary" appearance="outline">Reset</bpdm-button>
+</form>
+```
+
+  </Tab>
+  <Tab value="Phoenix LiveView">
+
+```html title="subscribe_live.html.heex"
+<form phx-submit="subscribe">
+  <select name="plan">
+    <option value="starter">Starter</option>
+    <option value="pro">Pro</option>
+  </select>
+  <bpdm-button type="submit" phx-update="ignore" id="subscribe-btn">Subscribe</bpdm-button>
+</form>
+```
+
+  </Tab>
+</Tabs>
+
+## Theming
+
+The element reads the `@bpdm/tokens` CSS custom properties, which cross the shadow
+boundary. Switch themes by setting `data-theme` on an ancestor, or override single
+tokens in your own CSS:
+
+```css title="theme.css"
+/* one of the four built-in themes */
+:root { /* paper (default) */ }
+[data-theme='charcoal'] { /* dark */ }
+
+/* or nudge a token — applies to every bpdm element inside */
+.brand-area {
+  --primary: #0ea5e9;
+  --primary-foreground: #ffffff;
+  --radius: 0.75rem;
+}
+```
+
+## API
+
+### Attributes & properties
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `primary \| secondary \| success \| info \| warning \| help \| destructive \| contrast` | `primary` | Semantic colour. |
+| `appearance` | `solid \| outline \| ghost` | `solid` | Filled, bordered, or text-only. |
+| `size` | `sm \| md \| lg \| iconSm \| icon \| iconLg \| none` | `md` | Text sizes, square icon sizes, or `none`. |
+| `shape` | `default \| round` | `default` | Token radius, or `round` (pill / circle). |
+| `type` | `button \| submit \| reset` | `button` | Native button behaviour inside a `<form>`. |
+| `disabled` | `boolean` | `false` | Removes interaction and dims the element. |
+| `loading` | `boolean` | `false` | Spinner + `aria-busy`; blocks activation. |
+| `loading-label` | `string` | `Loading` | Screen-reader text while loading (property: `loadingLabel`). |
+
+### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The button label. |
+| `start` | Leading adornment (e.g. an icon), before the label. |
+| `end` | Trailing adornment, after the label. |
+
+### Parts
+
+| Part | Description |
+| --- | --- |
+| `base` | The inner `<button>` — style with `::part(base)`. |
+| `spinner` | The loading spinner. |
+
+### Events
+
+Standard DOM events bubble from the element — listen for `click` as usual. When
+`disabled` or `loading`, activation is swallowed so no `click` escapes.
+
+## Accessibility
+
+- Renders a **native `<button>`** in the shadow root with `delegatesFocus`, so
+  <kbd>Tab</kbd>, <kbd>Enter</kbd> / <kbd>Space</kbd>, and the focus ring are the
+  platform's own.
+- **Icon-only** buttons have no text — set an `aria-label` describing the action.
+- `loading` sets `aria-busy="true"` and keeps the label for context; `disabled`
+  exposes `aria-disabled` and drops the element from the tab order.
+- Motion honours `prefers-reduced-motion` (the press spring and spinner calm down).
+- Logical CSS throughout, so an icon + label pair mirrors under `dir="rtl"`.
+
+## Framework interop
+
+### TypeScript
+
+Declare the tag once so JSX / templates type-check:
+
+```ts title="bpdm-wc.d.ts"
+import type { BpdmButton } from '@bpdm/wc/button';
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'bpdm-button': BpdmButton;
+  }
+}
+```
+
+### Angular
+
+Add `CUSTOM_ELEMENTS_SCHEMA` to any component (or module) that uses the tag.
+
+### Vue
+
+Tell the compiler it's a custom element so Vue doesn't try to resolve it as a Vue
+component:
+
+```ts title="vite.config.ts"
+export default {
+  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith('bpdm-') } } })],
+};
+```
