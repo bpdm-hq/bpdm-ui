@@ -26,7 +26,7 @@ export const TabsList = React.forwardRef<
       // vertical: stack the tabs; the underline track runs down the inline-end edge
       "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
       variant === "underline" &&
-        "border-b border-border data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e",
+        "border-b border-[var(--bpdm-border)] data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e",
       // content → shrink the list so the baseline ends with the last tab
       variant === "underline" && baseline === "content" && "w-fit",
       // scroll the row when tabs overflow: keep tabs at natural width (no squeeze),
@@ -41,7 +41,7 @@ export const TabsList = React.forwardRef<
 TabsList.displayName = "TabsList";
 
 const triggerVariants = cva(
-  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed! disabled:opacity-50 data-[orientation=vertical]:justify-start [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)] disabled:cursor-not-allowed! disabled:opacity-50 data-[orientation=vertical]:justify-start [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -50,8 +50,8 @@ const triggerVariants = cva(
         // this static bottom border there (so the two don't double up); vertical always
         // uses its own inline-end border.
         underline:
-          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong data-[state=active]:border-primary-strong data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-primary-strong",
-        pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-muted/60 data-[orientation=vertical]:data-[state=active]:bg-muted",
+          "-mb-px border-b-2 border-transparent px-3 py-2.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:border-[var(--bpdm-primary-strong)]/60 data-[state=inactive]:enabled:hover:text-[var(--bpdm-primary-strong)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-primary-strong)] data-[state=active]:border-[var(--bpdm-primary-strong)] data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-[var(--bpdm-primary-strong)]",
+        pill: "relative z-10 rounded-lg px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)] data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/60 data-[orientation=vertical]:data-[state=active]:bg-[var(--bpdm-muted)]",
       },
     },
     defaultVariants: { variant: "underline" },
@@ -80,7 +80,7 @@ export const TabsContent = React.forwardRef<
     ref={ref}
     data-bpdm-slot="tabs-content"
     className={cn(
-      "pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
       // vertical: the panel sits beside the list instead of below it
       "data-[orientation=vertical]:flex-1 data-[orientation=vertical]:pt-0 data-[orientation=vertical]:ps-4",
       "data-[state=active]:animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
@@ -230,8 +230,8 @@ export function Tabs({
       className={cn(
         "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
         variant === "underline"
-          ? "-bottom-px h-0.5 bg-primary-strong" // sit on the baseline (like the tab's -mb-px border), flush not floating
-          : "inset-y-0 z-0 rounded-lg bg-muted",
+          ? "-bottom-px h-0.5 bg-[var(--bpdm-primary-strong)]" // sit on the baseline (like the tab's -mb-px border), flush not floating
+          : "inset-y-0 z-0 rounded-lg bg-[var(--bpdm-muted)]",
       )}
     />
   ) : null;
@@ -245,7 +245,7 @@ export function Tabs({
 
   // minimal inline chevron (no chip/border) — dims at the edge it can't scroll toward
   const chevron =
-    "grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
+    "grid size-8 shrink-0 place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] disabled:pointer-events-none disabled:opacity-30";
   // symmetric edge fade so partial tabs dissolve at both ends (RTL-safe)
   const fade = "linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent)";
 
@@ -277,7 +277,7 @@ export function Tabs({
       {scrollable ? (
         // inline chevrons flank a fade-masked scroll row; the underline moves to the
         // wrapper so it stays solid edge-to-edge
-        <div className={cn("flex items-center", variant === "underline" && "border-b border-border")}>
+        <div className={cn("flex items-center", variant === "underline" && "border-b border-[var(--bpdm-border)]")}>
           <button
             type="button"
             aria-hidden

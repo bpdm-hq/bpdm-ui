@@ -123,7 +123,7 @@ describe("Popover", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog").className).not.toContain("border-border");
+    expect(screen.getByRole("dialog").className).not.toContain("border-[var(--bpdm-border)]");
   });
 
   it("keeps the border class by default", async () => {
@@ -135,7 +135,7 @@ describe("Popover", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("dialog").className).toContain("border-border");
+    expect(screen.getByRole("dialog").className).toContain("border-[var(--bpdm-border)]");
   });
 
   it("renders the arrow when showArrow is set", async () => {

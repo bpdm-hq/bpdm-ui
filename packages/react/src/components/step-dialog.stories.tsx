@@ -133,7 +133,7 @@ export function Example() {
           title: "Review",
           description: "Confirm and finish.",
           content: (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--bpdm-muted-foreground)]">
               Everything looks good. Click <strong>Finish</strong> to create your workspace.
             </p>
           ),

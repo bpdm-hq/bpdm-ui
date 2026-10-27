@@ -226,9 +226,9 @@ function Marker({
       data-bpdm-slot="stepper-marker"
       className={cn(
         "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
-        state === "completed" && "border-success bg-success text-success-foreground",
-        state === "active" && "scale-105 border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background",
-        state === "upcoming" && "border-border text-muted-foreground",
+        state === "completed" && "border-[var(--bpdm-success)] bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]",
+        state === "active" && "scale-105 border-[var(--bpdm-primary)] bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-2 ring-[var(--bpdm-primary)] ring-offset-2 ring-offset-[var(--bpdm-background)]",
+        state === "upcoming" && "border-[var(--bpdm-border)] text-[var(--bpdm-muted-foreground)]",
       )}
     >
       {state === "completed" && !icon ? (
@@ -312,7 +312,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
       onClick={() => clickable && ctx.activate(value)}
       data-bpdm-slot="stepper-step"
       className={cn(
-        "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
         clickable && !active && "cursor-pointer",
         // locked (linear future) or disabled steps read as not-allowed + dimmed;
         // `!` beats any host-app global that forces a pointer cursor on step buttons
@@ -326,7 +326,7 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
         <span
           className={cn(
             "whitespace-nowrap text-sm transition-colors duration-[var(--bpdm-duration-base)]",
-            active ? "font-semibold text-foreground" : completed ? "font-medium text-foreground" : "text-muted-foreground",
+            active ? "font-semibold text-[var(--bpdm-foreground)]" : completed ? "font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
             // horizontal on mobile: only the active step keeps its label (markers +
             // connectors stay), so the row never overflows a narrow screen; from sm up
             // every label shows. Vertical always shows labels (no width pressure).
@@ -349,10 +349,10 @@ function StepImpl({ value: valueProp, children, icon, disabled = false, classNam
       {trigger}
       {!isLast && (
         // track + a primary fill that grows left→right as the step completes
-        <span aria-hidden className="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-border sm:mx-3">
+        <span aria-hidden className="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-[var(--bpdm-border)] sm:mx-3">
           <span
             className={cn(
-              "absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
+              "absolute inset-0 origin-left rtl:origin-right rounded-full bg-[var(--bpdm-success)] transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
               completed ? "scale-x-100" : "scale-x-0",
             )}
           />
@@ -405,7 +405,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
         )}
       >
         <div className="overflow-hidden">
-          <div className={cn("ms-[2.75rem] pb-2 pt-1 text-sm text-foreground", className)}>
+          <div className={cn("ms-[2.75rem] pb-2 pt-1 text-sm text-[var(--bpdm-foreground)]", className)}>
             {children}
           </div>
         </div>
@@ -422,7 +422,7 @@ export function StepPanel({ value: valueProp, children, className }: StepPanelPr
       aria-labelledby={stepTabId(ctx.uid, value)}
       data-bpdm-slot="stepper-panel"
       className={cn(
-        "animate-[bpdm-step-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] pt-2 text-sm text-foreground",
+        "animate-[bpdm-step-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] pt-2 text-sm text-[var(--bpdm-foreground)]",
         className,
       )}
     >
@@ -452,11 +452,11 @@ function StepItemImpl({ value, children, className }: StepItemProps) {
           // track + a primary fill that grows top→bottom as the step completes
           <span
             aria-hidden
-            className="absolute start-4 top-9 bottom-0 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-border"
+            className="absolute start-4 top-9 bottom-0 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-[var(--bpdm-border)]"
           >
             <span
               className={cn(
-                "absolute inset-0 origin-top rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
+                "absolute inset-0 origin-top rounded-full bg-[var(--bpdm-success)] transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]",
                 completed ? "scale-y-100" : "scale-y-0",
               )}
             />

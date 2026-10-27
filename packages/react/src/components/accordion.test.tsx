@@ -20,7 +20,7 @@ describe("Accordion", () => {
     const trigger = screen.getByRole("button", { name: "First" });
     expect(trigger.className).toContain("focus-visible:ring-2");
     expect(trigger.className).toContain("focus-visible:ring-offset-2");
-    expect(trigger.className).toContain("focus-visible:ring-offset-background");
+    expect(trigger.className).toContain("focus-visible:ring-offset-[var(--bpdm-background)]");
   });
 
   it("opens the defaultValue section", () => {

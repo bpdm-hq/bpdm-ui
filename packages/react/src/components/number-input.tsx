@@ -92,7 +92,7 @@ function StepButton({
         timer.current = setTimeout(() => setPressed(false), 160);
       }}
       className={cn(
-        "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 enabled:hover:bg-muted enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
+        "flex cursor-pointer select-none items-center justify-center text-[var(--bpdm-foreground)] transition-transform duration-100 enabled:hover:bg-[var(--bpdm-muted)] enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
         pressed && "scale-90",
         className,
       )}
@@ -179,7 +179,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         )}
       >
         {prefix && (
-          <span className="shrink-0 text-muted-foreground">{prefix}</span>
+          <span className="shrink-0 text-[var(--bpdm-muted-foreground)]">{prefix}</span>
         )}
         <input
           ref={ref}
@@ -209,14 +209,14 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           onBlur={() => commit(current)}
           data-bpdm-slot="number-input-field"
           className={cn(
-            "w-full min-w-0 border-0 bg-transparent text-foreground tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full min-w-0 border-0 bg-transparent text-[var(--bpdm-foreground)] tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
             buttonLayout === "horizontal" ? "text-center" : "text-start",
             d.text,
           )}
           {...props}
         />
         {suffix && (
-          <span className="shrink-0 text-muted-foreground">{suffix}</span>
+          <span className="shrink-0 text-[var(--bpdm-muted-foreground)]">{suffix}</span>
         )}
       </div>
     );
@@ -226,7 +226,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         key={buttonLayout}
         data-bpdm="" data-bpdm-slot="number-input"
         className={cn(
-          "inline-flex items-stretch overflow-hidden rounded-[var(--radius)] border border-input bg-background shadow-sm focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
+          "inline-flex items-stretch overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] shadow-sm focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)]",
           d.h,
           className,
         )}
@@ -237,7 +237,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             path={Glyph.minus}
             disabled={disabled || atMin}
             onTrigger={dec}
-            className={cn(d.btn, "border-e border-input")}
+            className={cn(d.btn, "border-e border-[var(--bpdm-input)]")}
           />
         )}
 
@@ -249,10 +249,10 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             path={Glyph.plus}
             disabled={disabled || atMax}
             onTrigger={inc}
-            className={cn(d.btn, "border-s border-input")}
+            className={cn(d.btn, "border-s border-[var(--bpdm-input)]")}
           />
         ) : (
-          <div className="flex w-7 flex-col border-s border-input">
+          <div className="flex w-7 flex-col border-s border-[var(--bpdm-input)]">
             <StepButton
               label={t.increase}
               path={Glyph.up}
@@ -265,7 +265,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
               path={Glyph.down}
               disabled={disabled || atMin}
               onTrigger={dec}
-              className="flex-1 border-t border-input"
+              className="flex-1 border-t border-[var(--bpdm-input)]"
             />
           </div>
         )}

@@ -163,8 +163,8 @@ export class BpdmButton extends LitElement {
     .base:focus-visible {
       outline: none;
       box-shadow:
-        0 0 0 2px var(--background, #fff),
-        0 0 0 4px var(--ring, #e8a300);
+        0 0 0 2px var(--bpdm-background, #fff),
+        0 0 0 4px var(--bpdm-ring, #e8a300);
     }
     :host([disabled]) .base,
     :host([loading]) .base {
@@ -181,41 +181,41 @@ export class BpdmButton extends LitElement {
     :host([size="iconLg"]) .base { height: 3rem; width: 3rem; }
 
     /* ── shape (owns the radius) ── */
-    :host([shape="default"]) .base { border-radius: var(--radius, 0.5rem); }
+    :host([shape="default"]) .base { border-radius: var(--bpdm-radius, 0.5rem); }
     :host([shape="round"]) .base { border-radius: 9999px; }
 
     /* ── solid ── */
-    :host([appearance="solid"][variant="primary"]) .base { background: var(--primary, #e8a300); color: var(--primary-foreground, #1a1a1a); }
-    :host([appearance="solid"][variant="primary"]) .base:hover { background: color-mix(in oklab, var(--primary, #e8a300) 90%, transparent); }
-    :host([appearance="solid"][variant="secondary"]) .base { background: var(--secondary, #e8e8e8); color: var(--secondary-foreground, #1a1a1a); }
-    :host([appearance="solid"][variant="secondary"]) .base:hover { background: color-mix(in oklab, var(--secondary, #e8e8e8) 80%, transparent); }
-    :host([appearance="solid"][variant="success"]) .base { background: var(--success, #16a34a); color: var(--success-foreground, #fff); }
-    :host([appearance="solid"][variant="info"]) .base { background: var(--info, #0284c7); color: var(--info-foreground, #fff); }
-    :host([appearance="solid"][variant="warning"]) .base { background: var(--warning, #d97706); color: var(--warning-foreground, #fff); }
-    :host([appearance="solid"][variant="help"]) .base { background: var(--help, #7c3aed); color: var(--help-foreground, #fff); }
-    :host([appearance="solid"][variant="destructive"]) .base { background: var(--destructive, #dc2626); color: var(--destructive-foreground, #fff); }
-    :host([appearance="solid"][variant="contrast"]) .base { background: var(--foreground, #1a1a1a); color: var(--background, #fff); }
+    :host([appearance="solid"][variant="primary"]) .base { background: var(--bpdm-primary, #e8a300); color: var(--bpdm-primary-foreground, #1a1a1a); }
+    :host([appearance="solid"][variant="primary"]) .base:hover { background: color-mix(in oklab, var(--bpdm-primary, #e8a300) 90%, transparent); }
+    :host([appearance="solid"][variant="secondary"]) .base { background: var(--bpdm-secondary, #e8e8e8); color: var(--bpdm-secondary-foreground, #1a1a1a); }
+    :host([appearance="solid"][variant="secondary"]) .base:hover { background: color-mix(in oklab, var(--bpdm-secondary, #e8e8e8) 80%, transparent); }
+    :host([appearance="solid"][variant="success"]) .base { background: var(--bpdm-success, #16a34a); color: var(--bpdm-success-foreground, #fff); }
+    :host([appearance="solid"][variant="info"]) .base { background: var(--bpdm-info, #0284c7); color: var(--bpdm-info-foreground, #fff); }
+    :host([appearance="solid"][variant="warning"]) .base { background: var(--bpdm-warning, #d97706); color: var(--bpdm-warning-foreground, #fff); }
+    :host([appearance="solid"][variant="help"]) .base { background: var(--bpdm-help, #7c3aed); color: var(--bpdm-help-foreground, #fff); }
+    :host([appearance="solid"][variant="destructive"]) .base { background: var(--bpdm-destructive, #dc2626); color: var(--bpdm-destructive-foreground, #fff); }
+    :host([appearance="solid"][variant="contrast"]) .base { background: var(--bpdm-foreground, #1a1a1a); color: var(--bpdm-background, #fff); }
 
     /* ── outline ── */
     :host([appearance="outline"]) .base { border: 1px solid; background: transparent; }
-    :host([appearance="outline"][variant="primary"]) .base { border-color: var(--primary-strong, #b37400); color: var(--primary-strong, #b37400); }
-    :host([appearance="outline"][variant="secondary"]) .base { border-color: var(--input, #d4d4d4); color: var(--foreground, #1a1a1a); }
-    :host([appearance="outline"][variant="success"]) .base { border-color: var(--success, #16a34a); color: var(--success, #16a34a); }
-    :host([appearance="outline"][variant="info"]) .base { border-color: var(--info, #0284c7); color: var(--info, #0284c7); }
-    :host([appearance="outline"][variant="warning"]) .base { border-color: var(--warning, #d97706); color: var(--warning, #d97706); }
-    :host([appearance="outline"][variant="help"]) .base { border-color: var(--help, #7c3aed); color: var(--help, #7c3aed); }
-    :host([appearance="outline"][variant="destructive"]) .base { border-color: var(--destructive, #dc2626); color: var(--destructive-strong, #b91c1c); }
-    :host([appearance="outline"][variant="contrast"]) .base { border-color: color-mix(in oklab, var(--foreground, #1a1a1a) 40%, transparent); color: var(--foreground, #1a1a1a); }
+    :host([appearance="outline"][variant="primary"]) .base { border-color: var(--bpdm-primary-strong, #b37400); color: var(--bpdm-primary-strong, #b37400); }
+    :host([appearance="outline"][variant="secondary"]) .base { border-color: var(--bpdm-input, #d4d4d4); color: var(--bpdm-foreground, #1a1a1a); }
+    :host([appearance="outline"][variant="success"]) .base { border-color: var(--bpdm-success, #16a34a); color: var(--bpdm-success, #16a34a); }
+    :host([appearance="outline"][variant="info"]) .base { border-color: var(--bpdm-info, #0284c7); color: var(--bpdm-info, #0284c7); }
+    :host([appearance="outline"][variant="warning"]) .base { border-color: var(--bpdm-warning, #d97706); color: var(--bpdm-warning, #d97706); }
+    :host([appearance="outline"][variant="help"]) .base { border-color: var(--bpdm-help, #7c3aed); color: var(--bpdm-help, #7c3aed); }
+    :host([appearance="outline"][variant="destructive"]) .base { border-color: var(--bpdm-destructive, #dc2626); color: var(--bpdm-destructive-strong, #b91c1c); }
+    :host([appearance="outline"][variant="contrast"]) .base { border-color: color-mix(in oklab, var(--bpdm-foreground, #1a1a1a) 40%, transparent); color: var(--bpdm-foreground, #1a1a1a); }
 
     /* ── ghost ── */
-    :host([appearance="ghost"][variant="primary"]) .base { color: var(--primary-strong, #b37400); }
-    :host([appearance="ghost"][variant="secondary"]) .base { color: var(--foreground, #1a1a1a); }
-    :host([appearance="ghost"][variant="success"]) .base { color: var(--success, #16a34a); }
-    :host([appearance="ghost"][variant="info"]) .base { color: var(--info, #0284c7); }
-    :host([appearance="ghost"][variant="warning"]) .base { color: var(--warning, #d97706); }
-    :host([appearance="ghost"][variant="help"]) .base { color: var(--help, #7c3aed); }
-    :host([appearance="ghost"][variant="destructive"]) .base { color: var(--destructive-strong, #b91c1c); }
-    :host([appearance="ghost"][variant="contrast"]) .base { color: var(--foreground, #1a1a1a); }
+    :host([appearance="ghost"][variant="primary"]) .base { color: var(--bpdm-primary-strong, #b37400); }
+    :host([appearance="ghost"][variant="secondary"]) .base { color: var(--bpdm-foreground, #1a1a1a); }
+    :host([appearance="ghost"][variant="success"]) .base { color: var(--bpdm-success, #16a34a); }
+    :host([appearance="ghost"][variant="info"]) .base { color: var(--bpdm-info, #0284c7); }
+    :host([appearance="ghost"][variant="warning"]) .base { color: var(--bpdm-warning, #d97706); }
+    :host([appearance="ghost"][variant="help"]) .base { color: var(--bpdm-help, #7c3aed); }
+    :host([appearance="ghost"][variant="destructive"]) .base { color: var(--bpdm-destructive-strong, #b91c1c); }
+    :host([appearance="ghost"][variant="contrast"]) .base { color: var(--bpdm-foreground, #1a1a1a); }
 
     /* hover wash for outline + ghost (tinted by the current variant) */
     :host([appearance="outline"]) .base:hover,

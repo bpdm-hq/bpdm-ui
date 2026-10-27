@@ -138,7 +138,7 @@ interface BodyRow<T> extends RenderRow<T> {
           }
           @if (searchable()) {
             <div class="relative">
-              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                 <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" />
                 <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
               </svg>
@@ -149,7 +149,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 [attr.placeholder]="searchPlaceholder()"
                 [attr.aria-label]="t().search"
                 data-bpdm-slot="data-table-search"
-                class="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                class="h-9 w-56 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-8 pe-3 text-sm text-[var(--bpdm-foreground)] shadow-sm transition-colors placeholder:text-[var(--bpdm-muted-foreground)] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)]"
               />
             </div>
           }
@@ -162,7 +162,7 @@ interface BodyRow<T> extends RenderRow<T> {
       <div class="space-y-3" data-dt-cards>
 
         @if (rows.length === 0) {
-          <div class="rounded-xl border border-border bg-card px-4 py-8 text-center text-muted-foreground">{{ emptyContent() }}</div>
+          <div class="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] px-4 py-8 text-center text-[var(--bpdm-muted-foreground)]">{{ emptyContent() }}</div>
         } @else {
           @for (rr of rows; track rr.key) {
             <div
@@ -175,7 +175,7 @@ interface BodyRow<T> extends RenderRow<T> {
                   @if (selectable()) {
                     @if (selectionMode() === "single") {
                       <button type="button" role="radio" data-dt-radio [attr.tabindex]="radioTabbable(rr.key) ? 0 : -1" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" (keydown)="onRadioKey($event)" [class]="radioClass(selectedSet().has(rr.key))">
-                        @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
+                        @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-[var(--bpdm-primary)]"></span> }
                       </button>
                     } @else {
                       <bpdm-checkbox size="sm" [attr.aria-label]="rowSelectLabel(rr)" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
@@ -184,7 +184,7 @@ interface BodyRow<T> extends RenderRow<T> {
                     <span></span>
                   }
                   @if (canExpand(rr.row)) {
-                    <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapse : t().expand" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                    <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapse : t().expand" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]">
                       <svg viewBox="0 0 16 16" [class]="'size-4 transition-transform ' + (expandedSet().has(rr.key) ? 'rotate-90' : '')" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     </button>
                   }
@@ -192,7 +192,7 @@ interface BodyRow<T> extends RenderRow<T> {
               }
               <dl class="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
                 @for (col of cols; track col.id) {
-                  <dt class="truncate text-muted-foreground">{{ col.header ?? col.id }}</dt>
+                  <dt class="truncate text-[var(--bpdm-muted-foreground)]">{{ col.header ?? col.id }}</dt>
                   <dd [class]="'flex min-w-0 items-center justify-end gap-2 text-end ' + (col.numeric ? 'tabular-nums' : '')">
                     @if (col.cell) {
                       <ng-container [ngTemplateOutlet]="col.cell" [ngTemplateOutletContext]="rr.ctx" />
@@ -205,7 +205,7 @@ interface BodyRow<T> extends RenderRow<T> {
               @if (expandedSet().has(rr.key) && expandedTemplate()) {
                 <div [attr.id]="rowPanelId(rr.key)" class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
                   <div class="overflow-hidden">
-                    <div class="mt-3 border-t border-border pt-3">
+                    <div class="mt-3 border-t border-[var(--bpdm-border)] pt-3">
                       <ng-container [ngTemplateOutlet]="expandedTemplate()!" [ngTemplateOutletContext]="rr.ctx" />
                     </div>
                   </div>
@@ -245,7 +245,7 @@ interface BodyRow<T> extends RenderRow<T> {
                 }
                 @if (selectable()) {
                   <th scope="col" data-pin-id="__lead_select"
-                    [class]="leadHeadClass(true) + ' text-muted-foreground'"
+                    [class]="leadHeadClass(true) + ' text-[var(--bpdm-muted-foreground)]'"
                     [style.position]="hasLeftPin() || stickyHeader() ? 'sticky' : null"
                     [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_select'] : null"
                     [style.top.px]="stickyHeader() ? 0 : null">
@@ -285,10 +285,10 @@ interface BodyRow<T> extends RenderRow<T> {
                           @if (dir === null) {
                             <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 opacity-40" fill="none" aria-hidden="true"><path d="M5 6.5 8 3.5l3 3M5 9.5 8 12.5l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           } @else {
-                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-primary" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <svg viewBox="0 0 16 16" class="size-3.5 shrink-0 text-[var(--bpdm-primary)]" fill="none" aria-hidden="true"><path [attr.d]="dir === 'asc' ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           }
                           @if (sortOrder(col.id) > 0) {
-                            <span class="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">{{ sortOrder(col.id) }}</span>
+                            <span class="grid size-4 place-items-center rounded-full bg-[var(--bpdm-primary)]/15 text-[10px] font-semibold text-[var(--bpdm-primary)]">{{ sortOrder(col.id) }}</span>
                           }
                         </button>
                       } @else {
@@ -324,7 +324,7 @@ interface BodyRow<T> extends RenderRow<T> {
 
             <tbody data-bpdm-slot="data-table-body">
               @if (rows.length === 0) {
-                <tr><td [attr.colspan]="colCount()" data-bpdm-slot="data-table-empty" [class]="cellPad() + ' text-center text-muted-foreground'">{{ emptyContent() }}</td></tr>
+                <tr><td [attr.colspan]="colCount()" data-bpdm-slot="data-table-empty" [class]="cellPad() + ' text-center text-[var(--bpdm-muted-foreground)]'">{{ emptyContent() }}</td></tr>
               } @else {
                 @if (virtualized() && padTop() > 0) {
                   <tr [style.height.px]="padTop()"><td [attr.colspan]="colCount()"></td></tr>
@@ -342,7 +342,7 @@ interface BodyRow<T> extends RenderRow<T> {
                     [class]="rr.rowClass"
                   >
                     @if (reorderableRows()) {
-                      <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-e border-border ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
+                      <td [class]="cellPad() + ' w-[1%] ' + (bordered() ? 'border-e border-[var(--bpdm-border)] ' : '') + (cellClassName() || '')" (click)="$event.stopPropagation()">
                         <button
                           type="button"
                           draggable="true"
@@ -350,7 +350,7 @@ interface BodyRow<T> extends RenderRow<T> {
                           (dragend)="dragRowKey.set(null); dropTarget.set(null)"
                           (keydown)="onGripKey($event, rr.key)"
                           [attr.aria-label]="rowReorderLabel(rr)"
-                          [class]="'grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' + (dragRowKey() === rr.key ? 'opacity-40' : '')"
+                          [class]="'grid size-6 cursor-grab place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] ' + (dragRowKey() === rr.key ? 'opacity-40' : '')"
                         >
                           <svg viewBox="0 0 16 16" class="size-4" fill="none" aria-hidden="true"><path d="M5 4h.01M5 8h.01M5 12h.01M11 4h.01M11 8h.01M11 12h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
                         </button>
@@ -359,7 +359,7 @@ interface BodyRow<T> extends RenderRow<T> {
                     @if (expandable()) {
                       <td [class]="leadBodyClass()" [style.position]="hasLeftPin() ? 'sticky' : null" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null" (click)="$event.stopPropagation()">
                         @if (canExpand(rr.row)) {
-                          <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapseRow : t().expandRow" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                          <button type="button" [attr.aria-label]="expandedSet().has(rr.key) ? t().collapseRow : t().expandRow" [attr.aria-expanded]="expandedSet().has(rr.key)" [attr.aria-controls]="rowPanelId(rr.key)" (click)="toggleExpand(rr.key)" class="grid size-6 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]">
                             <svg viewBox="0 0 16 16" [class]="'size-4 transition-transform ' + (expandedSet().has(rr.key) ? 'rotate-90' : '')" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                           </button>
                         }
@@ -370,7 +370,7 @@ interface BodyRow<T> extends RenderRow<T> {
                         <div class="flex justify-center">
                           @if (selectionMode() === "single") {
                             <button type="button" role="radio" data-dt-radio [attr.tabindex]="radioTabbable(rr.key) ? 0 : -1" [attr.aria-checked]="selectedSet().has(rr.key)" [attr.aria-label]="rowSelectLabel(rr)" (click)="toggleRow(rr.key)" (keydown)="onRadioKey($event)" [class]="radioClass(selectedSet().has(rr.key))">
-                              @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-primary"></span> }
+                              @if (selectedSet().has(rr.key)) { <span class="size-2.5 rounded-full bg-[var(--bpdm-primary)]"></span> }
                             </button>
                           } @else {
                             <bpdm-checkbox size="sm" [attr.aria-label]="rowSelectLabel(rr)" [checked]="selectedSet().has(rr.key)" (checkedChange)="toggleRow(rr.key)" />
@@ -395,7 +395,7 @@ interface BodyRow<T> extends RenderRow<T> {
                     }
                   </tr>
                   @if (expandedSet().has(rr.key) && expandedTemplate()) {
-                    <tr [attr.id]="rowPanelId(rr.key)" [class]="'bg-muted/30 ' + (divided() ? 'border-t border-border' : '')">
+                    <tr [attr.id]="rowPanelId(rr.key)" [class]="'bg-[var(--bpdm-muted)]/30 ' + (divided() ? 'border-t border-[var(--bpdm-border)]' : '')">
                       <td [attr.colspan]="colCount()" class="p-0">
                         <!-- grid 0fr→1fr animates the reveal to natural height smoothly -->
                         <div class="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
@@ -419,7 +419,7 @@ interface BodyRow<T> extends RenderRow<T> {
               <tfoot data-bpdm-slot="data-table-footer">
                 <tr>
                   @if (reorderableRows()) {
-                    <td [class]="cellPad() + ' w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0'"></td>
+                    <td [class]="cellPad() + ' w-[1%] bg-[var(--bpdm-muted)] shadow-[inset_0_1px_0_var(--bpdm-border)] sticky bottom-0'"></td>
                   }
                   @if (expandable()) {
                     <td [class]="footLeadClass()" [style.position]="'sticky'" [style.inset-inline-start.px]="hasLeftPin() ? pinPx().left['__lead_expand'] : null"></td>
@@ -455,7 +455,7 @@ interface BodyRow<T> extends RenderRow<T> {
       @let fm = footerModel()!;
       <div data-bpdm-slot="data-table-pagination" [class]="footerClass(fm.align, fm.attached)">
         @if (fm.kind === "numbered") {
-          <span class="text-muted-foreground">{{ fm.total === 0 ? t().noResults : t().range(fm.rangeFrom, fm.rangeTo, fm.total) }}</span>
+          <span class="text-[var(--bpdm-muted-foreground)]">{{ fm.total === 0 ? t().noResults : t().range(fm.rangeFrom, fm.rangeTo, fm.total) }}</span>
           <div class="flex items-center gap-3">
             @if (fm.sizeOptions && fm.onSize) {
               <ng-container [ngTemplateOutlet]="sizeSelect" [ngTemplateOutletContext]="{ value: fm.pageSize, options: fm.sizeOptions, onChange: fm.onSize }" />
@@ -466,7 +466,7 @@ interface BodyRow<T> extends RenderRow<T> {
               </button>
               @for (p of fm.pages; track $index) {
                 @if (p === "ellipsis") {
-                  <span class="px-1 text-muted-foreground" aria-hidden="true">…</span>
+                  <span class="px-1 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">…</span>
                 } @else {
                   <button bpdmButton [variant]="p === fm.page ? 'primary' : 'secondary'" [appearance]="p === fm.page ? 'solid' : 'ghost'" size="sm" [attr.aria-current]="p === fm.page ? 'page' : null" [attr.aria-label]="t().goToPage($any(p))" (click)="fm.onPage($any(p))" class="min-w-8 px-2.5">{{ p }}</button>
                 }
@@ -478,7 +478,7 @@ interface BodyRow<T> extends RenderRow<T> {
           </div>
         } @else {
           @if (fm.rangeLabel) {
-            <span class="text-muted-foreground">{{ fm.rangeLabel }}</span>
+            <span class="text-[var(--bpdm-muted-foreground)]">{{ fm.rangeLabel }}</span>
           } @else if (fm.align === "between") {
             <span></span>
           }
@@ -500,13 +500,13 @@ interface BodyRow<T> extends RenderRow<T> {
     </ng-template>
 
     <ng-template #sizeSelect let-value="value" let-options="options" let-onChange="onChange">
-      <label class="flex items-center gap-2 text-muted-foreground">
+      <label class="flex items-center gap-2 text-[var(--bpdm-muted-foreground)]">
         <span>{{ t().rowsPerPage }}</span>
         <div class="relative">
-          <select [value]="value" (change)="onChange(+$any($event.target).value)" class="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background ps-2.5 pe-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <select [value]="value" (change)="onChange(+$any($event.target).value)" class="h-8 cursor-pointer appearance-none rounded-lg border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-2.5 pe-7 text-[var(--bpdm-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]">
             @for (o of options; track o) { <option [value]="o">{{ o }}</option> }
           </select>
-          <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </div>
       </label>
     </ng-template>
@@ -593,7 +593,7 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // contain-content keeps a wide/pinned table from inflating the mobile
       // layout viewport (window.innerWidth) instead of scrolling inside here
       "overflow-auto contain-content",
-      this.scrollableX() && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+      this.scrollableX() && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--bpdm-ring)]",
     );
   }
 
@@ -1365,14 +1365,14 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // `frame` = a defined outlined card; the borderless default whisper-floats so
       // it blends; `elevated`=false drops the float for a flat, flush table
       this.frame()
-        ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+        ? "overflow-hidden rounded-xl border border-[var(--bpdm-border)]/70 bg-[var(--bpdm-card)] shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
         : this.elevated() &&
-            "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
+            "overflow-hidden rounded-lg bg-[var(--bpdm-card)] shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
       this.classInput(),
     );
   }
   protected tableClass(): string {
-    return cn("w-full text-card-foreground", this.rowSpacing() ? "border-separate" : "border-collapse");
+    return cn("w-full text-[var(--bpdm-card-foreground)]", this.rowSpacing() ? "border-separate" : "border-collapse");
   }
   protected scrollMaxHeight(): string | null {
     const mh = this.maxHeight();
@@ -1391,9 +1391,9 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       "w-[1%]",
-      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-card" : "bg-transparent",
-      "shadow-[inset_0_-1px_0_var(--border)]",
-      canPin && this.bordered() && "border-e border-border",
+      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+      "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+      canPin && this.bordered() && "border-e border-[var(--bpdm-border)]",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
       this.headerClassName(),
     );
@@ -1405,18 +1405,18 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       ALIGN_CLASS[align],
       // strong, readable header — confident dark sentence-case label
       // (size inherited from density), distinct from the body weight
-      "whitespace-nowrap font-semibold text-foreground",
+      "whitespace-nowrap font-semibold text-[var(--bpdm-foreground)]",
       this.reorderableColumns() && "cursor-grab active:cursor-grabbing",
       this.dragColId() === col.id && "opacity-40",
       // framed/pinned/sticky headers sit on the card surface (clean header +
       // divider, not a heavy grey band) and stay opaque so scrolling rows never
       // bleed through; otherwise transparent
-      this.frame() || col.pin || this.stickyHeader() ? "bg-card" : "bg-transparent",
-      "shadow-[inset_0_-1px_0_var(--border)]",
-      this.bordered() && "border-e border-border/55 last:border-e-0",
+      this.frame() || col.pin || this.stickyHeader() ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+      "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+      this.bordered() && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
-      col.id === this.lastLeftId() && "border-e border-border",
-      col.id === this.firstRightId() && "border-s border-border",
+      col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
+      col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
       this.headerClassName(),
       col.className,
     );
@@ -1424,22 +1424,22 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   protected sortBtnClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
     return cn(
-      "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
+      "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-[var(--bpdm-foreground)]",
       JUSTIFY_CLASS[align],
       // keep the active-sort LABEL dark/strong (enterprise-restrained);
       // the small amber arrow + order badge signal the sort
-      this.dirOf(col.id) && "text-foreground",
+      this.dirOf(col.id) && "text-[var(--bpdm-foreground)]",
     );
   }
   private readonly pinnedBg = computed(() =>
     cn(
-      "bg-card",
-      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
-      "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
+      "bg-[var(--bpdm-card)]",
+      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--bpdm-primary)_4%,var(--bpdm-card))]",
+      "group-data-[selected]:bg-[color-mix(in_srgb,var(--bpdm-primary)_10%,var(--bpdm-card))]",
     ),
   );
   protected readonly leadBodyClass = computed(() =>
-    cn(this.cellPad(), "w-[1%]", this.bordered() && "border-e border-border", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName()),
+    cn(this.cellPad(), "w-[1%]", this.bordered() && "border-e border-[var(--bpdm-border)]", this.hasLeftPin() && `z-10 ${this.pinnedBg()}`, this.cellClassName()),
   );
   protected bodyCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
@@ -1447,16 +1447,16 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.cellPad(),
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
-      this.bordered() && "border-e border-border/55 last:border-e-0",
+      this.bordered() && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
       col.pin && `z-10 ${this.pinnedBg()}`,
-      col.id === this.lastLeftId() && "border-e border-border",
-      col.id === this.firstRightId() && "border-s border-border",
+      col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
+      col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
       this.cellClassName(),
       col.className,
     );
   }
   protected footLeadClass(): string {
-    return cn(this.cellPad(), "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]", this.bordered() && "border-e border-border", "bottom-0", this.hasLeftPin() && "z-20");
+    return cn(this.cellPad(), "w-[1%] bg-[var(--bpdm-muted)] shadow-[inset_0_1px_0_var(--bpdm-border)]", this.bordered() && "border-e border-[var(--bpdm-border)]", "bottom-0", this.hasLeftPin() && "z-20");
   }
   protected footCellClass(col: DataTableColumn<T>): string {
     const align = col.align ?? (col.numeric ? "right" : "left");
@@ -1464,11 +1464,11 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       this.cellPad(),
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
-      "sticky bottom-0 bg-muted font-medium text-foreground shadow-[inset_0_1px_0_var(--border)]",
-      this.bordered() && "border-e border-border/55 last:border-e-0",
+      "sticky bottom-0 bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)] shadow-[inset_0_1px_0_var(--bpdm-border)]",
+      this.bordered() && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
       col.pin ? "z-20" : "z-10",
-      col.id === this.lastLeftId() && "border-e border-border",
-      col.id === this.firstRightId() && "border-s border-border",
+      col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
+      col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
       col.className,
     );
   }
@@ -1484,20 +1484,20 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       "transition-colors",
       this.hasPinned() && "group",
-      this.divided() && !this.rowSpacing() && "border-t border-border",
+      this.divided() && !this.rowSpacing() && "border-t border-[var(--bpdm-border)]",
       // borderless tables get a closing rule under the last row
       // (framed tables are closed by the container border)
-      this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-border",
-      this.rowSpacing() && "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
-      this.striped() && "even:bg-muted/40",
+      this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-[var(--bpdm-border)]",
+      this.rowSpacing() && "bg-[var(--bpdm-muted)]/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
+      this.striped() && "even:bg-[var(--bpdm-muted)]/40",
       // bpdm signature: a warm amber focus language — soft amber hover, and
       // selected rows get an amber tint + an inline-start accent bar (RTL flips it)
-      this.hoverable() && "hover:bg-primary/[0.04]",
-      this.selectedSet().has(rr.key) && "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
-      this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-primary/[0.14]",
-      t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--primary)]",
-      t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--primary)]",
-      this.clickable() && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+      this.hoverable() && "hover:bg-[var(--bpdm-primary)]/[0.04]",
+      this.selectedSet().has(rr.key) && "bg-[var(--bpdm-primary)]/10 shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
+      this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-[var(--bpdm-primary)]/[0.14]",
+      t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--bpdm-primary)]",
+      t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--bpdm-primary)]",
+      this.clickable() && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--bpdm-ring)]",
       extra,
     );
   }
@@ -1505,20 +1505,20 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     const rc = this.rowClassName();
     const extra = typeof rc === "function" ? rc(rr.row, rr.index) : rc;
     return cn(
-      "rounded-xl border border-border bg-card p-4",
-      this.selectedSet().has(rr.key) && "ring-1 ring-primary",
+      "rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4",
+      this.selectedSet().has(rr.key) && "ring-1 ring-[var(--bpdm-primary)]",
       this.clickable() && "cursor-pointer",
       extra,
     );
   }
   protected radioClass(checked: boolean): string {
     return cn(
-      "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-      checked ? "border-primary" : "border-muted-foreground/60",
+      "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-[var(--bpdm-background)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
+      checked ? "border-[var(--bpdm-primary)]" : "border-[var(--bpdm-muted-foreground)]/60",
     );
   }
   protected footerClass(align: "between" | "center" | "end", attached: boolean): string {
-    return cn("flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm", FOOTER_JUSTIFY[align], attached ? "border-t border-border" : "pt-4");
+    return cn("flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm", FOOTER_JUSTIFY[align], attached ? "border-t border-[var(--bpdm-border)]" : "pt-4");
   }
   protected onRowKey(e: KeyboardEvent, rr: RenderRow<T>): void {
     if (!this.clickable()) return;

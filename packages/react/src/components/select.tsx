@@ -22,7 +22,7 @@ const isGroup = (x: SelectOption | SelectOptionGroup): x is SelectOptionGroup =>
   Array.isArray((x as SelectOptionGroup).options);
 
 const triggerVariants = cva(
-  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+  "flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-[var(--bpdm-foreground)] shadow-sm transition-colors focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
   {
     variants: {
       size: {
@@ -294,7 +294,7 @@ export function Select({
         >
           <span
             data-bpdm-slot="select-value"
-            className={cn("truncate", !selectedLabel && "text-muted-foreground")}
+            className={cn("truncate", !selectedLabel && "text-[var(--bpdm-muted-foreground)]")}
             title={selectedLabel ?? placeholder}
           >
             {selectedLabel ?? placeholder}
@@ -321,13 +321,13 @@ export function Select({
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           data-bpdm="" data-bpdm-slot="select-content"
           className={cn(
-            "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
+            "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
           )}
         >
           {searchable && (
-            <div className="flex shrink-0 items-center gap-2 border-b border-border px-3">
+            <div className="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
               <FieldSearch />
               <input
                 ref={searchRef}
@@ -341,13 +341,13 @@ export function Select({
                 aria-autocomplete="list"
                 aria-activedescendant={activeId}
                 data-bpdm-slot="select-search"
-                className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
               />
             </div>
           )}
 
           {rows.length === 0 ? (
-            <div data-bpdm-slot="select-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">
+            <div data-bpdm-slot="select-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">
               {emptyText}
             </div>
           ) : (
@@ -380,7 +380,7 @@ export function Select({
                         key={`g-${vi.index}`}
                         aria-hidden="true"
                         data-bpdm-slot="select-group"
-                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-foreground [&_img]:size-4 [&_svg]:size-4"
+                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)] [&_img]:size-4 [&_svg]:size-4"
                         {...common}
                       >
                         {r.icon}
@@ -403,17 +403,17 @@ export function Select({
                       onMouseMove={() => setActive(vi.index)}
                       data-bpdm-slot="select-option"
                       className={cn(
-                        "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+                        "absolute start-0 top-0 flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--bpdm-radius)-3px)] px-2 text-start text-sm text-[var(--bpdm-foreground)] transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
                         // keyboard-active / hovered row: an amber inline-start bar (ring
                         // token, ≥3:1 in every theme) + soft tint + weight — clearly
-                        // perceptible where bg-muted alone was ~1.05:1. RTL-safe (logical
+                        // perceptible where bg-[var(--bpdm-muted)] alone was ~1.05:1. RTL-safe (logical
                         // shadow mirror), jitter-free (inset shadow takes no layout space).
                         isActive &&
                           "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
                       )}
                       {...common}
                     >
-                      <span className="flex size-4 shrink-0 items-center justify-center text-primary">
+                      <span className="flex size-4 shrink-0 items-center justify-center text-[var(--bpdm-primary)]">
                         {isSelected && (
                           <span className="animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]">
                             <FieldCheck />

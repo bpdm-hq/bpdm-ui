@@ -31,16 +31,16 @@ type Side = "left" | "right" | "top" | "bottom";
 type Size = "sm" | "md" | "lg" | "xl" | "full";
 
 const drawerVariants = cva(
-  "fixed z-50 flex flex-col bg-popover text-popover-foreground shadow-xl outline-none",
+  "fixed z-50 flex flex-col bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none",
   {
     variants: {
       side: {
         right:
-          "right-0 top-0 h-full border-l border-border data-[state=open]:animate-[bpdm-slide-in-right_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-right_var(--bpdm-duration-base)_ease-in]",
-        left: "left-0 top-0 h-full border-r border-border data-[state=open]:animate-[bpdm-slide-in-left_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-left_var(--bpdm-duration-base)_ease-in]",
-        top: "left-0 top-0 w-full border-b border-border data-[state=open]:animate-[bpdm-slide-in-top_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-top_var(--bpdm-duration-base)_ease-in]",
+          "right-0 top-0 h-full border-l border-[var(--bpdm-border)] data-[state=open]:animate-[bpdm-slide-in-right_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-right_var(--bpdm-duration-base)_ease-in]",
+        left: "left-0 top-0 h-full border-r border-[var(--bpdm-border)] data-[state=open]:animate-[bpdm-slide-in-left_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-left_var(--bpdm-duration-base)_ease-in]",
+        top: "left-0 top-0 w-full border-b border-[var(--bpdm-border)] data-[state=open]:animate-[bpdm-slide-in-top_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-top_var(--bpdm-duration-base)_ease-in]",
         bottom:
-          "left-0 bottom-0 w-full border-t border-border data-[state=open]:animate-[bpdm-slide-in-bottom_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-bottom_var(--bpdm-duration-base)_ease-in]",
+          "left-0 bottom-0 w-full border-t border-[var(--bpdm-border)] data-[state=open]:animate-[bpdm-slide-in-bottom_var(--bpdm-duration-slow)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-slide-out-bottom_var(--bpdm-duration-base)_ease-in]",
       },
     },
     defaultVariants: { side: "right" },
@@ -96,7 +96,7 @@ export const DrawerContent = React.forwardRef<
         <DialogPrimitive.Close
           aria-label={closeLabel}
           data-bpdm-slot="drawer-close"
-          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           <XIcon />
         </DialogPrimitive.Close>

@@ -133,7 +133,7 @@ export class BpdmDialogService {
     panelRef.setInput("closeLabel", this.t.close);
     panelRef.setInput("fallbackTitle", this.t.dialogLabel);
     panelRef.setInput("panelClass", cn(
-      "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none",
+      "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none",
       SIZE[options.size ?? "md"],
     ));
     panelRef.setInput("enterAnim", ENTER);

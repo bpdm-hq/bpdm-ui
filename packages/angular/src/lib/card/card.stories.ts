@@ -136,7 +136,7 @@ export const Advanced: Story = {
   <bpdm-card-header>
     <h3 bpdmCardTitle>Project Atlas</h3>
     <p bpdmCardDescription>Updated 2 days ago</p>
-    <span bpdmCardAction class="inline-flex h-6 items-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-2.5 text-xs font-medium text-success-strong">Live</span>
+    <span bpdmCardAction class="inline-flex h-6 items-center rounded-full bg-[color-mix(in_srgb,var(--bpdm-success)_18%,transparent)] px-2.5 text-xs font-medium text-[var(--bpdm-success-strong)]">Live</span>
   </bpdm-card-header>
   <div bpdmCardContent>${BODY}</div>
   <div bpdmCardFooter>
@@ -296,7 +296,7 @@ export const Interactive: Story = {
     <bpdm-card-header>
       <h3 bpdmCardTitle>Open Project Atlas →</h3>
       <p bpdmCardDescription>The entire card is clickable</p>
-      <svg bpdmCardAction viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-muted-foreground">
+      <svg bpdmCardAction viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-[var(--bpdm-muted-foreground)]">
         <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
       </svg>
     </bpdm-card-header>

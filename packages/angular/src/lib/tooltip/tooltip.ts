@@ -62,7 +62,7 @@ let uid = 0;
           width="12"
           height="6"
           viewBox="0 0 12 6"
-          class="block fill-popover"
+          class="block fill-[var(--bpdm-popover)]"
           style="filter: drop-shadow(0 0 1.5px rgb(0 0 0 / 0.22))"
         >
           <path d="M0 0L6 6L12 0Z" />
@@ -90,7 +90,7 @@ class BpdmTooltipContent {
 
   protected readonly boxClass = computed(() =>
     cn(
-      "relative z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
+      "relative z-50 max-w-xs rounded-md bg-[var(--bpdm-popover)] px-2.5 py-1.5 text-xs text-[var(--bpdm-popover-foreground)] shadow-lg",
       OVERLAY_ORIGIN[this.side()],
       this.closing()
         ? // `forwards` holds the faded-out frame until teardown (no snap-back flicker)

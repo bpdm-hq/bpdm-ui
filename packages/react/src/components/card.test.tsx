@@ -45,7 +45,7 @@ describe("Card", () => {
 
   it("applies the outlined variant", () => {
     const { container } = render(<Card variant="outlined">x</Card>);
-    expect((container.firstElementChild as HTMLElement).className).toContain("border-border");
+    expect((container.firstElementChild as HTMLElement).className).toContain("border-[var(--bpdm-border)]");
   });
 
   it("adds a hover-lift when hoverable", () => {

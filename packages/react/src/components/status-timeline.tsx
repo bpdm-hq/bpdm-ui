@@ -87,10 +87,10 @@ function Cross() {
 }
 
 const dotByStatus: Record<TimelineStatus, string> = {
-  complete: "bg-success text-success-foreground",
-  current: "bg-primary text-primary-foreground ring-4 ring-primary/20",
-  pending: "border-2 border-border bg-background text-transparent",
-  failed: "bg-destructive text-destructive-foreground",
+  complete: "bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]",
+  current: "bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-4 ring-[var(--bpdm-primary)]/20",
+  pending: "border-2 border-[var(--bpdm-border)] bg-[var(--bpdm-background)] text-transparent",
+  failed: "bg-[var(--bpdm-destructive)] text-[var(--bpdm-destructive-foreground)]",
 };
 
 /** The default status marker: custom colour/icon, else the status glyph; pulses when current. */
@@ -107,7 +107,7 @@ function Marker({ item, status, className }: { item: TimelineItem; status: Timel
     >
       {status === "current" && (
         <span
-          className="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none"
+          className="absolute inset-0 rounded-full bg-[var(--bpdm-primary)] animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none"
           aria-hidden
         />
       )}
@@ -122,7 +122,7 @@ function Marker({ item, status, className }: { item: TimelineItem; status: Timel
 }
 
 const interactiveClasses =
-  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-[var(--bpdm-muted)]/50 focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]";
 
 /**
  * Status timeline for lifecycles (deployment, approval, onboarding, …). Each step
@@ -211,7 +211,7 @@ export function StatusTimeline({
                     // logical `start-1/2` so the connector runs toward the next
                     // marker in both LTR and RTL
                     "absolute start-1/2 top-1/2 h-px w-full -translate-y-1/2",
-                    status === "complete" ? "bg-success/40" : "bg-border",
+                    status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
                   )}
                   aria-hidden
                 />
@@ -225,12 +225,12 @@ export function StatusTimeline({
                 ) : (
                   <>
                     <div className="flex min-h-6 items-center justify-center">
-                      <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
+                      <p className={cn("text-sm font-medium", muted ? "text-[var(--bpdm-muted-foreground)]" : "text-[var(--bpdm-foreground)]")}>
                         {item.title}
                       </p>
                     </div>
-                    {item.timestamp && <p className="m-0 text-xs tabular-nums text-muted-foreground">{item.timestamp}</p>}
-                    {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+                    {item.timestamp && <p className="m-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{item.timestamp}</p>}
+                    {item.description && <p className="mt-0.5 text-sm text-[var(--bpdm-muted-foreground)]">{item.description}</p>}
                   </>
                 )}
               </div>
@@ -281,7 +281,7 @@ export function StatusTimeline({
                     : align === "right"
                       ? "end-3 translate-x-1/2"
                       : "start-3 -translate-x-1/2",
-                  status === "complete" ? "bg-success/40" : "bg-border",
+                  status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
                 )}
                 aria-hidden
               />
@@ -313,14 +313,14 @@ export function StatusTimeline({
                       !contentRight && "flex-row-reverse",
                     )}
                   >
-                    <p className={cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground")}>
+                    <p className={cn("text-sm font-medium", muted ? "text-[var(--bpdm-muted-foreground)]" : "text-[var(--bpdm-foreground)]")}>
                       {item.title}
                     </p>
                     {item.timestamp && (
-                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{item.timestamp}</span>
+                      <span className="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{item.timestamp}</span>
                     )}
                   </div>
-                  {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
+                  {item.description && <p className="mt-0.5 text-sm text-[var(--bpdm-muted-foreground)]">{item.description}</p>}
                 </>
               )}
             </div>
@@ -333,7 +333,7 @@ export function StatusTimeline({
                   contentRight
                     ? "col-start-1 row-start-1 justify-self-end"
                     : "col-start-3 row-start-1 justify-self-start",
-                  !renderOpposite && "flex min-h-6 items-center text-sm text-muted-foreground",
+                  !renderOpposite && "flex min-h-6 items-center text-sm text-[var(--bpdm-muted-foreground)]",
                   !renderOpposite && (contentRight ? "text-end" : "text-start"),
                 )}
               >

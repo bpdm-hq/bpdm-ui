@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/wc",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic Web Components for bpdm/ui — standards-based custom elements that run in any stack (React, Angular, Vue, PHP, Rails, Elixir/Phoenix + LiveView, Django, vanilla). Built on Lit, themed with @bpdm/tokens.",
   "type": "module",
   "license": "MIT",

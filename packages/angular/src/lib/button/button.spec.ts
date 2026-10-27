@@ -47,7 +47,7 @@ describe("BpdmButton", () => {
   it("applies the shared base and default-variant classes", () => {
     const { button } = setup();
     expect(button.classList.contains("inline-flex")).toBe(true); // shared base
-    expect(button.classList.contains("bg-primary")).toBe(true); // default variant
+    expect(button.classList.contains("bg-[var(--bpdm-primary)]")).toBe(true); // default variant
     expect(button.classList.contains("h-10")).toBe(true); // default size (md)
   });
 
@@ -55,8 +55,8 @@ describe("BpdmButton", () => {
     const { fixture, button } = setup();
     fixture.componentInstance.variant.set("destructive");
     fixture.detectChanges();
-    expect(button.classList.contains("bg-destructive")).toBe(true);
-    expect(button.classList.contains("bg-primary")).toBe(false);
+    expect(button.classList.contains("bg-[var(--bpdm-destructive)]")).toBe(true);
+    expect(button.classList.contains("bg-[var(--bpdm-primary)]")).toBe(false);
   });
 
   it("applies appearance, size and shape classes", () => {
@@ -72,10 +72,10 @@ describe("BpdmButton", () => {
 
   it("merges a user class and lets it win via tailwind-merge", () => {
     const { fixture, button } = setup();
-    fixture.componentInstance.extra.set("bg-success");
+    fixture.componentInstance.extra.set("bg-[var(--bpdm-success)]");
     fixture.detectChanges();
-    expect(button.classList.contains("bg-success")).toBe(true);
-    expect(button.classList.contains("bg-primary")).toBe(false);
+    expect(button.classList.contains("bg-[var(--bpdm-success)]")).toBe(true);
+    expect(button.classList.contains("bg-[var(--bpdm-primary)]")).toBe(false);
   });
 
   it("defaults type to button, but respects an explicit type", () => {
@@ -90,7 +90,7 @@ describe("BpdmButton", () => {
     const fixture = TestBed.createComponent(AnchorHost);
     fixture.detectChanges();
     const a = fixture.nativeElement.querySelector("a") as HTMLAnchorElement;
-    expect(a.classList.contains("bg-primary")).toBe(true);
+    expect(a.classList.contains("bg-[var(--bpdm-primary)]")).toBe(true);
     expect(a.getAttribute("type")).toBeNull();
   });
 

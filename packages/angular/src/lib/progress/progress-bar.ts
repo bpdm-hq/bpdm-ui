@@ -37,8 +37,8 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
   template: `
     @if (hasHeader()) {
       <div class="mb-1.5 flex items-center justify-between gap-3 text-sm">
-        <span class="truncate text-muted-foreground">{{ label() }}</span>
-        <span class="shrink-0 font-medium tabular-nums text-foreground">{{ valueText() }}</span>
+        <span class="truncate text-[var(--bpdm-muted-foreground)]">{{ label() }}</span>
+        <span class="shrink-0 font-medium tabular-nums text-[var(--bpdm-foreground)]">{{ valueText() }}</span>
       </div>
     }
     <div
@@ -50,12 +50,12 @@ export const DEFAULT_PROGRESS_MESSAGES: ProgressMessages = { label: "Progress", 
       [attr.aria-valuetext]="indeterminate() ? t().loading : valueText()"
       [attr.aria-busy]="indeterminate() ? true : null"
       data-bpdm-slot="progress-track"
-      class="relative w-full overflow-hidden rounded-full bg-muted"
+      class="relative w-full overflow-hidden rounded-full bg-[var(--bpdm-muted)]"
       [class]="inside() ? 'h-5' : track()"
     >
       @if (inside()) {
         <span
-          class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-[0.7rem] font-semibold tabular-nums text-muted-foreground"
+          class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-[0.7rem] font-semibold tabular-nums text-[var(--bpdm-muted-foreground)]"
         >{{ valueText() }}</span>
       }
 

@@ -22,10 +22,10 @@ export const AccordionItem = React.forwardRef<
       data-bpdm-slot="accordion-item"
       className={cn(
         variant === "separated"
-          ? "rounded-[var(--radius)] border border-border bg-card transition-shadow data-[state=open]:shadow-sm"
+          ? "rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] transition-shadow data-[state=open]:shadow-sm"
           : variant === "borderless"
-            ? "border-b border-border"
-            : "border-b border-border last:border-b-0",
+            ? "border-b border-[var(--bpdm-border)]"
+            : "border-b border-[var(--bpdm-border)] last:border-b-0",
         className,
       )}
       {...props}
@@ -48,18 +48,18 @@ export const AccordionTrigger = React.forwardRef<
       data-bpdm-slot="accordion-trigger"
       className={cn(
         // `text-start` (logical) so the header aligns correctly under `dir="rtl"`
-        "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
+        "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold [&_svg]:size-4",
         // open header stands out; closed is calmer — the "active" emphasis
         variant === "borderless"
-          ? "px-0 py-4 font-medium text-muted-foreground hover:text-foreground data-[state=open]:text-foreground"
-          : "px-4 py-3.5 font-medium text-foreground hover:bg-muted/50",
+          ? "px-0 py-4 font-medium text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)] data-[state=open]:text-[var(--bpdm-foreground)]"
+          : "px-4 py-3.5 font-medium text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]/50",
         className,
       )}
       {...props}
     >
       {icon}
       <span className="flex-1">{children}</span>
-      <ChevronDown className="shrink-0 text-muted-foreground transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground" />
+      <ChevronDown className="shrink-0 text-[var(--bpdm-muted-foreground)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] group-data-[state=open]:rotate-180 group-data-[state=open]:text-[var(--bpdm-foreground)]" />
     </AccordionPrimitive.Trigger>
   );
   // WAI-ARIA APG accordion header: "an element with role heading" at the right
@@ -90,7 +90,7 @@ export const AccordionContent = React.forwardRef<
     >
       <div
         className={cn(
-          "pt-0 text-sm leading-relaxed text-muted-foreground",
+          "pt-0 text-sm leading-relaxed text-[var(--bpdm-muted-foreground)]",
           variant === "borderless" ? "px-0 pb-5" : "px-4 pb-4",
           className,
         )}
@@ -172,7 +172,7 @@ export function Accordion(props: AccordionProps) {
               ? "flex flex-col gap-2"
               : variant === "borderless"
                 ? ""
-                : "overflow-hidden rounded-[var(--radius)] border border-border",
+                : "overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)]",
             className,
           )}
         >

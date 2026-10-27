@@ -154,15 +154,15 @@ export const WithIcons: Story = {
   render: () => ({
     template: `<div class="flex w-80 flex-col gap-3">
   <div class="relative flex items-center">
-    <span class="pointer-events-none absolute left-3 flex items-center text-muted-foreground">${SEARCH}</span>
+    <span class="pointer-events-none absolute left-3 flex items-center text-[var(--bpdm-muted-foreground)]">${SEARCH}</span>
     <input bpdmInput class="pl-9" placeholder="Search" />
   </div>
   <div class="relative flex items-center">
     <input bpdmInput class="pr-9" placeholder="Pick a date" />
-    <span class="pointer-events-none absolute right-3 flex items-center text-muted-foreground">${CALENDAR}</span>
+    <span class="pointer-events-none absolute right-3 flex items-center text-[var(--bpdm-muted-foreground)]">${CALENDAR}</span>
   </div>
   <div class="relative flex items-center">
-    <span class="pointer-events-none absolute left-3 flex items-center text-muted-foreground">${MAIL}</span>
+    <span class="pointer-events-none absolute left-3 flex items-center text-[var(--bpdm-muted-foreground)]">${MAIL}</span>
     <input bpdmInput class="pl-9" type="email" placeholder="Email" />
   </div>
 </div>`,
@@ -178,7 +178,7 @@ import { BpdmInput } from '@bpdm/ng';
   imports: [BpdmInput],
   template: \`
     <div class="relative flex items-center">
-      <span class="pointer-events-none absolute left-3 flex items-center text-muted-foreground">
+      <span class="pointer-events-none absolute left-3 flex items-center text-[var(--bpdm-muted-foreground)]">
         <svg><!-- search icon --></svg>
       </span>
       <input bpdmInput class="pl-9" placeholder="Search" />
@@ -232,14 +232,14 @@ export const FormField: Story = {
   render: () => ({
     template: `<div class="flex w-80 flex-col gap-4">
   <div class="flex flex-col gap-1.5">
-    <label for="name" class="text-sm font-medium text-foreground">Full name</label>
+    <label for="name" class="text-sm font-medium text-[var(--bpdm-foreground)]">Full name</label>
     <input bpdmInput id="name" placeholder="Ada Lovelace" />
-    <p class="text-sm text-muted-foreground">As it appears on your ID.</p>
+    <p class="text-sm text-[var(--bpdm-muted-foreground)]">As it appears on your ID.</p>
   </div>
   <div class="flex flex-col gap-1.5">
-    <label for="email" class="text-sm font-medium text-foreground">Email</label>
+    <label for="email" class="text-sm font-medium text-[var(--bpdm-foreground)]">Email</label>
     <input bpdmInput id="email" type="email" aria-invalid="true" aria-describedby="email-err" value="not-an-email" />
-    <p id="email-err" class="text-sm text-destructive-strong">Enter a valid email address.</p>
+    <p id="email-err" class="text-sm text-[var(--bpdm-destructive-strong)]">Enter a valid email address.</p>
   </div>
 </div>`,
   }),
@@ -257,7 +257,7 @@ import { BpdmInput } from '@bpdm/ng';
       <label for="email" class="text-sm font-medium">Email</label>
       <input bpdmInput id="email" type="email" aria-invalid="true"
              aria-describedby="email-err" placeholder="name@company.com" />
-      <p id="email-err" class="text-sm text-destructive-strong">Enter a valid email address.</p>
+      <p id="email-err" class="text-sm text-[var(--bpdm-destructive-strong)]">Enter a valid email address.</p>
     </div>
   \`,
 })

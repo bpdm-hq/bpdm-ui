@@ -40,7 +40,7 @@ import { BpdmDialogService } from "./dynamic-dialog";
 
     <ng-template #stackedTpl let-d>
       <div class="space-y-3">
-        <p class="text-sm text-muted-foreground">
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">
           Stack another dialog on top, then open more from here.
         </p>
         <button bpdmButton size="sm" (click)="d.close()">Got it</button>

@@ -38,7 +38,7 @@ import { BpdmStepDialog, BpdmStepDialogTrigger, type StepDialogStep } from "./st
       </div>
     </ng-template>
     <ng-template #review>
-      <p class="text-sm text-muted-foreground">
+      <p class="text-sm text-[var(--bpdm-muted-foreground)]">
         Everything looks good. Click <strong>Finish</strong> to create your workspace.
       </p>
     </ng-template>

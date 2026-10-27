@@ -119,7 +119,7 @@ export class BpdmCardMedia {
   readonly classInput = input<string>("", { alias: "class" });
 
   protected readonly hostClass = computed(() =>
-    cn("relative block overflow-hidden bg-muted", ASPECTS[this.aspect()], this.classInput()),
+    cn("relative block overflow-hidden bg-[var(--bpdm-muted)]", ASPECTS[this.aspect()], this.classInput()),
   );
 }
 
@@ -145,14 +145,14 @@ export class BpdmCardTitle {}
 /** Card description — apply to a paragraph. */
 @Directive({
   selector: "[bpdmCardDescription]",
-  host: { "data-bpdm-slot": "card-description", class: "m-0 text-sm text-muted-foreground" },
+  host: { "data-bpdm-slot": "card-description", class: "m-0 text-sm text-[var(--bpdm-muted-foreground)]" },
 })
 export class BpdmCardDescription {}
 
 /** Card body content. */
 @Directive({
   selector: "[bpdmCardContent]",
-  host: { "data-bpdm-slot": "card-content", class: "px-5 py-4 text-sm leading-relaxed text-muted-foreground" },
+  host: { "data-bpdm-slot": "card-content", class: "px-5 py-4 text-sm leading-relaxed text-[var(--bpdm-muted-foreground)]" },
 })
 export class BpdmCardContent {}
 
@@ -163,7 +163,7 @@ export class BpdmCardContent {}
     "data-bpdm-slot": "card-footer",
     class: "mt-auto flex items-center gap-3 px-5 pb-5 pt-1",
     "[class.border-t]": "divider()",
-    "[class.border-border]": "divider()",
+    "[class.border-[var(--bpdm-border)]]": "divider()",
     "[class.pt-4]": "divider()",
   },
 })

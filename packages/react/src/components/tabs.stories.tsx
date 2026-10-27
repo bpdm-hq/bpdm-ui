@@ -76,7 +76,7 @@ export default meta;
 type Story = StoryObj<typeof Tabs>;
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>;
+  return <p className="text-sm text-[var(--bpdm-muted-foreground)]">{children}</p>;
 }
 
 export const Underline: Story = {};
@@ -91,7 +91,7 @@ export const ContentBaseline: Story = {
         code: `import { Tabs } from "@bpdm/ui";
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>;
+  return <p className="text-sm text-[var(--bpdm-muted-foreground)]">{children}</p>;
 }
 
 export function Example() {
@@ -140,7 +140,7 @@ export const Pill: Story = {
 import { Tabs } from "@bpdm/ui";
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>;
+  return <p className="text-sm text-[var(--bpdm-muted-foreground)]">{children}</p>;
 }
 
 export function Example() {
@@ -186,7 +186,7 @@ export const FullWidth: Story = {
         code: `import { Tabs } from "@bpdm/ui";
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>;
+  return <p className="text-sm text-[var(--bpdm-muted-foreground)]">{children}</p>;
 }
 
 export function Example() {
@@ -221,7 +221,7 @@ export const DisabledTab: Story = {
         code: `import { Tabs } from "@bpdm/ui";
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>;
+  return <p className="text-sm text-[var(--bpdm-muted-foreground)]">{children}</p>;
 }
 
 export function Example() {

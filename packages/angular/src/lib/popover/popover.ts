@@ -87,12 +87,12 @@ export class BpdmPopoverClose {
       />
       @if (showArrow()) {
         <span [class]="arrowClass()" aria-hidden="true">
-          <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-popover">
+          <svg width="12" height="6" viewBox="0 0 12 6" class="block fill-[var(--bpdm-popover)]">
             <!-- open path (no base line) so the bordered stroke only outlines the
                  two visible sides — no seam where the arrow meets the panel -->
             <path
               d="M0 0L6 6L12 0"
-              [attr.stroke]="bordered() ? 'var(--border)' : null"
+              [attr.stroke]="bordered() ? 'var(--bpdm-border)' : null"
               [attr.stroke-width]="bordered() ? 1 : null"
               stroke-linejoin="round"
             />
@@ -129,8 +129,8 @@ class BpdmPopoverPanel {
 
   protected readonly boxClass = computed(() =>
     cn(
-      "relative z-50 rounded-[var(--radius)] bg-popover p-4 text-popover-foreground shadow-lg outline-none",
-      this.bordered() && "border border-border",
+      "relative z-50 rounded-[var(--bpdm-radius)] bg-[var(--bpdm-popover)] p-4 text-[var(--bpdm-popover-foreground)] shadow-lg outline-none",
+      this.bordered() && "border border-[var(--bpdm-border)]",
       OVERLAY_ORIGIN[this.side()],
       this.closing()
         ? // `forwards` holds the faded-out frame until teardown — without it the

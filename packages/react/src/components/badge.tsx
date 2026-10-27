@@ -77,7 +77,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     const ghost = appearance === "ghost";
     // ghost = no chrome (transparent, no border/padding); else the tinted/solid/outline tone
     const toneClass = ghost
-      ? "border-transparent bg-transparent text-foreground"
+      ? "border-transparent bg-transparent text-[var(--bpdm-foreground)]"
       : TONE[variant][appearance];
     const ghostClass = ghost && "h-auto gap-1.5 px-0 text-sm font-normal";
 
@@ -113,7 +113,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           ghostClass,
           interactive && "cursor-pointer active:scale-[0.96]",
           clickable &&
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
           // dynamic chips pop in on mount
           onRemove && "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
           className,
@@ -151,7 +151,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               setRemoving(true);
             }}
             data-bpdm-slot="badge-remove"
-            className="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-[var(--bpdm-foreground)]/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
           >
             <svg viewBox="0 0 16 16" fill="none" className="size-2.5" aria-hidden>
               <path
@@ -282,7 +282,7 @@ export function NotificationBadge({
             aria-label={announced}
             data-bpdm-slot="notification-badge-indicator"
             className={cn(
-              "flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
+              "flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-[var(--bpdm-background)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
               TONE[variant].solid,
               dot ? "size-2.5" : "h-[1.125rem] min-w-[1.125rem] px-1 text-[0.625rem]",
             )}

@@ -39,7 +39,7 @@ class StepNav {
   }
 }
 
-const BOX = "rounded-lg border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground";
+const BOX = "rounded-lg border border-dashed border-[var(--bpdm-border)] bg-[var(--bpdm-muted)]/30 p-6 text-sm text-[var(--bpdm-muted-foreground)]";
 
 @Component({
   selector: "demo-stepper-horizontal",
@@ -113,7 +113,7 @@ class VerticalDemo {
             <div class="space-y-3 py-2">
               <input bpdmInput placeholder="Full name" [value]="name()" (input)="name.set($any($event.target).value)" />
               <input bpdmInput placeholder="Email" type="email" [value]="email()" (input)="email.set($any($event.target).value)" />
-              <p class="text-xs text-muted-foreground">
+              <p class="text-xs text-[var(--bpdm-muted-foreground)]">
                 {{ valid() ? "Looks good — you can continue." : "Enter your name and a valid email to continue." }}
               </p>
             </div>
@@ -254,8 +254,8 @@ class TwoStepsDemo {
   imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
   template: `
     <div class="w-full max-w-2xl space-y-3">
-      <p class="text-sm text-muted-foreground">
-        Active step: <span class="font-medium text-foreground">{{ value() }}</span>
+      <p class="text-sm text-[var(--bpdm-muted-foreground)]">
+        Active step: <span class="font-medium text-[var(--bpdm-foreground)]">{{ value() }}</span>
       </p>
       <bpdm-stepper [value]="value()" (valueChange)="value.set($event)">
         <bpdm-step-list>
@@ -834,8 +834,8 @@ export class StepNav {
   selector: 'app-stepper-controlled',
   imports: [BpdmStepper, BpdmStepList, BpdmStep, BpdmStepPanels, BpdmStepPanel, StepNav],
   template: \`
-    <p class="text-sm text-muted-foreground">
-      Active step: <span class="font-medium text-foreground">{{ value() }}</span>
+    <p class="text-sm text-[var(--bpdm-muted-foreground)]">
+      Active step: <span class="font-medium text-[var(--bpdm-foreground)]">{{ value() }}</span>
     </p>
     <bpdm-stepper [value]="value()" (valueChange)="value.set($event)">
       <bpdm-step-list>

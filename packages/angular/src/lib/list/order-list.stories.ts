@@ -73,7 +73,7 @@ class OlStringHost {
     <ng-template #tpl let-w>
       <div class="flex items-center justify-between gap-3">
         <span>{{ w.name }}</span>
-        <span class="text-xs text-muted-foreground">{{ w.category }}</span>
+        <span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</span>
       </div>
     </ng-template>
   `,
@@ -94,14 +94,14 @@ class OlFilterHost {
     </div>
     <ng-template #tpl let-w>
       <div class="flex items-center gap-3">
-        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-muted-foreground" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
           <path [attr.d]="w.icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="min-w-0 flex-1">
           <p class="truncate font-medium">{{ w.name }}</p>
-          <p class="text-xs text-muted-foreground">{{ w.category }}</p>
+          <p class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</p>
         </div>
-        <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ w.updated }}</span>
+        <span class="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{{ w.updated }}</span>
       </div>
     </ng-template>
   `,
@@ -212,7 +212,7 @@ type Widget = { id: string; name: string; category: string };
     <ng-template #tpl let-w>
       <div class="flex items-center justify-between gap-3">
         <span>{{ w.name }}</span>
-        <span class="text-xs text-muted-foreground">{{ w.category }}</span>
+        <span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</span>
       </div>
     </ng-template>
   \`,
@@ -249,14 +249,14 @@ type Widget = { id: string; name: string; category: string; updated: string; ico
     <bpdm-order-list [(value)]="items" [itemKey]="key" [itemTemplate]="tpl" header="Dashboard widgets" />
     <ng-template #tpl let-w>
       <div class="flex items-center gap-3">
-        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-muted-foreground">
+        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]">
           <path [attr.d]="w.icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="min-w-0 flex-1">
           <p class="truncate font-medium">{{ w.name }}</p>
-          <p class="text-xs text-muted-foreground">{{ w.category }}</p>
+          <p class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</p>
         </div>
-        <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ w.updated }}</span>
+        <span class="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{{ w.updated }}</span>
       </div>
     </ng-template>
   \`,

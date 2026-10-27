@@ -69,7 +69,7 @@ describe("BpdmAccordion", () => {
     const btn = fixture.nativeElement.querySelector("button") as HTMLElement;
     expect(btn.className).toContain("focus-visible:ring-2");
     expect(btn.className).toContain("focus-visible:ring-offset-2");
-    expect(btn.className).toContain("focus-visible:ring-offset-background");
+    expect(btn.className).toContain("focus-visible:ring-offset-[var(--bpdm-background)]");
   });
 
   it("wires each trigger to its panel (ids + aria-controls / aria-labelledby)", () => {

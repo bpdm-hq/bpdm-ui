@@ -65,7 +65,7 @@ export interface CardMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 /** Edge-to-edge media band at the top of a card; the image zooms on card hover. */
 export const CardMedia = React.forwardRef<HTMLDivElement, CardMediaProps>(
   ({ className, src, alt, aspect = "video", overlay = false, children, ...props }, ref) => (
-    <div ref={ref} data-bpdm-slot="card-media" className={cn("relative overflow-hidden bg-muted", ASPECT[aspect], className)} {...props}>
+    <div ref={ref} data-bpdm-slot="card-media" className={cn("relative overflow-hidden bg-[var(--bpdm-muted)]", ASPECT[aspect], className)} {...props}>
       {src ? (
         <img
           src={src}
@@ -126,7 +126,7 @@ export const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} data-bpdm-slot="card-description" className={cn("m-0 text-sm text-muted-foreground", className)} {...props} />
+  <p ref={ref} data-bpdm-slot="card-description" className={cn("m-0 text-sm text-[var(--bpdm-muted-foreground)]", className)} {...props} />
 ));
 CardDescription.displayName = "CardDescription";
 
@@ -137,7 +137,7 @@ export const CardContent = React.forwardRef<
   <div
     ref={ref}
     data-bpdm-slot="card-content"
-    className={cn("px-5 py-4 text-sm leading-relaxed text-muted-foreground", className)}
+    className={cn("px-5 py-4 text-sm leading-relaxed text-[var(--bpdm-muted-foreground)]", className)}
     {...props}
   />
 ));
@@ -155,7 +155,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
       data-bpdm-slot="card-footer"
       className={cn(
         "mt-auto flex items-center gap-3 px-5 pb-5 pt-1",
-        divider && "border-t border-border pt-4",
+        divider && "border-t border-[var(--bpdm-border)] pt-4",
         className,
       )}
       {...props}

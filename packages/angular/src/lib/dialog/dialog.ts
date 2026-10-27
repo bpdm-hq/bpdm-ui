@@ -155,7 +155,7 @@ export class BpdmDialog implements OnDestroy {
     ref.setInput(
       "panelClass",
       cn(
-        "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none",
+        "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] flex-col rounded-xl bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none",
         SIZE[this.size()],
       ),
     );

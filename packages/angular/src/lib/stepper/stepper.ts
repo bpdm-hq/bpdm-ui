@@ -174,10 +174,10 @@ export class BpdmStepList {
       @if (!isLast()) {
         <span
           aria-hidden="true"
-          class="absolute bottom-0 start-4 top-9 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-border"
+          class="absolute bottom-0 start-4 top-9 w-0.5 -translate-x-1/2 overflow-hidden rounded-full bg-[var(--bpdm-border)]"
         >
           <span
-            class="absolute inset-0 origin-top rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
+            class="absolute inset-0 origin-top rounded-full bg-[var(--bpdm-success)] transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
             [class]="completed() ? 'scale-y-100' : 'scale-y-0'"
           ></span>
         </span>
@@ -237,9 +237,9 @@ export class BpdmStepItem {
         <span class="sr-only">{{ srStatus() }}</span>
       </button>
       @if (!vertical() && !isLast()) {
-        <span aria-hidden="true" class="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-border sm:mx-3">
+        <span aria-hidden="true" class="relative mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-[var(--bpdm-border)] sm:mx-3">
           <span
-            class="absolute inset-0 origin-left rtl:origin-right rounded-full bg-success transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
+            class="absolute inset-0 origin-left rtl:origin-right rounded-full bg-[var(--bpdm-success)] transition-transform duration-[360ms] ease-[var(--bpdm-ease-out)]"
             [class]="completed() ? 'scale-x-100' : 'scale-x-0'"
           ></span>
         </span>
@@ -304,7 +304,7 @@ export class BpdmStep {
 
   protected readonly btnClass = computed(() =>
     cn(
-      "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "group flex items-center gap-2.5 rounded-md text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
       this.clickable() && !this.active() && "cursor-pointer",
       // `!` beats any host-app global that forces a pointer cursor on step buttons
       !this.clickable() && !this.active() && "cursor-not-allowed! opacity-60",
@@ -314,19 +314,19 @@ export class BpdmStep {
   protected readonly markerClass = computed(() =>
     cn(
       "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] [&_svg]:size-4",
-      this.state() === "completed" && "border-success bg-success text-success-foreground",
-      this.state() === "active" && "scale-105 border-primary bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background",
-      this.state() === "upcoming" && "border-border text-muted-foreground",
+      this.state() === "completed" && "border-[var(--bpdm-success)] bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]",
+      this.state() === "active" && "scale-105 border-[var(--bpdm-primary)] bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-2 ring-[var(--bpdm-primary)] ring-offset-2 ring-offset-[var(--bpdm-background)]",
+      this.state() === "upcoming" && "border-[var(--bpdm-border)] text-[var(--bpdm-muted-foreground)]",
     ),
   );
   protected readonly labelClass = computed(() =>
     cn(
       "whitespace-nowrap text-sm transition-colors duration-[var(--bpdm-duration-base)] empty:hidden",
       this.active()
-        ? "font-semibold text-foreground"
+        ? "font-semibold text-[var(--bpdm-foreground)]"
         : this.completed()
-          ? "font-medium text-foreground"
-          : "text-muted-foreground",
+          ? "font-medium text-[var(--bpdm-foreground)]"
+          : "text-[var(--bpdm-muted-foreground)]",
       // horizontal on mobile: only the active step keeps its label (markers +
       // connectors stay), so the row never overflows a narrow screen; from sm up
       // every label shows. Vertical always shows labels (no width pressure).
@@ -393,6 +393,6 @@ export class BpdmStepPanel {
     ),
   );
   protected readonly innerClass = computed(() =>
-    cn("text-sm text-foreground", this.vertical() ? "ms-[2.75rem] pb-2 pt-1" : "pt-2"),
+    cn("text-sm text-[var(--bpdm-foreground)]", this.vertical() ? "ms-[2.75rem] pb-2 pt-1" : "pt-2"),
   );
 }

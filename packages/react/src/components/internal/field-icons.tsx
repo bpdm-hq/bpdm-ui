@@ -56,7 +56,7 @@ export function FieldSearch({ className }: { className?: string }) {
       viewBox="0 0 16 16"
       fill="none"
       aria-hidden
-      className={cn("size-4 shrink-0 text-muted-foreground", className)}
+      className={cn("size-4 shrink-0 text-[var(--bpdm-muted-foreground)]", className)}
     >
       <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" />
       <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

@@ -47,7 +47,8 @@ describe("Checkbox", () => {
   it("uses a ≥3:1 unchecked border (full muted-foreground, no opacity)", () => {
     render(<Checkbox aria-label="Accept" />);
     const cls = screen.getByRole("checkbox", { name: "Accept" }).className;
-    expect(cls).toMatch(/(^|\s)border-muted-foreground(\s|$)/);
-    expect(cls).not.toMatch(/border-muted-foreground\//);
+    expect(cls).toContain("border-[var(--bpdm-muted-foreground)]");
+    // ...and not the opacity-modified variant (that would drop below 3:1)
+    expect(cls).not.toContain("border-[var(--bpdm-muted-foreground)]/");
   });
 });

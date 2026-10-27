@@ -227,7 +227,7 @@ export function Calendar({
     setView(new Date(year, month - index, 1));
 
   const selectCls =
-    "cursor-pointer appearance-none rounded-md bg-transparent py-1 ps-2 pe-6 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "cursor-pointer appearance-none rounded-md bg-transparent py-1 ps-2 pe-6 text-sm font-semibold tabular-nums text-[var(--bpdm-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]";
 
   const select = (d: Date) => {
     if (isDisabled(d)) return;
@@ -333,7 +333,7 @@ export function Calendar({
             aria-label={t.previousMonth}
             onClick={() => goMonth(-1)}
             className={cn(
-              "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4",
+              "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] [&_svg]:size-4",
               !isFirst && "invisible",
             )}
           >
@@ -354,7 +354,7 @@ export function Calendar({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true" />
+                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-[var(--bpdm-muted-foreground)]" aria-hidden="true" />
               </div>
               <div className="relative inline-flex items-center">
                 <select
@@ -369,7 +369,7 @@ export function Calendar({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true" />
+                <ChevronDown className="pointer-events-none absolute end-1.5 size-3.5 text-[var(--bpdm-muted-foreground)]" aria-hidden="true" />
               </div>
             </div>
           ) : (
@@ -382,7 +382,7 @@ export function Calendar({
             aria-label={t.nextMonth}
             onClick={() => goMonth(1)}
             className={cn(
-              "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4",
+              "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] [&_svg]:size-4",
               !isLast && "invisible",
             )}
           >
@@ -405,7 +405,7 @@ export function Calendar({
                 key={i}
                 role="columnheader"
                 aria-label={longHeaders[i]}
-                className="grid h-8 place-items-center text-xs font-medium text-muted-foreground"
+                className="grid h-8 place-items-center text-xs font-medium text-[var(--bpdm-muted-foreground)]"
               >
                 {w}
               </div>
@@ -431,7 +431,7 @@ export function Calendar({
                     className={cn(
                       "relative grid place-items-center",
                       // soft range-band background spanning the row
-                      (rangeMid || rangeStart || rangeEnd) && "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)]",
+                      (rangeMid || rangeStart || rangeEnd) && "bg-[color-mix(in_srgb,var(--bpdm-primary)_14%,transparent)]",
                       rangeStart && (dayShape === "circle" ? "rounded-s-full" : "rounded-s-lg"),
                       rangeEnd && (dayShape === "circle" ? "rounded-e-full" : "rounded-e-lg"),
                     )}
@@ -448,15 +448,15 @@ export function Calendar({
                       aria-current={isToday ? "date" : undefined}
                       data-bpdm-slot="calendar-day"
                       className={cn(
-                    "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+                    "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)]",
                     round,
-                    "hover:bg-muted active:scale-90",
-                    outside && "text-muted-foreground",
-                    !outside && !selected && "text-foreground",
-                    isToday && !selected && "font-semibold text-foreground ring-1 ring-inset ring-primary",
+                    "hover:bg-[var(--bpdm-muted)] active:scale-90",
+                    outside && "text-[var(--bpdm-muted-foreground)]",
+                    !outside && !selected && "text-[var(--bpdm-foreground)]",
+                    isToday && !selected && "font-semibold text-[var(--bpdm-foreground)] ring-1 ring-inset ring-[var(--bpdm-primary)]",
                     selected &&
-                      "bg-primary font-semibold text-primary-foreground hover:bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
-                    disabledDay && "pointer-events-none text-muted-foreground/30 line-through",
+                      "bg-[var(--bpdm-primary)] font-semibold text-[var(--bpdm-primary-foreground)] hover:bg-[var(--bpdm-primary)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
+                    disabledDay && "pointer-events-none text-[var(--bpdm-muted-foreground)]/30 line-through",
                   )}
                     >
                       {d.getDate()}
@@ -478,7 +478,7 @@ export function Calendar({
       aria-label={t.calendar}
       data-bpdm="" data-bpdm-slot="calendar"
       className={cn(
-        "flex w-fit select-none flex-col gap-5 rounded-[var(--radius)] p-3 sm:flex-row",
+        "flex w-fit select-none flex-col gap-5 rounded-[var(--bpdm-radius)] p-3 sm:flex-row",
         className,
       )}
     >
@@ -654,13 +654,13 @@ export function DatePicker({
             aria-invalid={invalid || undefined}
             data-bpdm-slot="date-picker-trigger"
             className={cn(
-              "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-input bg-background ps-3 text-start text-sm transition-colors hover:border-ring/60 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+              "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-3 text-start text-sm transition-colors hover:border-[var(--bpdm-ring)]/60 focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
               showClear ? "pe-9" : "pe-3",
               className,
             )}
           >
-            <CalendarDays className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <span className={cn("flex-1 truncate", !hasValue && "text-muted-foreground")}>
+            <CalendarDays className="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true" />
+            <span className={cn("flex-1 truncate", !hasValue && "text-[var(--bpdm-muted-foreground)]")}>
               {text || placeholder}
             </span>
           </button>
@@ -669,7 +669,7 @@ export function DatePicker({
         <div className="flex flex-col">
           {mode === "range" && presets && presets.length > 0 ? (
             <div className="flex w-fit flex-col sm:w-auto sm:flex-row">
-              <div className="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-border p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
+              <div className="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-[var(--bpdm-border)] p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
                 {presets.map((p) => {
                   const r = calValue as DateRange | null;
                   const pr = p.range();
@@ -681,8 +681,8 @@ export function DatePicker({
                       onClick={() => pick(p.range())}
                       data-bpdm-slot="date-picker-preset"
                       className={cn(
-                        "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
+                        "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
+                        active ? "bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
                       )}
                     >
                       {p.label}
@@ -696,11 +696,11 @@ export function DatePicker({
             calendar
           )}
           {confirm && (
-            <div className="flex items-center justify-end gap-2 border-t border-border p-2">
+            <div className="flex items-center justify-end gap-2 border-t border-[var(--bpdm-border)] p-2">
               <button
                 type="button"
                 onClick={cancel}
-                className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
               >
                 {messages?.cancel ?? "Cancel"}
               </button>
@@ -708,7 +708,7 @@ export function DatePicker({
                 type="button"
                 onClick={apply}
                 disabled={!rangeComplete(draft, mode)}
-                className="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer rounded-md bg-[var(--bpdm-primary)] px-3 py-1.5 text-sm font-medium text-[var(--bpdm-primary-foreground)] transition-colors hover:bg-[var(--bpdm-primary)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {messages?.apply ?? "Apply"}
               </button>
@@ -722,7 +722,7 @@ export function DatePicker({
           aria-label={messages?.clear ?? "Clear"}
           onClick={() => commit(mode === "single" ? null : { from: null, to: null })}
           data-bpdm-slot="date-picker-clear"
-          className="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
+          className="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] [&_svg]:size-3.5"
         >
           <X aria-hidden="true" />
         </button>

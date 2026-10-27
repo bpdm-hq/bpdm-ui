@@ -20,18 +20,18 @@ export const progressFill: Record<ProgressVariant, string> = {
   // (A ≥3:1 fill/track edge is geometrically impossible with a bright amber fill on
   // any acceptably-light track — amber vs white caps at ~1.9:1 — so we keep the
   // brand fill rather than reintroduce a second gold or an off-brand grey rim.)
-  primary: "bg-primary",
-  success: "bg-success",
-  warning: "bg-warning",
-  destructive: "bg-destructive",
-  info: "bg-info",
+  primary: "bg-[var(--bpdm-primary)]",
+  success: "bg-[var(--bpdm-success)]",
+  warning: "bg-[var(--bpdm-warning)]",
+  destructive: "bg-[var(--bpdm-destructive)]",
+  info: "bg-[var(--bpdm-info)]",
 };
 
 /** Readable text color on top of each fill (for the inside-bar label). */
 export const progressFillFg: Record<ProgressVariant, string> = {
-  primary: "text-primary-foreground",
-  success: "text-success-foreground",
-  warning: "text-warning-foreground",
-  destructive: "text-destructive-foreground",
-  info: "text-info-foreground",
+  primary: "text-[var(--bpdm-primary-foreground)]",
+  success: "text-[var(--bpdm-success-foreground)]",
+  warning: "text-[var(--bpdm-warning-foreground)]",
+  destructive: "text-[var(--bpdm-destructive-foreground)]",
+  info: "text-[var(--bpdm-info-foreground)]",
 };

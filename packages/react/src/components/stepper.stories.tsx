@@ -59,7 +59,7 @@ function Nav() {
 
 function Box({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
+    <div className="rounded-lg border border-dashed border-[var(--bpdm-border)] bg-[var(--bpdm-muted)]/30 p-6 text-sm text-[var(--bpdm-muted-foreground)]">
       {children}
     </div>
   );
@@ -383,7 +383,7 @@ export const Validated: Story = {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[var(--bpdm-muted-foreground)]">
                   {accountValid
                     ? "Looks good — you can continue."
                     : "Enter your name and a valid email to continue."}
@@ -754,8 +754,8 @@ export const Controlled: Story = {
     const [value, setValue] = useState("1");
     return (
       <div className="w-full max-w-2xl space-y-3">
-        <p className="text-sm text-muted-foreground">
-          Active step: <span className="font-medium text-foreground">{value}</span>
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">
+          Active step: <span className="font-medium text-[var(--bpdm-foreground)]">{value}</span>
         </p>
         <Stepper value={value} onValueChange={setValue}>
           <StepList>

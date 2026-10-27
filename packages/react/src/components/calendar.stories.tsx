@@ -316,7 +316,7 @@ export const InlineCalendar: Story = {
   render: () => {
     const [date, setDate] = useState<Date | null>(null);
     return (
-      <div className="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+      <div className="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
         <Calendar value={date} onChange={(v) => setDate(v as Date | null)} />
       </div>
     );
@@ -330,7 +330,7 @@ import { Calendar } from "@bpdm/ui";
 export function Example() {
   const [date, setDate] = useState<Date | null>(null);
   return (
-    <div className="w-fit rounded-lg border bg-card shadow-sm">
+    <div className="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <Calendar value={date} onChange={(v) => setDate(v as Date | null)} />
     </div>
   );
@@ -346,7 +346,7 @@ export const MonthYearDropdown: Story = {
   render: () => {
     const [date, setDate] = useState<Date | null>(null);
     return (
-      <div className="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+      <div className="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
         <Calendar
           value={date}
           onChange={(v) => setDate(v as Date | null)}
@@ -364,7 +364,7 @@ import { Calendar } from "@bpdm/ui";
 export function Example() {
   const [date, setDate] = useState<Date | null>(null);
   return (
-    <div className="w-fit rounded-lg border bg-card shadow-sm">
+    <div className="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <Calendar
         value={date}
         onChange={(v) => setDate(v as Date | null)}
@@ -386,7 +386,7 @@ export const SquareDays: Story = {
   render: () => {
     const [date, setDate] = useState<Date | null>(null);
     return (
-      <div className="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+      <div className="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
         <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="square" />
       </div>
     );
@@ -400,7 +400,7 @@ import { Calendar } from "@bpdm/ui";
 export function Example() {
   const [date, setDate] = useState<Date | null>(null);
   return (
-    <div className="w-fit rounded-lg border bg-card shadow-sm">
+    <div className="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <Calendar value={date} onChange={(v) => setDate(v as Date | null)} dayShape="square" />
     </div>
   );
@@ -416,7 +416,7 @@ export const Invalid: Story = {
   render: () => (
     <div className="w-72 space-y-1.5">
       <DatePicker invalid placeholder="Required" />
-      <p className="text-xs text-destructive-strong">Please choose a date.</p>
+      <p className="text-xs text-[var(--bpdm-destructive-strong)]">Please choose a date.</p>
     </div>
   ),
   parameters: {
@@ -428,7 +428,7 @@ export function Example() {
   return (
     <div className="space-y-1.5">
       <DatePicker invalid placeholder="Required" />
-      <p className="text-xs text-destructive-strong">Please choose a date.</p>
+      <p className="text-xs text-[var(--bpdm-destructive-strong)]">Please choose a date.</p>
     </div>
   );
 }`,

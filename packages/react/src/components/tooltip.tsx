@@ -73,7 +73,7 @@ export function Tooltip({
     ? (children as React.ReactElement<{ disabled?: boolean; className?: string; tabIndex?: number }>)
     : null;
   const trigger = childEl?.props.disabled ? (
-    <span tabIndex={0} className="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+    <span tabIndex={0} className="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]">
       {React.cloneElement(childEl, {
         tabIndex: -1,
         className: cn(childEl.props.className, "pointer-events-none"),
@@ -96,7 +96,7 @@ export function Tooltip({
             align={align}
             sideOffset={sideOffset}
             className={cn(
-              "z-50 max-w-xs rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg",
+              "z-50 max-w-xs rounded-md bg-[var(--bpdm-popover)] px-2.5 py-1.5 text-xs text-[var(--bpdm-popover-foreground)] shadow-lg",
               "origin-[var(--radix-tooltip-content-transform-origin)] animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_100ms_ease-in]",
               className,
             )}
@@ -108,7 +108,7 @@ export function Tooltip({
               // where the bubble's shadow happens to fall. A tight all-around
               // drop-shadow gives it the same lift on every side.
               <TooltipPrimitive.Arrow
-                className="fill-popover [filter:drop-shadow(0_0_1.5px_rgb(0_0_0/0.22))]"
+                className="fill-[var(--bpdm-popover)] [filter:drop-shadow(0_0_1.5px_rgb(0_0_0/0.22))]"
                 width={12}
                 height={6}
               />

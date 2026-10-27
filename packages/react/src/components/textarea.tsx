@@ -80,7 +80,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           <div
             id={countId}
             data-bpdm-slot="textarea-count"
-            className="mt-1 text-end text-xs tabular-nums text-muted-foreground"
+            className="mt-1 text-end text-xs tabular-nums text-[var(--bpdm-muted-foreground)]"
           >
             {count}
             {maxLength != null ? ` / ${maxLength}` : ""}

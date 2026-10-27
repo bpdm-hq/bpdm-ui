@@ -49,7 +49,7 @@ describe("BpdmAvatar", () => {
     const dot = host.querySelector('[aria-label="Online"]') as HTMLElement;
     expect(dot).toBeTruthy();
     expect(dot.getAttribute("role")).toBe("img");
-    expect(dot.className).toContain("bg-success");
+    expect(dot.className).toContain("bg-[var(--bpdm-success)]");
   });
 
   it("names the fallback with the full name for screen readers", () => {

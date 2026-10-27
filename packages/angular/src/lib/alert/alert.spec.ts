@@ -46,7 +46,7 @@ describe("BpdmAlert", () => {
     const box = host.querySelector('[role="alert"]') as HTMLElement;
 
     expect(box).toBeTruthy();
-    expect(box.className).toContain("var(--destructive)"); // error accent (destructive color-mix bg/border)
+    expect(box.className).toContain("var(--bpdm-destructive)"); // error accent (destructive color-mix bg/border)
     expect(host.textContent).toContain("Oops"); // title
     expect(host.textContent).toContain("Something failed"); // body
   });

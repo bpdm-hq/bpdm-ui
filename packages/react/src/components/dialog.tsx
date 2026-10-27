@@ -37,7 +37,7 @@ export const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = "DialogOverlay";
 
 const contentVariants = cva(
-  "fixed left-1/2 top-1/2 z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
+  "fixed left-1/2 top-1/2 z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
   {
     variants: {
       size: {
@@ -72,7 +72,7 @@ export const DialogContent = React.forwardRef<
         <DialogPrimitive.Close
           aria-label={closeLabel}
           data-bpdm-slot="dialog-close"
-          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           <XIcon />
         </DialogPrimitive.Close>
@@ -119,7 +119,7 @@ export const DialogDescription = React.forwardRef<
   <DialogPrimitive.Description
     ref={ref}
     data-bpdm-slot="dialog-description"
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-[var(--bpdm-muted-foreground)]", className)}
     {...props}
   />
 ));

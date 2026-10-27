@@ -14,7 +14,7 @@ export const buttonVariants = cva(
   // baseline scale-100/translate-y-0 so it interpolates). The `bpdm-btn` marker
   // class also gets an amber "pulse ring" on click via @bpdm/tokens CSS (an
   // ::after that expands + fades on release, so even a quick click registers).
-  "bpdm-btn relative inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium no-underline scale-100 translate-y-0 transition-[color,background-color,border-color,box-shadow,transform,scale,translate] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] active:scale-[0.95] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "bpdm-btn relative inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium no-underline scale-100 translate-y-0 transition-[color,background-color,border-color,box-shadow,transform,scale,translate] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] active:scale-[0.95] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       // colour / severity only — appearance is a separate axis
@@ -50,41 +50,41 @@ export const buttonVariants = cva(
       // so there is no tailwind-merge conflict). `round` makes a square icon
       // button a circle, or a text button a pill.
       shape: {
-        default: "rounded-[var(--radius)]",
+        default: "rounded-[var(--bpdm-radius)]",
         round: "rounded-full",
       },
     },
     compoundVariants: [
       // solid (filled)
-      { variant: "primary", appearance: "solid", class: "bg-primary text-primary-foreground hover:bg-primary/90" },
-      { variant: "secondary", appearance: "solid", class: "bg-secondary text-secondary-foreground hover:bg-secondary/80" },
-      { variant: "success", appearance: "solid", class: "bg-success text-success-foreground hover:bg-success/90" },
-      { variant: "info", appearance: "solid", class: "bg-info text-info-foreground hover:bg-info/90" },
-      { variant: "warning", appearance: "solid", class: "bg-warning text-warning-foreground hover:bg-warning/90" },
-      { variant: "help", appearance: "solid", class: "bg-help text-help-foreground hover:bg-help/90" },
-      { variant: "destructive", appearance: "solid", class: "bg-destructive text-destructive-foreground hover:bg-destructive/90" },
+      { variant: "primary", appearance: "solid", class: "bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] hover:bg-[var(--bpdm-primary)]/90" },
+      { variant: "secondary", appearance: "solid", class: "bg-[var(--bpdm-secondary)] text-[var(--bpdm-secondary-foreground)] hover:bg-[var(--bpdm-secondary)]/80" },
+      { variant: "success", appearance: "solid", class: "bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)] hover:bg-[var(--bpdm-success)]/90" },
+      { variant: "info", appearance: "solid", class: "bg-[var(--bpdm-info)] text-[var(--bpdm-info-foreground)] hover:bg-[var(--bpdm-info)]/90" },
+      { variant: "warning", appearance: "solid", class: "bg-[var(--bpdm-warning)] text-[var(--bpdm-warning-foreground)] hover:bg-[var(--bpdm-warning)]/90" },
+      { variant: "help", appearance: "solid", class: "bg-[var(--bpdm-help)] text-[var(--bpdm-help-foreground)] hover:bg-[var(--bpdm-help)]/90" },
+      { variant: "destructive", appearance: "solid", class: "bg-[var(--bpdm-destructive)] text-[var(--bpdm-destructive-foreground)] hover:bg-[var(--bpdm-destructive)]/90" },
       // high-contrast: flips to the theme's foreground (black on light, white on dark)
-      { variant: "contrast", appearance: "solid", class: "bg-foreground text-background hover:bg-foreground/90" },
+      { variant: "contrast", appearance: "solid", class: "bg-[var(--bpdm-foreground)] text-[var(--bpdm-background)] hover:bg-[var(--bpdm-foreground)]/90" },
 
       // outline (border, transparent fill) — secondary/contrast read as a neutral outline
-      { variant: "primary", appearance: "outline", class: "border-primary-strong text-primary-strong hover:bg-primary/10" },
-      { variant: "secondary", appearance: "outline", class: "border-input text-foreground hover:bg-muted" },
-      { variant: "success", appearance: "outline", class: "border-success text-success hover:bg-success/10" },
-      { variant: "info", appearance: "outline", class: "border-info text-info hover:bg-info/10" },
-      { variant: "warning", appearance: "outline", class: "border-warning text-warning hover:bg-warning/10" },
-      { variant: "help", appearance: "outline", class: "border-help text-help hover:bg-help/10" },
-      { variant: "destructive", appearance: "outline", class: "border-destructive text-destructive-strong hover:bg-destructive/10" },
-      { variant: "contrast", appearance: "outline", class: "border-foreground/40 text-foreground hover:bg-muted" },
+      { variant: "primary", appearance: "outline", class: "border-[var(--bpdm-primary-strong)] text-[var(--bpdm-primary-strong)] hover:bg-[var(--bpdm-primary)]/10" },
+      { variant: "secondary", appearance: "outline", class: "border-[var(--bpdm-input)] text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]" },
+      { variant: "success", appearance: "outline", class: "border-[var(--bpdm-success)] text-[var(--bpdm-success)] hover:bg-[var(--bpdm-success)]/10" },
+      { variant: "info", appearance: "outline", class: "border-[var(--bpdm-info)] text-[var(--bpdm-info)] hover:bg-[var(--bpdm-info)]/10" },
+      { variant: "warning", appearance: "outline", class: "border-[var(--bpdm-warning)] text-[var(--bpdm-warning)] hover:bg-[var(--bpdm-warning)]/10" },
+      { variant: "help", appearance: "outline", class: "border-[var(--bpdm-help)] text-[var(--bpdm-help)] hover:bg-[var(--bpdm-help)]/10" },
+      { variant: "destructive", appearance: "outline", class: "border-[var(--bpdm-destructive)] text-[var(--bpdm-destructive-strong)] hover:bg-[var(--bpdm-destructive)]/10" },
+      { variant: "contrast", appearance: "outline", class: "border-[var(--bpdm-foreground)]/40 text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]" },
 
       // ghost (no border, transparent fill) — secondary/contrast read as a neutral ghost
-      { variant: "primary", appearance: "ghost", class: "text-primary-strong hover:bg-primary/10" },
-      { variant: "secondary", appearance: "ghost", class: "text-foreground hover:bg-muted" },
-      { variant: "success", appearance: "ghost", class: "text-success hover:bg-success/10" },
-      { variant: "info", appearance: "ghost", class: "text-info hover:bg-info/10" },
-      { variant: "warning", appearance: "ghost", class: "text-warning hover:bg-warning/10" },
-      { variant: "help", appearance: "ghost", class: "text-help hover:bg-help/10" },
-      { variant: "destructive", appearance: "ghost", class: "text-destructive-strong hover:bg-destructive/10" },
-      { variant: "contrast", appearance: "ghost", class: "text-foreground hover:bg-muted" },
+      { variant: "primary", appearance: "ghost", class: "text-[var(--bpdm-primary-strong)] hover:bg-[var(--bpdm-primary)]/10" },
+      { variant: "secondary", appearance: "ghost", class: "text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]" },
+      { variant: "success", appearance: "ghost", class: "text-[var(--bpdm-success)] hover:bg-[var(--bpdm-success)]/10" },
+      { variant: "info", appearance: "ghost", class: "text-[var(--bpdm-info)] hover:bg-[var(--bpdm-info)]/10" },
+      { variant: "warning", appearance: "ghost", class: "text-[var(--bpdm-warning)] hover:bg-[var(--bpdm-warning)]/10" },
+      { variant: "help", appearance: "ghost", class: "text-[var(--bpdm-help)] hover:bg-[var(--bpdm-help)]/10" },
+      { variant: "destructive", appearance: "ghost", class: "text-[var(--bpdm-destructive-strong)] hover:bg-[var(--bpdm-destructive)]/10" },
+      { variant: "contrast", appearance: "ghost", class: "text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]" },
     ],
     defaultVariants: { variant: "primary", appearance: "solid", size: "md", shape: "default" },
   },

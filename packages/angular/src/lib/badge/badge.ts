@@ -87,7 +87,7 @@ export const DEFAULT_NOTIFICATION_BADGE_MESSAGES: NotificationBadgeMessages = {
             data-bpdm-slot="badge-remove"
             [attr.aria-label]="t().remove"
             (click)="remove($event)"
-            class="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-foreground/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="-me-1 ms-0.5 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-[color,background-color,opacity] hover:bg-[var(--bpdm-foreground)]/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
           >
             <svg viewBox="0 0 16 16" fill="none" class="size-2.5" aria-hidden="true">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -125,7 +125,7 @@ export class BpdmBadge {
   protected readonly badgeClass = computed(() => {
     const ghost = this.appearance() === "ghost";
     const tone = ghost
-      ? "border-transparent bg-transparent text-foreground"
+      ? "border-transparent bg-transparent text-[var(--bpdm-foreground)]"
       : badgeTone[this.variant()][this.appearance() as "soft" | "solid" | "outline"];
     return cn(
       badgeVariants({ size: this.size() }),
@@ -135,7 +135,7 @@ export class BpdmBadge {
       // an interactive badge is keyboard-operable (role=button + tabindex), so it
       // needs a visible focus ring like the rest of the library's controls
       this.interactive() &&
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
       this.removable() &&
         "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
       this.classInput(),
@@ -196,7 +196,7 @@ export class BpdmBadge {
         [class]="dot() ? 'end-1 top-1' : 'end-0 top-0'"
       >
         <span
-          class="flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-background animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
+          class="flex items-center justify-center rounded-full font-semibold leading-none ring-2 ring-[var(--bpdm-background)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"
           [class]="indicatorClass()"
           data-bpdm-slot="notification-badge-indicator"
           [attr.role]="announced() ? 'status' : null"

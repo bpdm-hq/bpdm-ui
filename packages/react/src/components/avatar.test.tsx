@@ -42,14 +42,14 @@ describe("Avatar", () => {
     // initials of "Aria Lindqvist"
     const fallback = await screen.findByText("AL");
     // auto-tint applies a palette bg/text (not the neutral muted look)
-    expect(fallback.className).not.toContain("bg-muted");
+    expect(fallback.className).not.toContain("bg-[var(--bpdm-muted)]");
     // named avatar exposes its full name to screen readers
     expect(screen.getByRole("img", { name: "Aria Lindqvist" })).toBeInTheDocument();
   });
 
   it("uses the neutral tint when colorful is false", async () => {
     render(<Avatar name="Aria Lindqvist" colorful={false} />);
-    expect((await screen.findByText("AL")).className).toContain("bg-muted");
+    expect((await screen.findByText("AL")).className).toContain("bg-[var(--bpdm-muted)]");
   });
 
   it("renders a custom icon when there's no name", async () => {

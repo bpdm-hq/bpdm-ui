@@ -47,7 +47,7 @@ describe("Switch", () => {
   it("uses a ≥3:1 unchecked track border (full muted-foreground)", () => {
     render(<Switch aria-label="N" />);
     const cls = sw("N").className;
-    expect(cls).toContain("data-[state=unchecked]:border-muted-foreground");
-    expect(cls).not.toContain("border-muted-foreground/");
+    expect(cls).toContain("data-[state=unchecked]:border-[var(--bpdm-muted-foreground)]");
+    expect(cls).not.toContain("border-[var(--bpdm-muted-foreground)]/");
   });
 });

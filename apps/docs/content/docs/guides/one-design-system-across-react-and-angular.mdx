@@ -13,12 +13,12 @@ A shared design system is supposed to solve that. The hard part is sharing it ac
 
 You can't drop a React component into an Angular app (or the reverse) without pain: different runtimes, bundle bloat, hydration quirks, accessibility that breaks in the seams. So don't try to share the components. Share the **design** instead.
 
-A design token is a named value: a colour, a spacing step, a radius, an easing curve. Expressed as CSS custom properties, tokens are framework-agnostic. A `<div>` styled with `var(--primary)` looks identical no matter what rendered it.
+A design token is a named value: a colour, a spacing step, a radius, an easing curve. Expressed as CSS custom properties, tokens are framework-agnostic. A `<div>` styled with `var(--bpdm-primary)` looks identical no matter what rendered it.
 
 ```css title="tokens.css"
 :root {
-  --primary: #f5a623;
-  --radius: 0.5rem;
+  --bpdm-primary: #f5a623;
+  --bpdm-radius: 0.5rem;
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 ```
@@ -59,7 +59,7 @@ Accessibility is the part teams most often duplicate and get subtly wrong. Keep 
 
 ## It scales past React and Angular
 
-The real payoff of putting design in tokens is that the token layer neither knows nor cares which framework consumes it. Anything that can read a CSS variable can join the system: a Vue app, a plain HTML page, a Web Component. React and Angular are simply the first two native implementations; the same `--primary` and `--radius` are ready for whatever target comes next, with no change to the design layer.
+The real payoff of putting design in tokens is that the token layer neither knows nor cares which framework consumes it. Anything that can read a CSS variable can join the system: a Vue app, a plain HTML page, a Web Component. React and Angular are simply the first two native implementations; the same `--bpdm-primary` and `--bpdm-radius` are ready for whatever target comes next, with no change to the design layer.
 
 That is what makes the approach future-proof. You invest in one token system, and every framework you add later inherits the same look for free.
 

@@ -357,11 +357,11 @@ export function TreeSelect({
         <div
           onMouseMove={() => setActiveValue(node.value)}
           className={cn(
-            "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
+            "flex items-center gap-1.5 rounded-[calc(var(--bpdm-radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
             // active treeitem — follows both the keyboard (aria-activedescendant) and
             // the pointer (onMouseMove), so there's a single highlight that tracks the
             // cursor. An amber inline-start bar (ring token, ≥3:1 in every theme) + soft
-            // tint + weight — clearly perceptible where bg-muted alone was ~1.05:1.
+            // tint + weight — clearly perceptible where bg-[var(--bpdm-muted)] alone was ~1.05:1.
             // RTL-safe (logical shadow mirror), jitter-free (inset shadow takes no space).
             isActive &&
               "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
@@ -374,7 +374,7 @@ export function TreeSelect({
               tabIndex={-1}
               aria-label={isOpen ? t.collapse : t.expand}
               onClick={() => toggleExpand(node.value)}
-              className="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground"
+              className="grid size-4 shrink-0 cursor-pointer place-items-center text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]"
             >
               <Caret open={isOpen} />
             </button>
@@ -387,15 +387,15 @@ export function TreeSelect({
             tabIndex={-1}
             disabled={node.disabled}
             onClick={() => toggleNode(node)}
-            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-foreground disabled:pointer-events-none disabled:opacity-50"
+            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-[var(--bpdm-foreground)] disabled:pointer-events-none disabled:opacity-50"
           >
             <span
               aria-hidden="true"
               className={cn(
                 "grid size-4 shrink-0 place-items-center rounded-[4px] border",
                 checked || indeterminate
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-muted-foreground/50",
+                  ? "border-[var(--bpdm-primary)] bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)]"
+                  : "border-[var(--bpdm-muted-foreground)]/50",
               )}
             >
               {checked ? <FieldCheck /> : indeterminate ? <FieldDash /> : null}
@@ -440,7 +440,7 @@ export function TreeSelect({
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
             {selectedLeaves.length === 0 ? (
-              <span className="text-muted-foreground">{placeholder}</span>
+              <span className="text-[var(--bpdm-muted-foreground)]">{placeholder}</span>
             ) : maxDisplay === 0 ? (
               <span>{t.selected(selectedLeaves.length)}</span>
             ) : (
@@ -449,12 +449,12 @@ export function TreeSelect({
                   <span
                     key={i}
                     data-bpdm-slot="tree-select-chip"
-                    className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs"
+                    className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs"
                   >
                     <span className="truncate">{o.label}</span>
                   </span>
                 ))}
-                {extra > 0 && <span className="shrink-0 text-xs text-muted-foreground">+{extra}</span>}
+                {extra > 0 && <span className="shrink-0 text-xs text-[var(--bpdm-muted-foreground)]">+{extra}</span>}
               </>
             )}
           </div>
@@ -470,7 +470,7 @@ export function TreeSelect({
                   setSelected([]);
                 }}
                 data-bpdm-slot="tree-select-clear"
-                className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground"
+                className="grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]"
               >
                 <FieldClearX />
               </button>
@@ -494,13 +494,13 @@ export function TreeSelect({
           style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
           data-bpdm="" data-bpdm-slot="tree-select-content"
           className={cn(
-            "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-popover text-popover-foreground shadow-md",
+            "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
           )}
         >
           {(searchable || (selectAll && allVisibleLeaves.length > 0)) && (
-            <div className="flex shrink-0 items-center gap-2 border-b border-border px-3">
+            <div className="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
               {selectAll && allVisibleLeaves.length > 0 && (
                 <button
                   type="button"
@@ -511,7 +511,7 @@ export function TreeSelect({
                   title={t.selectAll}
                   data-bpdm-slot="tree-select-select-all"
                   className={cn(
-                    "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground",
+                    "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]",
                     !searchable && "w-full",
                   )}
                 >
@@ -519,8 +519,8 @@ export function TreeSelect({
                     className={cn(
                       "grid size-4 shrink-0 place-items-center rounded-[4px] border",
                       allSel || someSel
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-muted-foreground/50",
+                        ? "border-[var(--bpdm-primary)] bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)]"
+                        : "border-[var(--bpdm-muted-foreground)]/50",
                     )}
                   >
                     {allSel ? <FieldCheck /> : someSel ? <FieldDash /> : null}
@@ -529,7 +529,7 @@ export function TreeSelect({
                 </button>
               )}
               {selectAll && allVisibleLeaves.length > 0 && searchable && (
-                <span className="w-px shrink-0 self-stretch bg-border" aria-hidden />
+                <span className="w-px shrink-0 self-stretch bg-[var(--bpdm-border)]" aria-hidden />
               )}
               {searchable && (
                 <>
@@ -541,14 +541,14 @@ export function TreeSelect({
                     placeholder={searchPlaceholder}
                     aria-label={searchPlaceholder}
                     data-bpdm-slot="tree-select-search"
-                    className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
                   />
                 </>
               )}
             </div>
           )}
           {visibleTree.length === 0 ? (
-            <div data-bpdm-slot="tree-select-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
+            <div data-bpdm-slot="tree-select-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{emptyText}</div>
           ) : (
             <div
               ref={treeRef}

@@ -55,7 +55,7 @@ export function provideBpdmConfirmMessages(messages: Partial<ConfirmMessages>): 
 let cid = 0;
 
 const PANEL_CLASS =
-  "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] max-w-sm flex-col rounded-xl bg-popover text-popover-foreground shadow-xl outline-none";
+  "relative z-50 flex max-h-[85dvh] w-[calc(100vw-2rem)] max-w-sm flex-col rounded-xl bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none";
 const ENTER = "animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]";
 const EXIT = "animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in_forwards]";
 

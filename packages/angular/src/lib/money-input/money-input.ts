@@ -34,7 +34,7 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
   template: `
     <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null" data-bpdm="" data-bpdm-slot="money-input">
       @if (symbolBefore()) {
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">{{ symbol() }}</span>
       }
       <input
         [id]="id() || null"
@@ -57,7 +57,7 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
         class="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
       @if (!symbolBefore()) {
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-muted-foreground">{{ symbol() }}</span>
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">{{ symbol() }}</span>
       }
     </div>
   `,

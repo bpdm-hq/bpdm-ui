@@ -15,11 +15,11 @@ import { BpdmTabs, type TabItem, type TabsBaseline, type TabsVariant } from "./t
         [fullWidth]="fullWidth()"
       />
     </div>
-    <ng-template #overview><p class="text-sm text-muted-foreground">Project overview and highlights.</p></ng-template>
-    <ng-template #activity><p class="text-sm text-muted-foreground">Recent activity and events.</p></ng-template>
-    <ng-template #members><p class="text-sm text-muted-foreground">People with access and their roles.</p></ng-template>
-    <ng-template #integrations><p class="text-sm text-muted-foreground">Connected apps and services.</p></ng-template>
-    <ng-template #settings><p class="text-sm text-muted-foreground">Project preferences.</p></ng-template>
+    <ng-template #overview><p class="text-sm text-[var(--bpdm-muted-foreground)]">Project overview and highlights.</p></ng-template>
+    <ng-template #activity><p class="text-sm text-[var(--bpdm-muted-foreground)]">Recent activity and events.</p></ng-template>
+    <ng-template #members><p class="text-sm text-[var(--bpdm-muted-foreground)]">People with access and their roles.</p></ng-template>
+    <ng-template #integrations><p class="text-sm text-[var(--bpdm-muted-foreground)]">Connected apps and services.</p></ng-template>
+    <ng-template #settings><p class="text-sm text-[var(--bpdm-muted-foreground)]">Project preferences.</p></ng-template>
   `,
 })
 class TabsDemo {
@@ -64,8 +64,8 @@ class TabsDemo {
     <ng-template #user>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
     </ng-template>
-    <ng-template #wsPanel><p class="text-sm text-muted-foreground">Workspace-wide preferences.</p></ng-template>
-    <ng-template #profilePanel><p class="text-sm text-muted-foreground">Your personal profile.</p></ng-template>
+    <ng-template #wsPanel><p class="text-sm text-[var(--bpdm-muted-foreground)]">Workspace-wide preferences.</p></ng-template>
+    <ng-template #profilePanel><p class="text-sm text-[var(--bpdm-muted-foreground)]">Your personal profile.</p></ng-template>
   `,
 })
 class TabsPillDemo {
@@ -93,9 +93,9 @@ class TabsPillDemo {
     <div class="w-full max-w-3xl">
       <bpdm-tabs [items]="items()" />
     </div>
-    <ng-template #general><p class="text-sm text-muted-foreground">General.</p></ng-template>
-    <ng-template #billing><p class="text-sm text-muted-foreground">Billing.</p></ng-template>
-    <ng-template #danger><p class="text-sm text-muted-foreground">Danger.</p></ng-template>
+    <ng-template #general><p class="text-sm text-[var(--bpdm-muted-foreground)]">General.</p></ng-template>
+    <ng-template #billing><p class="text-sm text-[var(--bpdm-muted-foreground)]">Billing.</p></ng-template>
+    <ng-template #danger><p class="text-sm text-[var(--bpdm-muted-foreground)]">Danger.</p></ng-template>
   `,
 })
 class TabsDisabledDemo {

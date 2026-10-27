@@ -14,25 +14,25 @@
    bpdm design token, so @bpdm/tokens — via data-theme — owns the docs palette. */
 :root,
 .dark {
-  --color-fd-background: var(--background);
-  --color-fd-foreground: var(--foreground);
-  --color-fd-muted: var(--muted);
-  --color-fd-muted-foreground: var(--muted-foreground);
-  --color-fd-popover: var(--popover);
-  --color-fd-popover-foreground: var(--popover-foreground);
-  --color-fd-card: var(--card);
-  --color-fd-card-foreground: var(--card-foreground);
-  --color-fd-border: var(--border);
-  --color-fd-primary: var(--primary);
-  --color-fd-primary-foreground: var(--primary-foreground);
-  --color-fd-secondary: var(--secondary);
-  --color-fd-secondary-foreground: var(--secondary-foreground);
-  --color-fd-accent: var(--accent);
-  --color-fd-accent-foreground: var(--accent-foreground);
-  --color-fd-ring: var(--ring);
+  --color-fd-background: var(--bpdm-background);
+  --color-fd-foreground: var(--bpdm-foreground);
+  --color-fd-muted: var(--bpdm-muted);
+  --color-fd-muted-foreground: var(--bpdm-muted-foreground);
+  --color-fd-popover: var(--bpdm-popover);
+  --color-fd-popover-foreground: var(--bpdm-popover-foreground);
+  --color-fd-card: var(--bpdm-card);
+  --color-fd-card-foreground: var(--bpdm-card-foreground);
+  --color-fd-border: var(--bpdm-border);
+  --color-fd-primary: var(--bpdm-primary);
+  --color-fd-primary-foreground: var(--bpdm-primary-foreground);
+  --color-fd-secondary: var(--bpdm-secondary);
+  --color-fd-secondary-foreground: var(--bpdm-secondary-foreground);
+  --color-fd-accent: var(--bpdm-accent);
+  --color-fd-accent-foreground: var(--bpdm-accent-foreground);
+  --color-fd-ring: var(--bpdm-ring);
 }
 @theme static {
-  --color-fd-error: var(--destructive);
+  --color-fd-error: var(--bpdm-destructive);
 }
 
 /* Tailwind v4 doesn't scan workspace packages by default. Point it at the bpdm
@@ -61,13 +61,13 @@
 /* @bpdm/tokens has no sidebar tokens; map them onto existing bpdm tokens so the
    docs sidebar chrome renders correct + on-brand in every theme, then apply them. */
 :root {
-  --sidebar: var(--card);
-  --sidebar-foreground: var(--foreground);
-  --sidebar-border: var(--border);
-  --sidebar-accent: var(--muted);
-  --sidebar-accent-foreground: var(--foreground);
-  --sidebar-ring: var(--ring);
-  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar: var(--bpdm-card);
+  --sidebar-foreground: var(--bpdm-foreground);
+  --sidebar-border: var(--bpdm-border);
+  --sidebar-accent: var(--bpdm-muted);
+  --sidebar-accent-foreground: var(--bpdm-foreground);
+  --sidebar-ring: var(--bpdm-ring);
+  --sidebar-primary-foreground: var(--bpdm-primary-foreground);
 }
 #nd-sidebar {
   background-color: var(--sidebar);
@@ -81,7 +81,7 @@
 
 html {
   scrollbar-gutter: stable;
-  background-color: var(--background);
+  background-color: var(--bpdm-background);
 }
 
 /* Side gutters: keep the whole layout off the viewport edges so it breathes
@@ -107,7 +107,7 @@ html {
   /* same colour as the page so it still reads as one seamless surface when
      docked, but OPAQUE — so the collapsed→hover-reveal floating panel doesn't
      let the page content bleed through it. */
-  background-color: var(--background);
+  background-color: var(--bpdm-background);
   border-inline-end-width: 0;
 }
 /* Collapsed → hover-reveal: the sidebar floats OVER the page content, so restore
@@ -115,7 +115,7 @@ html {
    look merged with the buttons/text underneath. The docked state stays seamless. */
 #nd-sidebar[data-collapsed='true'] {
   border-inline-end-width: 1px;
-  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--foreground) 28%, transparent);
+  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--bpdm-foreground) 28%, transparent);
 }
 /* The floating collapse+search pill (shown when collapsed) defaults to the very
    left edge, where it clashes with the sidebar's peeking edges. Nudge it right a
@@ -149,14 +149,14 @@ html {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.07em;
-  color: color-mix(in oklab, var(--muted-foreground) 85%, transparent);
+  color: color-mix(in oklab, var(--bpdm-muted-foreground) 85%, transparent);
 }
 #nd-sidebar header {
   /* breathing space above the logo + a solid (opaque) sticky header. It must be
      opaque so the collapsed→hover-reveal floating panel isn't see-through at the
      top; matching the page colour keeps it seamless when docked. */
   padding-top: 0.85rem;
-  background-color: var(--background);
+  background-color: var(--bpdm-background);
   border-bottom-width: 0;
 }
 
@@ -209,11 +209,11 @@ html {
 /* the page description (subtitle) — softer, larger, set apart */
 #nd-page h1 + p {
   font-size: 1.075rem;
-  color: var(--muted-foreground);
+  color: var(--bpdm-muted-foreground);
 }
 /* links: amber, with a refined underline offset */
 #nd-page a:not([data-card]):not([class*='not-prose']) {
-  text-decoration-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  text-decoration-color: color-mix(in oklab, var(--bpdm-primary) 45%, transparent);
   text-underline-offset: 3px;
 }
 
@@ -244,8 +244,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--primary) 25%, transparent), transparent 60%),
-    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%);
+    radial-gradient(34rem 18rem at 24% -6rem, color-mix(in oklab, var(--bpdm-primary) 25%, transparent), transparent 60%),
+    radial-gradient(32rem 17rem at 78% -8rem, color-mix(in oklab, var(--bpdm-accent) 18%, transparent), transparent 60%);
   -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent);
   animation: bpdm-aurora-drift 20s ease-in-out infinite alternate;
@@ -260,7 +260,7 @@ body::after {
   z-index: -1;
   pointer-events: none;
   background-image: radial-gradient(
-    color-mix(in oklab, var(--primary) 38%, transparent) 1px,
+    color-mix(in oklab, var(--bpdm-primary) 38%, transparent) 1px,
     transparent 1.5px
   );
   background-size: 1.5rem 1.5rem;
@@ -403,5 +403,5 @@ figure button {
 }
 #nd-toc a:hover,
 #nd-toc a:hover code {
-  color: var(--foreground);
+  color: var(--bpdm-foreground);
 }

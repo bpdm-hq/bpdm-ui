@@ -27,7 +27,7 @@ export const Switch = React.forwardRef<
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden
-            className="hidden size-[62%] text-primary group-data-[state=checked]:block"
+            className="hidden size-[62%] text-[var(--bpdm-primary)] group-data-[state=checked]:block"
           >
             <path
               d="M3.5 8.5l3 3 6-7"
@@ -41,7 +41,7 @@ export const Switch = React.forwardRef<
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden
-            className="hidden size-[62%] text-muted-foreground group-data-[state=unchecked]:block"
+            className="hidden size-[62%] text-[var(--bpdm-muted-foreground)] group-data-[state=unchecked]:block"
           >
             <path
               d="M4 4l8 8M12 4l-8 8"

@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const wrapVariants = cva(
-  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-within:ring-destructive",
+  "flex w-full items-center gap-1.5 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-[var(--bpdm-foreground)] shadow-sm transition-colors focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)] aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-within:ring-[var(--bpdm-destructive)]",
   {
     variants: {
       size: {
@@ -137,7 +137,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
       )}
     >
       {symbolBefore && (
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-muted-foreground">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">
           {symbol}
         </span>
       )}
@@ -170,7 +170,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
         className="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
       {!symbolBefore && (
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-muted-foreground">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">
           {symbol}
         </span>
       )}

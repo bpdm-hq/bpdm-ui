@@ -44,7 +44,7 @@ const meta: Meta<BpdmPopover> = {
   <ng-template #panel>
     <div class="w-64 space-y-1">
       <p class="font-medium">Quick info</p>
-      <p class="text-sm text-muted-foreground">Popovers can hold any content — text, forms, menus.</p>
+      <p class="text-sm text-[var(--bpdm-muted-foreground)]">Popovers can hold any content — text, forms, menus.</p>
     </div>
   </ng-template>
 </div>`,
@@ -69,7 +69,7 @@ import { BpdmButton, BpdmPopover } from '@bpdm/ng';
     <ng-template #panel>
       <div class="w-64 space-y-1">
         <p class="font-medium">Quick info</p>
-        <p class="text-sm text-muted-foreground">Popovers can hold any content — text, forms, menus.</p>
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Popovers can hold any content — text, forms, menus.</p>
       </div>
     </ng-template>
   \`,
@@ -189,7 +189,7 @@ import { BpdmButton, BpdmPopover } from '@bpdm/ng';
     <ng-template #panel>
       <div class="w-64 space-y-1">
         <p class="font-medium">Quick info</p>
-        <p class="text-sm text-muted-foreground">Popovers can hold any content — text, forms, menus.</p>
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Popovers can hold any content — text, forms, menus.</p>
       </div>
     </ng-template>
   \`,

@@ -1,6 +1,6 @@
 ---
 title: Data Table
-description: A fully data-driven table — sorting, selection, pagination, filtering, pinning, expansion and more, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: A fully data-driven table, sorting, selection, pagination, filtering, pinning, expansion and more, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
 import { Tab, Tabs } from '@/components/framework-tabs';
@@ -29,7 +29,7 @@ import {
 import { Preview } from '@/components/preview';
 
 The **Data Table** is fully data-driven: describe your `columns` once and pass an
-array of `data` — no per-cell markup. Density, striping, sorting, selection,
+array of `data`, no per-cell markup. Density, striping, sorting, selection,
 pagination, filtering, column pinning, row expansion, a column toggle, global
 search, reordering and virtualization are all opt-in props. In Angular it's
 `<bpdm-data-table>` with the same `columns` / `data` inputs; custom cells use an
@@ -67,7 +67,7 @@ const members: Member[] = [
   { id: 'm3', name: 'Sara Kovac', email: 'sara@bpdm.dev', role: 'Editor', team: 'Engineering', status: 'active', tasks: 86 },
 ];
 
-// a rich identity cell — Avatar derives initials + colour from the name
+// a rich identity cell, Avatar derives initials + colour from the name
 function MemberCell({ member }: { member: Member }) {
   return (
     <div className="flex items-center gap-3">
@@ -150,8 +150,8 @@ export class MembersTable {
 
 ## Sizes
 
-Set the `size` prop for cell density — `sm`, `md` (default) or `lg`. The preview
-switches between them with our own [`Tabs`](/docs/panel/tabs) — a neat way to
+Set the `size` prop for cell density, `sm`, `md` (default) or `lg`. The preview
+switches between them with our own [`Tabs`](/docs/panel/tabs), a neat way to
 compare densities, and a small example of composing two components.
 
 <Preview>
@@ -243,7 +243,7 @@ export class SizedTables {
 
 ## Borders & striping
 
-The table is **borderless by default** — just a clean header rule and soft row
+The table is **borderless by default**: just a clean header rule and soft row
 dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
 into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
 The preview toggles the three looks with our `Tabs`.
@@ -338,9 +338,9 @@ export class BorderTables {
 ## Sorting
 
 Mark a column `sortable`; clicking its header cycles asc → desc → none, with a live
-arrow indicator. Add `multiSort` to sort by several columns at once — **Shift+click**
+arrow indicator. Add `multiSort` to sort by several columns at once, **Shift+click**
 a header to append it (each shows its order); in **Multi sort** rows are grouped by
-**role**, then by **tasks**. By default sorting is **client-side** — leave `sort` unset
+**role**, then by **tasks**. By default sorting is **client-side**: leave `sort` unset
 and the table orders the data in memory. For **server-side** ordering, control `sort` +
 `onSortChange`: the table renders exactly the order you give and fires `onSortChange`
 so you can re-fetch the sorted page (it won't re-sort itself). The preview toggles all
@@ -369,7 +369,7 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, sortable: true, accessor: (r) => r.tasks },
 ];
 
-// Single-column sort — clicking a header cycles asc → desc → none
+// Single-column sort, clicking a header cycles asc → desc → none
 export function SortableTable() {
   return (
     <DataTable
@@ -382,7 +382,7 @@ export function SortableTable() {
   );
 }
 
-// Multi-column sort — Shift+click a header to append it (each shows its order);
+// Multi-column sort, Shift+click a header to append it (each shows its order);
 // here rows are grouped by role, then by tasks within each role
 export function MultiSortTable() {
   return (
@@ -399,11 +399,11 @@ export function MultiSortTable() {
   );
 }
 
-// Server-side sort — control `sort`; the table renders your order and calls
+// Server-side sort, control `sort`; the table renders your order and calls
 // onSortChange so you can re-fetch. It never re-sorts the data itself.
 export function ServerSortedTable() {
   const [sort, setSort] = useState<DataTableSort[]>([{ id: 'name', dir: 'asc' }]);
-  const rows = useSortedMembers(sort); // your data hook — fetches rows in `sort` order
+  const rows = useSortedMembers(sort); // your data hook, fetches rows in `sort` order
   return (
     <DataTable columns={columns} data={rows} rowKey={(r) => r.id} sort={sort} onSortChange={setSort} />
   );
@@ -428,13 +428,13 @@ type Member = { id: string; name: string; role: string; tasks: number };
       [columns]="columns" [data]="members" [rowKey]="rowKey"
       [defaultSort]="[{ id: 'tasks', dir: 'desc' }]" />
 
-    <!-- Multi-column sort — Shift+click a header to append (grouped by role, then tasks) -->
+    <!-- Multi-column sort, Shift+click a header to append (grouped by role, then tasks) -->
     <bpdm-data-table
       [columns]="columns" [data]="members" [rowKey]="rowKey"
       multiSort
       [defaultSort]="[{ id: 'role', dir: 'asc' }, { id: 'tasks', dir: 'desc' }]" />
 
-    <!-- Server-side sort — control [sort]; re-fetch on (sortChange), table won't re-sort -->
+    <!-- Server-side sort, control [sort]; re-fetch on (sortChange), table won't re-sort -->
     <bpdm-data-table
       [columns]="columns" [data]="serverRows()" [rowKey]="rowKey"
       [sort]="sort()" (sortChange)="onSort($event)" />
@@ -468,12 +468,12 @@ export class SortableTable {
 
 ## Column filters
 
-Set `filterable` on a column for a header filter menu — `filterType` is `text`,
+Set `filterable` on a column for a header filter menu, `filterType` is `text`,
 `number`, or `select` (pick from the column's distinct values). Filtering is
 **client-side** by default (the table filters `data` in memory). For **server-side**
 filtering, control `filters` + `onFiltersChange` (and `searchValue` + `onSearchChange`
 for search): the same funnel UI is shown, but the table stops filtering itself and
-just emits the change so you can re-fetch — exactly like controlled sorting. The
+just emits the change so you can re-fetch, exactly like controlled sorting. The
 preview toggles **Client** and **Server** with our `Tabs`.
 
 <Preview>
@@ -483,7 +483,7 @@ preview toggles **Client** and **Server** with our `Tabs`.
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-**Client** — mark columns `filterable`; the table filters `data` in memory:
+**Client**: mark columns `filterable`; the table filters `data` in memory:
 
 ```tsx title="filters-client.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
@@ -505,7 +505,7 @@ export function FilterableTable() {
 }
 ```
 
-**Server** — control `filters`; the same funnel UI shows, but *you* fetch the filtered
+**Server**: control `filters`; the same funnel UI shows, but *you* fetch the filtered
 rows (swap `filterMembers` for a real API call). A `ColumnFilter` is
 `{ matchMode: 'all' | 'any', rules: [{ op, value }] }`:
 
@@ -530,7 +530,7 @@ const FIELD: Record<string, (m: Member) => string | number> = {
   tasks: (m) => m.tasks,
 };
 
-// stand-in for your backend — apply the active filters (replace with a fetch)
+// stand-in for your backend, apply the active filters (replace with a fetch)
 function filterMembers(filters: Record<string, ColumnFilter>): Member[] {
   const active = Object.entries(filters).filter(([, f]) => f.rules.some((r) => r.value !== ''));
   if (!active.length) return ALL;
@@ -571,7 +571,7 @@ export function ServerFilteredTable() {
   </Tab>
   <Tab value="Angular">
 
-**Client** — mark columns `filterable`; the table filters in memory:
+**Client**: mark columns `filterable`; the table filters in memory:
 
 ```ts title="filters-client.ts"
 import { Component } from '@angular/core';
@@ -599,7 +599,7 @@ export class FilterableTable {
 }
 ```
 
-**Server** — control `[filters]`; re-fetch on `(filtersChange)`:
+**Server**: control `[filters]`; re-fetch on `(filtersChange)`:
 
 ```ts title="filters-server.ts"
 import { Component, signal, computed } from '@angular/core';
@@ -639,7 +639,7 @@ export class ServerFilteredTable {
     this.filters.set(next);
   }
 
-  // stand-in for your backend — apply the active filters (replace with a fetch)
+  // stand-in for your backend, apply the active filters (replace with a fetch)
   readonly rows = computed(() => {
     const active = Object.entries(this.filters()).filter(([, f]) => f.rules.some((r) => r.value !== ''));
     if (!active.length) return ALL;
@@ -675,8 +675,7 @@ export class ServerFilteredTable {
 
 ## Search
 
-`searchable` adds a global search box that filters rows across all columns —
-**client-side** by default. For **server-side** search, control `searchValue` +
+`searchable` adds a global search box that filters rows across all columns, **client-side** by default. For **server-side** search, control `searchValue` +
 `onSearchChange`: the box is shown but the table stops filtering itself and emits
 the query so you can re-fetch. The preview toggles **Client** and **Server** with
 our `Tabs`.
@@ -688,7 +687,7 @@ our `Tabs`.
 <Tabs groupId="framework" items={['React', 'Angular']}>
   <Tab value="React">
 
-**Client** — hand the table everything; it searches `data` in memory:
+**Client**: hand the table everything; it searches `data` in memory:
 
 ```tsx title="search-client.tsx"
 import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
@@ -712,7 +711,7 @@ export function SearchableTable() {
 }
 ```
 
-**Server** — control `searchValue`; the box is shown but *you* fetch the results
+**Server**: control `searchValue`; the box is shown but *you* fetch the results
 (swap `searchMembers` for a debounced API call):
 
 ```tsx title="search-server.tsx"
@@ -731,7 +730,7 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks },
 ];
 
-// stand-in for your backend — replace with a (debounced) fetch
+// stand-in for your backend, replace with a (debounced) fetch
 function searchMembers(q: string): Member[] {
   const query = q.trim().toLowerCase();
   if (!query) return ALL;
@@ -758,7 +757,7 @@ export function ServerSearchTable() {
   </Tab>
   <Tab value="Angular">
 
-**Client** — the table searches `data` in memory:
+**Client**: the table searches `data` in memory:
 
 ```ts title="search-client.ts"
 import { Component } from '@angular/core';
@@ -786,7 +785,7 @@ export class SearchableTable {
 }
 ```
 
-**Server** — control `[searchValue]`; re-fetch on `(searchChange)` (debounced):
+**Server**: control `[searchValue]`; re-fetch on `(searchChange)` (debounced):
 
 ```ts title="search-server.ts"
 import { Component, signal, computed } from '@angular/core';
@@ -818,7 +817,7 @@ export class ServerSearchTable {
   ];
 
   readonly q = signal('');
-  // stand-in for your backend — replace with a (debounced) API call
+  // stand-in for your backend, replace with a (debounced) API call
   readonly rows = computed(() => {
     const query = this.q().trim().toLowerCase();
     if (!query) return ALL;
@@ -835,12 +834,12 @@ export class ServerSearchTable {
 
 ## Pagination
 
-The `pagination` prop supports three modes — the preview toggles between them with
+The `pagination` prop supports three modes, the preview toggles between them with
 our `Tabs`:
 
-- **Client** — the table slices `data` itself (just give it everything).
-- **Server** (offset) — you fetch the current page; supply `total` + handle `onPageChange`.
-- **Cursor** — prev/next only (no page numbers), for cursor-based APIs.
+- **Client**: the table slices `data` itself (just give it everything).
+- **Server** (offset), you fetch the current page; supply `total` + handle `onPageChange`.
+- **Cursor**: prev/next only (no page numbers), for cursor-based APIs.
 
 <Preview>
   <DataTablePaginationDemo />
@@ -859,7 +858,7 @@ const columns: DataTableColumn<Row>[] = [
   { id: 'role', header: 'Role', accessor: (r) => r.role },
 ];
 
-// 1 — Client: hand the table everything; it pages internally.
+// 1, Client: hand the table everything; it pages internally.
 export function ClientPaged({ rows }: { rows: Row[] }) {
   return (
     <DataTable
@@ -871,7 +870,7 @@ export function ClientPaged({ rows }: { rows: Row[] }) {
   );
 }
 
-// 2 — Server (offset): fetch the current page; supply `total` + handle `onPageChange`.
+// 2, Server (offset): fetch the current page; supply `total` + handle `onPageChange`.
 export function ServerPaged() {
   const [page, setPage] = useState(1);
   const pageSize = 8;
@@ -886,7 +885,7 @@ export function ServerPaged() {
   );
 }
 
-// 3 — Cursor: prev/next only — for cursor-based APIs (no page numbers).
+// 3, Cursor: prev/next only, for cursor-based APIs (no page numbers).
 export function CursorPaged() {
   const { rows, hasNextPage, hasPreviousPage, next, prev, rangeLabel } = useCursor();
   return (
@@ -920,13 +919,13 @@ type Row = { id: string; name: string; role: string };
   selector: 'paged-table',
   imports: [BpdmDataTable],
   template: `
-    <!-- 1 — Client: the table pages internally -->
+    <!-- 1, Client: the table pages internally -->
     <bpdm-data-table [columns]="columns" [data]="rows()" [rowKey]="rowKey" [pagination]="clientPg" />
 
-    <!-- 2 — Server (offset): bind a computed config; you fetch each page -->
+    <!-- 2, Server (offset): bind a computed config; you fetch each page -->
     <bpdm-data-table [columns]="columns" [data]="pageRows()" [rowKey]="rowKey" [pagination]="serverPg()" />
 
-    <!-- 3 — Cursor: prev/next only -->
+    <!-- 3, Cursor: prev/next only -->
     <bpdm-data-table [columns]="columns" [data]="pageRows()" [rowKey]="rowKey" [pagination]="cursorPg()" />
   `,
 })
@@ -940,7 +939,7 @@ export class PagedTable {
   // client
   readonly clientPg = { pageSize: 8, pageSizeOptions: [8, 16, 32] };
 
-  // server (offset) — `page` drives your data fetch; `total` comes from the backend
+  // server (offset), `page` drives your data fetch; `total` comes from the backend
   readonly page = signal(1);
   readonly total = signal(0);
   readonly serverPg = computed(() => ({
@@ -951,7 +950,7 @@ export class PagedTable {
     onPageChange: (p: number) => this.page.set(p),
   }));
 
-  // cursor — prev/next only
+  // cursor, prev/next only
   readonly hasNext = signal(true);
   readonly hasPrev = signal(false);
   readonly cursorPg = computed(() => ({
@@ -975,7 +974,7 @@ export class PagedTable {
 
 ## Selection
 
-`selectable` adds a selection column — **checkboxes with a select-all** by default,
+`selectable` adds a selection column, **checkboxes with a select-all** by default,
 or **radios** with `selectionMode="single"`. The preview toggles the two modes with
 our `Tabs`. Drive it with `selectedKeys` + `onSelectionChange` to build a selection
 toolbar (bulk actions, a "clear" button, …).
@@ -1132,7 +1131,7 @@ export class ClickableTable {
 
 ## Expandable rows
 
-`renderExpanded` shows a detail panel under a row — it's any JSX, so compose your
+`renderExpanded` shows a detail panel under a row, it's any JSX, so compose your
 own components. Here it's an `Avatar`, a couple of `Badge`s and a `ProgressBar`.
 `expandMode="single"` keeps only one open.
 
@@ -1253,7 +1252,7 @@ export class ExpandableTable {
 
 ## Editable cells
 
-There's no separate "edit mode" prop — a `cell` is just a renderer, so an editable
+There's no separate "edit mode" prop, a `cell` is just a renderer, so an editable
 cell is one that swaps its text for an input. Hold the rows in state and commit on
 **Enter** or blur (**Esc** cancels). It composes our [`Input`](/docs/form/input),
 and works with sorting, selection and pagination unchanged.
@@ -1436,7 +1435,7 @@ export class EditableTable {
 ## Frozen & pinnable columns
 
 Give a column `pin: 'left' | 'right'` (with a numeric `width`) to freeze it while
-the table scrolls horizontally. **Scroll the table sideways** — *Name* stays pinned
+the table scrolls horizontally. **Scroll the table sideways**: *Name* stays pinned
 on the left and *Tasks* on the right while the middle columns move. Add `pinnable`
 for a per-column header menu to pin/unpin at runtime.
 
@@ -1511,7 +1510,7 @@ export class FrozenTable {
 
 ## Sticky header & scroll
 
-Cap the height with `maxHeight` and set `stickyHeader` — the body scrolls while
+Cap the height with `maxHeight` and set `stickyHeader`, the body scrolls while
 the header stays pinned.
 
 <Preview>
@@ -1724,7 +1723,7 @@ export class ReorderableTable {
 
 ## Footer summary
 
-Give a column a `footer` — a node, or a function over the filtered rows to compute
+Give a column a `footer`, a node, or a function over the filtered rows to compute
 an aggregate. Any column with a `footer` renders a sticky summary row.
 
 <Preview>
@@ -1794,21 +1793,21 @@ export class SummaryTable {
 
 Style the table to fit your product. Three hooks cover most needs:
 
-- **`headerClassName`** — classes on every header cell (tint or colour the header row).
-- **`rowClassName`** — a string, or a function `(row, i) => string` for **conditional** rows
+- **`headerClassName`**: classes on every header cell (tint or colour the header row).
+- **`rowClassName`**: a string, or a function `(row, i) => string` for **conditional** rows
   (e.g. flag a deactivated user with a destructive tint).
-- **`column.className`** — classes on a column's header **and** cells, to accent a key column.
+- **`column.className`**: classes on a column's header **and** cells, to accent a key column.
 
 These compose with `cellClassName` (every body cell) and `className` (the table). Below,
 the header is tinted, the **Tasks** column is accented, and disabled members are flagged.
 
 <Callout type="info">
-  **Theming, not styling.** The table's focus accents — row hover, the selected-row
-  tint + left bar, and the active-sort arrow — all follow your `--primary` token, so
+  **Theming, not styling.** The table's focus accents, row hover, the selected-row
+  tint + left bar, and the active-sort arrow, all follow your `--bpdm-primary` token, so
   they adopt your brand automatically. Override it once and every table re-tints:
   ```css
-  :root { --primary: #2563eb; }   /* your brand → blue hover, blue accent bar */
-  .dark { --primary: #3b82f6; }
+  :root { --bpdm-primary: #2563eb; }   /* your brand → blue hover, blue accent bar */
+  .dark { --bpdm-primary: #3b82f6; }
   ```
   Use the `className` hooks above only for one-off, per-table overrides.
 </Callout>
@@ -1855,7 +1854,7 @@ const columns: DataTableColumn<Member>[] = [
       </Badge>
     ),
   },
-  // a column className styles its header + every cell — here a subtle accent
+  // a column className styles its header + every cell, here a subtle accent
   { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
 ];
 
@@ -1906,7 +1905,7 @@ export class CustomStyledTable {
     { id: 'name', header: 'Name', cell: this.nameCell(), sortAccessor: (r) => r.name },
     { id: 'role', header: 'Role', accessor: (r) => r.role },
     { id: 'status', header: 'Status', align: 'center', cell: this.statusCell() },
-    // a column className styles its header + every cell — here a subtle accent
+    // a column className styles its header + every cell, here a subtle accent
     { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, className: 'bg-primary/[0.04]' },
   ]);
 }
@@ -2007,21 +2006,21 @@ export class HugeTable {
 ## Responsive
 
 On narrow screens, `responsive` stacks each row into a label/value card instead of
-scrolling horizontally. Everything else still works together — **sorting**, **filtering**,
+scrolling horizontally. Everything else still works together, **sorting**, **filtering**,
 **frozen edges** (Name pinned left, Actions pinned right while the middle scrolls),
 **expandable rows**, and rich cells (avatar, avatar group, flag, row actions). On
 narrow screens they all collapse into the card. **Resize the preview** to see it switch;
 on a wide view, scroll sideways and expand a row.
 
 <Callout type="info">
-  **You don't configure responsiveness — the table is responsive out of the box.**
+  **You don't configure responsiveness, the table is responsive out of the box.**
   On any screen too narrow for its columns, the table **scrolls horizontally inside its
   own bounds** by default: no prop, no wrapper, no CSS on your side. It never breaks the
-  page layout or spills past the viewport — the scroll is contained to the table.
+  page layout or spills past the viewport, the scroll is contained to the table.
 
   `responsive` is the **opt-in upgrade** for when horizontal scroll isn't the experience
   you want: it swaps the scroll for the stacked **label/value cards** above. Both are
-  first-class responsive patterns — dense, data-heavy tables often read better with a
+  first-class responsive patterns, dense, data-heavy tables often read better with a
   horizontal scroll; lighter tables read better as cards. Pick per table with one boolean;
   either way there's nothing else to wire up.
 </Callout>
@@ -2238,7 +2237,7 @@ export function EmptyTable() {
       columns={columns}
       data={[]}
       rowKey={(r) => r.id}
-      emptyContent={<div className="py-8 text-center">No members yet — invite your team.</div>}
+      emptyContent={<div className="py-8 text-center">No members yet, invite your team.</div>}
     />
   );
 }
@@ -2258,7 +2257,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
 @Component({
   selector: 'empty-table',
   imports: [BpdmDataTable],
-  template: `<bpdm-data-table [columns]="columns" [data]="[]" [rowKey]="rowKey" emptyContent="No members yet — invite your team." />`,
+  template: `<bpdm-data-table [columns]="columns" [data]="[]" [rowKey]="rowKey" emptyContent="No members yet, invite your team." />`,
 })
 export class EmptyTable {
   readonly rowKey = (r: Member) => r.id;
@@ -2282,8 +2281,8 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `columns` | `DataTableColumn<T>[]` | — | **Required.** Column definitions. |
-| `data` | `T[]` | — | **Required.** Row data. |
+| `columns` | `DataTableColumn<T>[]` |, | **Required.** Column definitions. |
+| `data` | `T[]` |, | **Required.** Row data. |
 | `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Cell density. |
 | `striped` | `boolean` | `false` | Zebra striping on alternate rows. |
@@ -2292,68 +2291,68 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 | `divided` | `boolean` | `true` | Horizontal dividers between rows. |
 | `elevated` | `boolean` | `true` | Soft drop shadow so the table gently floats. Set `false` for a flat, flush table (e.g. nested inside your own card). |
 | `hoverable` | `boolean` | `true` | Highlight the hovered row. |
-| `headerClassName` | `string` | — | Classes on every header cell. |
-| `cellClassName` | `string` | — | Classes on every body cell. |
-| `rowClassName` | `string \| (row, i) => string` | — | Per-row classes — string or a function for conditional styling. See [Custom styling](#custom-styling). |
-| `rowSpacing` | `number` | — | Vertical gap (px) between rows — renders rows as separated, rounded filled blocks (no dividers). |
+| `headerClassName` | `string` |, | Classes on every header cell. |
+| `cellClassName` | `string` |, | Classes on every body cell. |
+| `rowClassName` | `string \| (row, i) => string` |, | Per-row classes, string or a function for conditional styling. See [Custom styling](#custom-styling). |
+| `rowSpacing` | `number` |, | Vertical gap (px) between rows, renders rows as separated, rounded filled blocks (no dividers). |
 | `stickyHeader` | `boolean` | `false` | Keep the header visible while the body scrolls (pair with `maxHeight`). |
-| `maxHeight` | `number \| string` | — | Cap the height → the body scrolls vertically inside the table. |
+| `maxHeight` | `number \| string` |, | Cap the height → the body scrolls vertically inside the table. |
 | `emptyContent` | `ReactNode` (Angular `string`) | `'No data'` | Shown when `data` is empty. |
-| `onRowClick` | `(row, i) => void` | — | Make rows clickable (adds pointer cursor + hover). |
-| `label` | `string` | — | Accessible name for the table (maps to `aria-label`). |
+| `onRowClick` | `(row, i) => void` |, | Make rows clickable (adds pointer cursor + hover). |
+| `label` | `string` |, | Accessible name for the table (maps to `aria-label`). |
 | `multiSort` | `boolean` | `false` | Allow sorting by several columns (Shift+click appends). |
-| `sort` | `DataTableSort[]` | — | Controlled sort state (server-side ordering). |
-| `defaultSort` | `DataTableSort[]` | — | Initial sort (uncontrolled). |
-| `onSortChange` | `(sort) => void` | — | Fired when the sort changes. Angular `(sortChange)`. |
+| `sort` | `DataTableSort[]` |, | Controlled sort state (server-side ordering). |
+| `defaultSort` | `DataTableSort[]` |, | Initial sort (uncontrolled). |
+| `onSortChange` | `(sort) => void` |, | Fired when the sort changes. Angular `(sortChange)`. |
 | `selectable` | `boolean` | `false` | Show a selection column. |
 | `selectionMode` | `'multiple' \| 'single'` | `'multiple'` | Checkboxes + select-all, or radios. |
-| `selectedKeys` | `Key[]` | — | Controlled selected row keys. |
-| `defaultSelectedKeys` | `Key[]` | — | Initial selection (uncontrolled). |
-| `onSelectionChange` | `(keys, rows) => void` | — | Fired when the selection changes. Angular `(selectionChange)` emits `{ keys, rows }`. |
-| `pagination` | `ClientPagination \| ServerPagination \| CursorPagination` | — | Paging config — see [below](#pagination-config). |
-| `renderExpanded` | `(row, i) => ReactNode` | — | Render an expandable detail panel under a row. Angular: `[expandedTemplate]` (an `<ng-template>`). |
+| `selectedKeys` | `Key[]` |, | Controlled selected row keys. |
+| `defaultSelectedKeys` | `Key[]` |, | Initial selection (uncontrolled). |
+| `onSelectionChange` | `(keys, rows) => void` |, | Fired when the selection changes. Angular `(selectionChange)` emits `{ keys, rows }`. |
+| `pagination` | `ClientPagination \| ServerPagination \| CursorPagination` |, | Paging config, see [below](#pagination-config). |
+| `renderExpanded` | `(row, i) => ReactNode` |, | Render an expandable detail panel under a row. Angular: `[expandedTemplate]` (an `<ng-template>`). |
 | `expandMode` | `'single' \| 'multiple'` | `'multiple'` | Only one row open at a time, or many. |
-| `rowExpandable` | `(row) => boolean` | — | Hide the expander for rows where this returns `false`. |
-| `expandedKeys` | `Key[]` | — | Controlled expanded row keys. |
-| `defaultExpandedKeys` | `Key[]` | — | Initial expanded rows (uncontrolled). |
-| `onExpandedChange` | `(keys) => void` | — | Fired when the expanded set changes. Angular `(expandedChange)`. |
+| `rowExpandable` | `(row) => boolean` |, | Hide the expander for rows where this returns `false`. |
+| `expandedKeys` | `Key[]` |, | Controlled expanded row keys. |
+| `defaultExpandedKeys` | `Key[]` |, | Initial expanded rows (uncontrolled). |
+| `onExpandedChange` | `(keys) => void` |, | Fired when the expanded set changes. Angular `(expandedChange)`. |
 | `pinnable` | `boolean` | `false` | Per-column header menu to pin/unpin at runtime. |
-| `onColumnPinChange` | `(id, pin) => void` | — | Fired when a column is pinned/unpinned. Angular `(columnPinChange)` emits `{ id, pin }`. |
+| `onColumnPinChange` | `(id, pin) => void` |, | Fired when a column is pinned/unpinned. Angular `(columnPinChange)` emits `{ id, pin }`. |
 | `columnToggle` | `boolean` | `false` | Show a "Columns" control to show/hide columns. |
-| `filters` | `Record<string, ColumnFilter>` | — | Controlled column filters — set for **server-side** filtering (table stops filtering itself). Angular `[filters]`. |
-| `onFiltersChange` | `(filters) => void` | — | Fired when a column filter changes. Angular `(filtersChange)`. |
+| `filters` | `Record<string, ColumnFilter>` |, | Controlled column filters, set for **server-side** filtering (table stops filtering itself). Angular `[filters]`. |
+| `onFiltersChange` | `(filters) => void` |, | Fired when a column filter changes. Angular `(filtersChange)`. |
 | `searchable` | `boolean` | `false` | Show a global search box across all columns. |
 | `searchPlaceholder` | `string` | `'Search…'` | Placeholder text for the search box. |
-| `searchValue` | `string` | — | Controlled search value — set for **server-side** search. Angular `[searchValue]`. |
-| `onSearchChange` | `(value) => void` | — | Fired when the search value changes. Angular `(searchChange)`. |
+| `searchValue` | `string` |, | Controlled search value, set for **server-side** search. Angular `[searchValue]`. |
+| `onSearchChange` | `(value) => void` |, | Fired when the search value changes. Angular `(searchChange)`. |
 | `responsive` | `boolean` | `false` | Opt-in: on narrow screens, stack each row into a label/value card instead of the default contained horizontal scroll (which needs no prop). |
 | `virtualized` | `boolean` | `false` | Render only visible rows (uses `maxHeight`, default 440); ignores pagination. |
 | `reorderableColumns` | `boolean` | `false` | Let users drag column headers to reorder columns. |
-| `onColumnOrderChange` | `(order) => void` | — | Fired with the new column-id order. Angular `(columnOrderChange)`. |
+| `onColumnOrderChange` | `(order) => void` |, | Fired with the new column-id order. Angular `(columnOrderChange)`. |
 | `reorderableRows` | `boolean` | `false` | Let users drag a row handle to reorder rows (requires `rowKey`). |
-| `onRowReorder` | `(rows) => void` | — | Fired with the reordered data. Angular `(rowReorder)`. |
+| `onRowReorder` | `(rows) => void` |, | Fired with the reordered data. Angular `(rowReorder)`. |
 | `messages` | `Partial<DataTableMessages>` | English | Translate the table's built-in strings; omitted keys fall back to English. See [Internationalization](#internationalization). |
-| `getRowLabel` | `(row, i) => string` | — | Accessible name for a row's selection control — appended after `selectRow`, e.g. `"Select row: Ada Lovelace"`. |
-| `className` | `string` | — | Classes on the outer table wrapper. Angular: `class`. |
+| `getRowLabel` | `(row, i) => string` |, | Accessible name for a row's selection control, appended after `selectRow`, e.g. `"Select row: Ada Lovelace"`. |
+| `className` | `string` |, | Classes on the outer table wrapper. Angular: `class`. |
 
 ### Pagination config
 
 `pagination` takes one of three shapes. `align` (`'between' \| 'center' \| 'end'`,
 default `'between'`) is shared by all three.
 
-**`ClientPagination`** — the table slices `data` itself:
+**`ClientPagination`**: the table slices `data` itself:
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `mode` | `'client'` | `'client'` | Optional — client is the default. |
+| `mode` | `'client'` | `'client'` | Optional, client is the default. |
 | `pageSize` | `number` | `10` | Rows per page. |
-| `pageSizeOptions` | `number[]` | — | Offer these sizes in a selector (omit to hide it). |
-| `page` | `number` | — | Controlled current page (1-based). |
+| `pageSizeOptions` | `number[]` |, | Offer these sizes in a selector (omit to hide it). |
+| `page` | `number` |, | Controlled current page (1-based). |
 | `defaultPage` | `number` | `1` | Initial page (uncontrolled). |
-| `onPageChange` | `(page) => void` | — | Fired when the page changes. |
-| `onPageSizeChange` | `(size) => void` | — | Fired when the page size changes. |
+| `onPageChange` | `(page) => void` |, | Fired when the page changes. |
+| `onPageSizeChange` | `(size) => void` |, | Fired when the page size changes. |
 
-**`ServerPagination`** — `data` is already the current page:
+**`ServerPagination`**: `data` is already the current page:
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -2365,7 +2364,7 @@ default `'between'`) is shared by all three.
 | `pageSizeOptions` | `number[]` | Optional page-size selector. |
 | `onPageSizeChange` | `(size) => void` | Fired when the page size changes. |
 
-**`CursorPagination`** — prev/next only (no page numbers):
+**`CursorPagination`**: prev/next only (no page numbers):
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -2381,30 +2380,30 @@ default `'between'`) is shared by all three.
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `id` | `string` | — | **Required.** Unique id — the row key and (with no `header`) the default label. |
+| `id` | `string` |, | **Required.** Unique id, the row key and (with no `header`) the default label. |
 | `header` | `ReactNode` (Angular `string`) | `id` | Header label / node. |
-| `accessor` | `(row) => ReactNode` (Angular `SortValue`) | — | Read a plain value from the row (used when `cell` is not given). |
-| `cell` | `(row, i) => ReactNode` (Angular `TemplateRef`) | — | Custom cell renderer — overrides `accessor`. Angular uses an `<ng-template>`. |
-| `footer` | `ReactNode \| (rows) => ReactNode` (Angular `string \| (rows) => string \| TemplateRef`) | — | Footer/summary cell; a function receives the filtered rows to compute an aggregate. |
+| `accessor` | `(row) => ReactNode` (Angular `SortValue`) |, | Read a plain value from the row (used when `cell` is not given). |
+| `cell` | `(row, i) => ReactNode` (Angular `TemplateRef`) |, | Custom cell renderer, overrides `accessor`. Angular uses an `<ng-template>`. |
+| `footer` | `ReactNode \| (rows) => ReactNode` (Angular `string \| (rows) => string \| TemplateRef`) |, | Footer/summary cell; a function receives the filtered rows to compute an aggregate. |
 | `align` | `'left' \| 'center' \| 'right'` | `'left'` | Horizontal alignment of header + cells. |
-| `width` | `number \| string` | — | Fixed column width, e.g. `120` or `'20%'`. |
+| `width` | `number \| string` |, | Fixed column width, e.g. `120` or `'20%'`. |
 | `numeric` | `boolean` | `false` | Right-align + tabular figures (money / counts). |
-| `pin` | `'left' \| 'right'` | — | Freeze the column to an edge while the table scrolls horizontally. |
+| `pin` | `'left' \| 'right'` |, | Freeze the column to an edge while the table scrolls horizontally. |
 | `disablePinning` | `boolean` | `false` | Hide the per-column pin menu for this column even when `pinnable` is on. |
 | `hideable` | `boolean` | `true` | Set `false` to keep the column always visible (excluded from the toggle). |
 | `filterable` | `boolean` | `false` | Show a filter menu on this column's header. |
 | `filterType` | `'text' \| 'number' \| 'select'` | numeric → `number`, else `text` | Filter UI kind. |
 | `filterOptions` | `{ value, label }[]` | derived | Options for a `select` filter (omit to derive distinct values from the data). |
 | `sortable` | `boolean` | `false` | Allow clicking the header to sort by this column. |
-| `sortAccessor` | `(row) => SortValue` | — | Comparable value used when sorting (needed when `cell`/`accessor` returns a node). |
-| `className` | `string` | — | Extra classes applied to every cell (and the header) in this column. |
+| `sortAccessor` | `(row) => SortValue` |, | Comparable value used when sorting (needed when `cell`/`accessor` returns a node). |
+| `className` | `string` |, | Extra classes applied to every cell (and the header) in this column. |
 
 ## Accessibility
 
-- Renders a real semantic `<table>` (`thead` / `tbody` / `th scope` / `td`) — a
+- Renders a real semantic `<table>` (`thead` / `tbody` / `th scope` / `td`), a
   plain accessible table, so screen readers announce rows and columns natively.
   Pass **`label`** for the table's accessible name (maps to `aria-label`).
-- Provide a meaningful **`header`** per column — it's the accessible name for that
+- Provide a meaningful **`header`** per column, it's the accessible name for that
   column's cells.
 - Sortable headers are `<button>`s and the header exposes **`aria-sort`**
   (`none` / `ascending` / `descending`). Clickable rows (`onRowClick`) are
@@ -2424,17 +2423,17 @@ default `'between'`) is shared by all three.
   pinned columns stay reachable. On narrow screens, `responsive` stacks each row
   into a **labelled label/value card** (the `header` becomes each field's label).
 - Every built-in label, operator, and pagination string is translatable via the
-  **`messages`** prop — see [Internationalization](#internationalization).
+  **`messages`** prop, see [Internationalization](#internationalization).
 
 <Callout type="info">
-  This is a semantic **table**, not a custom ARIA **grid** — it does not implement
+  This is a semantic **table**, not a custom ARIA **grid**: it does not implement
   arrow-key cell-to-cell navigation (`role="grid"`). That fits the vast majority of
   data tables; reach for a grid only if you need spreadsheet-style cell navigation.
 </Callout>
 
 ## Internationalization
 
-- **Every built-in string is overridable** via the `messages` prop — a
+- **Every built-in string is overridable** via the `messages` prop, a
   `Partial<DataTableMessages>` merged over the English defaults, so you translate
   only the subset you need. It covers the search box, the "no results" and range
   text, the columns / pin / filter menus, the filter **operators**, the pagination
@@ -2443,9 +2442,9 @@ default `'between'`) is shared by all three.
   you localize number order and grammar.
 - **`getRowLabel`** gives each row's selection checkbox a unique accessible name
   (appended after the `selectRow` label), so screen-reader users can tell rows apart.
-- **RTL-safe**: layout uses logical properties throughout — cells align with
+- **RTL-safe**: layout uses logical properties throughout, cells align with
   `text-start`, pinned columns use `inset-inline-start/end`, and the chevrons, pin
-  arrows and sort icons mirror under `dir="rtl"` — so the whole table flips correctly
+  arrows and sort icons mirror under `dir="rtl"`, so the whole table flips correctly
   right-to-left. See the [Internationalization guide](/docs/getting-started/i18n).
 
 <Tabs groupId="framework" items={['React', 'Angular']}>
@@ -2466,7 +2465,7 @@ const columns: DataTableColumn<Member>[] = [
   { id: 'tasks', header: 'Aufgaben', numeric: true, filterable: true, accessor: (r) => r.tasks },
 ];
 
-// German overrides — pass any subset; the rest fall back to English
+// German overrides, pass any subset; the rest fall back to English
 export function GermanTable() {
   return (
     <DataTable
@@ -2542,7 +2541,7 @@ export class GermanTable {
 
   readonly pagination = { pageSize: 2, pageSizeOptions: [2, 4, 8] };
 
-  // German overrides — pass any subset; the rest fall back to English
+  // German overrides, pass any subset; the rest fall back to English
   readonly messages: Partial<DataTableMessages> = {
     search: 'Suchen',
     noResults: 'Keine Ergebnisse',

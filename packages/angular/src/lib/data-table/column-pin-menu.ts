@@ -3,7 +3,7 @@ import { BpdmPopover } from "../popover/popover";
 import { DEFAULT_DATA_TABLE_MESSAGES, type DataTableMessages } from "./data-table-types";
 
 const PIN_ITEM =
-  "flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-4px)] px-2 py-1.5 text-sm outline-none transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40";
+  "flex w-full cursor-pointer items-center gap-2 rounded-[calc(var(--bpdm-radius)-4px)] px-2 py-1.5 text-sm outline-none transition-colors hover:bg-[var(--bpdm-muted)] disabled:pointer-events-none disabled:opacity-40";
 
 /** Per-column header menu: Pin left / Pin right / Unpin (interactive freezing). */
 @Component({
@@ -20,7 +20,7 @@ const PIN_ITEM =
       bpdmPopoverAlign="end"
       bpdmPopoverClass="min-w-[9rem] p-1"
       (click)="$event.stopPropagation()"
-      class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-background)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
     >
       <svg viewBox="0 0 16 16" class="size-4" aria-hidden="true">
         <circle cx="8" cy="3.5" r="1.3" fill="currentColor" />
@@ -32,13 +32,13 @@ const PIN_ITEM =
     <ng-template #panel>
       @if (reorderable()) {
         <button type="button" [class]="item" [disabled]="!canMoveLeft()" (click)="doMove(-1)">
-          <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+          <svg viewBox="0 0 16 16" class="size-3.5 text-[var(--bpdm-muted-foreground)] rtl:-scale-x-100" fill="none" aria-hidden="true">
             <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           {{ messages().moveColumnLeft }}
         </button>
         <button type="button" [class]="item" [disabled]="!canMoveRight()" (click)="doMove(1)">
-          <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+          <svg viewBox="0 0 16 16" class="size-3.5 text-[var(--bpdm-muted-foreground)] rtl:-scale-x-100" fill="none" aria-hidden="true">
             <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           {{ messages().moveColumnRight }}
@@ -46,13 +46,13 @@ const PIN_ITEM =
       }
       @if (showPin()) {
       <button type="button" [class]="item" [disabled]="pin() === 'left'" (click)="choose('left')">
-        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 16 16" class="size-3.5 text-[var(--bpdm-muted-foreground)] rtl:-scale-x-100" fill="none" aria-hidden="true">
           <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         {{ messages().pinLeft }}
       </button>
       <button type="button" [class]="item" [disabled]="pin() === 'right'" (click)="choose('right')">
-        <svg viewBox="0 0 16 16" class="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 16 16" class="size-3.5 text-[var(--bpdm-muted-foreground)] rtl:-scale-x-100" fill="none" aria-hidden="true">
           <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         {{ messages().pinRight }}

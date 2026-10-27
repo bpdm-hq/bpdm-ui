@@ -83,7 +83,7 @@ export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
                     {{ $index + 1 }}
                   }
                 </span>
-                <span [class]="$index === step() ? 'hidden text-sm font-medium text-foreground sm:inline' : 'hidden text-sm text-muted-foreground sm:inline'">
+                <span [class]="$index === step() ? 'hidden text-sm font-medium text-[var(--bpdm-foreground)] sm:inline' : 'hidden text-sm text-[var(--bpdm-muted-foreground)] sm:inline'">
                   {{ s.title }}
                 </span>
               </li>
@@ -93,7 +93,7 @@ export const DEFAULT_STEP_DIALOG_MESSAGES: StepDialogMessages = {
                 <li
                   aria-hidden="true"
                   class="h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]"
-                  [class]="$index < step() ? 'bg-success' : 'bg-border'"
+                  [class]="$index < step() ? 'bg-[var(--bpdm-success)]' : 'bg-[var(--bpdm-border)]'"
                 ></li>
               }
             }
@@ -179,10 +179,10 @@ export class BpdmStepDialog {
     return cn(
       "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
       i < step
-        ? "bg-success text-success-foreground"
+        ? "bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]"
         : i === step
-          ? "scale-110 bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
-          : "border border-border text-muted-foreground",
+          ? "scale-110 bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-2 ring-[var(--bpdm-primary)] ring-offset-2 ring-offset-[var(--bpdm-background)]"
+          : "border border-[var(--bpdm-border)] text-[var(--bpdm-muted-foreground)]",
     );
   }
 }

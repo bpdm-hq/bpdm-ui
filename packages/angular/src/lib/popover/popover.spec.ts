@@ -215,7 +215,7 @@ describe("BpdmPopover", () => {
     btn.click();
     await settle();
 
-    expect(getDialog()!.className).not.toContain("border-border");
+    expect(getDialog()!.className).not.toContain("border-[var(--bpdm-border)]");
   });
 
   it("keeps the border class by default", async () => {
@@ -226,7 +226,7 @@ describe("BpdmPopover", () => {
     btn.click();
     await settle();
 
-    expect(getDialog()!.className).toContain("border-border");
+    expect(getDialog()!.className).toContain("border-[var(--bpdm-border)]");
   });
 
   it("renders the arrow when showArrow is set", async () => {

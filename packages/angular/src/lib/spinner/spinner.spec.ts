@@ -5,7 +5,7 @@ import { BpdmSpinner, BpdmLoadingOverlay, type SpinnerMessages } from "./spinner
 
 @Component({
   imports: [BpdmSpinner],
-  template: `<bpdm-spinner variant="dots" label="Please wait" class="text-success" />`,
+  template: `<bpdm-spinner variant="dots" label="Please wait" class="text-[var(--bpdm-success)]" />`,
 })
 class HostComponent {}
 
@@ -45,8 +45,8 @@ describe("BpdmSpinner", () => {
 
     expect(host.getAttribute("role")).toBe("status");
     expect(host.getAttribute("aria-live")).toBe("polite");
-    expect(host.classList.contains("text-success")).toBe(true); // user color
-    expect(host.classList.contains("text-primary")).toBe(false); // tailwind-merge dropped default
+    expect(host.classList.contains("text-[var(--bpdm-success)]")).toBe(true); // user color
+    expect(host.classList.contains("text-[var(--bpdm-primary)]")).toBe(false); // tailwind-merge dropped default
     expect(host.querySelector(".sr-only")?.textContent).toContain("Please wait");
     // dots variant renders three staggered dots (each with an animation-delay)
     expect(host.querySelectorAll('span[style*="animation-delay"]').length).toBe(3);

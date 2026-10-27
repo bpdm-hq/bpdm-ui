@@ -121,7 +121,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span data-bpdm-slot="select-value" class="truncate" [class.text-muted-foreground]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
+      <span data-bpdm-slot="select-value" class="truncate" [class.text-[var(--bpdm-muted-foreground)]]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
         {{ selectedLabel() || placeholder() }}
       </span>
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]" [class.rotate-180]="open()">
@@ -132,13 +132,13 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
     <ng-template #panel>
       <div #panelRoot data-bpdm="" data-bpdm-slot="select-content" tabindex="-1" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown)="onKeydown($event)">
         @if (searchable()) {
-          <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-            <input #search data-bpdm-slot="select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+          <div class="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+            <input #search data-bpdm-slot="select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none" />
           </div>
         }
         @if (rows().length === 0) {
-          <div data-bpdm-slot="select-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="select-empty" class="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{{ emptyText() }}</div>
         } @else {
           <cdk-virtual-scroll-viewport
             #viewport
@@ -154,7 +154,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
           >
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div data-bpdm-slot="select-group" aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-foreground">{{ r.label }}</div>
+                <div data-bpdm-slot="select-group" aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)]">{{ r.label }}</div>
               } @else {
                 <button
                   type="button"
@@ -167,7 +167,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
                   (mousemove)="active.set(i)"
                   [class]="optionClass(i)"
                 >
-                  <span class="flex size-4 shrink-0 items-center justify-center text-primary">
+                  <span class="flex size-4 shrink-0 items-center justify-center text-[var(--bpdm-primary)]">
                     @if (r.option.value === selected()) {
                       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     }
@@ -250,9 +250,9 @@ export class BpdmSelect implements OnDestroy, ControlValueAccessor {
 
   protected optionClass(i: number): string {
     return cn(
-      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-3px)] px-2 text-start text-sm text-foreground transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
+      "flex h-9 w-full cursor-pointer items-center gap-2 rounded-[calc(var(--bpdm-radius)-3px)] px-2 text-start text-sm text-[var(--bpdm-foreground)] transition-colors duration-[var(--bpdm-duration-fast)] disabled:pointer-events-none disabled:opacity-50",
       // keyboard-active / hovered row: an amber inline-start bar (ring token, ≥3:1
-      // in every theme) + soft tint + weight — clearly perceptible where bg-muted
+      // in every theme) + soft tint + weight — clearly perceptible where bg-[var(--bpdm-muted)]
       // alone was ~1.05:1. RTL-safe (logical shadow mirror), jitter-free (inset).
       i === this.active() &&
         "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",

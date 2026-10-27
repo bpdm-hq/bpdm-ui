@@ -80,7 +80,7 @@ function maskValue(formatted: string, tail: number): string {
           [class]="btnClass"
         >
           @if (copied()) {
-            <svg viewBox="0 0 16 16" fill="none" class="size-4 text-success animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" class="size-4 text-[var(--bpdm-success)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden="true">
               <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           } @else {
@@ -160,7 +160,7 @@ export class BpdmSecureField {
   private timer: ReturnType<typeof setTimeout> | undefined;
 
   protected readonly btnClass =
-    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
+    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none disabled:opacity-50";
 
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));

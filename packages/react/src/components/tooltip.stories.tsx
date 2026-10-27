@@ -151,8 +151,8 @@ export function Example() {
       side="right"
       content={
         <div className="space-y-1">
-          <p className="font-medium text-foreground">Auto-sync</p>
-          <p className="text-muted-foreground">Changes sync across devices in real time.</p>
+          <p className="font-medium text-[var(--bpdm-foreground)]">Auto-sync</p>
+          <p className="text-[var(--bpdm-muted-foreground)]">Changes sync across devices in real time.</p>
         </div>
       }
     >
@@ -169,8 +169,8 @@ export function Example() {
         side="right"
         content={
           <div className="space-y-1">
-            <p className="font-medium text-foreground">Auto-sync</p>
-            <p className="text-muted-foreground">Changes sync across devices in real time.</p>
+            <p className="font-medium text-[var(--bpdm-foreground)]">Auto-sync</p>
+            <p className="text-[var(--bpdm-muted-foreground)]">Changes sync across devices in real time.</p>
           </div>
         }
       >
@@ -214,13 +214,13 @@ export function Example() {
         <Tooltip content="Saves your changes">
           <Button variant="secondary" appearance="outline">Tooltip on</Button>
         </Tooltip>
-        <span className="text-xs text-muted-foreground">hover → tooltip shows</span>
+        <span className="text-xs text-[var(--bpdm-muted-foreground)]">hover → tooltip shows</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <Tooltip content="Saves your changes" disabled>
           <Button variant="secondary" appearance="outline">Tooltip off</Button>
         </Tooltip>
-        <span className="text-xs text-muted-foreground">disabled → nothing on hover</span>
+        <span className="text-xs text-[var(--bpdm-muted-foreground)]">disabled → nothing on hover</span>
       </div>
     </div>
   ),

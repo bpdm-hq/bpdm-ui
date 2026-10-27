@@ -57,10 +57,10 @@ export const Playground: Story = {};
 export const Currencies: Story = {
   render: () => ({
     template: `<div class="flex w-72 flex-col gap-3">
-  <div class="flex items-center gap-3"><span class="w-10 text-sm text-muted-foreground">USD</span><bpdm-money-input currency="USD" locale="en-US" defaultValue="100000" /></div>
-  <div class="flex items-center gap-3"><span class="w-10 text-sm text-muted-foreground">EUR</span><bpdm-money-input currency="EUR" locale="de-DE" defaultValue="100000" /></div>
-  <div class="flex items-center gap-3"><span class="w-10 text-sm text-muted-foreground">INR</span><bpdm-money-input currency="INR" locale="en-IN" defaultValue="100000" /></div>
-  <div class="flex items-center gap-3"><span class="w-10 text-sm text-muted-foreground">JPY</span><bpdm-money-input currency="JPY" locale="ja-JP" defaultValue="100000" /></div>
+  <div class="flex items-center gap-3"><span class="w-10 text-sm text-[var(--bpdm-muted-foreground)]">USD</span><bpdm-money-input currency="USD" locale="en-US" defaultValue="100000" /></div>
+  <div class="flex items-center gap-3"><span class="w-10 text-sm text-[var(--bpdm-muted-foreground)]">EUR</span><bpdm-money-input currency="EUR" locale="de-DE" defaultValue="100000" /></div>
+  <div class="flex items-center gap-3"><span class="w-10 text-sm text-[var(--bpdm-muted-foreground)]">INR</span><bpdm-money-input currency="INR" locale="en-IN" defaultValue="100000" /></div>
+  <div class="flex items-center gap-3"><span class="w-10 text-sm text-[var(--bpdm-muted-foreground)]">JPY</span><bpdm-money-input currency="JPY" locale="ja-JP" defaultValue="100000" /></div>
 </div>`,
   }),
   parameters: {
@@ -149,7 +149,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="flex w-64 flex-col gap-1.5">
   <bpdm-money-input aria-invalid="true" currency="USD" defaultValue="0" />
-  <p class="text-sm text-destructive-strong">Amount must be greater than 0.</p>
+  <p class="text-sm text-[var(--bpdm-destructive-strong)]">Amount must be greater than 0.</p>
 </div>`,
   }),
   parameters: {
@@ -164,7 +164,7 @@ import { BpdmMoneyInput } from '@bpdm/ng';
   template: \`
     <div class="flex w-64 flex-col gap-1.5">
       <bpdm-money-input aria-invalid="true" currency="USD" defaultValue="0" />
-      <p class="text-sm text-destructive-strong">Amount must be greater than 0.</p>
+      <p class="text-sm text-[var(--bpdm-destructive-strong)]">Amount must be greater than 0.</p>
     </div>
   \`,
 })

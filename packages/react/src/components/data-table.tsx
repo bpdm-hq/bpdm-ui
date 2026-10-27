@@ -278,7 +278,7 @@ export interface DataTableProps<T> {
   rowClassName?: string | ((row: T, index: number) => string);
   /**
    * Vertical gap (px) between rows. Renders rows as separated filled blocks
-   * (rounded, no dividers). Each row gets a default `bg-muted/50` fill —
+   * (rounded, no dividers). Each row gets a default `bg-[var(--bpdm-muted)]/50` fill —
    * override the colour with `rowClassName`.
    */
   rowSpacing?: number;
@@ -440,7 +440,7 @@ function SortIcon({ dir }: { dir: SortDirection | null }) {
     );
   }
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-primary" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-[var(--bpdm-primary)]" fill="none" aria-hidden>
       <path d={dir === "asc" ? "M4 10l4-4 4 4" : "M4 6l4 4 4-4"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -502,7 +502,7 @@ function TrashGlyph() {
 
 function PinArrow({ side }: { side: "left" | "right" }) {
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5 text-muted-foreground rtl:-scale-x-100" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" className="size-3.5 text-[var(--bpdm-muted-foreground)] rtl:-scale-x-100" fill="none" aria-hidden>
       <path
         d={side === "left" ? "M10 4 6 8l4 4" : "M6 4l4 4-4 4"}
         stroke="currentColor"
@@ -515,7 +515,7 @@ function PinArrow({ side }: { side: "left" | "right" }) {
 }
 
 const pinMenuItem =
-  "flex cursor-pointer items-center gap-2 rounded-[calc(var(--radius)-4px)] px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-40";
+  "flex cursor-pointer items-center gap-2 rounded-[calc(var(--bpdm-radius)-4px)] px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-[var(--bpdm-muted)] data-[disabled]:pointer-events-none data-[disabled]:opacity-40";
 
 // per-column header menu: keyboard column reorder (move left/right) + pin
 // left / pin right / unpin (interactive freezing). A keyboard-reachable
@@ -548,7 +548,7 @@ function ColumnPinMenu({
           type="button"
           aria-label={t.columnOptions}
           onClick={(e) => e.stopPropagation()}
-          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-background)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           <DotsIcon />
         </button>
@@ -557,7 +557,7 @@ function ColumnPinMenu({
         <DropdownMenu.Content
           align="end"
           sideOffset={4}
-          className="z-50 min-w-[9rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md outline-none animate-[bpdm-pop-in_120ms_ease-out]"
+          className="z-50 min-w-[9rem] rounded-md border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] p-1 text-[var(--bpdm-popover-foreground)] shadow-md outline-none animate-[bpdm-pop-in_120ms_ease-out]"
         >
           {reorderable && (
             <>
@@ -658,7 +658,7 @@ function evalRule(
 }
 
 const filterField =
-  "h-9 w-full rounded-[var(--radius)] border border-input bg-background px-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring";
+  "h-9 w-full rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] px-2.5 text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)]";
 
 // native select with the browser arrow hidden + our own chevron (with breathing room)
 function FilterSelect({
@@ -684,7 +684,7 @@ function FilterSelect({
       <svg
         viewBox="0 0 16 16"
         fill="none"
-        className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]"
         aria-hidden
       >
         <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -739,8 +739,8 @@ function ColumnFilterMenu({
           aria-label={t.filterColumn}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            active ? "text-primary" : "text-muted-foreground/70",
+            "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-[var(--bpdm-background)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
+            active ? "text-[var(--bpdm-primary)]" : "text-[var(--bpdm-muted-foreground)]/70",
           )}
         >
           <FunnelGlyph />
@@ -755,7 +755,7 @@ function ColumnFilterMenu({
               return (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                  className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bpdm-muted)]"
                 >
                   <Checkbox
                     size="sm"
@@ -771,10 +771,10 @@ function ColumnFilterMenu({
               );
             })}
             {(options ?? []).length === 0 && (
-              <p className="m-0 px-2 py-1.5 text-sm text-muted-foreground">{t.noValues}</p>
+              <p className="m-0 px-2 py-1.5 text-sm text-[var(--bpdm-muted-foreground)]">{t.noValues}</p>
             )}
           </div>
-          <div className="flex items-center justify-between border-t border-border pt-2">
+          <div className="flex items-center justify-between border-t border-[var(--bpdm-border)] pt-2">
             <Button
               variant="secondary" appearance="ghost"
               size="sm"
@@ -851,14 +851,14 @@ function ColumnFilterMenu({
                     rules: d.rules.filter((_, j) => j !== i),
                   }))
                 }
-                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] py-1.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--bpdm-radius)] py-1.5 text-sm font-medium text-[var(--bpdm-destructive)] transition-colors hover:bg-[var(--bpdm-destructive)]/10"
               >
                 <TrashGlyph />
                 {t.removeRule}
               </button>
             )}
             {i < draft.rules.length - 1 && (
-              <div className="border-t border-border" />
+              <div className="border-t border-[var(--bpdm-border)]" />
             )}
           </div>
         ))}
@@ -870,7 +870,7 @@ function ColumnFilterMenu({
               rules: [...d.rules, { op: ops[0].value, value: "" }],
             }))
           }
-          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] border border-dashed border-border py-1.5 text-sm text-primary transition-colors hover:bg-primary/5"
+          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--bpdm-radius)] border border-dashed border-[var(--bpdm-border)] py-1.5 text-sm text-[var(--bpdm-primary)] transition-colors hover:bg-[var(--bpdm-primary)]/5"
         >
           + {t.addRule}
         </button>
@@ -956,11 +956,11 @@ function RowRadio({
       onClick={onSelect}
       onKeyDown={onKeyDown}
       className={cn(
-        "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        checked ? "border-primary" : "border-muted-foreground/60",
+        "grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border bg-[var(--bpdm-background)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]",
+        checked ? "border-[var(--bpdm-primary)]" : "border-[var(--bpdm-muted-foreground)]/60",
       )}
     >
-      {checked && <span className="size-2.5 rounded-full bg-primary" />}
+      {checked && <span className="size-2.5 rounded-full bg-[var(--bpdm-primary)]" />}
     </button>
   );
 }
@@ -990,7 +990,7 @@ function footerClass(align: PaginationAlign, attached: boolean) {
   return cn(
     footerBar,
     footerJustify[align],
-    attached ? "border-t border-border" : "pt-4",
+    attached ? "border-t border-[var(--bpdm-border)]" : "pt-4",
   );
 }
 
@@ -1041,13 +1041,13 @@ function PageSizeSelect({
   t: DataTableMessages;
 }) {
   return (
-    <label className="flex items-center gap-2 text-muted-foreground">
+    <label className="flex items-center gap-2 text-[var(--bpdm-muted-foreground)]">
       <span>{t.rowsPerPage}</span>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-8 cursor-pointer appearance-none rounded-lg border border-input bg-background ps-2.5 pe-7 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-8 cursor-pointer appearance-none rounded-lg border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-2.5 pe-7 text-[var(--bpdm-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           {options.map((o) => (
             <option key={o} value={o}>
@@ -1058,7 +1058,7 @@ function PageSizeSelect({
         <svg
           viewBox="0 0 16 16"
           fill="none"
-          className="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          className="pointer-events-none absolute end-2 top-1/2 size-3.5 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]"
           aria-hidden
         >
           <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -1097,7 +1097,7 @@ function NumberedFooter({
 }) {
   return (
     <div data-bpdm-slot="data-table-pagination" className={footerClass(align, attached)}>
-      <span className="text-muted-foreground">
+      <span className="text-[var(--bpdm-muted-foreground)]">
         {total === 0 ? t.noResults : t.range(rangeFrom, rangeTo, total)}
       </span>
       <div className="flex items-center gap-3">
@@ -1108,7 +1108,7 @@ function NumberedFooter({
           <ChevronButton dir="left" label={t.previousPage} disabled={page <= 1} onClick={() => onPage(page - 1)} />
           {pageList(page, pageCount).map((p, i) =>
             p === "ellipsis" ? (
-              <span key={`e${i}`} className="px-1 text-muted-foreground" aria-hidden="true">
+              <span key={`e${i}`} className="px-1 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                 …
               </span>
             ) : (
@@ -1161,7 +1161,7 @@ function CursorFooter({
   return (
     <div data-bpdm-slot="data-table-pagination" className={footerClass(align, attached)}>
       {rangeLabel ? (
-        <span className="text-muted-foreground">{rangeLabel}</span>
+        <span className="text-[var(--bpdm-muted-foreground)]">{rangeLabel}</span>
       ) : align === "between" ? (
         <span />
       ) : null}
@@ -1307,30 +1307,30 @@ function DataTableRowInner<T>({
           "transition-colors",
           // `group` lets pinned cells mirror the row's hover/selected state
           hasPinned && "group",
-          divided && !rowSpacing && "border-t border-border",
+          divided && !rowSpacing && "border-t border-[var(--bpdm-border)]",
           // borderless tables get a closing rule under the last row
           // (framed tables are closed by the container border)
-          divided && !rowSpacing && !frame && isLast && "border-b border-border",
+          divided && !rowSpacing && !frame && isLast && "border-b border-[var(--bpdm-border)]",
           rowSpacing &&
-            "bg-muted/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
-          striped && "even:bg-muted/40",
+            "bg-[var(--bpdm-muted)]/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
+          striped && "even:bg-[var(--bpdm-muted)]/40",
           // bpdm signature: a warm amber focus language — soft amber hover,
           // and selected rows get an amber tint + a left accent bar
-          hoverable && "hover:bg-primary/[0.04]",
+          hoverable && "hover:bg-[var(--bpdm-primary)]/[0.04]",
           selected &&
-            "bg-primary/10 shadow-[inset_3px_0_0_0_var(--primary)] rtl:shadow-[inset_-3px_0_0_0_var(--primary)]",
-          hoverable && selected && "hover:bg-primary/[0.14]",
+            "bg-[var(--bpdm-primary)]/10 shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
+          hoverable && selected && "hover:bg-[var(--bpdm-primary)]/[0.14]",
           // insertion line while reordering rows
-          isDropBefore && "shadow-[inset_0_2px_0_var(--primary)]",
-          isDropAfter && "shadow-[inset_0_-2px_0_var(--primary)]",
+          isDropBefore && "shadow-[inset_0_2px_0_var(--bpdm-primary)]",
+          isDropAfter && "shadow-[inset_0_-2px_0_var(--bpdm-primary)]",
           clickable &&
-            "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+            "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--bpdm-ring)]",
           rowClassNameValue,
         )}
       >
         {reorderableRows && (
           <td
-            className={cn(padCls, "w-[1%]", bordered && "border-e border-border", cellClassName)}
+            className={cn(padCls, "w-[1%]", bordered && "border-e border-[var(--bpdm-border)]", cellClassName)}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -1353,7 +1353,7 @@ function DataTableRowInner<T>({
               }}
               aria-label={rowReorderLabel}
               className={cn(
-                "grid size-6 cursor-grab place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "grid size-6 cursor-grab place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
                 isDragging && "opacity-40",
               )}
             >
@@ -1371,7 +1371,7 @@ function DataTableRowInner<T>({
             className={cn(
               padCls,
               "w-[1%]",
-              bordered && "border-e border-border",
+              bordered && "border-e border-[var(--bpdm-border)]",
               hasLeftPin && `z-10 ${pinnedBg}`,
               cellClassName,
             )}
@@ -1384,7 +1384,7 @@ function DataTableRowInner<T>({
                 aria-expanded={expanded}
                 aria-controls={panelId(key)}
                 onClick={() => toggleExpand(key)}
-                className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="grid size-6 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]"
               >
                 <svg
                   viewBox="0 0 16 16"
@@ -1408,7 +1408,7 @@ function DataTableRowInner<T>({
             className={cn(
               padCls,
               "w-[1%]",
-              bordered && "border-e border-border",
+              bordered && "border-e border-[var(--bpdm-border)]",
               hasLeftPin && `z-10 ${pinnedBg}`,
               cellClassName,
             )}
@@ -1444,10 +1444,10 @@ function DataTableRowInner<T>({
                 padCls,
                 alignClass[align],
                 col.numeric && "tabular-nums",
-                bordered && "border-e border-border/55 last:border-e-0",
+                bordered && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
                 col.pin && `z-10 ${pinnedBg}`,
-                col.id === lastLeftId && "border-e border-border",
-                col.id === firstRightId && "border-s border-border",
+                col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
+                col.id === firstRightId && "border-s border-[var(--bpdm-border)]",
                 cellClassName,
                 col.className,
               )}
@@ -1462,7 +1462,7 @@ function DataTableRowInner<T>({
         })}
       </tr>
       {expanded && (
-        <tr id={panelId(key)} role="region" className={cn("bg-muted/30", divided && "border-t border-border")}>
+        <tr id={panelId(key)} role="region" className={cn("bg-[var(--bpdm-muted)]/30", divided && "border-t border-[var(--bpdm-border)]")}>
           <td colSpan={colCount} className="p-0">
             {/* grid 0fr→1fr animates the reveal to natural height smoothly */}
             <div className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]">
@@ -2175,9 +2175,9 @@ export function DataTable<T>({
   const pinnedBg = React.useMemo(
     () =>
       cn(
-        "bg-card",
-        hoverable && "group-hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]",
-        "group-data-[selected]:bg-[color-mix(in_srgb,var(--primary)_10%,var(--card))]",
+        "bg-[var(--bpdm-card)]",
+        hoverable && "group-hover:bg-[color-mix(in_srgb,var(--bpdm-primary)_4%,var(--bpdm-card))]",
+        "group-data-[selected]:bg-[color-mix(in_srgb,var(--bpdm-primary)_10%,var(--bpdm-card))]",
       ),
     [hoverable],
   );
@@ -2347,7 +2347,7 @@ export function DataTable<T>({
             )}
             {searchable && (
               <div className="relative">
-                <SearchGlyph className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <SearchGlyph className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]" />
                 <input
                   type="text"
                   value={query}
@@ -2355,7 +2355,7 @@ export function DataTable<T>({
                   placeholder={searchPlaceholder}
                   aria-label={t.search}
                   data-bpdm-slot="data-table-search"
-                  className="h-9 w-56 rounded-[var(--radius)] border border-input bg-background ps-8 pe-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="h-9 w-56 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-8 pe-3 text-sm text-[var(--bpdm-foreground)] shadow-sm transition-colors placeholder:text-[var(--bpdm-muted-foreground)] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)]"
                 />
               </div>
             )}
@@ -2366,7 +2366,7 @@ export function DataTable<T>({
         <div className="space-y-3" data-dt-cards="">
 
           {rows.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card px-4 py-8 text-center text-muted-foreground">
+            <div className="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] px-4 py-8 text-center text-[var(--bpdm-muted-foreground)]">
               {emptyContent}
             </div>
           ) : (
@@ -2384,8 +2384,8 @@ export function DataTable<T>({
                   data-selected={selected || undefined}
                   onClick={clickable ? () => onRowClick!(row, rowIndex) : undefined}
                   className={cn(
-                    "rounded-xl border border-border bg-card p-4",
-                    selected && "ring-1 ring-primary",
+                    "rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4",
+                    selected && "ring-1 ring-[var(--bpdm-primary)]",
                     clickable && "cursor-pointer",
                     typeof rowClassName === "function"
                       ? rowClassName(row, rowIndex)
@@ -2413,7 +2413,7 @@ export function DataTable<T>({
                           aria-expanded={expanded}
                           aria-controls={panelId(key)}
                           onClick={() => toggleExpand(key)}
-                          className="grid size-6 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          className="grid size-6 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]"
                         >
                           <svg viewBox="0 0 16 16" className={cn("size-4 transition-transform", expanded && "rotate-90")} fill="none" aria-hidden>
                             <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -2425,7 +2425,7 @@ export function DataTable<T>({
                   <dl className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-3 gap-y-1.5 text-sm">
                     {orderedColumns.map((col) => (
                       <React.Fragment key={col.id}>
-                        <dt className="truncate text-muted-foreground">
+                        <dt className="truncate text-[var(--bpdm-muted-foreground)]">
                           {col.header ?? col.id}
                         </dt>
                         <dd className={cn("flex min-w-0 items-center justify-end gap-2 text-end", col.numeric && "tabular-nums")}>
@@ -2441,7 +2441,7 @@ export function DataTable<T>({
                       className="grid animate-[bpdm-expand_var(--bpdm-duration-slow)_var(--bpdm-ease-out)]"
                     >
                       <div className="overflow-hidden">
-                        <div className="mt-3 border-t border-border pt-3">
+                        <div className="mt-3 border-t border-[var(--bpdm-border)] pt-3">
                           {renderExpanded!(row, rowIndex)}
                         </div>
                       </div>
@@ -2460,9 +2460,9 @@ export function DataTable<T>({
           // `frame` = a defined outlined card; the borderless default whisper-floats
           // so it blends; `elevated={false}` drops the float for a flat, flush table
           frame
-            ? "overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
+            ? "overflow-hidden rounded-xl border border-[var(--bpdm-border)]/70 bg-[var(--bpdm-card)] shadow-[0_1px_2px_0_rgb(0_0_0/0.04),0_10px_24px_-14px_rgb(0_0_0/0.15)]"
             : elevated &&
-                "overflow-hidden rounded-lg bg-card shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
+                "overflow-hidden rounded-lg bg-[var(--bpdm-card)] shadow-[0_1px_2px_0_rgb(0_0_0/0.03),0_6px_18px_-10px_rgb(0_0_0/0.10)]",
           className,
         )}
       >
@@ -2473,7 +2473,7 @@ export function DataTable<T>({
           // contain-content keeps a wide/pinned table from inflating the mobile
           // layout viewport (window.innerWidth) instead of scrolling inside here
           "overflow-auto contain-content",
-          scrollableX && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          scrollableX && "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--bpdm-ring)]",
         )}
         role={scrollableX ? "region" : undefined}
         aria-label={scrollableX ? (label ?? "Table") : undefined}
@@ -2489,7 +2489,7 @@ export function DataTable<T>({
       <table
         aria-label={label}
         className={cn(
-          "w-full text-card-foreground",
+          "w-full text-[var(--bpdm-card-foreground)]",
           rowSpacing ? "border-separate" : "border-collapse",
         )}
         style={rowSpacing ? { borderSpacing: `0 ${rowSpacing}px` } : undefined}
@@ -2502,8 +2502,8 @@ export function DataTable<T>({
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  frame || stickyHeader ? "bg-card" : "bg-transparent",
-                  "shadow-[inset_0_-1px_0_var(--border)]",
+                  frame || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+                  "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
                   stickyHeader && "sticky top-0 z-10",
                   headerClassName,
                 )}
@@ -2522,9 +2522,9 @@ export function DataTable<T>({
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
-                  "shadow-[inset_0_-1px_0_var(--border)]",
-                  bordered && "border-e border-border",
+                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+                  "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                  bordered && "border-e border-[var(--bpdm-border)]",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
                 )}
@@ -2543,9 +2543,9 @@ export function DataTable<T>({
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  "text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]",
-                  frame || hasLeftPin || stickyHeader ? "bg-card" : "bg-transparent",
-                  bordered && "border-e border-border",
+                  "text-[var(--bpdm-muted-foreground)] shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+                  bordered && "border-e border-[var(--bpdm-border)]",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
                 )}
@@ -2623,19 +2623,19 @@ export function DataTable<T>({
                     alignClass[align],
                     // strong, readable header — confident dark sentence-case label
                     // (size inherited from density), distinct from the body weight
-                    "whitespace-nowrap font-semibold text-foreground",
+                    "whitespace-nowrap font-semibold text-[var(--bpdm-foreground)]",
                     reorderableColumns && "cursor-grab active:cursor-grabbing",
                     dragColId === col.id && "opacity-40",
                     // framed/pinned/sticky headers sit on the card surface (clean
                     // header + divider, not a heavy grey band) and stay opaque so
                     // scrolling rows never bleed through; otherwise transparent
-                    frame || col.pin || stickyHeader ? "bg-card" : "bg-transparent",
+                    frame || col.pin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
                     // keep a divider line under the header even when it is sticky
-                    "shadow-[inset_0_-1px_0_var(--border)]",
-                    bordered && "border-e border-border/55 last:border-e-0",
+                    "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                    bordered && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
                     col.pin ? "z-20" : stickyHeader && "z-10",
-                    col.id === lastLeftId && "border-e border-border",
-                    col.id === firstRightId && "border-s border-border",
+                    col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
+                    col.id === firstRightId && "border-s border-[var(--bpdm-border)]",
                     headerClassName,
                     col.className,
                   )}
@@ -2657,11 +2657,11 @@ export function DataTable<T>({
                             : undefined
                         }
                         className={cn(
-                          "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-foreground",
+                          "flex flex-1 cursor-pointer items-center gap-1.5 select-none transition-colors hover:text-[var(--bpdm-foreground)]",
                           justifyClass[align],
                           // keep the active-sort LABEL dark/strong (enterprise-restrained);
                           // the small amber arrow + order badge signal the sort
-                          dir && "text-foreground",
+                          dir && "text-[var(--bpdm-foreground)]",
                         )}
                       >
                         <span>
@@ -2670,7 +2670,7 @@ export function DataTable<T>({
                         </span>
                         <SortIcon dir={dir} />
                         {order > 0 && (
-                          <span className="grid size-4 place-items-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
+                          <span className="grid size-4 place-items-center rounded-full bg-[var(--bpdm-primary)]/15 text-[10px] font-semibold text-[var(--bpdm-primary)]">
                             {order}
                           </span>
                         )}
@@ -2728,7 +2728,7 @@ export function DataTable<T>({
                 data-bpdm-slot="data-table-empty"
                 className={cn(
                   padCls,
-                  "text-center text-muted-foreground",
+                  "text-center text-[var(--bpdm-muted-foreground)]",
                 )}
               >
                 {emptyContent}
@@ -2827,7 +2827,7 @@ export function DataTable<T>({
           <tfoot data-bpdm-slot="data-table-footer">
             <tr>
               {reorderableRows && (
-                <td className={cn(padCls, "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)] sticky bottom-0")} />
+                <td className={cn(padCls, "w-[1%] bg-[var(--bpdm-muted)] shadow-[inset_0_1px_0_var(--bpdm-border)] sticky bottom-0")} />
               )}
               {expandable && (
                 <td
@@ -2838,8 +2838,8 @@ export function DataTable<T>({
                   }
                   className={cn(
                     padCls,
-                    "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
-                    bordered && "border-e border-border",
+                    "w-[1%] bg-[var(--bpdm-muted)] shadow-[inset_0_1px_0_var(--bpdm-border)]",
+                    bordered && "border-e border-[var(--bpdm-border)]",
                     hasLeftPin ? "sticky z-20" : "sticky",
                     "bottom-0",
                   )}
@@ -2854,8 +2854,8 @@ export function DataTable<T>({
                   }
                   className={cn(
                     padCls,
-                    "w-[1%] bg-muted shadow-[inset_0_1px_0_var(--border)]",
-                    bordered && "border-e border-border",
+                    "w-[1%] bg-[var(--bpdm-muted)] shadow-[inset_0_1px_0_var(--bpdm-border)]",
+                    bordered && "border-e border-[var(--bpdm-border)]",
                     "sticky bottom-0",
                     hasLeftPin && "z-20",
                   )}
@@ -2873,12 +2873,12 @@ export function DataTable<T>({
                       padCls,
                       alignClass[align],
                       col.numeric && "tabular-nums",
-                      "sticky bottom-0 bg-muted font-medium text-foreground",
-                      "shadow-[inset_0_1px_0_var(--border)]",
-                      bordered && "border-e border-border/55 last:border-e-0",
+                      "sticky bottom-0 bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)]",
+                      "shadow-[inset_0_1px_0_var(--bpdm-border)]",
+                      bordered && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
                       col.pin ? "z-20" : "z-10",
-                      col.id === lastLeftId && "border-e border-border",
-                      col.id === firstRightId && "border-s border-border",
+                      col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
+                      col.id === firstRightId && "border-s border-[var(--bpdm-border)]",
                       col.className,
                     )}
                   >

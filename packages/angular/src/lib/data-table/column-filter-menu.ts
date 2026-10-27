@@ -22,7 +22,7 @@ import {
 } from "./data-table-types";
 
 const FILTER_FIELD =
-  "h-9 w-full rounded-[var(--radius)] border border-input bg-background px-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring";
+  "h-9 w-full rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] px-2.5 text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)]";
 
 /** The funnel button + popover with the per-column filter UI (text / number / select). */
 @Component({
@@ -50,7 +50,7 @@ const FILTER_FIELD =
         <div class="w-56 space-y-2">
           <div class="max-h-56 space-y-0.5 overflow-y-auto">
             @for (o of options(); track o.value) {
-              <label class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted">
+              <label class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bpdm-muted)]">
                 <bpdm-checkbox
                   size="sm"
                   [checked]="selected().includes(o.value)"
@@ -59,10 +59,10 @@ const FILTER_FIELD =
                 <span class="truncate">{{ o.label }}</span>
               </label>
             } @empty {
-              <p class="m-0 px-2 py-1.5 text-sm text-muted-foreground">{{ messages().noValues }}</p>
+              <p class="m-0 px-2 py-1.5 text-sm text-[var(--bpdm-muted-foreground)]">{{ messages().noValues }}</p>
             }
           </div>
-          <div class="flex items-center justify-between border-t border-border pt-2">
+          <div class="flex items-center justify-between border-t border-[var(--bpdm-border)] pt-2">
             <button bpdmButton variant="secondary" appearance="ghost" size="sm" (click)="doClear(close)">{{ messages().clear }}</button>
             <button bpdmButton size="sm" (click)="applySelect(close)">{{ messages().apply }}</button>
           </div>
@@ -79,7 +79,7 @@ const FILTER_FIELD =
                 <option value="all">{{ messages().matchAll }}</option>
                 <option value="any">{{ messages().matchAny }}</option>
               </select>
-              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                 <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -96,7 +96,7 @@ const FILTER_FIELD =
                     <option [value]="o.value">{{ opLabel(o.value) }}</option>
                   }
                 </select>
-                <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" class="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                   <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
@@ -111,7 +111,7 @@ const FILTER_FIELD =
                 <button
                   type="button"
                   (click)="removeRule(i)"
-                  class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] py-1.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                  class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--bpdm-radius)] py-1.5 text-sm font-medium text-[var(--bpdm-destructive)] transition-colors hover:bg-[var(--bpdm-destructive)]/10"
                 >
                   <svg viewBox="0 0 16 16" fill="none" class="size-3.5" aria-hidden="true">
                     <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
@@ -120,14 +120,14 @@ const FILTER_FIELD =
                 </button>
               }
               @if (i < draft().rules.length - 1) {
-                <div class="border-t border-border"></div>
+                <div class="border-t border-[var(--bpdm-border)]"></div>
               }
             </div>
           }
           <button
             type="button"
             (click)="addRule()"
-            class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius)] border border-dashed border-border py-1.5 text-sm text-primary transition-colors hover:bg-primary/5"
+            class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--bpdm-radius)] border border-dashed border-[var(--bpdm-border)] py-1.5 text-sm text-[var(--bpdm-primary)] transition-colors hover:bg-[var(--bpdm-primary)]/5"
           >
             + {{ messages().addRule }}
           </button>
@@ -169,8 +169,8 @@ export class BpdmColumnFilterMenu {
   protected readonly triggerClass = computed(() => {
     const active = !!this.filter() && this.filter()!.rules.some((r) => r.value !== "");
     return cn(
-      "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-      active ? "text-primary" : "text-muted-foreground/70",
+      "grid size-6 shrink-0 cursor-pointer place-items-center rounded-md transition-colors hover:bg-[var(--bpdm-background)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
+      active ? "text-[var(--bpdm-primary)]" : "text-[var(--bpdm-muted-foreground)]/70",
     );
   });
 

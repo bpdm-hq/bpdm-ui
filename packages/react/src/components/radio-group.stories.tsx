@@ -78,7 +78,7 @@ function Option({
   return (
     <div className="flex items-center gap-2">
       <RadioGroupItem value={value} id={id} size={size} />
-      <label htmlFor={id} className="cursor-pointer text-sm text-foreground">
+      <label htmlFor={id} className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
         {label}
       </label>
     </div>
@@ -254,7 +254,7 @@ export function Example() {
           <label htmlFor="inv-pro">Pro</label>
         </div>
       </RadioGroup>
-      <p className="text-sm text-destructive-strong">Please choose a plan.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Please choose a plan.</p>
     </div>
   );
 }`,
@@ -266,18 +266,18 @@ export function Example() {
       <RadioGroup>
         <div className="flex items-center gap-2">
           <RadioGroupItem value="free" id="inv-free" aria-invalid />
-          <label htmlFor="inv-free" className="cursor-pointer text-sm text-foreground">
+          <label htmlFor="inv-free" className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
             Free
           </label>
         </div>
         <div className="flex items-center gap-2">
           <RadioGroupItem value="pro" id="inv-pro" aria-invalid />
-          <label htmlFor="inv-pro" className="cursor-pointer text-sm text-foreground">
+          <label htmlFor="inv-pro" className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
             Pro
           </label>
         </div>
       </RadioGroup>
-      <p className="text-sm text-destructive-strong">Please choose a plan.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Please choose a plan.</p>
     </div>
   ),
 };

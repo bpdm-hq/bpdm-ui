@@ -120,7 +120,7 @@ export const Sizes: Story = {
   @for (size of sizes; track size) {
     <bpdm-dialog [size]="size" [title]="'Size: ' + size" description="The panel width adapts to the size prop.">
       <button bpdmButton variant="secondary" appearance="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
-      <ng-template bpdmDialogBody><p class="text-sm text-muted-foreground">Dialog body content.</p></ng-template>
+      <ng-template bpdmDialogBody><p class="text-sm text-[var(--bpdm-muted-foreground)]">Dialog body content.</p></ng-template>
       <ng-template bpdmDialogFooter><button bpdmButton bpdmDialogClose>Got it</button></ng-template>
     </bpdm-dialog>
   }
@@ -140,7 +140,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFoot
       @for (size of sizes; track size) {
         <bpdm-dialog [size]="size" [title]="'Size: ' + size" description="The panel width adapts to the size prop.">
           <button bpdmButton variant="secondary" appearance="outline" class="uppercase" bpdmDialogTrigger>{{ size }}</button>
-          <ng-template bpdmDialogBody><p class="text-sm text-muted-foreground">Dialog body content.</p></ng-template>
+          <ng-template bpdmDialogBody><p class="text-sm text-[var(--bpdm-muted-foreground)]">Dialog body content.</p></ng-template>
           <ng-template bpdmDialogFooter><button bpdmButton bpdmDialogClose>Got it</button></ng-template>
         </bpdm-dialog>
       }
@@ -163,7 +163,7 @@ export const ScrollableContent: Story = {
     template: `<bpdm-dialog title="Terms of service" description="Please review before continuing.">
   <button bpdmButton variant="secondary" appearance="outline" bpdmDialogTrigger>Open long content</button>
   <ng-template bpdmDialogBody>
-    <div class="space-y-3 text-sm text-muted-foreground">
+    <div class="space-y-3 text-sm text-[var(--bpdm-muted-foreground)]">
       @for (i of lines; track i) {
         <p>{{ i }}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
       }
@@ -185,7 +185,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogClose, BpdmDialogFoot
     <bpdm-dialog title="Terms of service" description="Please review before continuing.">
       <button bpdmButton variant="secondary" appearance="outline" bpdmDialogTrigger>Open long content</button>
       <ng-template bpdmDialogBody>
-        <div class="space-y-3 text-sm text-muted-foreground">
+        <div class="space-y-3 text-sm text-[var(--bpdm-muted-foreground)]">
           @for (i of lines; track i) {
             <p>{{ i }}. Lorem ipsum dolor sit amet…</p>
           }
@@ -210,7 +210,7 @@ export const Controlled: Story = {
     template: `<button bpdmButton (click)="open = true">Open controlled</button>
 <bpdm-dialog [(open)]="open" title="Controlled dialog" description="Its open state lives in the parent.">
   <ng-template bpdmDialogBody>
-    <p class="text-sm text-muted-foreground">Useful when opening from a menu, after an async action, etc.</p>
+    <p class="text-sm text-[var(--bpdm-muted-foreground)]">Useful when opening from a menu, after an async action, etc.</p>
   </ng-template>
   <ng-template bpdmDialogFooter><button bpdmButton (click)="open = false">Close</button></ng-template>
 </bpdm-dialog>`,
@@ -228,7 +228,7 @@ import { BpdmButton, BpdmDialog, BpdmDialogBody, BpdmDialogFooter } from '@bpdm/
     <button bpdmButton (click)="open = true">Open controlled</button>
     <bpdm-dialog [(open)]="open" title="Controlled dialog" description="Its open state lives in the parent.">
       <ng-template bpdmDialogBody>
-        <p class="text-sm text-muted-foreground">Useful when opening from a menu, after an async action, etc.</p>
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Useful when opening from a menu, after an async action, etc.</p>
       </ng-template>
       <ng-template bpdmDialogFooter><button bpdmButton (click)="open = false">Close</button></ng-template>
     </bpdm-dialog>

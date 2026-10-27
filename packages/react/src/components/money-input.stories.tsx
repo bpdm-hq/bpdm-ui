@@ -99,7 +99,7 @@ export function Example() {
         { currency: "JPY", locale: "ja-JP" },
       ].map((c) => (
         <div key={c.currency} className="flex items-center gap-3">
-          <span className="w-10 text-sm text-muted-foreground">{c.currency}</span>
+          <span className="w-10 text-sm text-[var(--bpdm-muted-foreground)]">{c.currency}</span>
           <MoneyInput currency={c.currency} locale={c.locale} defaultValue="100000" />
         </div>
       ))}
@@ -167,7 +167,7 @@ export function Example() {
   return (
     <div className="flex w-64 flex-col gap-1.5">
       <MoneyInput aria-invalid currency="USD" defaultValue="0" />
-      <p className="text-sm text-destructive-strong">Amount must be greater than 0.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Amount must be greater than 0.</p>
     </div>
   );
 }`,
@@ -177,7 +177,7 @@ export function Example() {
   render: () => (
     <div className="flex w-64 flex-col gap-1.5">
       <MoneyInput aria-invalid currency="USD" defaultValue="0" />
-      <p className="text-sm text-destructive-strong">Amount must be greater than 0.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Amount must be greater than 0.</p>
     </div>
   ),
 };

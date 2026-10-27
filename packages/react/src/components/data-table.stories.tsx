@@ -113,9 +113,9 @@ const HUGE: Member[] = Array.from({ length: 10000 }, (_, i) => {
 
 const STATUS_STYLE: Record<Member["status"], string> = {
   // mirror Badge `soft` tones — the `-strong` text ramp clears 4.5:1 on the tint
-  active: "bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success-strong",
-  invited: "bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary-strong",
-  disabled: "bg-muted text-muted-foreground",
+  active: "bg-[color-mix(in_srgb,var(--bpdm-success)_18%,transparent)] text-[var(--bpdm-success-strong)]",
+  invited: "bg-[color-mix(in_srgb,var(--bpdm-primary)_18%,transparent)] text-[var(--bpdm-primary-strong)]",
+  disabled: "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]",
 };
 
 function StatusBadge({ status }: { status: Member["status"] }) {
@@ -141,28 +141,28 @@ function MemberDetails({ member }: { member: Member }) {
   ];
   return (
     <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-      <section className="rounded-lg border border-border bg-card p-4">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <section className="rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">
           Task activity
         </p>
         <dl className="space-y-2 text-sm tabular-nums">
           <div className="flex items-center justify-between">
-            <dt className="text-muted-foreground">Assigned</dt>
+            <dt className="text-[var(--bpdm-muted-foreground)]">Assigned</dt>
             <dd>{assigned}</dd>
           </div>
           <div className="flex items-center justify-between">
-            <dt className="text-muted-foreground">Completed</dt>
-            <dd className="text-success">{completed}</dd>
+            <dt className="text-[var(--bpdm-muted-foreground)]">Completed</dt>
+            <dd className="text-[var(--bpdm-success)]">{completed}</dd>
           </div>
-          <div className="mt-1 flex items-center justify-between border-t border-border pt-2 text-base font-semibold">
+          <div className="mt-1 flex items-center justify-between border-t border-[var(--bpdm-border)] pt-2 text-base font-semibold">
             <dt>Open</dt>
             <dd>{open}</dd>
           </div>
         </dl>
       </section>
-      <section className="rounded-lg border border-border bg-card p-4">
+      <section className="rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">
             Details
           </p>
           <StatusBadge status={member.status} />
@@ -170,7 +170,7 @@ function MemberDetails({ member }: { member: Member }) {
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
           {detail.map(([label, value]) => (
             <div key={label} className="flex flex-col gap-0.5">
-              <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
+              <dt className="text-xs uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">{label}</dt>
               <dd>{value}</dd>
             </div>
           ))}
@@ -275,7 +275,7 @@ export function Example() {
     <div className="flex flex-col gap-6">
       {(["sm", "md", "lg"] as const).map((s) => (
         <div key={s}>
-          <p className="mb-1.5 font-mono text-xs text-muted-foreground">size=&quot;{s}&quot;</p>
+          <p className="mb-1.5 font-mono text-xs text-[var(--bpdm-muted-foreground)]">size=&quot;{s}&quot;</p>
           <DataTable {...args} size={s} />
         </div>
       ))}
@@ -420,7 +420,7 @@ export function Example() {
   },
   render: (args) => (
     <div className="flex flex-col gap-2">
-      <p className="font-mono text-xs text-muted-foreground">
+      <p className="font-mono text-xs text-[var(--bpdm-muted-foreground)]">
         Click any sortable header (Name / Role / Team / Status / Tasks). Only one
         column sorts at a time.
       </p>
@@ -477,7 +477,7 @@ export function Example() {
   },
   render: (args) => (
     <div className="flex flex-col gap-2">
-      <p className="max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">
+      <p className="max-w-2xl font-mono text-xs leading-relaxed text-[var(--bpdm-muted-foreground)]">
         Sorted by Status ➊, then Tasks ➋ — rows group by status, and Tasks
         orders the rows <em>within</em> each status block (that is what a
         secondary sort does). Shift+click a header to add a column; click without
@@ -604,7 +604,7 @@ export function Example() {
             <button type="button">Remove</button>
           </>
         ) : (
-          <span className="text-sm text-muted-foreground">Select rows to act on them.</span>
+          <span className="text-sm text-[var(--bpdm-muted-foreground)]">Select rows to act on them.</span>
         )}
       </div>
       <DataTable
@@ -633,19 +633,19 @@ export function Example() {
                 <button
                   type="button"
                   onClick={() => setSelected([])}
-                  className="rounded-lg border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="rounded-lg border border-[var(--bpdm-border)] px-3 py-1 text-sm text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)]"
                 >
                   Clear
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground"
+                  className="rounded-lg bg-[var(--bpdm-destructive)] px-3 py-1 text-sm font-medium text-[var(--bpdm-destructive-foreground)]"
                 >
                   Remove
                 </button>
               </>
             ) : (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-[var(--bpdm-muted-foreground)]">
                 Select rows to act on them.
               </span>
             )}
@@ -917,7 +917,7 @@ export function Example() {
       hoverable={false}      // no row hover
       rowSpacing={4}         // thin gap between filled row blocks
       cellClassName="py-4"   // taller rows
-      // default fill is bg-muted/50 — override with rowClassName
+      // default fill is bg-[var(--bpdm-muted)]/50 — override with rowClassName
       pagination={{
         mode: "cursor",
         align: "center",
@@ -1285,7 +1285,7 @@ export function Example() {
   },
   render: (args) => {
     const cols: DataTableColumn<Member>[] = [
-      { id: "name", header: "Name", sortable: true, accessor: (r) => r.name, footer: <span className="text-muted-foreground">Total</span> },
+      { id: "name", header: "Name", sortable: true, accessor: (r) => r.name, footer: <span className="text-[var(--bpdm-muted-foreground)]">Total</span> },
       { id: "role", header: "Role", sortable: true, accessor: (r) => r.role },
       { id: "team", header: "Team", sortable: true, accessor: (r) => r.team },
       {
@@ -1294,7 +1294,7 @@ export function Example() {
         align: "center",
         cell: (r) => <StatusBadge status={r.status} />,
         footer: (rows) => (
-          <span className="text-muted-foreground">
+          <span className="text-[var(--bpdm-muted-foreground)]">
             {rows.filter((r) => r.status === "active").length} active
           </span>
         ),

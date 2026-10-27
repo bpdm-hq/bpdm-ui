@@ -93,7 +93,7 @@ export class BpdmTextarea {
     const counter = this.renderer.createElement("div") as HTMLElement;
     this.renderer.setAttribute(counter, "id", this.countId);
     this.renderer.setAttribute(counter, "data-bpdm-slot", "textarea-count");
-    for (const c of "mt-1 text-end text-xs tabular-nums text-muted-foreground".split(" ")) {
+    for (const c of "mt-1 text-end text-xs tabular-nums text-[var(--bpdm-muted-foreground)]".split(" ")) {
       this.renderer.addClass(counter, c);
     }
     // insert directly after the textarea so it reads as the field's description

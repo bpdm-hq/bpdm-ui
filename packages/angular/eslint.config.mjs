@@ -28,4 +28,11 @@ export default tseslint.config(
       },
     },
   },
+  // Build scripts run in Node
+  {
+    files: ["scripts/**/*.{js,mjs}"],
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly", URL: "readonly" },
+    },
+  },
 );

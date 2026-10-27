@@ -77,7 +77,7 @@ function DeleteDemo() {
       >
         Delete project
       </Button>
-      {result && <span className="text-sm text-muted-foreground">{result}</span>}
+      {result && <span className="text-sm text-[var(--bpdm-muted-foreground)]">{result}</span>}
     </div>
   );
 }
@@ -142,7 +142,7 @@ function PublishDemo() {
       >
         Publish
       </Button>
-      {result && <span className="text-sm text-muted-foreground">{result}</span>}
+      {result && <span className="text-sm text-[var(--bpdm-muted-foreground)]">{result}</span>}
     </div>
   );
 }

@@ -112,7 +112,7 @@ export function Example() {
       {(["pill", "square", "sharp"] as const).map((s) => (
         <div key={s} className="flex items-center gap-2">
           <Switch shape={s} defaultChecked />
-          <span className="text-sm text-muted-foreground">{s}</span>
+          <span className="text-sm text-[var(--bpdm-muted-foreground)]">{s}</span>
         </div>
       ))}
     </div>
@@ -196,7 +196,7 @@ export function Example() {
   render: () => (
     <div className="flex items-center gap-2">
       <Switch id="airplane" defaultChecked />
-      <label htmlFor="airplane" className="cursor-pointer text-sm text-foreground">
+      <label htmlFor="airplane" className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
         Airplane mode
       </label>
     </div>
@@ -240,7 +240,7 @@ export function Example() {
         { id: "s-beta", label: "Beta features", on: true },
       ].map((s) => (
         <div key={s.id} className="flex items-center justify-between gap-8">
-          <label htmlFor={s.id} className="cursor-pointer text-sm text-foreground">
+          <label htmlFor={s.id} className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
             {s.label}
           </label>
           <Switch id={s.id} defaultChecked={s.on} />

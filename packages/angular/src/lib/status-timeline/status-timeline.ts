@@ -85,16 +85,16 @@ interface TimelineRow {
 }
 
 const DOT_BY_STATUS: Record<TimelineStatus, string> = {
-  complete: "bg-success text-success-foreground",
-  current: "bg-primary text-primary-foreground ring-4 ring-primary/20",
-  pending: "border-2 border-border bg-background text-transparent",
-  failed: "bg-destructive text-destructive-foreground",
+  complete: "bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]",
+  current: "bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-4 ring-[var(--bpdm-primary)]/20",
+  pending: "border-2 border-[var(--bpdm-border)] bg-[var(--bpdm-background)] text-transparent",
+  failed: "bg-[var(--bpdm-destructive)] text-[var(--bpdm-destructive-foreground)]",
 };
 
 const DOT_BASE = "relative z-10 grid size-6 shrink-0 place-items-center rounded-full [&_svg]:size-3.5";
 const MARKER_WRAP = "relative z-10 flex shrink-0 items-center justify-center";
 const INTERACTIVE =
-  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "cursor-pointer rounded-lg outline-none transition-colors hover:bg-[var(--bpdm-muted)]/50 focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)]";
 
 /**
  * `<bpdm-status-timeline>` — status timeline for lifecycles (deployment, approval,
@@ -133,7 +133,7 @@ const INTERACTIVE =
           } @else {
             <span data-bpdm-slot="status-timeline-marker" [style.background-color]="row.color || null" [class]="row.dotClass">
               @if (row.status === "current") {
-                <span class="absolute inset-0 rounded-full bg-primary animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none" aria-hidden="true"></span>
+                <span class="absolute inset-0 rounded-full bg-[var(--bpdm-primary)] animate-[bpdm-ping_1.8s_var(--bpdm-ease-out)_infinite] motion-reduce:animate-none" aria-hidden="true"></span>
               }
               @if (row.status === "complete") {
                 <svg viewBox="0 0 16 16" fill="none" class="size-3.5" aria-hidden="true">
@@ -158,10 +158,10 @@ const INTERACTIVE =
                 <p [class]="row.titleClass">{{ row.title }}</p>
               </div>
               @if (row.timestamp) {
-                <p class="m-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</p>
+                <p class="m-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{{ row.timestamp }}</p>
               }
               @if (row.description) {
-                <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
+                <p class="mt-0.5 text-sm text-[var(--bpdm-muted-foreground)]">{{ row.description }}</p>
               }
             </div>
           } @else {
@@ -169,11 +169,11 @@ const INTERACTIVE =
               <div [class]="row.titleRowClass">
                 <p [class]="row.titleClass">{{ row.title }}</p>
                 @if (row.timestamp) {
-                  <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{{ row.timestamp }}</span>
+                  <span class="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{{ row.timestamp }}</span>
                 }
               </div>
               @if (row.description) {
-                <p class="mt-0.5 text-sm text-muted-foreground">{{ row.description }}</p>
+                <p class="mt-0.5 text-sm text-[var(--bpdm-muted-foreground)]">{{ row.description }}</p>
               }
             </div>
           }
@@ -267,7 +267,7 @@ export class BpdmStatusTimeline {
         color: item.color,
         last,
         dotClass: cn(DOT_BASE, item.color ? "text-white" : DOT_BY_STATUS[status]),
-        titleClass: cn("text-sm font-medium", muted ? "text-muted-foreground" : "text-foreground"),
+        titleClass: cn("text-sm font-medium", muted ? "text-[var(--bpdm-muted-foreground)]" : "text-[var(--bpdm-foreground)]"),
       };
 
       if (horizontal) {
@@ -282,7 +282,7 @@ export class BpdmStatusTimeline {
           lineClass: cn(
             // logical `start-1/2` so the connector runs toward the next marker in LTR and RTL
             "absolute start-1/2 top-1/2 h-px w-full -translate-y-1/2",
-            status === "complete" ? "bg-success/40" : "bg-border",
+            status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
           ),
           dotClass: cn(base.dotClass, "row-start-2"),
           markerWrapClass: cn(MARKER_WRAP, "row-start-2"),
@@ -328,7 +328,7 @@ export class BpdmStatusTimeline {
             : align === "right"
               ? "end-3 translate-x-1/2"
               : "start-3 -translate-x-1/2",
-          status === "complete" ? "bg-success/40" : "bg-border",
+          status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
         ),
         dotClass: cn(base.dotClass, markerPlacement),
         markerWrapClass: cn(MARKER_WRAP, markerPlacement),
@@ -338,7 +338,7 @@ export class BpdmStatusTimeline {
         oppositePlacement,
         oppositeClass: cn(
           oppositePlacement,
-          "flex min-h-6 items-center text-sm text-muted-foreground",
+          "flex min-h-6 items-center text-sm text-[var(--bpdm-muted-foreground)]",
           contentRight ? "text-end" : "text-start",
         ),
       };

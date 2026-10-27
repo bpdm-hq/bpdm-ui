@@ -71,7 +71,7 @@ class PlStringHost {
     <ng-template #tpl let-w>
       <div class="flex items-center justify-between gap-3">
         <span>{{ w.name }}</span>
-        <span class="text-xs text-muted-foreground">{{ w.category }}</span>
+        <span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</span>
       </div>
     </ng-template>
   `,
@@ -96,12 +96,12 @@ class PlFilterHost {
     />
     <ng-template #tpl let-w>
       <div class="flex items-center gap-3">
-        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-muted-foreground" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
           <path [attr.d]="w.icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="min-w-0 flex-1">
           <p class="truncate font-medium">{{ w.name }}</p>
-          <p class="text-xs text-muted-foreground">{{ w.category }}</p>
+          <p class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</p>
         </div>
       </div>
     </ng-template>
@@ -240,7 +240,7 @@ type Widget = { id: string; name: string; category: string };
     <ng-template #tpl let-w>
       <div class="flex items-center justify-between gap-3">
         <span>{{ w.name }}</span>
-        <span class="text-xs text-muted-foreground">{{ w.category }}</span>
+        <span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</span>
       </div>
     </ng-template>
   \`,
@@ -279,12 +279,12 @@ type Widget = { id: string; name: string; category: string; icon: string };
     <bpdm-pick-list [(value)]="lists" [itemKey]="key" [itemTemplate]="tpl" sourceHeader="Available" targetHeader="Your dashboard" />
     <ng-template #tpl let-w>
       <div class="flex items-center gap-3">
-        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-muted-foreground">
+        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]">
           <path [attr.d]="w.icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div class="min-w-0 flex-1">
           <p class="truncate font-medium">{{ w.name }}</p>
-          <p class="text-xs text-muted-foreground">{{ w.category }}</p>
+          <p class="text-xs text-[var(--bpdm-muted-foreground)]">{{ w.category }}</p>
         </div>
       </div>
     </ng-template>

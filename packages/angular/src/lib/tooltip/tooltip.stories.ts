@@ -159,8 +159,8 @@ export const RichContent: Story = {
   <button bpdmButton variant="secondary" appearance="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
   <ng-template #rich>
     <div class="space-y-1">
-      <p class="font-medium text-foreground">Auto-sync</p>
-      <p class="text-muted-foreground">Changes sync across devices in real time.</p>
+      <p class="font-medium text-[var(--bpdm-foreground)]">Auto-sync</p>
+      <p class="text-[var(--bpdm-muted-foreground)]">Changes sync across devices in real time.</p>
     </div>
   </ng-template>
 </div>`,
@@ -178,8 +178,8 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
     <button bpdmButton variant="secondary" appearance="outline" [bpdmTooltip]="rich" bpdmTooltipSide="right">Sync info</button>
     <ng-template #rich>
       <div class="space-y-1">
-        <p class="font-medium text-foreground">Auto-sync</p>
-        <p class="text-muted-foreground">Changes sync across devices in real time.</p>
+        <p class="font-medium text-[var(--bpdm-foreground)]">Auto-sync</p>
+        <p class="text-[var(--bpdm-muted-foreground)]">Changes sync across devices in real time.</p>
       </div>
     </ng-template>
   \`,
@@ -199,11 +199,11 @@ export const Disabled: Story = {
     template: `<div class="flex min-h-24 items-center justify-center gap-12">
   <div class="flex flex-col items-center gap-2">
     <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes">Tooltip on</button>
-    <span class="text-xs text-muted-foreground">hover → tooltip shows</span>
+    <span class="text-xs text-[var(--bpdm-muted-foreground)]">hover → tooltip shows</span>
   </div>
   <div class="flex flex-col items-center gap-2">
     <button bpdmButton variant="secondary" appearance="outline" bpdmTooltip="Saves your changes" [bpdmTooltipDisabled]="true">Tooltip off</button>
-    <span class="text-xs text-muted-foreground">disabled → nothing on hover</span>
+    <span class="text-xs text-[var(--bpdm-muted-foreground)]">disabled → nothing on hover</span>
   </div>
 </div>`,
   }),
@@ -240,7 +240,7 @@ export const OnDisabledTrigger: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="flex min-h-24 items-center justify-center">
-  <span bpdmTooltip="You need the Admin role to publish" tabindex="0" class="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+  <span bpdmTooltip="You need the Admin role to publish" tabindex="0" class="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]">
     <button bpdmButton disabled tabindex="-1" class="pointer-events-none">Publish</button>
   </span>
 </div>`,
@@ -256,7 +256,7 @@ import { BpdmButton, BpdmTooltip } from '@bpdm/ng';
   imports: [BpdmButton, BpdmTooltip],
   template: \`
     <span bpdmTooltip="You need the Admin role to publish" tabindex="0"
-      class="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      class="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]">
       <button bpdmButton disabled tabindex="-1" class="pointer-events-none">Publish</button>
     </span>
   \`,

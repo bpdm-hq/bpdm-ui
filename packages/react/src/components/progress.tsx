@@ -74,8 +74,8 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
       <div ref={ref} data-bpdm="" data-bpdm-slot="progress" className={cn("w-full", className)} {...props}>
         {hasHeader && (
           <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-            <span className="truncate text-muted-foreground">{label}</span>
-            <span className="shrink-0 font-medium tabular-nums text-foreground">{valueText}</span>
+            <span className="truncate text-[var(--bpdm-muted-foreground)]">{label}</span>
+            <span className="shrink-0 font-medium tabular-nums text-[var(--bpdm-foreground)]">{valueText}</span>
           </div>
         )}
         <div
@@ -88,13 +88,13 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
           aria-busy={indeterminate ? true : undefined}
           data-bpdm-slot="progress-track"
           className={cn(
-            "relative w-full overflow-hidden rounded-full bg-muted",
+            "relative w-full overflow-hidden rounded-full bg-[var(--bpdm-muted)]",
             inside ? "h-5" : progressTrack[size],
           )}
         >
           {/* inside label, base layer — reads on the unfilled track */}
           {inside && (
-            <span className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-[0.7rem] font-semibold tabular-nums text-muted-foreground">
+            <span className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-[0.7rem] font-semibold tabular-nums text-[var(--bpdm-muted-foreground)]">
               {valueText}
             </span>
           )}

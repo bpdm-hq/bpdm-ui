@@ -66,8 +66,8 @@ function Row() {
 
 function Brand({ name, vars }: { name: string; vars: CSSProperties }) {
   return (
-    <div className="space-y-4 rounded-xl border border-border p-6" style={vars}>
-      <p className="text-sm text-muted-foreground">{name}</p>
+    <div className="space-y-4 rounded-xl border border-[var(--bpdm-border)] p-6" style={vars}>
+      <p className="text-sm text-[var(--bpdm-muted-foreground)]">{name}</p>
       <Row />
     </div>
   );
@@ -129,7 +129,7 @@ function Sample() {
       </div>
       <Input placeholder="you@company.com" className="max-w-xs" />
       {/* a white card lifting off the page */}
-      <div className="rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm">
+      <div className="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4 text-[var(--bpdm-card-foreground)] shadow-sm">
         <p className="mb-3 text-sm font-medium">Card on page</p>
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-2 text-sm">
@@ -170,9 +170,9 @@ export const AllThemes: Story = {
         <div
           key={t.id}
           data-theme={t.id}
-          className="rounded-xl border border-border bg-background p-8 text-foreground"
+          className="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-background)] p-8 text-[var(--bpdm-foreground)]"
         >
-          <p className="mb-5 text-sm font-medium text-muted-foreground">
+          <p className="mb-5 text-sm font-medium text-[var(--bpdm-muted-foreground)]">
             {t.label}
           </p>
           <Sample />
@@ -258,14 +258,14 @@ export const CustomThemeTemplate: Story = {
     <div className="max-w-2xl space-y-5">
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={downloadTheme}>Download bpdm-theme.css</Button>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-[var(--bpdm-muted-foreground)]">
           Starter file with every variable — required ones marked.
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border">
+      <div className="overflow-hidden rounded-xl border border-[var(--bpdm-border)]">
         <table className="w-full text-left text-sm">
-          <thead className="bg-muted text-muted-foreground">
+          <thead className="bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]">
             <tr>
               <th className="px-4 py-2 font-medium">CSS variable</th>
               <th className="px-4 py-2 font-medium">Required</th>
@@ -274,18 +274,18 @@ export const CustomThemeTemplate: Story = {
           </thead>
           <tbody>
             {TOKENS.map((t) => (
-              <tr key={t.name} className="border-t border-border">
-                <td className="px-4 py-2 font-mono text-xs text-foreground">
+              <tr key={t.name} className="border-t border-[var(--bpdm-border)]">
+                <td className="px-4 py-2 font-mono text-xs text-[var(--bpdm-foreground)]">
                   {t.name}
                 </td>
                 <td className="px-4 py-2">
                   {t.required ? (
-                    <span className="font-medium text-primary-strong">required</span>
+                    <span className="font-medium text-[var(--bpdm-primary-strong)]">required</span>
                   ) : (
-                    <span className="text-muted-foreground">optional</span>
+                    <span className="text-[var(--bpdm-muted-foreground)]">optional</span>
                   )}
                 </td>
-                <td className="px-4 py-2 text-muted-foreground">{t.note}</td>
+                <td className="px-4 py-2 text-[var(--bpdm-muted-foreground)]">{t.note}</td>
               </tr>
             ))}
           </tbody>
