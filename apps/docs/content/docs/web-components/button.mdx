@@ -1,6 +1,6 @@
 ---
 title: Button (Web Component)
-description: <bpdm-button> — the bpdm/ui Button as a standards-based custom element. Works in React, Angular, Vue, PHP, Rails, Elixir/Phoenix LiveView, Django, WordPress and plain HTML, with native <form> submit.
+description: <bpdm-button>, the bpdm/ui Button as a standards-based custom element. Works in React, Angular, Vue, PHP, Rails, Elixir/Phoenix LiveView, Django, WordPress and plain HTML, with native <form> submit.
 ---
 
 import { Tab, Tabs } from '@/components/framework-tabs';
@@ -19,13 +19,13 @@ import {
 `<bpdm-button>` is the bpdm/ui Button delivered as a framework-agnostic **Web
 Component**. It renders a real `<button>` inside its shadow root (so focus and
 keyboard behaviour stay native), is themed by the `@bpdm/tokens` CSS variables,
-and is **form-associated** — `type="submit"` / `type="reset"` drive the
+and is **form-associated**: `type="submit"` / `type="reset"` drive the
 surrounding native `<form>` exactly like a built-in button, with no extra JS.
 
 ## Setup
 
 Register the element once, and load the tokens so it picks up a theme. After that
-you just write the tag — in a template, a component, or straight HTML.
+you just write the tag, in a template, a component, or straight HTML.
 
 <Tabs groupId="wc-stack" items={['HTML', 'React', 'Angular', 'PHP / Laravel', 'Phoenix LiveView']}>
   <Tab value="HTML">
@@ -145,7 +145,7 @@ The `variant` attribute sets the semantic colour: `primary`, `secondary`,
 
 ## Appearances
 
-The `appearance` attribute sets the style — `solid` (default, filled), `outline`
+The `appearance` attribute sets the style: `solid` (default, filled), `outline`
 (bordered, transparent fill), and `ghost` (no border or fill). It composes with
 every `variant`.
 
@@ -213,7 +213,7 @@ block activation while a request is in flight. Toggle it from your own code.
 ## Native form submit
 
 This is the headline feature: `<bpdm-button>` is a **form-associated custom
-element**, so `type="submit"` and `type="reset"` work inside a real `<form>` —
+element**, so `type="submit"` and `type="reset"` work inside a real `<form>`,
 the browser (and your server, Rails, Laravel or LiveView) sees an ordinary
 submit. No click handlers, no JS glue.
 
@@ -262,7 +262,7 @@ tokens in your own CSS:
 :root { /* paper (default) */ }
 [data-theme='charcoal'] { /* dark */ }
 
-/* or nudge a token — applies to every bpdm element inside */
+/* or nudge a token, applies to every bpdm element inside */
 .brand-area {
   --primary: #0ea5e9;
   --primary-foreground: #ffffff;
@@ -297,12 +297,12 @@ tokens in your own CSS:
 
 | Part | Description |
 | --- | --- |
-| `base` | The inner `<button>` — style with `::part(base)`. |
+| `base` | The inner `<button>`, styled with `::part(base)`. |
 | `spinner` | The loading spinner. |
 
 ### Events
 
-Standard DOM events bubble from the element — listen for `click` as usual. When
+Standard DOM events bubble from the element, listen for `click` as usual. When
 `disabled` or `loading`, activation is swallowed so no `click` escapes.
 
 ## Accessibility
@@ -310,7 +310,7 @@ Standard DOM events bubble from the element — listen for `click` as usual. Whe
 - Renders a **native `<button>`** in the shadow root with `delegatesFocus`, so
   <kbd>Tab</kbd>, <kbd>Enter</kbd> / <kbd>Space</kbd>, and the focus ring are the
   platform's own.
-- **Icon-only** buttons have no text — set an `aria-label` describing the action.
+- **Icon-only** buttons have no text, so set an `aria-label` describing the action.
 - `loading` sets `aria-busy="true"` and keeps the label for context; `disabled`
   exposes `aria-disabled` and drops the element from the tab order.
 - Motion honours `prefers-reduced-motion` (the press spring and spinner calm down).

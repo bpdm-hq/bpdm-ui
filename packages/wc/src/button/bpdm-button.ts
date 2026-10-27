@@ -33,6 +33,15 @@ export class BpdmButton extends LitElement {
   /** Form-associated: participates in native `<form>` submit/reset. */
   static readonly formAssociated = true;
 
+  // Delegate focus to the inner <button> so Tab and :focus-visible stay native.
+  // This MUST be set via shadowRootOptions, not by overriding createRenderRoot:
+  // a custom createRenderRoot skips Lit's adoptStyles() and the component ships
+  // with no styles in its shadow root.
+  static override shadowRootOptions: ShadowRootInit = {
+    ...LitElement.shadowRootOptions,
+    delegatesFocus: true,
+  };
+
   static override properties = {
     variant: { type: String, reflect: true },
     appearance: { type: String, reflect: true },
@@ -67,11 +76,6 @@ export class BpdmButton extends LitElement {
     this.loadingLabel = "Loading";
     // attachInternals() is how a form-associated element talks to its form.
     this.internals = this.attachInternals();
-  }
-
-  // Focus is delegated to the inner <button> so Tab + :focus-visible behave natively.
-  protected override createRenderRoot() {
-    return this.attachShadow({ mode: "open", delegatesFocus: true });
   }
 
   protected override updated(changed: PropertyValues) {
