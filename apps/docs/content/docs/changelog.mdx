@@ -3,64 +3,75 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.1.4**, Angular `@bpdm/ng` **0.1.6**, Scheduler `@bpdm/scheduler` **0.2.1** (React) / `@bpdm/ng-scheduler` **0.1.0** (Angular); tokens `@bpdm/tokens`, variants `@bpdm/variants` **0.1.2**.
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.2.0**, Angular `@bpdm/ng` **0.2.0**, Web Components `@bpdm/wc` **0.1.0**, tokens `@bpdm/tokens` and variants `@bpdm/variants` **0.2.0**; Scheduler `@bpdm/scheduler` **0.2.1** (React) and `@bpdm/ng-scheduler` **0.1.0** (Angular).
 
-## 0.1.6 `@bpdm/ng` — Select, Multi-select & Tree-select: ARIA + i18n (October 2026)
+## 0.2.0: Namespaced tokens and self-contained stylesheets (October 2026)
+
+A collision-free, self-contained styling model. **Breaking** for anyone who rebrands by overriding the design tokens.
+
+- **Namespaced tokens.** Every design token now carries a `--bpdm-` prefix (`--primary` becomes `--bpdm-primary`, `--radius` becomes `--bpdm-radius`, and so on). A bare token can no longer clash with a host application's own CSS variable of the same name.
+- **Theme-independent component classes.** Components reference those tokens as arbitrary values (`bg-[var(--bpdm-primary)]`) instead of semantic utilities, so their generated class names are unique and never collide with a consuming app's own `bg-primary`.
+- **Self-contained `styles.css`.** `@bpdm/ui` and `@bpdm/ng` now ship a precompiled stylesheet (namespaced tokens plus every component utility, and no CSS reset). A single import styles the components with no Tailwind of your own; apps that already run Tailwind can keep the classic setup.
+- **`@bpdm/wc` 0.1.0.** First release of the framework-agnostic Web Components, built on the same namespaced tokens.
+
+**Migration:** if you override tokens to rebrand, add the `--bpdm-` prefix (`--primary` becomes `--bpdm-primary`). The four themes, the `data-theme` attribute, and every component API are unchanged. Semantic Tailwind utilities still resolve for apps that run Tailwind over the tokens, so existing markup keeps working.
+
+## 0.1.6 `@bpdm/ng`: Select, Multi-select & Tree-select, ARIA + i18n (October 2026)
 
 Richer ARIA semantics and internationalization for the three Angular selection components (React twins unchanged):
 
-- **Select / Multi-select** — combobox + listbox roles with `aria-activedescendant`, stable option ids and `aria-controls`; keyboard navigation (type-ahead, arrow / Home / End, Enter / Escape); a translatable `messages` input; multi-select adds a tri-state select-all.
-- **Tree-select** — `role="tree"` / `treeitem` / `group` with `aria-level`, `aria-expanded` and `aria-checked`, and RTL-aware indentation.
-- **Docs** — every example is a complete, copy-pasteable snippet (import → usage), plus per-component Internationalization sections.
+- **Select / Multi-select**: combobox + listbox roles with `aria-activedescendant`, stable option ids and `aria-controls`; keyboard navigation (type-ahead, arrow / Home / End, Enter / Escape); a translatable `messages` input; multi-select adds a tri-state select-all.
+- **Tree-select**: `role="tree"` / `treeitem` / `group` with `aria-level`, `aria-expanded` and `aria-checked`, and RTL-aware indentation.
+- **Docs**: every example is a complete, copy-pasteable snippet (import → usage), plus per-component Internationalization sections.
 
-## 0.1.4 `@bpdm/ui` · 0.1.5 `@bpdm/ng` — Packaging fix (August 2026)
+## 0.1.4 `@bpdm/ui` · 0.1.5 `@bpdm/ng`: Packaging fix (August 2026)
 
 The same `workspace:*` fix as the scheduler packages. `@bpdm/ui`'s dependency on `@bpdm/variants`, and `@bpdm/ng`'s on `@bpdm/tokens` and `@bpdm/variants`, were pinned to the internal `workspace:*` protocol, which a plain `npm install` can't resolve. They now resolve to real published versions. No code or API changes.
 
-## 0.2.1 `@bpdm/scheduler` — Packaging fix (August 2026)
+## 0.2.1 `@bpdm/scheduler`: Packaging fix (August 2026)
 
 Fixes the published package's dependency on `@bpdm/scheduler-core`: it was pinned to the internal `workspace:*` protocol, which a plain `npm install` can't resolve. It now resolves to a real published version. No code or API changes.
 
-## 0.1.0 `@bpdm/ng-scheduler` — Angular scheduler (August 2026)
+## 0.1.0 `@bpdm/ng-scheduler`: Angular scheduler (August 2026)
 
-The scheduler now ships for **Angular** too — a 1:1 twin of the React `@bpdm/scheduler`, built on the same headless `@bpdm/scheduler-core` and the same stylesheet, so both frameworks stay pixel-identical and theme from one token set.
+The scheduler now ships for **Angular** too, a 1:1 twin of the React `@bpdm/scheduler`, built on the same headless `@bpdm/scheduler-core` and the same stylesheet, so both frameworks stay pixel-identical and theme from one token set.
 
 - **Day / week / month views** with the same layout engine, event packing, drag-to-move, drag-to-resize, cross-day drag and click-to-create as React.
-- **Keyboard & accessibility** parity — roving focus, Space to grab an event and arrows to move it, ARIA grid semantics and live-region announcements.
-- **Responsive** — the same container-width reflow (horizontal-scroll week, dot-collapsed month, bottom-sheet dialogs) plus opt-in `collapseToDayBelow`.
-- **i18n / RTL** — locale-driven date and time formatting and a translatable `messages` input.
+- **Keyboard & accessibility** parity, roving focus, Space to grab an event and arrows to move it, ARIA grid semantics and live-region announcements.
+- **Responsive**: the same container-width reflow (horizontal-scroll week, dot-collapsed month, bottom-sheet dialogs) plus opt-in `collapseToDayBelow`.
+- **i18n / RTL**: locale-driven date and time formatting and a translatable `messages` input.
 - Standalone components, signals and `OnPush` throughout; `@angular/common` and `@angular/core` are the only peer dependencies.
 
-## 0.2.0 `@bpdm/scheduler` — Responsive scheduler (July 2026)
+## 0.2.0 `@bpdm/scheduler`: Responsive scheduler (July 2026)
 
-The scheduler now adapts to **its own container's width** (not just the window), entirely in CSS — so it works the same on a phone as embedded in a narrow panel. No breaking changes; the API is a superset.
+The scheduler now adapts to **its own container's width** (not just the window), entirely in CSS, so it works the same on a phone as embedded in a narrow panel. No breaking changes; the API is a superset.
 
 - **Day / week / month** all reflow on narrow widths: day-and-week columns keep a usable width and scroll horizontally (time gutter + day headers stay pinned) rather than squishing; the month shortens cells and collapses event chips to dots; the toolbar wraps its view switcher; touch pointers get larger hit areas.
-- **`collapseToDayBelow`** (new, opt-in) — below a container width you choose, a week becomes a **single day with a week strip** (two-letter day + date, tap to switch, ‹ › steps by day) and the month caps its dots (≤2). It measures the scheduler's own width, keeps the store on `week` (so the toolbar still reads Week and widening is seamless), and restores the week when it widens.
-- **Dialogs & the day peek** become **bottom sheets** on phones — docked, rounded, with a grab handle and a scrollable body so a tall form (or the keyboard) never hides the actions. Background scroll is locked while any overlay is open.
-- **Self-contained stacking** — the grid's internal z-indexes are isolated, so a sticky header/event layer can never leak above a host app's own navbar.
+- **`collapseToDayBelow`** (new, opt-in), below a container width you choose, a week becomes a **single day with a week strip** (two-letter day + date, tap to switch, ‹ › steps by day) and the month caps its dots (≤2). It measures the scheduler's own width, keeps the store on `week` (so the toolbar still reads Week and widening is seamless), and restores the week when it widens.
+- **Dialogs & the day peek** become **bottom sheets** on phones, docked, rounded, with a grab handle and a scrollable body so a tall form (or the keyboard) never hides the actions. Background scroll is locked while any overlay is open.
+- **Self-contained stacking**: the grid's internal z-indexes are isolated, so a sticky header/event layer can never leak above a host app's own navbar.
 
-## 0.1.3 `@bpdm/ui` · 0.1.4 `@bpdm/ng` — Responsive fixes (July 2026)
+## 0.1.3 `@bpdm/ui` · 0.1.4 `@bpdm/ng`: Responsive fixes (July 2026)
 
-Mobile and small-screen fixes across three components — the same fixes in both React and Angular. No API changes.
+Mobile and small-screen fixes across three components, the same fixes in both React and Angular. No API changes.
 
-- **Data table.** A wide or pinned table no longer inflates the mobile layout viewport — it scrolls inside its own container as intended, so drawers and other fixed-position overlays size to the real screen width again. The docs also now spell out that responsiveness is on by default (contained horizontal scroll), with `responsive` as an opt-in that stacks each row into a label/value card.
-- **Stepper.** No more horizontal overflow on narrow screens — non-active step labels collapse on mobile (the active step keeps its label) and the connectors tighten, so a multi-step header fits a phone without sideways scrolling.
+- **Data table.** A wide or pinned table no longer inflates the mobile layout viewport, it scrolls inside its own container as intended, so drawers and other fixed-position overlays size to the real screen width again. The docs also now spell out that responsiveness is on by default (contained horizontal scroll), with `responsive` as an opt-in that stacks each row into a label/value card.
+- **Stepper.** No more horizontal overflow on narrow screens, non-active step labels collapse on mobile (the active step keeps its label) and the connectors tighten, so a multi-step header fits a phone without sideways scrolling.
 - **Calendar & date picker.** The calendar stacks vertically on mobile and switches to a row on larger screens; range-picker presets wrap to fit instead of forcing a horizontal scroll; and the live range preview no longer leaves a stray highlight behind the start day (most visible on touch).
 
-## 0.1.3 — `@bpdm/ng` (July 2026)
+## 0.1.3: `@bpdm/ng` (July 2026)
 
-- **Angular 22 support.** Widened the peer range to `^21.0.0 || ^22.0.0` (was Angular 21 only), so `npm install @bpdm/ng` resolves cleanly on the current Angular. No component changes — the same library, now installable on Angular 21 and 22.
-- **Installation docs fixed.** The [installation guide](/docs/getting-started/installation) now covers the full Tailwind v4 setup — the `@tailwindcss/postcss` plugin, the `.postcssrc.json`, and the required `@source` directives that point Tailwind at the bpdm packages (without them, components render unstyled).
+- **Angular 22 support.** Widened the peer range to `^21.0.0 || ^22.0.0` (was Angular 21 only), so `npm install @bpdm/ng` resolves cleanly on the current Angular. No component changes, the same library, now installable on Angular 21 and 22.
+- **Installation docs fixed.** The [installation guide](/docs/getting-started/installation) now covers the full Tailwind v4 setup, the `@tailwindcss/postcss` plugin, the `.postcssrc.json`, and the required `@source` directives that point Tailwind at the bpdm packages (without them, components render unstyled).
 
-## 0.1.x — July 2026
+## 0.1.x: July 2026
 
 **Initial public release.** The same 38 components shipping natively in both React (`@bpdm/ui`) and Angular (`@bpdm/ng`), driven by one shared design-token set (`@bpdm/tokens`).
 
-- **Components** — inputs, selection, overlays (dialog, drawer, popover), navigation (tabs, accordion, stepper), data display (data table, stat card, status timeline), and more.
-- **Four built-in themes** — two light (paper, mist), two dark (charcoal, slate), switched with a single `data-theme` attribute.
+- **Components**: inputs, selection, overlays (dialog, drawer, popover), navigation (tabs, accordion, stepper), data display (data table, stat card, status timeline), and more.
+- **Four built-in themes**: two light (paper, mist), two dark (charcoal, slate), switched with a single `data-theme` attribute.
 - **First-class TypeScript** across every component and variant.
-- **Tree-shakeable** — standalone components, ESM, `sideEffects: false`.
+- **Tree-shakeable**: standalone components, ESM, `sideEffects: false`.
 - **MIT licensed**, published on npm under the `@bpdm/` scope.
 
 Patch releases `0.1.1` and `0.1.2` followed with packaging and metadata refinements.
