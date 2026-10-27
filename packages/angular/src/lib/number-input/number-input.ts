@@ -58,7 +58,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           [attr.aria-label]="t().decrease"
           [disabled]="disabled() || atMin()"
           (click)="step1(-1)"
-          [class]="btnClass('dec', dims().btn + ' border-e border-input')"
+          [class]="btnClass('dec', dims().btn + ' border-e border-[var(--bpdm-input)]')"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path [attr.d]="glyph.minus" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -68,7 +68,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
 
       <div [class]="fieldClass()">
         @if (prefix()) {
-          <span class="shrink-0 text-muted-foreground">{{ prefix() }}</span>
+          <span class="shrink-0 text-[var(--bpdm-muted-foreground)]">{{ prefix() }}</span>
         }
         <input
           type="text"
@@ -96,7 +96,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           [class]="inputClass()"
         />
         @if (suffix()) {
-          <span class="shrink-0 text-muted-foreground">{{ suffix() }}</span>
+          <span class="shrink-0 text-[var(--bpdm-muted-foreground)]">{{ suffix() }}</span>
         }
       </div>
 
@@ -106,14 +106,14 @@ const PARTIAL = /^-?\d*\.?\d*$/;
           [attr.aria-label]="t().increase"
           [disabled]="disabled() || atMax()"
           (click)="step1(1)"
-          [class]="btnClass('inc', dims().btn + ' border-s border-input')"
+          [class]="btnClass('inc', dims().btn + ' border-s border-[var(--bpdm-input)]')"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path [attr.d]="glyph.plus" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
       } @else {
-        <div class="flex w-7 flex-col border-s border-input">
+        <div class="flex w-7 flex-col border-s border-[var(--bpdm-input)]">
           <button
             type="button"
             [attr.aria-label]="t().increase"
@@ -130,7 +130,7 @@ const PARTIAL = /^-?\d*\.?\d*$/;
             [attr.aria-label]="t().decrease"
             [disabled]="disabled() || atMin()"
             (click)="step1(-1)"
-            [class]="btnClass('dec', 'flex-1 border-t border-input')"
+            [class]="btnClass('dec', 'flex-1 border-t border-[var(--bpdm-input)]')"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path [attr.d]="glyph.down" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -225,7 +225,7 @@ export class BpdmNumberInput {
 
   protected readonly rootClass = computed(() =>
     cn(
-      "inline-flex items-stretch overflow-hidden rounded-[var(--radius)] border border-input bg-background shadow-sm focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
+      "inline-flex items-stretch overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] shadow-sm focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)]",
       this.dims().h,
       this.classInput(),
     ),
@@ -238,7 +238,7 @@ export class BpdmNumberInput {
   );
   protected readonly inputClass = computed(() =>
     cn(
-      "w-full min-w-0 border-0 bg-transparent text-foreground tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+      "w-full min-w-0 border-0 bg-transparent text-[var(--bpdm-foreground)] tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
       this.buttonLayout() === "horizontal" ? "text-center" : "text-start",
       this.dims().text,
     ),
@@ -246,7 +246,7 @@ export class BpdmNumberInput {
 
   protected btnClass(which: "inc" | "dec", extra: string): string {
     return cn(
-      "flex cursor-pointer select-none items-center justify-center text-foreground transition-transform duration-100 enabled:hover:bg-muted enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
+      "flex cursor-pointer select-none items-center justify-center text-[var(--bpdm-foreground)] transition-transform duration-100 enabled:hover:bg-[var(--bpdm-muted)] enabled:active:scale-90 disabled:cursor-not-allowed! disabled:opacity-40",
       this.pressed() === which && "scale-90",
       extra,
     );

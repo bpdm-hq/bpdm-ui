@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const wrapVariants = cva(
-  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:focus-within:ring-destructive",
+  "flex w-full items-center gap-1.5 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-[var(--bpdm-foreground)] shadow-sm transition-colors focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)] has-[[aria-invalid=true]]:border-[var(--bpdm-destructive)] has-[[aria-invalid=true]]:focus-within:ring-[var(--bpdm-destructive)]",
   {
     variants: {
       size: {
@@ -33,7 +33,7 @@ function Eye({ off }: { off?: boolean }) {
 }
 function CopyIcon({ done }: { done?: boolean }) {
   return done ? (
-    <svg viewBox="0 0 16 16" fill="none" className="size-4 text-success animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden>
+    <svg viewBox="0 0 16 16" fill="none" className="size-4 text-[var(--bpdm-success)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden>
       <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ) : (
@@ -159,7 +159,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
   };
 
   const btn =
-    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
+    "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none disabled:opacity-50";
 
   return (
     <div

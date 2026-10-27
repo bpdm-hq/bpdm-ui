@@ -276,10 +276,10 @@ export const InCard: Story = {
       }, 220);
     };
     return (
-      <div className="w-72 space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm">
+      <div className="w-72 space-y-4 rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
         <div>
           <p className="text-sm font-medium">report-2025.pdf</p>
-          <p className="text-xs text-muted-foreground">4.2 MB</p>
+          <p className="text-xs text-[var(--bpdm-muted-foreground)]">4.2 MB</p>
         </div>
         <ProgressBar value={value} showValue variant={value >= 100 ? "success" : "primary"} />
         <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>
@@ -314,10 +314,10 @@ export function Example() {
   };
 
   return (
-    <div className="w-72 space-y-4 rounded-xl border bg-card p-5 shadow-sm">
+    <div className="w-72 space-y-4 rounded-xl border bg-[var(--bpdm-card)] p-5 shadow-sm">
       <div>
         <p className="text-sm font-medium">report-2025.pdf</p>
-        <p className="text-xs text-muted-foreground">4.2 MB</p>
+        <p className="text-xs text-[var(--bpdm-muted-foreground)]">4.2 MB</p>
       </div>
       <ProgressBar value={value} showValue variant={value >= 100 ? "success" : "primary"} />
       <Button size="sm" variant="secondary" appearance="outline" onClick={start} disabled={uploading}>

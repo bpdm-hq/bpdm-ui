@@ -131,7 +131,7 @@ export function Example() {
             </DrawerClose>
           }
         >
-          <p className="text-sm text-muted-foreground">Drawer body content.</p>
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Drawer body content.</p>
         </Drawer>
       ))}
     </div>
@@ -159,7 +159,7 @@ export function Example() {
             </DrawerClose>
           }
         >
-          <p className="text-sm text-muted-foreground">Drawer body content.</p>
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Drawer body content.</p>
         </Drawer>
       ))}
     </div>
@@ -274,7 +274,7 @@ export function Example() {
         description="Its open state lives in the parent."
         footer={<Button onClick={() => setOpen(false)}>Close</Button>}
       >
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">
           Open it from a menu, after an async action, etc.
         </p>
       </Drawer>
@@ -297,7 +297,7 @@ export function Example() {
             description="Its open state lives in the parent."
             footer={<Button onClick={() => setOpen(false)}>Close</Button>}
           >
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--bpdm-muted-foreground)]">
               Open it from a menu, after an async action, etc.
             </p>
           </Drawer>

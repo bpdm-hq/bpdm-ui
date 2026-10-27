@@ -140,7 +140,7 @@ export function Example() {
   render: () => (
     <div className="flex items-center gap-2">
       <Checkbox id="terms" defaultChecked />
-      <label htmlFor="terms" className="cursor-pointer text-sm text-foreground">
+      <label htmlFor="terms" className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
         Accept terms &amp; conditions
       </label>
     </div>
@@ -185,7 +185,7 @@ export function Example() {
           <Checkbox id={o.id} defaultChecked={o.checked} />
           <label
             htmlFor={o.id}
-            className="cursor-pointer text-sm text-foreground"
+            className="cursor-pointer text-sm text-[var(--bpdm-foreground)]"
           >
             {o.label}
           </label>
@@ -210,7 +210,7 @@ export function Example() {
         <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
         <label htmlFor="agree">I agree</label>
       </div>
-      <p id="agree-err" className="text-sm text-destructive-strong">
+      <p id="agree-err" className="text-sm text-[var(--bpdm-destructive-strong)]">
         You must agree to continue.
       </p>
     </div>
@@ -223,11 +223,11 @@ export function Example() {
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-2">
         <Checkbox id="agree" aria-invalid aria-describedby="agree-err" />
-        <label htmlFor="agree" className="cursor-pointer text-sm text-foreground">
+        <label htmlFor="agree" className="cursor-pointer text-sm text-[var(--bpdm-foreground)]">
           I agree to the processing of my data
         </label>
       </div>
-      <p id="agree-err" className="text-sm text-destructive-strong">
+      <p id="agree-err" className="text-sm text-[var(--bpdm-destructive-strong)]">
         You must agree to continue.
       </p>
     </div>

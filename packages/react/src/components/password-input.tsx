@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const wrapVariants = cva(
-  "flex w-full items-center gap-1.5 rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:focus-within:ring-destructive",
+  "flex w-full items-center gap-1.5 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-[var(--bpdm-foreground)] shadow-sm transition-colors focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)] has-[[aria-invalid=true]]:border-[var(--bpdm-destructive)] has-[[aria-invalid=true]]:focus-within:ring-[var(--bpdm-destructive)]",
   {
     variants: {
       size: {
@@ -110,13 +110,13 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
   const ratio = levels > 0 ? filled / levels : 0;
   const tone = filled === 0 ? "" : ratio <= 0.34 ? "weak" : ratio <= 0.67 ? "medium" : "strong";
   const barColor =
-    tone === "weak" ? "bg-destructive" : tone === "strong" ? "bg-success" : "bg-primary";
+    tone === "weak" ? "bg-[var(--bpdm-destructive)]" : tone === "strong" ? "bg-[var(--bpdm-success)]" : "bg-[var(--bpdm-primary)]";
   const textColor =
     tone === "weak"
-      ? "text-destructive"
+      ? "text-[var(--bpdm-destructive)]"
       : tone === "strong"
-        ? "text-success"
-        : "text-muted-foreground";
+        ? "text-[var(--bpdm-success)]"
+        : "text-[var(--bpdm-muted-foreground)]";
   const labelSet = labels ?? DEFAULT_LABELS[levels] ?? [];
   const meterLabel = filled > 0 ? (labelSet[filled - 1] ?? "") : "";
 
@@ -152,7 +152,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
           data-bpdm-slot="password-input-toggle"
-          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
+          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none"
         >
           <Eye off={revealed} />
         </button>
@@ -166,7 +166,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
                 key={i}
                 className={cn(
                   "h-1 flex-1 rounded-full transition-colors",
-                  i < filled ? barColor : "bg-muted",
+                  i < filled ? barColor : "bg-[var(--bpdm-muted)]",
                 )}
               />
             ))}

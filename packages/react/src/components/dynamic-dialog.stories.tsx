@@ -87,7 +87,7 @@ function Demo() {
           dialog.open(
             ({ close }) => (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-[var(--bpdm-muted-foreground)]">
                   Stack another dialog on top, then open more from here.
                 </p>
                 <Button size="sm" onClick={close}>

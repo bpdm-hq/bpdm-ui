@@ -154,34 +154,34 @@ const VARIANTS: Record<
     tint: string;
   }
 > = {
-  default: { Icon: null, fg: "", accent: "before:bg-border", bar: "bg-border", tint: "" },
+  default: { Icon: null, fg: "", accent: "before:bg-[var(--bpdm-border)]", bar: "bg-[var(--bpdm-border)]", tint: "" },
   success: {
     Icon: CircleCheck,
-    fg: "text-success",
-    accent: "before:bg-success",
-    bar: "bg-success",
-    tint: "bg-[color-mix(in_srgb,var(--success)_16%,transparent)]",
+    fg: "text-[var(--bpdm-success)]",
+    accent: "before:bg-[var(--bpdm-success)]",
+    bar: "bg-[var(--bpdm-success)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-success)_16%,transparent)]",
   },
   error: {
     Icon: CircleX,
-    fg: "text-destructive",
-    accent: "before:bg-destructive",
-    bar: "bg-destructive",
-    tint: "bg-[color-mix(in_srgb,var(--destructive)_16%,transparent)]",
+    fg: "text-[var(--bpdm-destructive)]",
+    accent: "before:bg-[var(--bpdm-destructive)]",
+    bar: "bg-[var(--bpdm-destructive)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-destructive)_16%,transparent)]",
   },
   warning: {
     Icon: TriangleAlert,
-    fg: "text-warning",
-    accent: "before:bg-warning",
-    bar: "bg-warning",
-    tint: "bg-[color-mix(in_srgb,var(--warning)_16%,transparent)]",
+    fg: "text-[var(--bpdm-warning)]",
+    accent: "before:bg-[var(--bpdm-warning)]",
+    bar: "bg-[var(--bpdm-warning)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-warning)_16%,transparent)]",
   },
   info: {
     Icon: Info,
-    fg: "text-info",
-    accent: "before:bg-info",
-    bar: "bg-info",
-    tint: "bg-[color-mix(in_srgb,var(--info)_16%,transparent)]",
+    fg: "text-[var(--bpdm-info)]",
+    accent: "before:bg-[var(--bpdm-info)]",
+    bar: "bg-[var(--bpdm-info)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-info)_16%,transparent)]",
   },
 };
 
@@ -293,8 +293,8 @@ function ToastItem({
   );
 
   const leading = record.loading ? (
-    <span className={cn(iconBox, "bg-muted")}>
-      <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+    <span className={cn(iconBox, "bg-[var(--bpdm-muted)]")}>
+      <LoaderCircle className="size-4 animate-spin text-[var(--bpdm-muted-foreground)]" />
     </span>
   ) : record.icon !== undefined ? (
     record.icon && <span className={cn(iconBox, v.tint)}>{record.icon}</span>
@@ -322,7 +322,7 @@ function ToastItem({
       }
       data-bpdm="" data-bpdm-slot="toast"
       className={cn(
-        "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
+        "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4 text-[var(--bpdm-card-foreground)] shadow-lg transition-shadow hover:shadow-xl",
         compact ? "items-center" : "items-start",
         "before:absolute before:inset-y-0 before:start-0 before:w-1 before:content-['']",
         v.accent,
@@ -346,7 +346,7 @@ function ToastItem({
           {record.title}
         </ToastPrimitive.Title>
         {record.description != null && (
-          <ToastPrimitive.Description data-bpdm-slot="toast-description" className="mt-1 text-sm text-muted-foreground">
+          <ToastPrimitive.Description data-bpdm-slot="toast-description" className="mt-1 text-sm text-[var(--bpdm-muted-foreground)]">
             {record.description}
           </ToastPrimitive.Description>
         )}
@@ -356,7 +356,7 @@ function ToastItem({
               <button
                 onClick={record.action.onClick}
                 data-bpdm-slot="toast-action"
-                className="inline-flex h-7 items-center rounded-md border border-border bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
               >
                 {record.action.label}
               </button>
@@ -368,7 +368,7 @@ function ToastItem({
         <ToastPrimitive.Close
           aria-label={dismissLabel}
           data-bpdm-slot="toast-close"
-          className="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+          className="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100"
         >
           <X className="size-3.5" />
         </ToastPrimitive.Close>

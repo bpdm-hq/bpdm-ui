@@ -105,23 +105,23 @@ let treeUid = 0;
     >
       <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         @if (selectedLeaves().length === 0) {
-          <span class="text-muted-foreground">{{ placeholder() }}</span>
+          <span class="text-[var(--bpdm-muted-foreground)]">{{ placeholder() }}</span>
         } @else if (maxDisplay() === 0) {
           <span>{{ t().selected(selectedLeaves().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
-            <span data-bpdm-slot="tree-select-chip" class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--radius)-4px)] bg-muted px-1.5 py-0.5 text-xs">
+            <span data-bpdm-slot="tree-select-chip" class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs">
               <span class="truncate">{{ o.label }}</span>
             </span>
           }
           @if (extra() > 0) {
-            <span class="shrink-0 text-xs text-muted-foreground">+{{ extra() }}</span>
+            <span class="shrink-0 text-xs text-[var(--bpdm-muted-foreground)]">+{{ extra() }}</span>
           }
         }
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selectedLeaves().length > 0 && !isDisabled()) {
-          <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground hover:text-foreground">
+          <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -132,9 +132,9 @@ let treeUid = 0;
     <ng-template #panel>
       <div data-bpdm="" data-bpdm-slot="tree-select-content" [class]="panelClass()" [style.width.px]="panelWidth()" (keydown.escape)="close()">
         @if (searchable() || (selectAll() && visibleLeaves().length > 0)) {
-          <div class="flex shrink-0 items-center gap-2 border-b border-border px-3">
+          <div class="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
             @if (selectAll() && visibleLeaves().length > 0) {
-              <button type="button" data-bpdm-slot="tree-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-foreground'">
+              <button type="button" data-bpdm-slot="tree-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]'">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -144,16 +144,16 @@ let treeUid = 0;
                 </span>
                 @if (!searchable()) { {{ t().selectAll }} }
               </button>
-              @if (searchable()) { <span class="w-px shrink-0 self-stretch bg-border" aria-hidden="true"></span> }
+              @if (searchable()) { <span class="w-px shrink-0 self-stretch bg-[var(--bpdm-border)]" aria-hidden="true"></span> }
             }
             @if (searchable()) {
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-muted-foreground"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-              <input #search data-bpdm-slot="tree-select-search" [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+              <input #search data-bpdm-slot="tree-select-search" [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none" />
             }
           </div>
         }
         @if (visibleTree().length === 0) {
-          <div data-bpdm-slot="tree-select-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="tree-select-empty" class="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{{ emptyText() }}</div>
         } @else {
           <div
             #tree
@@ -191,13 +191,13 @@ let treeUid = 0;
       >
         <div [class]="rowClass(n)" [style.paddingInlineStart.px]="8 + depth * 18" (mousemove)="activeValue.set(n.value)">
           @if (n.children?.length) {
-            <button type="button" tabindex="-1" [attr.aria-label]="isExpanded(n) ? t().collapse : t().expand" (click)="toggleExpand(n.value)" class="grid size-4 shrink-0 cursor-pointer place-items-center text-muted-foreground hover:text-foreground">
+            <button type="button" tabindex="-1" [attr.aria-label]="isExpanded(n) ? t().collapse : t().expand" (click)="toggleExpand(n.value)" class="grid size-4 shrink-0 cursor-pointer place-items-center text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]">
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5 transition-transform rtl:-scale-x-100" [class.rotate-90]="isExpanded(n)"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </button>
           } @else {
             <span class="size-4 shrink-0"></span>
           }
-          <button type="button" tabindex="-1" [disabled]="n.disabled || null" (click)="toggleNode(n)" class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-foreground disabled:pointer-events-none disabled:opacity-50">
+          <button type="button" tabindex="-1" [disabled]="n.disabled || null" (click)="toggleNode(n)" class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start text-sm text-[var(--bpdm-foreground)] disabled:pointer-events-none disabled:opacity-50">
             <span aria-hidden="true" [class]="boxClass(nodeChecked(n) || nodeIndeterminate(n))">
               @if (nodeChecked(n)) {
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -360,17 +360,17 @@ export class BpdmTreeSelect implements OnDestroy, ControlValueAccessor {
   protected boxClass(on: boolean): string {
     return cn(
       "grid size-4 shrink-0 place-items-center rounded-[4px] border",
-      on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/50",
+      on ? "border-[var(--bpdm-primary)] bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)]" : "border-[var(--bpdm-muted-foreground)]/50",
     );
   }
 
   protected rowClass(n: TreeNode): string {
     return cn(
-      "flex items-center gap-1.5 rounded-[calc(var(--radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
+      "flex items-center gap-1.5 rounded-[calc(var(--bpdm-radius)-3px)] py-1.5 pe-2 transition-colors duration-[var(--bpdm-duration-fast)]",
       // active treeitem — follows both the keyboard (aria-activedescendant) and the
       // pointer (mousemove), so a single highlight tracks the cursor. An amber
       // inline-start bar (ring token, ≥3:1 in every theme) + soft tint + weight —
-      // clearly perceptible where bg-muted alone was ~1.05:1. RTL-safe, jitter-free.
+      // clearly perceptible where bg-[var(--bpdm-muted)] alone was ~1.05:1. RTL-safe, jitter-free.
       this.activeValue() === n.value &&
         "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
     );

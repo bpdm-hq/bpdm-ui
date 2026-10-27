@@ -199,26 +199,26 @@ export function SelectableList<T>({
     <div
       data-bpdm-slot="selectable-list"
       className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card",
+        "flex min-w-0 flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)]",
         className,
       )}
     >
       {header && (
-        <div id={headerId} className="border-b border-border px-3 py-2 text-sm font-semibold">
+        <div id={headerId} className="border-b border-[var(--bpdm-border)] px-3 py-2 text-sm font-semibold">
           {header}
         </div>
       )}
 
       {filterBy && (
-        <div className="flex items-center gap-2 border-b border-border px-3">
-          <Search className="size-4 shrink-0 text-muted-foreground" />
+        <div className="flex items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
+          <Search className="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={filterPlaceholder}
             aria-label={filterPlaceholder}
             data-bpdm-slot="selectable-list-search"
-            className="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
           />
         </div>
       )}
@@ -242,7 +242,7 @@ export function SelectableList<T>({
         style={{ maxHeight: scrollHeight }}
       >
         {shown.length === 0 ? (
-          <div data-bpdm-slot="selectable-list-empty" className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyText}</div>
+          <div data-bpdm-slot="selectable-list-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{emptyText}</div>
         ) : (
           shown.map((item) => {
             const key = keyOf(item);
@@ -282,19 +282,19 @@ export function SelectableList<T>({
                 }}
                 data-bpdm-slot="selectable-list-option"
                 className={cn(
-                  "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
+                  "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--bpdm-radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
                   // gentle settle-in when an item is added / transferred into this list
                   "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
                   // on-brand: a primary inline-start accent bar marks the selection, the
                   // keyboard-active option, AND the drag drop-target — full-height, RTL-safe.
-                  "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
+                  "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--bpdm-radius)-3px)] before:bg-[var(--bpdm-primary)] before:transition-opacity",
                   itemDisabled
-                    ? "cursor-not-allowed text-muted-foreground opacity-60 before:opacity-0"
+                    ? "cursor-not-allowed text-[var(--bpdm-muted-foreground)] opacity-60 before:opacity-0"
                     : cn(
                         "cursor-pointer active:scale-[0.99]",
                         isSel
-                          ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
-                          : "text-foreground hover:bg-muted",
+                          ? "bg-[color-mix(in_srgb,var(--bpdm-primary)_14%,transparent)] text-[var(--bpdm-foreground)]"
+                          : "text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]",
                         // selection + drop-target: bar always; keyboard-active: bar only
                         // while the list is :focus-visible, so a mouse deselect leaves none
                         isSel || isOver ? "before:opacity-100" : "before:opacity-0",
@@ -306,7 +306,7 @@ export function SelectableList<T>({
                 {draggable && (
                   <GripVertical
                     aria-hidden
-                    className="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground"
+                    className="size-4 shrink-0 cursor-grab text-[var(--bpdm-muted-foreground)]/50 transition-colors active:cursor-grabbing group-hover:text-[var(--bpdm-muted-foreground)]"
                   />
                 )}
                 <div className="min-w-0 flex-1">{renderItem(item)}</div>
@@ -339,7 +339,7 @@ export function ControlButton({
       disabled={disabled}
       onClick={onClick}
       data-bpdm-slot="control-button"
-      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border/60 bg-card text-muted-foreground shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4"
+      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)]/60 bg-[var(--bpdm-card)] text-[var(--bpdm-muted-foreground)] shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4"
     >
       {children}
     </button>

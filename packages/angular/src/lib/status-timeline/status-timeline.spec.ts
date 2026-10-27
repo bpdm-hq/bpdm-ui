@@ -81,7 +81,7 @@ describe("BpdmStatusTimeline", () => {
     const fixture = create();
     const last = (fixture.nativeElement.querySelectorAll("li")[3]) as HTMLElement;
     const title = last.querySelector("p") as HTMLElement;
-    expect(title.className).toContain("text-muted-foreground");
+    expect(title.className).toContain("text-[var(--bpdm-muted-foreground)]");
   });
 
   it("draws no connector line after the last item", () => {

@@ -47,10 +47,10 @@ import { cn, switchVariants, thumbVariants, type SwitchVariants } from "@bpdm/va
     >
       <span data-bpdm-slot="switch-thumb" [class]="thumbClass()" [attr.data-state]="state()">
         @if (icon()) {
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-primary group-data-[state=checked]:block">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-[var(--bpdm-primary)] group-data-[state=checked]:block">
             <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-muted-foreground group-data-[state=unchecked]:block">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="hidden size-[62%] text-[var(--bpdm-muted-foreground)] group-data-[state=unchecked]:block">
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         }

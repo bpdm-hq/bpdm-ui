@@ -85,7 +85,7 @@ describe("Tabs", () => {
       );
       const active = screen.getByRole("tab", { name: "Overview" });
       expect(active).toHaveAttribute("aria-selected", "true");
-      expect(active.className).toContain("data-[state=active]:border-primary-strong");
+      expect(active.className).toContain("data-[state=active]:border-[var(--bpdm-primary-strong)]");
     });
 
     it("the convenience Tabs suppresses that static border where the sliding indicator draws it", () => {

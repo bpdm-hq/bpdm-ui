@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 /** Textarea size + resize classes — framework-agnostic, shared by React and Angular. */
 export const textareaVariants = cva(
-  "flex w-full rounded-[var(--radius)] border border-input bg-background text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+  "flex w-full rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-[var(--bpdm-foreground)] shadow-sm transition-colors placeholder:text-[var(--bpdm-muted-foreground)] focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
   {
     variants: {
       size: {

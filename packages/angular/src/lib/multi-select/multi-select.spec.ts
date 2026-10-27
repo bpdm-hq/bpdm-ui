@@ -74,7 +74,7 @@ describe("BpdmMultiSelect", () => {
     expect(document.querySelector('[role="listbox"][aria-multiselectable="true"]')).toBeTruthy();
   });
 
-  it("marks the active option with the accessible amber indicator (not bg-muted)", async () => {
+  it("marks the active option with the accessible amber indicator (not bg-[var(--bpdm-muted)])", async () => {
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const trigger = fixture.nativeElement.querySelector('[role="combobox"]') as HTMLElement;
@@ -90,8 +90,8 @@ describe("BpdmMultiSelect", () => {
     expect(active.className).toContain("bg-[var(--bpdm-option-active-bg)]");
     expect(active.className).toContain("shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)]");
     expect(active.className).toContain("rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]");
-    // the weak, near-invisible bg-muted active fill is gone
-    expect(active.className).not.toContain("bg-muted");
+    // the weak, near-invisible bg-[var(--bpdm-muted)] active fill is gone
+    expect(active.className).not.toContain("bg-[var(--bpdm-muted)]");
   });
 
   it("translates the chip remove label and wires listbox a11y", async () => {

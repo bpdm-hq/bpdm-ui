@@ -60,7 +60,7 @@ const meta: Meta<typeof Popover> = {
       <Popover {...args} trigger={<Button variant="secondary" appearance="outline">Open popover</Button>}>
         <div className="w-64 space-y-1">
           <p className="font-medium">Quick info</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">
             Popovers can hold any content — text, forms, menus.
           </p>
         </div>
@@ -183,7 +183,7 @@ export function Example() {
     <Popover showArrow trigger={<Button variant="secondary" appearance="outline">Open popover</Button>}>
       <div className="w-64 space-y-1">
         <p className="font-medium">Quick info</p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">
           Popovers can hold any content — text, forms, menus.
         </p>
       </div>

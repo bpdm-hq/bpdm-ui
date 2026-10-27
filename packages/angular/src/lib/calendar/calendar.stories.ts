@@ -302,7 +302,7 @@ export class DateConstraintsComponent {
 // the calendar on its own, without the popover trigger
 export const InlineCalendar: Story = {
   render: () => ({
-    template: `<div class="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+    template: `<div class="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
   <bpdm-calendar [(value)]="date" />
 </div>`,
     props: { date: null },
@@ -317,7 +317,7 @@ import { BpdmCalendar } from '@bpdm/ng';
   selector: 'app-calendar-inline',
   imports: [BpdmCalendar],
   template: \`
-    <div class="w-fit rounded-lg border bg-card shadow-sm">
+    <div class="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <bpdm-calendar [(value)]="date" />
     </div>
   \`,
@@ -334,7 +334,7 @@ export class CalendarInlineComponent {
 export const MonthYearDropdown: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<div class="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+    template: `<div class="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
   <bpdm-calendar [(value)]="date" captionLayout="dropdown" />
 </div>`,
     props: { date: null },
@@ -349,7 +349,7 @@ import { BpdmCalendar } from '@bpdm/ng';
   selector: 'app-calendar-dropdown',
   imports: [BpdmCalendar],
   template: \`
-    <div class="w-fit rounded-lg border bg-card shadow-sm">
+    <div class="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <bpdm-calendar
         [(value)]="date"
         captionLayout="dropdown"
@@ -370,7 +370,7 @@ export class CalendarDropdownComponent {
 export const SquareDays: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<div class="w-fit rounded-[var(--radius)] border border-border bg-card shadow-sm">
+    template: `<div class="w-fit rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] shadow-sm">
   <bpdm-calendar [(value)]="date" dayShape="square" />
 </div>`,
     props: { date: null },
@@ -385,7 +385,7 @@ import { BpdmCalendar } from '@bpdm/ng';
   selector: 'app-calendar-square',
   imports: [BpdmCalendar],
   template: \`
-    <div class="w-fit rounded-lg border bg-card shadow-sm">
+    <div class="w-fit rounded-lg border bg-[var(--bpdm-card)] shadow-sm">
       <bpdm-calendar [(value)]="date" dayShape="square" />
     </div>
   \`,
@@ -404,7 +404,7 @@ export const Invalid: Story = {
   render: () => ({
     template: `<div class="w-72 space-y-1.5">
   <bpdm-date-picker invalid placeholder="Required" />
-  <p class="text-xs text-destructive-strong">Please choose a date.</p>
+  <p class="text-xs text-[var(--bpdm-destructive-strong)]">Please choose a date.</p>
 </div>`,
   }),
   parameters: {
@@ -419,7 +419,7 @@ import { BpdmDatePicker } from '@bpdm/ng';
   template: \`
     <div class="space-y-1.5">
       <bpdm-date-picker invalid placeholder="Required" />
-      <p class="text-xs text-destructive-strong">Please choose a date.</p>
+      <p class="text-xs text-[var(--bpdm-destructive-strong)]">Please choose a date.</p>
     </div>
   \`,
 })

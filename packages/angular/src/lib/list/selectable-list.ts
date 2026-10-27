@@ -37,14 +37,14 @@ import {
   imports: [NgTemplateOutlet],
   host: { class: "flex min-w-0 flex-1" },
   template: `
-    <div data-bpdm-slot="selectable-list" class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+    <div data-bpdm-slot="selectable-list" class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)]">
       @if (header()) {
-        <div [id]="headerId()" class="border-b border-border px-3 py-2 text-sm font-semibold">{{ header() }}</div>
+        <div [id]="headerId()" class="border-b border-[var(--bpdm-border)] px-3 py-2 text-sm font-semibold">{{ header() }}</div>
       }
 
       @if (filterBy()) {
-        <div class="flex items-center gap-2 border-b border-border px-3">
-          <svg viewBox="0 0 16 16" fill="none" class="size-4 shrink-0 text-muted-foreground" aria-hidden="true">
+        <div class="flex items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
+          <svg viewBox="0 0 16 16" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
             <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" />
             <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
@@ -54,7 +54,7 @@ import {
             (input)="query.set($any($event.target).value)"
             [attr.placeholder]="filterPlaceholder()"
             [attr.aria-label]="filterPlaceholder()"
-            class="h-9 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            class="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
           />
         </div>
       }
@@ -74,7 +74,7 @@ import {
         [style.max-height]="scrollHeight()"
       >
         @if (shown().length === 0) {
-          <div data-bpdm-slot="selectable-list-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">{{ emptyText() }}</div>
+          <div data-bpdm-slot="selectable-list-empty" class="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{{ emptyText() }}</div>
         } @else {
           @for (item of shown(); track keyOf()(item)) {
             @let key = keyOf()(item);
@@ -94,7 +94,7 @@ import {
               [class]="rowClass(key, item)"
             >
               @if (canDrag() && !isDisabled(item)) {
-                <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 cursor-grab text-muted-foreground/50 transition-colors active:cursor-grabbing group-hover:text-muted-foreground" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 cursor-grab text-[var(--bpdm-muted-foreground)]/50 transition-colors active:cursor-grabbing group-hover:text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                   <circle cx="9" cy="6" r="1" fill="currentColor" /><circle cx="9" cy="12" r="1" fill="currentColor" /><circle cx="9" cy="18" r="1" fill="currentColor" />
                   <circle cx="15" cy="6" r="1" fill="currentColor" /><circle cx="15" cy="12" r="1" fill="currentColor" /><circle cx="15" cy="18" r="1" fill="currentColor" />
                 </svg>
@@ -216,19 +216,19 @@ export class BpdmSelectableList<T = unknown> {
     const solidAccent = !disabled && (isSel || over);
     const kbdAccent = !disabled && isActive && !isSel && !over;
     return cn(
-      "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
+      "group relative flex items-center gap-2 overflow-hidden rounded-[calc(var(--bpdm-radius)-3px)] px-2.5 py-2 text-sm transition-[background-color,transform] duration-[var(--bpdm-duration-fast)]",
       // gentle settle-in when an item is added / transferred into this list
       "animate-[bpdm-list-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] motion-reduce:animate-none",
       // primary inline-start accent bar is the single visual language — it marks the
       // selection, the keyboard-active option, AND the drag drop-target. RTL-safe.
-      "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--radius)-3px)] before:bg-primary before:transition-opacity",
+      "before:absolute before:inset-y-0 before:start-0 before:w-1 before:rounded-s-[calc(var(--bpdm-radius)-3px)] before:bg-[var(--bpdm-primary)] before:transition-opacity",
       disabled
-        ? "cursor-not-allowed text-muted-foreground opacity-60"
+        ? "cursor-not-allowed text-[var(--bpdm-muted-foreground)] opacity-60"
         : cn(
             "cursor-pointer active:scale-[0.99]",
             isSel
-              ? "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-foreground"
-              : "text-foreground hover:bg-muted",
+              ? "bg-[color-mix(in_srgb,var(--bpdm-primary)_14%,transparent)] text-[var(--bpdm-foreground)]"
+              : "text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]",
           ),
       solidAccent ? "before:opacity-100" : "before:opacity-0",
       // keyboard-active accent: only when the listbox itself is focus-visible

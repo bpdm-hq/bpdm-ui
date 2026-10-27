@@ -195,34 +195,34 @@ interface VariantLook {
 }
 
 const VARIANTS: Record<ToastVariant, VariantLook> = {
-  default: { hasIcon: false, fg: "", accent: "before:bg-border", bar: "bg-border", tint: "" },
+  default: { hasIcon: false, fg: "", accent: "before:bg-[var(--bpdm-border)]", bar: "bg-[var(--bpdm-border)]", tint: "" },
   success: {
     hasIcon: true,
-    fg: "text-success",
-    accent: "before:bg-success",
-    bar: "bg-success",
-    tint: "bg-[color-mix(in_srgb,var(--success)_16%,transparent)]",
+    fg: "text-[var(--bpdm-success)]",
+    accent: "before:bg-[var(--bpdm-success)]",
+    bar: "bg-[var(--bpdm-success)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-success)_16%,transparent)]",
   },
   error: {
     hasIcon: true,
-    fg: "text-destructive",
-    accent: "before:bg-destructive",
-    bar: "bg-destructive",
-    tint: "bg-[color-mix(in_srgb,var(--destructive)_16%,transparent)]",
+    fg: "text-[var(--bpdm-destructive)]",
+    accent: "before:bg-[var(--bpdm-destructive)]",
+    bar: "bg-[var(--bpdm-destructive)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-destructive)_16%,transparent)]",
   },
   warning: {
     hasIcon: true,
-    fg: "text-warning",
-    accent: "before:bg-warning",
-    bar: "bg-warning",
-    tint: "bg-[color-mix(in_srgb,var(--warning)_16%,transparent)]",
+    fg: "text-[var(--bpdm-warning)]",
+    accent: "before:bg-[var(--bpdm-warning)]",
+    bar: "bg-[var(--bpdm-warning)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-warning)_16%,transparent)]",
   },
   info: {
     hasIcon: true,
-    fg: "text-info",
-    accent: "before:bg-info",
-    bar: "bg-info",
-    tint: "bg-[color-mix(in_srgb,var(--info)_16%,transparent)]",
+    fg: "text-[var(--bpdm-info)]",
+    accent: "before:bg-[var(--bpdm-info)]",
+    bar: "bg-[var(--bpdm-info)]",
+    tint: "bg-[color-mix(in_srgb,var(--bpdm-info)_16%,transparent)]",
   },
 };
 
@@ -290,8 +290,8 @@ const SWIPE_THRESHOLD = 45;
 
     @switch (leadingKind()) {
       @case ("loading") {
-        <span [class]="iconBoxClass('bg-muted')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 animate-spin text-muted-foreground" aria-hidden="true">
+        <span [class]="iconBoxClass('bg-[var(--bpdm-muted)]')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 animate-spin text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
           </svg>
         </span>
@@ -326,7 +326,7 @@ const SWIPE_THRESHOLD = 45;
     <div class="min-w-0 flex-1">
       <p data-bpdm-slot="toast-title" class="m-0 text-sm font-semibold">{{ record().title }}</p>
       @if (record().description != null) {
-        <p data-bpdm-slot="toast-description" class="m-0 mt-1 text-sm text-muted-foreground">{{ record().description }}</p>
+        <p data-bpdm-slot="toast-description" class="m-0 mt-1 text-sm text-[var(--bpdm-muted-foreground)]">{{ record().description }}</p>
       }
       @if (record().action; as action) {
         <div class="mt-2.5">
@@ -334,7 +334,7 @@ const SWIPE_THRESHOLD = 45;
             type="button"
             data-bpdm-slot="toast-action"
             (click)="onAction(action)"
-            class="inline-flex h-7 items-center rounded-md border border-border bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
           >
             {{ action.label }}
           </button>
@@ -348,7 +348,7 @@ const SWIPE_THRESHOLD = 45;
         data-bpdm-slot="toast-close"
         [attr.aria-label]="dismissLabel()"
         (click)="beginClose()"
-        class="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+        class="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
           <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -396,7 +396,7 @@ export class BpdmToastItem {
 
   protected readonly rootClass = computed(() =>
     cn(
-      "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg transition-shadow hover:shadow-xl",
+      "group pointer-events-auto relative flex w-full gap-3 overflow-hidden rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4 text-[var(--bpdm-card-foreground)] shadow-lg transition-shadow hover:shadow-xl",
       this.compact() ? "items-center" : "items-start",
       // accent track on the inline-START edge (logical → correct under RTL)
       "before:absolute before:inset-y-0 before:start-0 before:w-1 before:content-['']",

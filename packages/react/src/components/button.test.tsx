@@ -37,7 +37,7 @@ describe("Button", () => {
       </Button>,
     );
     const btn = screen.getByRole("button", { name: "Delete" });
-    expect(btn.className).toContain("border-destructive"); // outline colour
+    expect(btn.className).toContain("border-[var(--bpdm-destructive)]"); // outline colour
     expect(btn.className).toContain("border"); // outline appearance
     expect(btn.className).toContain("h-12"); // lg
     expect(btn.className).toContain("rounded-full"); // round
@@ -47,7 +47,7 @@ describe("Button", () => {
     render(<Button className="bg-red-500">X</Button>);
     const tokens = screen.getByRole("button", { name: "X" }).className.split(/\s+/);
     expect(tokens).toContain("bg-red-500");
-    expect(tokens).not.toContain("bg-primary"); // base fill dropped in our favour
+    expect(tokens).not.toContain("bg-[var(--bpdm-primary)]"); // base fill dropped in our favour
   });
 
   it("defaults type to button, but respects an explicit type", () => {

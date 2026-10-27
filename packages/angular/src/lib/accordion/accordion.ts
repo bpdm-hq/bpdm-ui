@@ -36,15 +36,15 @@ interface AccordionRow {
 
 const ITEM_VARIANT: Record<AccordionVariant, string> = {
   separated:
-    "rounded-[var(--radius)] border border-border bg-card transition-shadow data-[state=open]:shadow-sm",
-  borderless: "border-b border-border",
-  default: "border-b border-border last:border-b-0",
+    "rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] transition-shadow data-[state=open]:shadow-sm",
+  borderless: "border-b border-[var(--bpdm-border)]",
+  default: "border-b border-[var(--bpdm-border)] last:border-b-0",
 };
 const TRIGGER_VARIANT: Record<AccordionVariant, string> = {
-  separated: "px-4 py-3.5 font-medium text-foreground hover:bg-muted/50",
-  default: "px-4 py-3.5 font-medium text-foreground hover:bg-muted/50",
+  separated: "px-4 py-3.5 font-medium text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]/50",
+  default: "px-4 py-3.5 font-medium text-[var(--bpdm-foreground)] hover:bg-[var(--bpdm-muted)]/50",
   borderless:
-    "px-0 py-4 font-medium text-muted-foreground hover:text-foreground data-[state=open]:text-foreground",
+    "px-0 py-4 font-medium text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)] data-[state=open]:text-[var(--bpdm-foreground)]",
 };
 const CONTENT_PAD: Record<AccordionVariant, string> = {
   separated: "px-4 pb-4",
@@ -54,7 +54,7 @@ const CONTENT_PAD: Record<AccordionVariant, string> = {
 const ROOT_VARIANT: Record<AccordionVariant, string> = {
   separated: "flex flex-col gap-2",
   borderless: "",
-  default: "overflow-hidden rounded-[var(--radius)] border border-border",
+  default: "overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)]",
 };
 
 // process-wide counter so every accordion instance gets collision-free ids
@@ -106,9 +106,9 @@ let accordionUid = 0;
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-4 shrink-0 text-muted-foreground transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]"
+              class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]"
               [class.rotate-180]="row.open"
-              [class.!text-foreground]="row.open"
+              [class.!text-[var(--bpdm-foreground)]]="row.open"
               aria-hidden="true"
             >
               <path d="m6 9 6 6 6-6" />
@@ -160,12 +160,12 @@ export class BpdmAccordion {
   protected readonly itemClass = computed(() => ITEM_VARIANT[this.variant()]);
   protected readonly triggerClass = computed(() =>
     cn(
-      "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold",
+      "group flex flex-1 cursor-pointer items-center gap-3 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:font-semibold",
       TRIGGER_VARIANT[this.variant()],
     ),
   );
   protected readonly contentClass = computed(() =>
-    cn("pt-0 text-sm leading-relaxed text-muted-foreground", CONTENT_PAD[this.variant()]),
+    cn("pt-0 text-sm leading-relaxed text-[var(--bpdm-muted-foreground)]", CONTENT_PAD[this.variant()]),
   );
 
   /** Open state + trigger/panel ids, recomputed only when items or open-set change. */

@@ -6,14 +6,14 @@ import { cva, type VariantProps } from "class-variance-authority";
  * `aria-invalid="true"`. Framework-agnostic: shared by the React and Angular inputs.
  */
 export const inputVariants = cva(
-  "flex w-full text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-foreground",
+  "flex w-full text-[var(--bpdm-foreground)] transition-colors placeholder:text-[var(--bpdm-muted-foreground)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:font-medium file:text-[var(--bpdm-foreground)]",
   {
     variants: {
       variant: {
         outline:
-          "rounded-[var(--radius)] border border-input bg-background shadow-sm focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+          "rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] shadow-sm focus-visible:border-[var(--bpdm-ring)] focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
         underline:
-          "rounded-none border-0 border-b border-input bg-transparent focus-visible:border-b-ring aria-[invalid=true]:border-b-destructive",
+          "rounded-none border-0 border-b border-[var(--bpdm-input)] bg-transparent focus-visible:border-b-ring aria-[invalid=true]:border-b-destructive",
       },
       size: {
         sm: "h-8 text-sm file:text-sm",

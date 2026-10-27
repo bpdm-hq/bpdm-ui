@@ -41,10 +41,10 @@ let dwid = 0;
 
 // edge anchor + border on the inner edge + the full cross-axis dimension
 const SIDE_BASE: Record<DrawerSide, string> = {
-  right: "h-dvh border-l border-border",
-  left: "h-dvh border-r border-border",
-  top: "w-dvw border-b border-border",
-  bottom: "w-dvw border-t border-border",
+  right: "h-dvh border-l border-[var(--bpdm-border)]",
+  left: "h-dvh border-r border-[var(--bpdm-border)]",
+  top: "w-dvw border-b border-[var(--bpdm-border)]",
+  bottom: "w-dvw border-t border-[var(--bpdm-border)]",
 };
 
 const ENTER: Record<DrawerSide, string> = {
@@ -211,7 +211,7 @@ export class BpdmDrawer implements OnDestroy {
     ref.setInput(
       "panelClass",
       cn(
-        "relative z-50 flex flex-col bg-popover text-popover-foreground shadow-xl outline-none",
+        "relative z-50 flex flex-col bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-xl outline-none",
         SIDE_BASE[side],
         sizeClass(side, this.size()),
       ),

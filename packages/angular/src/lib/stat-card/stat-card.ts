@@ -53,14 +53,14 @@ let statCardUid = 0;
   template: `
     @if (loading()) {
       <div class="min-w-0 flex-1 space-y-2.5">
-        <div class="h-3.5 w-24 animate-pulse rounded bg-muted"></div>
-        <div class="h-7 w-28 animate-pulse rounded bg-muted"></div>
-        <div class="h-3.5 w-32 animate-pulse rounded bg-muted"></div>
+        <div class="h-3.5 w-24 animate-pulse rounded bg-[var(--bpdm-muted)]"></div>
+        <div class="h-7 w-28 animate-pulse rounded bg-[var(--bpdm-muted)]"></div>
+        <div class="h-3.5 w-32 animate-pulse rounded bg-[var(--bpdm-muted)]"></div>
       </div>
-      <div class="size-12 shrink-0 animate-pulse rounded-full bg-muted"></div>
+      <div class="size-12 shrink-0 animate-pulse rounded-full bg-[var(--bpdm-muted)]"></div>
     } @else {
     <div class="min-w-0">
-      <p data-bpdm-slot="stat-card-label" [id]="labelId" class="m-0 truncate text-sm text-muted-foreground">{{ label() }}</p>
+      <p data-bpdm-slot="stat-card-label" [id]="labelId" class="m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]">{{ label() }}</p>
       <p data-bpdm-slot="stat-card-value" class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
       @if (hasDelta()) {
         <div data-bpdm-slot="stat-card-delta" class="mt-1.5 flex items-center gap-1.5 text-sm">
@@ -79,7 +79,7 @@ let statCardUid = 0;
             <span aria-hidden="true">{{ neutral() ? "0" : deltaNum() }}%</span>
           </span>
           @if (deltaLabel()) {
-            <span class="text-muted-foreground">{{ deltaLabel() }}</span>
+            <span class="text-[var(--bpdm-muted-foreground)]">{{ deltaLabel() }}</span>
           }
         </div>
       }
@@ -91,8 +91,8 @@ let statCardUid = 0;
       [style.background-color]="badgeBg()"
       [style.color]="accent() || null"
       class="grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5 empty:hidden"
-      [class.bg-muted]="!accent()"
-      [class.text-muted-foreground]="!accent()"
+      [class.bg-[var(--bpdm-muted)]]="!accent()"
+      [class.text-[var(--bpdm-muted-foreground)]]="!accent()"
     >
       <ng-content select="[bpdmStatCardIcon]" />
     </span>
@@ -140,20 +140,20 @@ export class BpdmStatCard {
     return `${this.up() ? this.t().increased : this.t().decreased} ${this.deltaNum()}%`;
   });
   protected readonly deltaColor = computed(() => {
-    if (this.neutral()) return "text-muted-foreground";
+    if (this.neutral()) return "text-[var(--bpdm-muted-foreground)]";
     const good = this.positiveIsGood() ? this.up() : !this.up();
-    return good ? "text-success-strong" : "text-destructive-strong";
+    return good ? "text-[var(--bpdm-success-strong)]" : "text-[var(--bpdm-destructive-strong)]";
   });
 
   protected readonly cardClass = computed(() =>
     cn(
-      "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
-      this.accent() && !this.loading() ? "border-transparent" : "border-border bg-card",
+      "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-[var(--bpdm-card-foreground)] shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
+      this.accent() && !this.loading() ? "border-transparent" : "border-[var(--bpdm-border)] bg-[var(--bpdm-card)]",
       this.classInput(),
     ),
   );
   protected readonly cardBg = computed(() =>
-    this.accent() && !this.loading() ? `color-mix(in srgb, ${this.accent()} 8%, var(--card))` : null,
+    this.accent() && !this.loading() ? `color-mix(in srgb, ${this.accent()} 8%, var(--bpdm-card))` : null,
   );
   protected readonly badgeBg = computed(() =>
     this.accent() ? `color-mix(in srgb, ${this.accent()} 14%, transparent)` : null,

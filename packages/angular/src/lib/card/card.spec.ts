@@ -46,7 +46,7 @@ describe("BpdmCard", () => {
     const fixture = TestBed.createComponent(CardHost);
     fixture.detectChanges();
     const card = fixture.nativeElement.querySelector("bpdm-card") as HTMLElement;
-    expect(card.classList.contains("border-border")).toBe(true); // outlined
+    expect(card.classList.contains("border-[var(--bpdm-border)]")).toBe(true); // outlined
     expect(card.classList.contains("rounded-2xl")).toBe(true); // shared base
   });
 

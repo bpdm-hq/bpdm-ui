@@ -79,7 +79,7 @@ describe("BpdmBadge", () => {
     const fixture = TestBed.createComponent(BadgeHost);
     fixture.detectChanges();
     const badge = fixture.nativeElement.querySelector("span.inline-flex") as HTMLElement;
-    expect(badge.className).toContain("bg-success"); // success/solid
+    expect(badge.className).toContain("bg-[var(--bpdm-success)]"); // success/solid
     expect(badge.textContent).toContain("Active");
   });
 

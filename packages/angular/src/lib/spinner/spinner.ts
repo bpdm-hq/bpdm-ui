@@ -97,7 +97,7 @@ export class BpdmSpinner {
   protected readonly t = computed(() => ({ ...DEFAULT_SPINNER_MESSAGES, ...this.messages() }));
   protected readonly s = computed(() => spinnerSize[this.size()]);
   protected readonly hostClass = computed(() =>
-    cn("inline-flex items-center justify-center text-primary", this.classInput()),
+    cn("inline-flex items-center justify-center text-[var(--bpdm-primary)]", this.classInput()),
   );
 
   // a conic "comet" ring, masked to a ring of the size's thickness
@@ -147,7 +147,7 @@ export class BpdmSpinner {
          when there's no visible message. -->
     <bpdm-spinner [variant]="variant()" [size]="spinnerSize()" [announce]="false" />
     @if (label()) {
-      <p data-bpdm-slot="loading-overlay-label" class="m-0 text-sm font-medium text-muted-foreground">{{ label() }}</p>
+      <p data-bpdm-slot="loading-overlay-label" class="m-0 text-sm font-medium text-[var(--bpdm-muted-foreground)]">{{ label() }}</p>
     } @else {
       <span class="sr-only">{{ t().loading }}</span>
     }
@@ -174,7 +174,7 @@ export class BpdmLoadingOverlay {
   );
   protected readonly hostClass = computed(() =>
     cn(
-      "z-50 flex flex-col items-center justify-center gap-3 bg-background/60 animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
+      "z-50 flex flex-col items-center justify-center gap-3 bg-[var(--bpdm-background)]/60 animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
       this.fullPage() ? "fixed inset-0" : "absolute inset-0 rounded-[inherit]",
       this.blur() && "backdrop-blur-sm",
     ),

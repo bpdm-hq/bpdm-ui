@@ -44,7 +44,7 @@ describe("BpdmProgressBar", () => {
     expect(bar.getAttribute("aria-valuemax")).toBe("100");
     expect(bar.getAttribute("aria-valuetext")).toBe("50%");
     const fill = bar.querySelector("span.block") as HTMLElement;
-    expect(fill.className).toContain("bg-success");
+    expect(fill.className).toContain("bg-[var(--bpdm-success)]");
     expect(fill.style.width).toBe("50%");
     expect(fixture.nativeElement.textContent).toContain("Uploading"); // header label
   });

@@ -87,7 +87,7 @@ export const Variants: Story = {
     <div className="flex flex-col gap-3">
       {(["soft", "solid", "outline"] as const).map((appearance) => (
         <div key={appearance} className="flex flex-wrap items-center gap-2">
-          <span className="w-16 text-xs text-muted-foreground">{appearance}</span>
+          <span className="w-16 text-xs text-[var(--bpdm-muted-foreground)]">{appearance}</span>
           {VARIANTS.map((variant) => (
             <Badge key={variant} variant={variant} appearance={appearance}>
               {variant}

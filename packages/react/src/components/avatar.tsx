@@ -86,7 +86,7 @@ export const Avatar = React.forwardRef<
     const tint =
       colorful && initials
         ? avatarTint(name ?? "")
-        : "bg-muted text-muted-foreground";
+        : "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]";
     const t = React.useMemo(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...messages }), [messages]);
 
     return (
@@ -103,7 +103,7 @@ export const Avatar = React.forwardRef<
           className={cn(
             "flex size-full items-center justify-center overflow-hidden",
             shape === "circle" ? "rounded-full" : "rounded-[28%]",
-            ring && "ring-2 ring-background",
+            ring && "ring-2 ring-[var(--bpdm-background)]",
           )}
         >
           {src && (
@@ -136,7 +136,7 @@ export const Avatar = React.forwardRef<
             role="img"
             data-bpdm-slot="avatar-status"
             className={cn(
-              "absolute z-10 rounded-full ring-2 ring-background",
+              "absolute z-10 rounded-full ring-2 ring-[var(--bpdm-background)]",
               STATUS_COLOR[status],
               // ~28% of the avatar, nudged onto the lower-inline-end edge
               "size-[28%] min-h-2 min-w-2",
@@ -213,7 +213,7 @@ export function AvatarGroup({ children, max, size = "md", messages, className }:
           aria-label={t.more.replace("{count}", String(overflow))}
           data-bpdm-slot="avatar-group-overflow"
           className={cn(
-            "relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
+            "relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--bpdm-muted)] font-semibold text-[var(--bpdm-muted-foreground)] ring-2 ring-[var(--bpdm-background)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
             SIZE[size],
           )}
         >

@@ -50,7 +50,7 @@ interface OtpCell {
 }
 
 const BASE_CELL =
-  "relative border border-input bg-background text-center font-medium text-foreground shadow-sm transition-[color,border-color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] focus:z-10 focus:scale-[1.08] focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+  "relative border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-center font-medium text-[var(--bpdm-foreground)] shadow-sm transition-[color,border-color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] focus:z-10 focus:scale-[1.08] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50";
 
 /**
  * `<bpdm-input-otp>` — one-time-code input: one box per character with
@@ -80,7 +80,7 @@ const BASE_CELL =
       >
         @for (group of groups(); track groupIndex; let groupIndex = $index) {
           @if (groupIndex > 0) {
-            <span aria-hidden="true" class="select-none px-1 text-muted-foreground">{{ separator() }}</span>
+            <span aria-hidden="true" class="select-none px-1 text-[var(--bpdm-muted-foreground)]">{{ separator() }}</span>
           }
           <div class="flex items-center">
             @for (cell of group; track cell.i) {
@@ -225,10 +225,10 @@ export class BpdmInputOtp {
         ? cn(
             "rounded-none",
             !cell.isFirst && "-ms-px",
-            cell.isFirst && "rounded-s-[var(--radius)]",
-            cell.isLast && "rounded-e-[var(--radius)]",
+            cell.isFirst && "rounded-s-[var(--bpdm-radius)]",
+            cell.isLast && "rounded-e-[var(--bpdm-radius)]",
           )
-        : "rounded-[var(--radius)]",
+        : "rounded-[var(--bpdm-radius)]",
     );
   }
 

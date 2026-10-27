@@ -212,10 +212,10 @@ export const WithIcons: Story = {
 import { Select } from "@bpdm/ui";
 
 const options = [
-  { value: "todo", label: "Todo", icon: <Circle className="size-4 text-muted-foreground" /> },
-  { value: "in-progress", label: "In progress", icon: <CircleDashed className="size-4 text-primary" /> },
-  { value: "done", label: "Done", icon: <CircleCheck className="size-4 text-primary" /> },
-  { value: "canceled", label: "Canceled", icon: <CircleX className="size-4 text-destructive" /> },
+  { value: "todo", label: "Todo", icon: <Circle className="size-4 text-[var(--bpdm-muted-foreground)]" /> },
+  { value: "in-progress", label: "In progress", icon: <CircleDashed className="size-4 text-[var(--bpdm-primary)]" /> },
+  { value: "done", label: "Done", icon: <CircleCheck className="size-4 text-[var(--bpdm-primary)]" /> },
+  { value: "canceled", label: "Canceled", icon: <CircleX className="size-4 text-[var(--bpdm-destructive)]" /> },
 ];
 
 export function Example() {
@@ -230,10 +230,10 @@ export function Example() {
         defaultValue="in-progress"
         placeholder="Set status"
         options={[
-          { value: "todo", label: "Todo", icon: <Circle className="size-4 text-muted-foreground" /> },
-          { value: "in-progress", label: "In progress", icon: <CircleDashed className="size-4 text-primary" /> },
-          { value: "done", label: "Done", icon: <CircleCheck className="size-4 text-primary" /> },
-          { value: "canceled", label: "Canceled", icon: <CircleX className="size-4 text-destructive" /> },
+          { value: "todo", label: "Todo", icon: <Circle className="size-4 text-[var(--bpdm-muted-foreground)]" /> },
+          { value: "in-progress", label: "In progress", icon: <CircleDashed className="size-4 text-[var(--bpdm-primary)]" /> },
+          { value: "done", label: "Done", icon: <CircleCheck className="size-4 text-[var(--bpdm-primary)]" /> },
+          { value: "canceled", label: "Canceled", icon: <CircleX className="size-4 text-[var(--bpdm-destructive)]" /> },
         ]}
       />
     </div>
@@ -289,7 +289,7 @@ export function Example() {
   return (
     <div className="flex w-72 flex-col gap-1.5">
       <Select aria-invalid options={frameworks} placeholder="Required" />
-      <p className="text-sm text-destructive-strong">Please choose a framework.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Please choose a framework.</p>
     </div>
   );
 }`,
@@ -299,7 +299,7 @@ export function Example() {
   render: () => (
     <div className="flex w-72 flex-col gap-1.5">
       <Select aria-invalid options={FRAMEWORKS} placeholder="Required" />
-      <p className="text-sm text-destructive-strong">Please choose a framework.</p>
+      <p className="text-sm text-[var(--bpdm-destructive-strong)]">Please choose a framework.</p>
     </div>
   ),
 };

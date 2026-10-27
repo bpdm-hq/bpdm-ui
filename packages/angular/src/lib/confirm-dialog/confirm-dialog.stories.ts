@@ -10,7 +10,7 @@ import { BpdmConfirm } from "./confirm-dialog";
   template: `<div class="flex items-center gap-3">
     <button bpdmButton variant="destructive" (click)="run()">Delete project</button>
     @if (result()) {
-      <span class="text-sm text-muted-foreground">{{ result() }}</span>
+      <span class="text-sm text-[var(--bpdm-muted-foreground)]">{{ result() }}</span>
     }
   </div>`,
 })
@@ -34,7 +34,7 @@ class DeleteDemo {
   template: `<div class="flex items-center gap-3">
     <button bpdmButton (click)="run()">Publish</button>
     @if (result()) {
-      <span class="text-sm text-muted-foreground">{{ result() }}</span>
+      <span class="text-sm text-[var(--bpdm-muted-foreground)]">{{ result() }}</span>
     }
   </div>`,
 })

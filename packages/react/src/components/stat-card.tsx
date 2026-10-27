@@ -87,16 +87,16 @@ export function StatCard({
         aria-label={`${label} ${t.loading}`}
         data-bpdm="" data-bpdm-slot="stat-card"
         className={cn(
-          "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm",
+          "flex items-center justify-between gap-4 rounded-2xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm",
           className,
         )}
       >
         <div className="min-w-0 flex-1 space-y-2.5">
-          <div className="h-3.5 w-24 animate-pulse rounded bg-muted" />
-          <div className="h-7 w-28 animate-pulse rounded bg-muted" />
-          <div className="h-3.5 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-3.5 w-24 animate-pulse rounded bg-[var(--bpdm-muted)]" />
+          <div className="h-7 w-28 animate-pulse rounded bg-[var(--bpdm-muted)]" />
+          <div className="h-3.5 w-32 animate-pulse rounded bg-[var(--bpdm-muted)]" />
         </div>
-        <div className="size-12 shrink-0 animate-pulse rounded-full bg-muted" />
+        <div className="size-12 shrink-0 animate-pulse rounded-full bg-[var(--bpdm-muted)]" />
       </div>
     );
   }
@@ -106,10 +106,10 @@ export function StatCard({
   const neutral = (delta ?? 0) === 0;
   const good = positiveIsGood ? up : !up;
   const deltaColor = neutral
-    ? "text-muted-foreground"
+    ? "text-[var(--bpdm-muted-foreground)]"
     : good
-      ? "text-success-strong"
-      : "text-destructive-strong";
+      ? "text-[var(--bpdm-success-strong)]"
+      : "text-[var(--bpdm-destructive-strong)]";
   const deltaNum = hasDelta ? new Intl.NumberFormat(locale).format(Math.abs(delta as number)) : "";
   // screen-reader alternative: convey the DIRECTION that the arrow/colour show visually
   const deltaSr = neutral
@@ -118,7 +118,7 @@ export function StatCard({
 
   // soft tint background, NO coloured border (the tint is the only fill)
   const cardStyle: React.CSSProperties = accent
-    ? { backgroundColor: `color-mix(in srgb, ${accent} 8%, var(--card))` }
+    ? { backgroundColor: `color-mix(in srgb, ${accent} 8%, var(--bpdm-card))` }
     : {};
   const badgeStyle: React.CSSProperties = accent
     ? { backgroundColor: `color-mix(in srgb, ${accent} 14%, transparent)`, color: accent }
@@ -131,13 +131,13 @@ export function StatCard({
       style={cardStyle}
       data-bpdm="" data-bpdm-slot="stat-card"
       className={cn(
-        "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-card-foreground shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
-        accent ? "border-transparent" : "border-border bg-card",
+        "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-[var(--bpdm-card-foreground)] shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
+        accent ? "border-transparent" : "border-[var(--bpdm-border)] bg-[var(--bpdm-card)]",
         className,
       )}
     >
       <div className="min-w-0">
-        <p id={labelId} data-bpdm-slot="stat-card-label" className="m-0 truncate text-sm text-muted-foreground">
+        <p id={labelId} data-bpdm-slot="stat-card-label" className="m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]">
           {label}
         </p>
         <p data-bpdm-slot="stat-card-value" className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">
@@ -153,7 +153,7 @@ export function StatCard({
               {!neutral && <Arrow up={up} />}
               <span aria-hidden="true">{neutral ? "0" : deltaNum}%</span>
             </span>
-            {deltaLabel && <span className="text-muted-foreground">{deltaLabel}</span>}
+            {deltaLabel && <span className="text-[var(--bpdm-muted-foreground)]">{deltaLabel}</span>}
           </div>
         )}
       </div>
@@ -165,7 +165,7 @@ export function StatCard({
           data-bpdm-slot="stat-card-icon"
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5",
-            !accent && "bg-muted text-muted-foreground",
+            !accent && "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]",
           )}
         >
           {icon}

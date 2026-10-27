@@ -104,7 +104,7 @@ export class BpdmAlertActions {}
             type="button"
             (click)="dismiss()"
             [attr.aria-label]="t().dismiss"
-            class="absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
             [class]="closeClass()"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
@@ -155,7 +155,7 @@ export class BpdmAlert {
     const base = "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4";
     const a = this.appearance();
     if (a === "solid") return cn(base, this.tone().solid);
-    if (a === "outline") return cn(base, "bg-card text-card-foreground shadow-sm", this.tone().outline);
+    if (a === "outline") return cn(base, "bg-[var(--bpdm-card)] text-[var(--bpdm-card-foreground)] shadow-sm", this.tone().outline);
     // soft = tinted inline-message surface (distinct from the white floating Toast)
     return cn(base, this.tone().soft);
   });
@@ -173,11 +173,11 @@ export class BpdmAlert {
     if (a === "solid") return "size-4";
     return cn("size-4", this.tone().fg); // outline
   });
-  protected readonly bodyClass = computed(() => (this.solid() ? "text-current" : "text-muted-foreground"));
+  protected readonly bodyClass = computed(() => (this.solid() ? "text-current" : "text-[var(--bpdm-muted-foreground)]"));
   protected readonly closeClass = computed(() =>
     this.solid()
       ? "text-current/70 hover:bg-white/15 hover:text-current"
-      : "text-muted-foreground/70 hover:bg-muted hover:text-foreground",
+      : "text-[var(--bpdm-muted-foreground)]/70 hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]",
   );
 
   protected dismiss(): void {

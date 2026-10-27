@@ -48,7 +48,7 @@ import { cn } from "@bpdm/variants";
           {{ title() || fallbackTitle() }}
         </h2>
         @if (description()) {
-          <p [attr.data-bpdm-slot]="slotBase() + '-description'" [attr.id]="descId()" class="m-0 text-sm text-muted-foreground">{{ description() }}</p>
+          <p [attr.data-bpdm-slot]="slotBase() + '-description'" [attr.id]="descId()" class="m-0 text-sm text-[var(--bpdm-muted-foreground)]">{{ description() }}</p>
         }
       </div>
       @if (body()) {
@@ -67,7 +67,7 @@ import { cn } from "@bpdm/variants";
           [attr.data-bpdm-slot]="slotBase() + '-close'"
           [attr.aria-label]="closeLabel()"
           (click)="dismiss.emit()"
-          class="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          class="absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           <svg
             viewBox="0 0 24 24"

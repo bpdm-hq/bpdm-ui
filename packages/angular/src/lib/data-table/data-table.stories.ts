@@ -124,9 +124,9 @@ const HUGE: Member[] = Array.from({ length: 10000 }, (_, i) => {
 
 const STATUS_STYLE: Record<Member["status"], string> = {
   // mirror Badge `soft` tones — the `-strong` text ramp clears 4.5:1 on the tint
-  active: "bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-success-strong",
-  invited: "bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] text-primary-strong",
-  disabled: "bg-muted text-muted-foreground",
+  active: "bg-[color-mix(in_srgb,var(--bpdm-success)_18%,transparent)] text-[var(--bpdm-success-strong)]",
+  invited: "bg-[color-mix(in_srgb,var(--bpdm-primary)_18%,transparent)] text-[var(--bpdm-primary-strong)]",
+  disabled: "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]",
 };
 
 /* ------------------------------------------------------------------ *
@@ -231,7 +231,7 @@ class DtMembersHost {
     <div class="flex flex-col gap-6">
       @for (s of sizes; track s) {
         <div>
-          <p class="mb-1.5 font-mono text-xs text-muted-foreground">size="{{ s }}"</p>
+          <p class="mb-1.5 font-mono text-xs text-[var(--bpdm-muted-foreground)]">size="{{ s }}"</p>
           <bpdm-data-table [columns]="columns()" [data]="data" [rowKey]="rowKey" [size]="s" />
         </div>
       }
@@ -268,10 +268,10 @@ class DtSizesHost {
       <div class="flex h-9 items-center gap-3">
         @if (selected().length > 0) {
           <span class="text-sm font-medium">{{ selected().length }} selected</span>
-          <button type="button" (click)="selected.set([])" class="rounded-lg border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground">Clear</button>
-          <button type="button" class="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground">Remove</button>
+          <button type="button" (click)="selected.set([])" class="rounded-lg border border-[var(--bpdm-border)] px-3 py-1 text-sm text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)]">Clear</button>
+          <button type="button" class="rounded-lg bg-[var(--bpdm-destructive)] px-3 py-1 text-sm font-medium text-[var(--bpdm-destructive-foreground)]">Remove</button>
         } @else {
-          <span class="text-sm text-muted-foreground">Select rows to act on them.</span>
+          <span class="text-sm text-[var(--bpdm-muted-foreground)]">Select rows to act on them.</span>
         }
       </div>
       <bpdm-data-table
@@ -457,24 +457,24 @@ class DtBorderlessHost {
     </ng-template>
     <ng-template #details let-row>
       <div class="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-        <section class="rounded-lg border border-border bg-card p-4">
-          <p class="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">Task activity</p>
+        <section class="rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4">
+          <p class="mb-3 text-xs font-medium uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Task activity</p>
           <dl class="space-y-2 text-sm tabular-nums">
-            <div class="flex items-center justify-between"><dt class="text-muted-foreground">Assigned</dt><dd>{{ row.tasks }}</dd></div>
-            <div class="flex items-center justify-between"><dt class="text-muted-foreground">Completed</dt><dd class="text-success">{{ completed(row.tasks) }}</dd></div>
-            <div class="mt-1 flex items-center justify-between border-t border-border pt-2 text-base font-semibold"><dt>Open</dt><dd>{{ row.tasks - completed(row.tasks) }}</dd></div>
+            <div class="flex items-center justify-between"><dt class="text-[var(--bpdm-muted-foreground)]">Assigned</dt><dd>{{ row.tasks }}</dd></div>
+            <div class="flex items-center justify-between"><dt class="text-[var(--bpdm-muted-foreground)]">Completed</dt><dd class="text-[var(--bpdm-success)]">{{ completed(row.tasks) }}</dd></div>
+            <div class="mt-1 flex items-center justify-between border-t border-[var(--bpdm-border)] pt-2 text-base font-semibold"><dt>Open</dt><dd>{{ row.tasks - completed(row.tasks) }}</dd></div>
           </dl>
         </section>
-        <section class="rounded-lg border border-border bg-card p-4">
+        <section class="rounded-lg border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-4">
           <div class="mb-3 flex items-center justify-between">
-            <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Details</p>
+            <p class="text-xs font-medium uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Details</p>
             <span [class]="'inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ' + statusStyle[row.status]">{{ row.status }}</span>
           </div>
           <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-muted-foreground">Email</dt><dd class="font-mono text-xs">{{ row.email }}</dd></div>
-            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-muted-foreground">Role</dt><dd>{{ row.role }}</dd></div>
-            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-muted-foreground">Team</dt><dd>{{ row.team }}</dd></div>
-            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-muted-foreground">Joined</dt><dd>{{ row.joined }}</dd></div>
+            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Email</dt><dd class="font-mono text-xs">{{ row.email }}</dd></div>
+            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Role</dt><dd>{{ row.role }}</dd></div>
+            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Team</dt><dd>{{ row.team }}</dd></div>
+            <div class="flex flex-col gap-0.5"><dt class="text-xs uppercase tracking-wide text-[var(--bpdm-muted-foreground)]">Joined</dt><dd>{{ row.joined }}</dd></div>
           </dl>
         </section>
       </div>
@@ -899,7 +899,7 @@ export class TableClickableComponent {
 export const Sorting: Story = {
   render: () => ({
     template: `<div class="flex flex-col gap-2">
-  <p class="font-mono text-xs text-muted-foreground">Click any sortable header (Name / Role / Team / Status / Tasks). Only one column sorts at a time.</p>
+  <p class="font-mono text-xs text-[var(--bpdm-muted-foreground)]">Click any sortable header (Name / Role / Team / Status / Tasks). Only one column sorts at a time.</p>
   <dt-members />
 </div>`,
   }),
@@ -946,7 +946,7 @@ export const MultiColumnSort: Story = {
       ] as DataTableSort[],
     },
     template: `<div class="flex flex-col gap-2">
-  <p class="max-w-2xl font-mono text-xs leading-relaxed text-muted-foreground">Sorted by Status ➊, then Tasks ➋ — rows group by status, and Tasks orders the rows within each status block. Shift+click a header to add a column; click without Shift to reset to one.</p>
+  <p class="max-w-2xl font-mono text-xs leading-relaxed text-[var(--bpdm-muted-foreground)]">Sorted by Status ➊, then Tasks ➋ — rows group by status, and Tasks orders the rows within each status block. Shift+click a header to add a column; click without Shift to reset to one.</p>
   <dt-members [multiSort]="true" [bordered]="true" [defaultSort]="defaultSort" />
 </div>`,
   }),
@@ -1103,7 +1103,7 @@ type Member = { id: string; name: string; role: string; tasks: number };
           <button type="button" (click)="selected.set([])">Clear</button>
           <button type="button">Remove</button>
         } @else {
-          <span class="text-sm text-muted-foreground">Select rows to act on them.</span>
+          <span class="text-sm text-[var(--bpdm-muted-foreground)]">Select rows to act on them.</span>
         }
       </div>
       <bpdm-data-table

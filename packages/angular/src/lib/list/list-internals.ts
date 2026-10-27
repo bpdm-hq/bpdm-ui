@@ -51,7 +51,7 @@ export function sameOrder<T>(a: T[], b: T[], keyOf: (i: T) => ItemKey): boolean 
 
 /** Shared square icon-button styling for the control columns. */
 export const CONTROL_BTN_CLASS =
-  "inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--radius)] border border-border/60 bg-card text-muted-foreground shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-muted hover:text-foreground hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4";
+  "inline-flex size-9 cursor-pointer items-center justify-center rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)]/60 bg-[var(--bpdm-card)] text-[var(--bpdm-muted-foreground)] shadow-sm transition-[background-color,color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] hover:shadow active:scale-90 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none [&_svg]:size-4";
 
 /** Context handed to a list's item template. */
 export interface ListItemContext<T> {

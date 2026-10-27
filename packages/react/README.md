@@ -49,15 +49,17 @@ pnpm add @bpdm/ui
 
 ## Setup
 
-`@bpdm/ui` ships Tailwind class names, so your app's Tailwind generates the styles.
-In your global CSS:
+`@bpdm/ui` ships a self-contained stylesheet, so the quickest setup needs no
+Tailwind of your own. Import it once in your global CSS or app entry:
 
 ```css
-@import "tailwindcss";
-@import "@bpdm/ui/styles.css";                  /* design tokens + themes */
-@source "../node_modules/@bpdm/ui/dist";        /* the components */
-@source "../node_modules/@bpdm/variants/dist";  /* the shared variant classes */
+@import "@bpdm/ui/styles.css";   /* namespaced tokens + every component style */
 ```
+
+That single import is enough. The stylesheet is precompiled and carries no CSS
+reset, so it never touches your own base element styles. Its design tokens are
+namespaced under `--bpdm-*`, so they cannot clash with your app's own tokens or
+Tailwind theme.
 
 Pick a theme on any ancestor (default is `paper`):
 
@@ -127,14 +129,15 @@ A few highlights:
 
 ## Theming
 
-Components never hardcode colors — they read CSS variables (`--primary`,
-`--background`, …). Re-brand by overriding those variables, globally or scoped:
+Components never hardcode colors. They read namespaced CSS variables
+(`--bpdm-primary`, `--bpdm-background`, …). Re-brand by overriding those,
+globally or scoped:
 
 ```css
 :root {
-  --primary: #7c3aed;          /* your brand color     */
-  --ring: #7c3aed;             /* matching focus ring  */
-  --primary-foreground: #fff;  /* text on primary      */
+  --bpdm-primary: #7c3aed;          /* your brand color     */
+  --bpdm-ring: #7c3aed;             /* matching focus ring  */
+  --bpdm-primary-foreground: #fff;  /* text on primary      */
 }
 ```
 

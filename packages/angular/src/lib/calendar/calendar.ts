@@ -118,7 +118,7 @@ interface MonthView {
                       <option [value]="mo.value">{{ mo.label }}</option>
                     }
                   </select>
-                  <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute end-1.5 size-3.5 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                     <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </div>
@@ -133,7 +133,7 @@ interface MonthView {
                       <option [value]="y">{{ y }}</option>
                     }
                   </select>
-                  <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute end-1.5 size-3.5 text-muted-foreground" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute end-1.5 size-3.5 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
                     <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </div>
@@ -165,7 +165,7 @@ interface MonthView {
           >
             <div role="row" data-bpdm-slot="calendar-weekdays" class="grid grid-cols-7">
               @for (w of headers(); track $index) {
-                <div role="columnheader" [attr.aria-label]="longHeaders()[$index]" class="grid h-8 place-items-center text-xs font-medium text-muted-foreground">{{ w }}</div>
+                <div role="columnheader" [attr.aria-label]="longHeaders()[$index]" class="grid h-8 place-items-center text-xs font-medium text-[var(--bpdm-muted-foreground)]">{{ w }}</div>
               }
             </div>
             @for (week of m.weeks; track $index) {
@@ -273,7 +273,7 @@ export class BpdmCalendar {
     this.monthNames().map((label, value) => ({ label, value })),
   );
   protected readonly selectCls =
-    "cursor-pointer appearance-none rounded-md bg-transparent py-1 ps-2 pe-6 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "cursor-pointer appearance-none rounded-md bg-transparent py-1 ps-2 pe-6 text-sm font-semibold tabular-nums text-[var(--bpdm-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]";
 
   protected readonly hover = signal<Date | null>(null);
   // null = "follow the selection"; set explicitly once the user navigates
@@ -321,7 +321,7 @@ export class BpdmCalendar {
 
   protected readonly rootClass = computed(() =>
     cn(
-      "flex w-fit select-none flex-col gap-5 rounded-[var(--radius)] p-3 sm:flex-row",
+      "flex w-fit select-none flex-col gap-5 rounded-[var(--bpdm-radius)] p-3 sm:flex-row",
       this.classInput(),
     ),
   );
@@ -382,20 +382,20 @@ export class BpdmCalendar {
         const wrapperClass = cn(
           "relative grid place-items-center",
           (rangeMid || rangeStart || rangeEnd) &&
-            "bg-[color-mix(in_srgb,var(--primary)_14%,transparent)]",
+            "bg-[color-mix(in_srgb,var(--bpdm-primary)_14%,transparent)]",
           rangeStart && (shape === "circle" ? "rounded-s-full" : "rounded-s-lg"),
           rangeEnd && (shape === "circle" ? "rounded-e-full" : "rounded-e-lg"),
         );
         const buttonClass = cn(
-          "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+          "grid size-9 cursor-pointer place-items-center text-sm tabular-nums transition-[background-color,color,transform] duration-[var(--bpdm-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)]",
           round,
-          "hover:bg-muted active:scale-90",
-          outside && "text-muted-foreground",
-          !outside && !selected && "text-foreground",
-          isToday && !selected && "font-semibold text-foreground ring-1 ring-inset ring-primary",
+          "hover:bg-[var(--bpdm-muted)] active:scale-90",
+          outside && "text-[var(--bpdm-muted-foreground)]",
+          !outside && !selected && "text-[var(--bpdm-foreground)]",
+          isToday && !selected && "font-semibold text-[var(--bpdm-foreground)] ring-1 ring-inset ring-[var(--bpdm-primary)]",
           selected &&
-            "bg-primary font-semibold text-primary-foreground hover:bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
-          disabledDay && "pointer-events-none text-muted-foreground/30 line-through",
+            "bg-[var(--bpdm-primary)] font-semibold text-[var(--bpdm-primary-foreground)] hover:bg-[var(--bpdm-primary)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
+          disabledDay && "pointer-events-none text-[var(--bpdm-muted-foreground)]/30 line-through",
         );
 
         return {
@@ -428,7 +428,7 @@ export class BpdmCalendar {
 
   protected navClass(visible: boolean): string {
     return cn(
-      "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
       !visible && "invisible",
     );
   }

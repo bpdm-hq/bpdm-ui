@@ -57,11 +57,11 @@ import {
         [attr.aria-invalid]="invalid() ? 'true' : null"
         [class]="triggerClass()"
       >
-        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-muted-foreground" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true">
           <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" />
           <path d="M3 10h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <span [class]="cn('flex-1 truncate', !hasValue() && 'text-muted-foreground')">
+        <span [class]="cn('flex-1 truncate', !hasValue() && 'text-[var(--bpdm-muted-foreground)]')">
           {{ text() || placeholder() }}
         </span>
       </button>
@@ -71,7 +71,7 @@ import {
           data-bpdm-slot="date-picker-clear"
           [attr.aria-label]="messages().clear || 'Clear'"
           (click)="clear($event)"
-          class="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          class="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
         >
           <svg viewBox="0 0 24 24" fill="none" class="size-3.5" aria-hidden="true">
             <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -84,7 +84,7 @@ import {
       <div class="flex flex-col">
         @if (mode() === "range" && presets() && presets()!.length > 0) {
           <div class="flex w-fit flex-col sm:w-auto sm:flex-row">
-            <div class="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-border p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
+            <div class="flex w-0 min-w-full shrink-0 flex-wrap gap-1 border-b border-[var(--bpdm-border)] p-2 sm:w-auto sm:min-w-0 sm:max-w-[9rem] sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-b-0 sm:border-e">
               @for (p of presets(); track p.label) {
                 <button
                   type="button"
@@ -132,11 +132,11 @@ import {
           />
         }
         @if (confirm()) {
-          <div class="flex items-center justify-end gap-2 border-t border-border p-2">
+          <div class="flex items-center justify-end gap-2 border-t border-[var(--bpdm-border)] p-2">
             <button
               type="button"
               (click)="cancel()"
-              class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-[var(--bpdm-muted-foreground)] transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
             >
               {{ messages().cancel || "Cancel" }}
             </button>
@@ -144,7 +144,7 @@ import {
               type="button"
               (click)="apply()"
               [disabled]="!draftComplete()"
-              class="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+              class="cursor-pointer rounded-md bg-[var(--bpdm-primary)] px-3 py-1.5 text-sm font-medium text-[var(--bpdm-primary-foreground)] transition-colors hover:bg-[var(--bpdm-primary)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {{ messages().apply || "Apply" }}
             </button>
@@ -221,7 +221,7 @@ export class BpdmDatePicker {
 
   protected readonly triggerClass = computed(() =>
     cn(
-      "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-input bg-background ps-3 text-start text-sm transition-colors hover:border-ring/60 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+      "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-3 text-start text-sm transition-colors hover:border-[var(--bpdm-ring)]/60 focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
       this.showClear() ? "pe-9" : "pe-3",
       this.classInput(),
     ),
@@ -263,8 +263,8 @@ export class BpdmDatePicker {
     const pr = p.range();
     const active = !!r && sameDay(r.from, pr.from) && sameDay(r.to, pr.to);
     return cn(
-      "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-      active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
+      "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
+      active ? "bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
     );
   }
 }

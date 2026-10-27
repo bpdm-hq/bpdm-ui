@@ -43,10 +43,10 @@ class ProgressDynamicDemo implements OnInit, OnDestroy {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BpdmProgressBar, BpdmButton],
   template: `
-    <div class="w-72 space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div class="w-72 space-y-4 rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
       <div>
         <p class="text-sm font-medium">report-2025.pdf</p>
-        <p class="text-xs text-muted-foreground">4.2 MB</p>
+        <p class="text-xs text-[var(--bpdm-muted-foreground)]">4.2 MB</p>
       </div>
       <bpdm-progress-bar [value]="value()" showValue [variant]="value() >= 100 ? 'success' : 'primary'" />
       <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="start()" [disabled]="uploading()">
@@ -321,10 +321,10 @@ import { BpdmProgressBar, BpdmButton } from '@bpdm/ng';
   selector: 'app-progress-in-card',
   imports: [BpdmProgressBar, BpdmButton],
   template: \`
-    <div class="w-72 space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div class="w-72 space-y-4 rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
       <div>
         <p class="text-sm font-medium">report-2025.pdf</p>
-        <p class="text-xs text-muted-foreground">4.2 MB</p>
+        <p class="text-xs text-[var(--bpdm-muted-foreground)]">4.2 MB</p>
       </div>
       <bpdm-progress-bar [value]="value()" showValue [variant]="value() >= 100 ? 'success' : 'primary'" />
       <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="start()" [disabled]="uploading()">

@@ -296,7 +296,7 @@ export const Interactive: Story = {
   render: () => (
     <Card asChild hoverable interactive className="w-full max-w-md">
       <a href="#atlas">
-        <CardHeader action={<MoreHorizontal className="size-4 text-muted-foreground" />}>
+        <CardHeader action={<MoreHorizontal className="size-4 text-[var(--bpdm-muted-foreground)]" />}>
           <CardTitle>Open Project Atlas →</CardTitle>
           <CardDescription>The entire card is clickable</CardDescription>
         </CardHeader>
@@ -314,7 +314,7 @@ export function Example() {
   return (
     <Card asChild hoverable interactive className="max-w-md">
       <a href="/atlas">
-        <CardHeader action={<MoreHorizontal className="size-4 text-muted-foreground" />}>
+        <CardHeader action={<MoreHorizontal className="size-4 text-[var(--bpdm-muted-foreground)]" />}>
           <CardTitle>Open Project Atlas →</CardTitle>
           <CardDescription>The entire card is clickable</CardDescription>
         </CardHeader>

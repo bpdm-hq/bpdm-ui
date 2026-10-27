@@ -71,7 +71,7 @@ let meterUid = 0;
           data-bpdm-slot="password-input-toggle"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
-          class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--radius)-4px)] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
+          class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none"
         >
           <svg viewBox="0 0 20 20" fill="none" class="size-4" aria-hidden="true">
             <path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10Z" stroke="currentColor" stroke-width="1.5" />
@@ -87,7 +87,7 @@ let meterUid = 0;
         <div data-bpdm-slot="password-input-meter" class="mt-2">
           <div class="flex gap-1" aria-hidden="true">
             @for (i of segments(); track i) {
-              <span [class]="'h-1 flex-1 rounded-full transition-colors ' + (i < filled() ? barColor() : 'bg-muted')"></span>
+              <span [class]="'h-1 flex-1 rounded-full transition-colors ' + (i < filled() ? barColor() : 'bg-[var(--bpdm-muted)]')"></span>
             }
           </div>
           <p [id]="meterId" [class]="'mt-1 text-xs ' + textColor()" aria-live="polite">{{ meterLabel() }}</p>
@@ -163,15 +163,15 @@ export class BpdmPasswordInput {
   });
   protected readonly barColor = computed(() => {
     const t = this.tone();
-    return t === "weak" ? "bg-destructive" : t === "strong" ? "bg-success" : "bg-primary";
+    return t === "weak" ? "bg-[var(--bpdm-destructive)]" : t === "strong" ? "bg-[var(--bpdm-success)]" : "bg-[var(--bpdm-primary)]";
   });
   protected readonly textColor = computed(() => {
     const t = this.tone();
     return t === "weak"
-      ? "text-destructive"
+      ? "text-[var(--bpdm-destructive)]"
       : t === "strong"
-        ? "text-success"
-        : "text-muted-foreground";
+        ? "text-[var(--bpdm-success)]"
+        : "text-[var(--bpdm-muted-foreground)]";
   });
   protected readonly meterLabel = computed(() => {
     const set = this.labels() ?? DEFAULT_LABELS[this.levels()] ?? [];

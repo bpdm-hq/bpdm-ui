@@ -20,7 +20,7 @@ it to a single card while it fetches, or use \`fullPage\` for the whole screen.
 import { Spinner, LoadingOverlay } from "@bpdm/ui";
 
 <Spinner />
-<Spinner variant="dots" size="lg" className="text-success" />
+<Spinner variant="dots" size="lg" className="text-[var(--bpdm-success)]" />
 
 // scoped to a card while data loads
 <div className="relative">
@@ -72,14 +72,14 @@ export const Playground: Story = {};
 // three looks
 export const Variants: Story = {
   render: () => (
-    <div className="flex flex-wrap items-start gap-16 text-primary">
+    <div className="flex flex-wrap items-start gap-16 text-[var(--bpdm-primary)]">
       {(["ring", "gradient", "square", "dots", "bars", "flip"] as const).map((v) => (
         <div key={v} className="flex w-16 flex-col items-center gap-3">
           {/* uniform-height cell so every spinner centers on the same line */}
           <span className="flex h-10 items-center justify-center">
             <Spinner variant={v} size="lg" />
           </span>
-          <span className="text-xs text-muted-foreground">{v}</span>
+          <span className="text-xs text-[var(--bpdm-muted-foreground)]">{v}</span>
         </div>
       ))}
     </div>
@@ -91,7 +91,7 @@ export const Variants: Story = {
 
 export function Example() {
   return (
-    <div className="flex flex-wrap items-start gap-16 text-primary">
+    <div className="flex flex-wrap items-start gap-16 text-[var(--bpdm-primary)]">
       <Spinner variant="ring" size="lg" />
       <Spinner variant="gradient" size="lg" />
       <Spinner variant="square" size="lg" />
@@ -116,10 +116,10 @@ export const OverlayInCard: Story = {
     };
     return (
       <div className="w-72 space-y-3">
-        <div className="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm">
-          <p className="text-sm text-muted-foreground">Active users</p>
+        <div className="relative overflow-hidden rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">12,480</p>
-          <p className="mt-1 text-xs text-success">+8.2% this week</p>
+          <p className="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
           <LoadingOverlay show={loading} label="Fetching…" size="md" />
         </div>
         <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
@@ -142,10 +142,10 @@ export function Example() {
   };
   return (
     <div className="w-72 space-y-3">
-      <div className="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p className="text-sm text-muted-foreground">Active users</p>
+      <div className="relative overflow-hidden rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
         <p className="mt-1 text-2xl font-semibold tabular-nums">12,480</p>
-        <p className="mt-1 text-xs text-success">+8.2% this week</p>
+        <p className="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
         <LoadingOverlay show={loading} label="Fetching…" size="md" />
       </div>
       <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
@@ -171,16 +171,16 @@ export const InlineValue: Story = {
     };
     return (
       <div className="w-72 space-y-3">
-        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          <p className="text-sm text-muted-foreground">Active users</p>
+        <div className="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
           <div className="mt-1 flex h-8 items-center">
             {loading ? (
-              <Spinner size="sm" variant="dots" className="text-muted-foreground" />
+              <Spinner size="sm" variant="dots" className="text-[var(--bpdm-muted-foreground)]" />
             ) : (
               <span className="text-2xl font-semibold tabular-nums">12,480</span>
             )}
           </div>
-          <p className="mt-1 text-xs text-success">+8.2% this week</p>
+          <p className="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
         </div>
         <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
           Refetch amount
@@ -202,17 +202,17 @@ export function Example() {
   };
   return (
     <div className="w-72 space-y-3">
-      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p className="text-sm text-muted-foreground">Active users</p>
+      <div className="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
         {/* reserve the height so swapping spinner ↔ value doesn't shift layout */}
         <div className="mt-1 flex h-8 items-center">
           {loading ? (
-            <Spinner size="sm" variant="dots" className="text-muted-foreground" />
+            <Spinner size="sm" variant="dots" className="text-[var(--bpdm-muted-foreground)]" />
           ) : (
             <span className="text-2xl font-semibold tabular-nums">12,480</span>
           )}
         </div>
-        <p className="mt-1 text-xs text-success">+8.2% this week</p>
+        <p className="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
       </div>
       <Button size="sm" variant="secondary" appearance="outline" onClick={refetch}>
         Refetch amount
@@ -273,11 +273,11 @@ export function Example() {
 export const Sizes: Story = {
   tags: ["!dev"],
   render: () => (
-    <div className="flex items-end gap-6 text-primary">
+    <div className="flex items-end gap-6 text-[var(--bpdm-primary)]">
       {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
         <div key={size} className="flex flex-col items-center gap-2">
           <Spinner size={size} />
-          <span className="text-xs text-muted-foreground">{size}</span>
+          <span className="text-xs text-[var(--bpdm-muted-foreground)]">{size}</span>
         </div>
       ))}
     </div>
@@ -289,7 +289,7 @@ export const Sizes: Story = {
 
 export function Example() {
   return (
-    <div className="flex items-end gap-6 text-primary">
+    <div className="flex items-end gap-6 text-[var(--bpdm-primary)]">
       <Spinner size="xs" />
       <Spinner size="sm" />
       <Spinner size="md" />
@@ -308,10 +308,10 @@ export const Colors: Story = {
   tags: ["!dev"],
   render: () => (
     <div className="flex items-center gap-6">
-      <Spinner className="text-primary" />
-      <Spinner variant="dots" className="text-success" />
-      <Spinner variant="bars" className="text-destructive" />
-      <Spinner className="text-muted-foreground" />
+      <Spinner className="text-[var(--bpdm-primary)]" />
+      <Spinner variant="dots" className="text-[var(--bpdm-success)]" />
+      <Spinner variant="bars" className="text-[var(--bpdm-destructive)]" />
+      <Spinner className="text-[var(--bpdm-muted-foreground)]" />
     </div>
   ),
   parameters: {
@@ -322,10 +322,10 @@ export const Colors: Story = {
 export function Example() {
   return (
     <div className="flex items-center gap-6">
-      <Spinner className="text-primary" />
-      <Spinner variant="dots" className="text-success" />
-      <Spinner variant="bars" className="text-destructive" />
-      <Spinner className="text-muted-foreground" />
+      <Spinner className="text-[var(--bpdm-primary)]" />
+      <Spinner variant="dots" className="text-[var(--bpdm-success)]" />
+      <Spinner variant="bars" className="text-[var(--bpdm-destructive)]" />
+      <Spinner className="text-[var(--bpdm-muted-foreground)]" />
     </div>
   );
 }`,

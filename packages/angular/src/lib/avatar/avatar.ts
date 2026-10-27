@@ -54,7 +54,7 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
       class="flex size-full items-center justify-center overflow-hidden"
       [class]="shape() === 'circle' ? 'rounded-full' : 'rounded-[28%]'"
       [class.ring-2]="ring()"
-      [class.ring-background]="ring()"
+      [class.ring-[var(--bpdm-background)]]="ring()"
     >
       @if (src() && !failed()) {
         <img
@@ -87,7 +87,7 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
     @if (status()) {
       <span
         role="img"
-        class="absolute z-10 rounded-full ring-2 ring-background size-[28%] min-h-2 min-w-2"
+        class="absolute z-10 rounded-full ring-2 ring-[var(--bpdm-background)] size-[28%] min-h-2 min-w-2"
         [class]="statusDotClass()"
         data-bpdm-slot="avatar-status"
         [attr.aria-label]="statusLabel()"
@@ -126,7 +126,7 @@ export class BpdmAvatar {
   protected readonly tint = computed(() =>
     this.colorful() && this.initials()
       ? avatarTint(this.name() ?? "")
-      : "bg-muted text-muted-foreground",
+      : "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]",
   );
   protected readonly statusDotClass = computed(() => {
     const st = this.status();
@@ -179,7 +179,7 @@ export interface AvatarGroupUser {
         role="img"
         [attr.aria-label]="overflowLabel()"
         data-bpdm-slot="avatar-group-overflow"
-        class="relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-background transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
+        class="relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--bpdm-muted)] font-semibold text-[var(--bpdm-muted-foreground)] ring-2 ring-[var(--bpdm-background)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
         [class]="sizeClass()"
       >+{{ overflow() }}</span>
     }

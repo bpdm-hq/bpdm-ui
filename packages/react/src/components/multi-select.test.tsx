@@ -58,7 +58,7 @@ describe("MultiSelect", () => {
     expect(listbox).toHaveAttribute("aria-label", "Tags");
   });
 
-  it("marks the active option with the accessible amber indicator (not bg-muted)", async () => {
+  it("marks the active option with the accessible amber indicator (not bg-[var(--bpdm-muted)])", async () => {
     // give the virtualized scroll element a real height so the option rows render
     // in jsdom (which otherwise reports 0 → tanstack renders nothing). tanstack
     // measures via offsetWidth/offsetHeight.
@@ -75,8 +75,8 @@ describe("MultiSelect", () => {
       expect(active!.className).toContain("bg-[var(--bpdm-option-active-bg)]");
       expect(active!.className).toContain("shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)]");
       expect(active!.className).toContain("rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]");
-      // the weak, near-invisible bg-muted active fill is gone
-      expect(active!.className).not.toContain("bg-muted");
+      // the weak, near-invisible bg-[var(--bpdm-muted)] active fill is gone
+      expect(active!.className).not.toContain("bg-[var(--bpdm-muted)]");
     } finally {
       if (realW) Object.defineProperty(HTMLElement.prototype, "offsetWidth", realW);
       if (realH) Object.defineProperty(HTMLElement.prototype, "offsetHeight", realH);

@@ -36,13 +36,13 @@ export interface TabItem {
 let tid = 0;
 
 const TRIGGER_BASE =
-  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed! disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0";
+  "inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bpdm-background)] disabled:cursor-not-allowed! disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0";
 const TRIGGER_VARIANT: Record<TabsVariant, string> = {
   // no per-tab active marker for horizontal — the sliding indicator draws it (see template);
   // vertical adds its own per-tab marker back in `triggerClass`
   underline:
-    "-mb-px border-b-2 border-transparent px-3 py-2.5 text-muted-foreground data-[state=inactive]:enabled:hover:border-primary-strong/60 data-[state=inactive]:enabled:hover:text-primary-strong data-[state=active]:font-semibold data-[state=active]:text-primary-strong",
-  pill: "relative z-10 rounded-lg px-3 py-1.5 text-muted-foreground data-[state=inactive]:enabled:hover:text-foreground data-[state=active]:text-foreground",
+    "-mb-px border-b-2 border-transparent px-3 py-2.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:border-[var(--bpdm-primary-strong)]/60 data-[state=inactive]:enabled:hover:text-[var(--bpdm-primary-strong)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-primary-strong)]",
+  pill: "relative z-10 rounded-lg px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)]",
 };
 
 /**
@@ -164,7 +164,7 @@ export class BpdmTabs {
   protected readonly canNext = signal(false);
   // minimal inline chevron (no chip/border); dims at the edge it can't scroll toward
   protected readonly chevron =
-    "grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
+    "grid size-8 shrink-0 place-items-center rounded-md text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] disabled:pointer-events-none disabled:opacity-30";
   // symmetric edge fade so partial tabs dissolve at both ends (RTL-safe)
   protected readonly fade =
     "linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent)";
@@ -203,7 +203,7 @@ export class BpdmTabs {
   // the non-scrollable case structurally identical (no extra box)
   protected readonly wrapClass = computed(() =>
     this.scrollable()
-      ? cn("flex items-center", this.variant() === "underline" && "border-b border-border")
+      ? cn("flex items-center", this.variant() === "underline" && "border-b border-[var(--bpdm-border)]")
       : "contents",
   );
 
@@ -215,7 +215,7 @@ export class BpdmTabs {
       "relative flex items-center gap-1",
       vertical && "flex-col items-stretch",
       // underline border sits on the list normally; when scrollable it moves to the wrapper
-      underline && !scroll && (vertical ? "border-e border-border" : "border-b border-border"),
+      underline && !scroll && (vertical ? "border-e border-[var(--bpdm-border)]" : "border-b border-[var(--bpdm-border)]"),
       underline && this.baseline() === "content" && "w-fit",
       this.fullWidth() && "w-full",
       // scroll the row when tabs overflow: natural-width tabs, hidden scrollbar
@@ -233,8 +233,8 @@ export class BpdmTabs {
     const verticalActive = !vertical
       ? ""
       : underline
-        ? "mb-0 -me-px border-b-0 border-e-2 data-[state=active]:border-primary-strong"
-        : "data-[state=inactive]:enabled:hover:bg-muted/60 data-[state=active]:bg-muted";
+        ? "mb-0 -me-px border-b-0 border-e-2 data-[state=active]:border-[var(--bpdm-primary-strong)]"
+        : "data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/60 data-[state=active]:bg-[var(--bpdm-muted)]";
     return cn(
       TRIGGER_BASE,
       vertical && "justify-start",
@@ -248,8 +248,8 @@ export class BpdmTabs {
     cn(
       "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
       this.variant() === "underline"
-        ? "-bottom-px h-0.5 bg-primary-strong" // sit on the baseline (like the tab's -mb-px border), flush not floating
-        : "inset-y-0 z-0 rounded-lg bg-muted",
+        ? "-bottom-px h-0.5 bg-[var(--bpdm-primary-strong)]" // sit on the baseline (like the tab's -mb-px border), flush not floating
+        : "inset-y-0 z-0 rounded-lg bg-[var(--bpdm-muted)]",
     ),
   );
 

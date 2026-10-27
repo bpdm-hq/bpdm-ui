@@ -44,16 +44,19 @@ npm install @bpdm/ng
 
 ## Setup
 
-`@bpdm/ng` ships Tailwind class names, so your app's Tailwind generates the styles.
-In your global `styles.css`:
+`@bpdm/ng` ships a self-contained stylesheet, so the quickest setup needs no
+Tailwind of your own. In your global `styles.css`:
 
 ```css
-@import "tailwindcss";
-@import "@bpdm/tokens/tokens.css";              /* design tokens + themes */
+@import "@bpdm/ng/styles.css";                  /* namespaced tokens + every component style */
 @import "@angular/cdk/overlay-prebuilt.css";    /* required for overlays (tooltip, …) */
-@source "../node_modules/@bpdm/ng";             /* the components */
-@source "../node_modules/@bpdm/variants/dist";  /* the shared variant classes */
 ```
+
+Those two imports are enough. The stylesheet is precompiled and carries no CSS
+reset, and its tokens are namespaced under `--bpdm-*`, so they cannot clash with
+your app's own tokens or Tailwind theme. Already using Tailwind 4? You can instead
+let your own build generate the classes (`@import "tailwindcss"` plus
+`@source "../node_modules/@bpdm/ng"` and `.../@bpdm/variants/dist"`).
 
 Pick a theme on any ancestor (default is `paper`):
 
@@ -102,14 +105,15 @@ _More components are landing incrementally; track progress on **[ui.bpdm.dev](ht
 
 ## Theming
 
-Components never hardcode colors — they read CSS variables (`--primary`,
-`--background`, …). Re-brand by overriding those variables, globally or scoped:
+Components never hardcode colors. They read namespaced CSS variables
+(`--bpdm-primary`, `--bpdm-background`, …). Re-brand by overriding those,
+globally or scoped:
 
 ```css
 :root {
-  --primary: #7c3aed;
-  --ring: #7c3aed;
-  --primary-foreground: #fff;
+  --bpdm-primary: #7c3aed;
+  --bpdm-ring: #7c3aed;
+  --bpdm-primary-foreground: #fff;
 }
 ```
 

@@ -42,7 +42,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
         role={announce ? "status" : undefined}
         aria-live={announce ? "polite" : undefined}
         data-bpdm="" data-bpdm-slot="spinner"
-        className={cn("inline-flex items-center justify-center text-primary", className)}
+        className={cn("inline-flex items-center justify-center text-[var(--bpdm-primary)]", className)}
         {...props}
       >
         {variant === "ring" && (
@@ -175,7 +175,7 @@ export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayPro
         aria-busy="true"
         data-bpdm="" data-bpdm-slot="loading-overlay"
         className={cn(
-          "z-50 flex flex-col items-center justify-center gap-3 bg-background/60 animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
+          "z-50 flex flex-col items-center justify-center gap-3 bg-[var(--bpdm-background)]/60 animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
           fullPage ? "fixed inset-0" : "absolute inset-0 rounded-[inherit]",
           blur && "backdrop-blur-sm",
           className,
@@ -188,7 +188,7 @@ export const LoadingOverlay = React.forwardRef<HTMLDivElement, LoadingOverlayPro
             fallback when there's no visible message. */}
         <Spinner variant={variant} size={size ?? (fullPage ? "lg" : "md")} announce={false} />
         {label ? (
-          <p data-bpdm-slot="loading-overlay-label" className="m-0 text-sm font-medium text-muted-foreground">{label}</p>
+          <p data-bpdm-slot="loading-overlay-label" className="m-0 text-sm font-medium text-[var(--bpdm-muted-foreground)]">{label}</p>
         ) : (
           <span className="sr-only">{t.loading}</span>
         )}

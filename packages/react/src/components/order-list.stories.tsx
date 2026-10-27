@@ -121,7 +121,7 @@ export const WithFilter: Story = {
           renderItem={(w) => (
             <div className="flex items-center justify-between gap-3">
               <span>{w.name}</span>
-              <span className="text-xs text-muted-foreground">{w.category}</span>
+              <span className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</span>
             </div>
           )}
         />
@@ -153,7 +153,7 @@ export function Example() {
       renderItem={(w) => (
         <div className="flex items-center justify-between gap-3">
           <span>{w.name}</span>
-          <span className="text-xs text-muted-foreground">{w.category}</span>
+          <span className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</span>
         </div>
       )}
     />
@@ -176,13 +176,13 @@ export const Template: Story = {
           itemKey={(w) => w.id}
           header="Dashboard widgets"
           renderItem={(w) => (
-            <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-muted-foreground">
+            <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-[var(--bpdm-muted-foreground)]">
               {w.icon}
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{w.name}</p>
-                <p className="text-xs text-muted-foreground">{w.category}</p>
+                <p className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</p>
               </div>
-              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{w.updated}</span>
+              <span className="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{w.updated}</span>
             </div>
           )}
         />
@@ -211,13 +211,13 @@ export function Example() {
       itemKey={(w) => w.id}
       header="Dashboard widgets"
       renderItem={(w) => (
-        <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-muted-foreground">
+        <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-[var(--bpdm-muted-foreground)]">
           {w.icon}
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{w.name}</p>
-            <p className="text-xs text-muted-foreground">{w.category}</p>
+            <p className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</p>
           </div>
-          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{w.updated}</span>
+          <span className="shrink-0 text-xs tabular-nums text-[var(--bpdm-muted-foreground)]">{w.updated}</span>
         </div>
       )}
     />

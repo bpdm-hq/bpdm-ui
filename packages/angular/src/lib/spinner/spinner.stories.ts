@@ -11,10 +11,10 @@ import { BpdmButton } from "../button/button";
   imports: [BpdmLoadingOverlay, BpdmButton],
   template: `
     <div class="w-72 space-y-3">
-      <div class="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p class="text-sm text-muted-foreground">Active users</p>
+      <div class="relative overflow-hidden rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
         <p class="mt-1 text-2xl font-semibold tabular-nums">12,480</p>
-        <p class="mt-1 text-xs text-success">+8.2% this week</p>
+        <p class="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
         <bpdm-loading-overlay [show]="loading()" label="Fetching…" size="md" />
       </div>
       <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch</button>
@@ -36,16 +36,16 @@ class SpinnerOverlayDemo {
   imports: [BpdmSpinner, BpdmButton],
   template: `
     <div class="w-72 space-y-3">
-      <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p class="text-sm text-muted-foreground">Active users</p>
+      <div class="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
         <div class="mt-1 flex h-8 items-center">
           @if (loading()) {
-            <bpdm-spinner size="sm" variant="dots" class="text-muted-foreground" />
+            <bpdm-spinner size="sm" variant="dots" class="text-[var(--bpdm-muted-foreground)]" />
           } @else {
             <span class="text-2xl font-semibold tabular-nums">12,480</span>
           }
         </div>
-        <p class="mt-1 text-xs text-success">+8.2% this week</p>
+        <p class="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
       </div>
       <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch amount</button>
     </div>
@@ -137,11 +137,11 @@ export class SpinnerDemoComponent {}`,
 /** All six looks. */
 export const Variants: Story = {
   render: () => ({
-    template: `<div class="flex flex-wrap items-start gap-16 text-primary">
+    template: `<div class="flex flex-wrap items-start gap-16 text-[var(--bpdm-primary)]">
   @for (v of ['ring','gradient','square','dots','bars','flip']; track v) {
     <div class="flex w-16 flex-col items-center gap-3">
       <span class="flex h-10 items-center justify-center"><bpdm-spinner [variant]="v" size="lg" /></span>
-      <span class="text-xs text-muted-foreground">{{ v }}</span>
+      <span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ v }}</span>
     </div>
   }
 </div>`,
@@ -156,7 +156,7 @@ import { BpdmSpinner } from '@bpdm/ng';
   selector: 'app-spinner-variants',
   imports: [BpdmSpinner],
   template: \`
-    <div class="flex flex-wrap items-start gap-16 text-primary">
+    <div class="flex flex-wrap items-start gap-16 text-[var(--bpdm-primary)]">
       <bpdm-spinner variant="ring" size="lg" />
       <bpdm-spinner variant="gradient" size="lg" />
       <bpdm-spinner variant="square" size="lg" />
@@ -186,10 +186,10 @@ import { BpdmLoadingOverlay, BpdmButton } from '@bpdm/ng';
   imports: [BpdmLoadingOverlay, BpdmButton],
   template: \`
     <div class="w-72 space-y-3">
-      <div class="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p class="text-sm text-muted-foreground">Active users</p>
+      <div class="relative overflow-hidden rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
         <p class="mt-1 text-2xl font-semibold tabular-nums">12,480</p>
-        <p class="mt-1 text-xs text-success">+8.2% this week</p>
+        <p class="mt-1 text-xs text-[var(--bpdm-success)]">+8.2% this week</p>
         <bpdm-loading-overlay [show]="loading()" label="Fetching…" size="md" />
       </div>
       <button bpdmButton size="sm" variant="secondary" appearance="outline" (click)="refetch()">Refetch</button>
@@ -219,11 +219,11 @@ import { BpdmSpinner, BpdmButton } from '@bpdm/ng';
   selector: 'app-spinner-inline',
   imports: [BpdmSpinner, BpdmButton],
   template: \`
-    <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <p class="text-sm text-muted-foreground">Active users</p>
+    <div class="rounded-xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm">
+      <p class="text-sm text-[var(--bpdm-muted-foreground)]">Active users</p>
       <div class="mt-1 flex h-8 items-center">
         @if (loading()) {
-          <bpdm-spinner size="sm" variant="dots" class="text-muted-foreground" />
+          <bpdm-spinner size="sm" variant="dots" class="text-[var(--bpdm-muted-foreground)]" />
         } @else {
           <span class="text-2xl font-semibold tabular-nums">12,480</span>
         }
@@ -269,9 +269,9 @@ export class SpinnerFullPageComponent {
 export const Sizes: Story = {
   tags: ["!dev"],
   render: () => ({
-    template: `<div class="flex items-end gap-6 text-primary">
+    template: `<div class="flex items-end gap-6 text-[var(--bpdm-primary)]">
   @for (s of ['xs','sm','md','lg','xl']; track s) {
-    <div class="flex flex-col items-center gap-2"><bpdm-spinner [size]="s" /><span class="text-xs text-muted-foreground">{{ s }}</span></div>
+    <div class="flex flex-col items-center gap-2"><bpdm-spinner [size]="s" /><span class="text-xs text-[var(--bpdm-muted-foreground)]">{{ s }}</span></div>
   }
 </div>`,
   }),
@@ -285,7 +285,7 @@ import { BpdmSpinner } from '@bpdm/ng';
   selector: 'app-spinner-sizes',
   imports: [BpdmSpinner],
   template: \`
-    <div class="flex items-end gap-6 text-primary">
+    <div class="flex items-end gap-6 text-[var(--bpdm-primary)]">
       <bpdm-spinner size="xs" /><bpdm-spinner size="sm" /><bpdm-spinner size="md" />
       <bpdm-spinner size="lg" /><bpdm-spinner size="xl" />
     </div>
@@ -302,10 +302,10 @@ export const Colors: Story = {
   tags: ["!dev"],
   render: () => ({
     template: `<div class="flex items-center gap-6">
-  <bpdm-spinner class="text-primary" />
-  <bpdm-spinner variant="dots" class="text-success" />
-  <bpdm-spinner variant="bars" class="text-destructive" />
-  <bpdm-spinner class="text-muted-foreground" />
+  <bpdm-spinner class="text-[var(--bpdm-primary)]" />
+  <bpdm-spinner variant="dots" class="text-[var(--bpdm-success)]" />
+  <bpdm-spinner variant="bars" class="text-[var(--bpdm-destructive)]" />
+  <bpdm-spinner class="text-[var(--bpdm-muted-foreground)]" />
 </div>`,
   }),
   parameters: {
@@ -319,10 +319,10 @@ import { BpdmSpinner } from '@bpdm/ng';
   imports: [BpdmSpinner],
   template: \`
     <div class="flex items-center gap-6">
-      <bpdm-spinner class="text-primary" />
-      <bpdm-spinner variant="dots" class="text-success" />
-      <bpdm-spinner variant="bars" class="text-destructive" />
-      <bpdm-spinner class="text-muted-foreground" />
+      <bpdm-spinner class="text-[var(--bpdm-primary)]" />
+      <bpdm-spinner variant="dots" class="text-[var(--bpdm-success)]" />
+      <bpdm-spinner variant="bars" class="text-[var(--bpdm-destructive)]" />
+      <bpdm-spinner class="text-[var(--bpdm-muted-foreground)]" />
     </div>
   \`,
 })

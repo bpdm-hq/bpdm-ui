@@ -51,7 +51,7 @@ function isRtl(el: HTMLElement): boolean {
     >
       @if (checked()) {
         <span class="flex h-full w-full items-center justify-center">
-          <span class="size-[45%] rounded-full bg-primary animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"></span>
+          <span class="size-[45%] rounded-full bg-[var(--bpdm-primary)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]"></span>
         </span>
       }
     </button>

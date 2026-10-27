@@ -12,27 +12,27 @@ describe("StatCard", () => {
   it("shows a positive delta as good (green) with its value", () => {
     const { container } = render(<StatCard label="Signups" value="1,294" delta={12.5} deltaLabel="vs last month" />);
     // uses the darkened -strong token so coloured delta text clears 4.5:1 on light themes
-    const delta = container.querySelector(".text-success-strong");
+    const delta = container.querySelector("[class~='text-[var(--bpdm-success-strong)]']");
     expect(delta?.textContent).toContain("12.5%");
     expect(screen.getByText("vs last month")).toBeTruthy();
   });
 
   it("shows a negative delta as bad (red)", () => {
     const { container } = render(<StatCard label="Session" value="4m" delta={-1.8} />);
-    expect(container.querySelector(".text-destructive-strong")?.textContent).toContain("1.8%");
-    expect(container.querySelector(".text-success-strong")).toBeNull();
+    expect(container.querySelector("[class~='text-[var(--bpdm-destructive-strong)]']")?.textContent).toContain("1.8%");
+    expect(container.querySelector("[class~='text-[var(--bpdm-success-strong)]']")).toBeNull();
   });
 
   it("flips colour with positiveIsGood=false — a rise is bad (red)", () => {
     const { container } = render(<StatCard label="Bounce" value="2.4%" delta={0.6} positiveIsGood={false} />);
-    expect(container.querySelector(".text-destructive-strong")?.textContent).toContain("0.6%");
-    expect(container.querySelector(".text-success-strong")).toBeNull();
+    expect(container.querySelector("[class~='text-[var(--bpdm-destructive-strong)]']")?.textContent).toContain("0.6%");
+    expect(container.querySelector("[class~='text-[var(--bpdm-success-strong)]']")).toBeNull();
   });
 
   it("treats a zero delta as neutral (no good/bad colour)", () => {
     const { container } = render(<StatCard label="Flat" value="100" delta={0} />);
-    expect(container.querySelector(".text-success-strong")).toBeNull();
-    expect(container.querySelector(".text-destructive-strong")).toBeNull();
+    expect(container.querySelector("[class~='text-[var(--bpdm-success-strong)]']")).toBeNull();
+    expect(container.querySelector("[class~='text-[var(--bpdm-destructive-strong)]']")).toBeNull();
     expect(container.textContent).toContain("0%");
   });
 

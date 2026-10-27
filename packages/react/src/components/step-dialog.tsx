@@ -76,10 +76,10 @@ function Stepper({
                 className={cn(
                   "grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium transition-[background-color,border-color,color,transform] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)]",
                   done
-                    ? "bg-success text-success-foreground"
+                    ? "bg-[var(--bpdm-success)] text-[var(--bpdm-success-foreground)]"
                     : active
-                      ? "scale-110 bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      : "border border-border text-muted-foreground",
+                      ? "scale-110 bg-[var(--bpdm-primary)] text-[var(--bpdm-primary-foreground)] ring-2 ring-[var(--bpdm-primary)] ring-offset-2 ring-offset-[var(--bpdm-background)]"
+                      : "border border-[var(--bpdm-border)] text-[var(--bpdm-muted-foreground)]",
                 )}
               >
                 {done ? <CheckGlyph /> : i + 1}
@@ -87,7 +87,7 @@ function Stepper({
               <span
                 className={cn(
                   "hidden text-sm sm:inline",
-                  active ? "font-medium text-foreground" : "text-muted-foreground",
+                  active ? "font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
                 )}
               >
                 {s.title}
@@ -100,7 +100,7 @@ function Stepper({
                 aria-hidden="true"
                 className={cn(
                   "h-px flex-1 transition-colors duration-[var(--bpdm-duration-slow)] ease-[var(--bpdm-ease-out)]",
-                  i < current ? "bg-success" : "bg-border",
+                  i < current ? "bg-[var(--bpdm-success)]" : "bg-[var(--bpdm-border)]",
                 )}
               />
             )}

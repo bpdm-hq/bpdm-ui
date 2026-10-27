@@ -28,10 +28,10 @@ describe("Toaster / toast", () => {
       toast.info("Note");
     });
     // each variant colours its leading icon with its `fg` class
-    expect(container.querySelector(".text-success")).toBeTruthy();
-    expect(container.querySelector(".text-destructive")).toBeTruthy();
-    expect(container.querySelector(".text-warning")).toBeTruthy();
-    expect(container.querySelector(".text-info")).toBeTruthy();
+    expect(container.querySelector("[class~='text-[var(--bpdm-success)]']")).toBeTruthy();
+    expect(container.querySelector("[class~='text-[var(--bpdm-destructive)]']")).toBeTruthy();
+    expect(container.querySelector("[class~='text-[var(--bpdm-warning)]']")).toBeTruthy();
+    expect(container.querySelector("[class~='text-[var(--bpdm-info)]']")).toBeTruthy();
   });
 
   it("renders description and action; clicking the action fires onClick", async () => {

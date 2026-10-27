@@ -115,7 +115,7 @@ export const Sides: Story = {
   @for (side of sides; track side) {
     <bpdm-drawer [side]="side" [title]="side + ' drawer'" [description]="'Slides in from the ' + side + '.'">
       <button bpdmButton variant="secondary" appearance="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
-      <ng-template bpdmDrawerBody><p class="text-sm text-muted-foreground">Drawer body content.</p></ng-template>
+      <ng-template bpdmDrawerBody><p class="text-sm text-[var(--bpdm-muted-foreground)]">Drawer body content.</p></ng-template>
       <ng-template bpdmDrawerFooter><button bpdmButton bpdmDrawerClose>Done</button></ng-template>
     </bpdm-drawer>
   }
@@ -135,7 +135,7 @@ import { BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerClose, BpdmDrawerFoot
       @for (side of sides; track side) {
         <bpdm-drawer [side]="side" [title]="side + ' drawer'" [description]="'Slides in from the ' + side + '.'">
           <button bpdmButton variant="secondary" appearance="outline" class="capitalize" bpdmDrawerTrigger>{{ side }}</button>
-          <ng-template bpdmDrawerBody><p class="text-sm text-muted-foreground">Drawer body content.</p></ng-template>
+          <ng-template bpdmDrawerBody><p class="text-sm text-[var(--bpdm-muted-foreground)]">Drawer body content.</p></ng-template>
           <ng-template bpdmDrawerFooter><button bpdmButton bpdmDrawerClose>Done</button></ng-template>
         </bpdm-drawer>
       }
@@ -158,7 +158,7 @@ export const Controlled: Story = {
     template: `<button bpdmButton (click)="open = true">Open controlled</button>
 <bpdm-drawer [(open)]="open" title="Controlled drawer" description="Its open state lives in the parent.">
   <ng-template bpdmDrawerBody>
-    <p class="text-sm text-muted-foreground">Open it from a menu, after an async action, etc.</p>
+    <p class="text-sm text-[var(--bpdm-muted-foreground)]">Open it from a menu, after an async action, etc.</p>
   </ng-template>
   <ng-template bpdmDrawerFooter><button bpdmButton (click)="open = false">Close</button></ng-template>
 </bpdm-drawer>`,
@@ -176,7 +176,7 @@ import { BpdmButton, BpdmDrawer, BpdmDrawerBody, BpdmDrawerFooter } from '@bpdm/
     <button bpdmButton (click)="open = true">Open controlled</button>
     <bpdm-drawer [(open)]="open" title="Controlled drawer" description="Its open state lives in the parent.">
       <ng-template bpdmDrawerBody>
-        <p class="text-sm text-muted-foreground">Open it from a menu, after an async action, etc.</p>
+        <p class="text-sm text-[var(--bpdm-muted-foreground)]">Open it from a menu, after an async action, etc.</p>
       </ng-template>
       <ng-template bpdmDrawerFooter><button bpdmButton (click)="open = false">Close</button></ng-template>
     </bpdm-drawer>

@@ -105,8 +105,8 @@ export function ThemeSelect() {
                 data-theme={t.value}
                 style={{
                   background:
-                    'linear-gradient(135deg, var(--background) 50%, var(--muted) 50%)',
-                  borderColor: 'color-mix(in oklab, var(--foreground) 22%, transparent)',
+                    'linear-gradient(135deg, var(--bpdm-background) 50%, var(--bpdm-muted) 50%)',
+                  borderColor: 'color-mix(in oklab, var(--bpdm-foreground) 22%, transparent)',
                 }}
                 className="size-4 shrink-0 rounded-full border"
               />

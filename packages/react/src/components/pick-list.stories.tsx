@@ -145,7 +145,7 @@ export const WithFilter: Story = {
         renderItem={(w) => (
           <div className="flex items-center justify-between gap-3">
             <span>{w.name}</span>
-            <span className="text-xs text-muted-foreground">{w.category}</span>
+            <span className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</span>
           </div>
         )}
       />
@@ -180,7 +180,7 @@ export function Example() {
       renderItem={(w) => (
         <div className="flex items-center justify-between gap-3">
           <span>{w.name}</span>
-          <span className="text-xs text-muted-foreground">{w.category}</span>
+          <span className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</span>
         </div>
       )}
     />
@@ -203,11 +203,11 @@ export const Template: Story = {
         sourceHeader="Available"
         targetHeader="Your dashboard"
         renderItem={(w) => (
-          <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-muted-foreground">
+          <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-[var(--bpdm-muted-foreground)]">
             {w.icon}
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{w.name}</p>
-              <p className="text-xs text-muted-foreground">{w.category}</p>
+              <p className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</p>
             </div>
           </div>
         )}
@@ -239,11 +239,11 @@ export function Example() {
       sourceHeader="Available"
       targetHeader="Your dashboard"
       renderItem={(w) => (
-        <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-muted-foreground">
+        <div className="flex items-center gap-3 [&_svg]:size-4 [&_svg]:text-[var(--bpdm-muted-foreground)]">
           {w.icon}
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{w.name}</p>
-            <p className="text-xs text-muted-foreground">{w.category}</p>
+            <p className="text-xs text-[var(--bpdm-muted-foreground)]">{w.category}</p>
           </div>
         </div>
       )}

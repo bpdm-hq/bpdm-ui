@@ -228,7 +228,7 @@ export function Example() {
     <div className="flex flex-col gap-1.5">
       <label htmlFor="email" className="text-sm font-medium">Email</label>
       <Input id="email" type="email" aria-invalid aria-describedby="email-err" placeholder="name@company.com" />
-      <p id="email-err" className="text-sm text-destructive-strong">Enter a valid email address.</p>
+      <p id="email-err" className="text-sm text-[var(--bpdm-destructive-strong)]">Enter a valid email address.</p>
     </div>
   );
 }`,
@@ -238,14 +238,14 @@ export function Example() {
   render: () => (
     <div className="flex w-80 flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="name" className="text-sm font-medium text-foreground">
+        <label htmlFor="name" className="text-sm font-medium text-[var(--bpdm-foreground)]">
           Full name
         </label>
         <Input id="name" placeholder="Ada Lovelace" />
-        <p className="text-sm text-muted-foreground">As it appears on your ID.</p>
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">As it appears on your ID.</p>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-foreground">
+        <label htmlFor="email" className="text-sm font-medium text-[var(--bpdm-foreground)]">
           Email
         </label>
         <Input
@@ -256,7 +256,7 @@ export function Example() {
           defaultValue="not-an-email"
           startIcon={<Mail />}
         />
-        <p id="email-err" className="text-sm text-destructive-strong">
+        <p id="email-err" className="text-sm text-[var(--bpdm-destructive-strong)]">
           Enter a valid email address.
         </p>
       </div>

@@ -165,7 +165,7 @@ export function InputOtp({
   const isGrouped = (!!groupSize && groupSize > 0) || !!grouped;
 
   const baseCell =
-    "border border-input bg-background text-center font-medium text-foreground shadow-sm transition-[color,border-color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] focus:z-10 focus:scale-[1.08] focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+    "border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] text-center font-medium text-[var(--bpdm-foreground)] shadow-sm transition-[color,border-color,box-shadow,transform] duration-[var(--bpdm-duration-fast)] ease-[var(--bpdm-ease-overshoot)] focus:z-10 focus:scale-[1.08] focus:border-[var(--bpdm-ring)] focus:outline-none focus:ring-1 focus:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50";
 
   // isFirst/isLast = position within the cell's group (for connected rounding)
   const renderCell = (i: number, isFirst: boolean, isLast: boolean) => (
@@ -201,10 +201,10 @@ export function InputOtp({
           ? cn(
               "rounded-none",
               !isFirst && "-ms-px", // collapse adjacent borders into one divider
-              isFirst && "rounded-s-[var(--radius)]",
-              isLast && "rounded-e-[var(--radius)]",
+              isFirst && "rounded-s-[var(--bpdm-radius)]",
+              isLast && "rounded-e-[var(--bpdm-radius)]",
             )
-          : "rounded-[var(--radius)]",
+          : "rounded-[var(--bpdm-radius)]",
       )}
     />
   );
@@ -247,7 +247,7 @@ export function InputOtp({
         return (
           <React.Fragment key={g}>
             {g > 0 && (
-              <span aria-hidden className="select-none px-1 text-muted-foreground">
+              <span aria-hidden className="select-none px-1 text-[var(--bpdm-muted-foreground)]">
                 {separator}
               </span>
             )}

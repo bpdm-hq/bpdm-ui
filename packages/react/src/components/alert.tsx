@@ -87,7 +87,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           "relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4",
           // soft = tinted inline-message surface (distinct from the white floating Toast)
           soft && tone.soft,
-          appearance === "outline" && cn("bg-card text-card-foreground shadow-sm", tone.outline),
+          appearance === "outline" && cn("bg-[var(--bpdm-card)] text-[var(--bpdm-card-foreground)] shadow-sm", tone.outline),
           solid && tone.solid,
           className,
         )}
@@ -113,7 +113,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         <div className={cn("min-w-0 flex-1", onClose && "pe-6")}>
           {title && <p data-bpdm-slot="alert-title" className="m-0 text-sm font-semibold">{title}</p>}
           {children != null && (
-            <div data-bpdm-slot="alert-description" className={cn("text-sm", solid ? "text-current" : "text-muted-foreground", title && "mt-1")}>
+            <div data-bpdm-slot="alert-description" className={cn("text-sm", solid ? "text-current" : "text-[var(--bpdm-muted-foreground)]", title && "mt-1")}>
               {children}
             </div>
           )}
@@ -125,10 +125,10 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
             onClick={() => setClosing(true)}
             aria-label={t.dismiss}
             className={cn(
-              "absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "absolute end-2.5 top-2.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
               solid
                 ? "text-current/70 hover:bg-white/15 hover:text-current"
-                : "text-muted-foreground/70 hover:bg-muted hover:text-foreground",
+                : "text-[var(--bpdm-muted-foreground)]/70 hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)]",
             )}
           >
             <X className="size-3.5" />

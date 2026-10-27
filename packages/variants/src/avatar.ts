@@ -16,22 +16,22 @@ export const avatarSize: Record<AvatarSize, string> = {
 };
 
 export const avatarStatusColor: Record<AvatarStatus, string> = {
-  online: "bg-success",
-  offline: "bg-muted-foreground",
-  busy: "bg-destructive",
-  away: "bg-warning",
+  online: "bg-[var(--bpdm-success)]",
+  offline: "bg-[var(--bpdm-muted-foreground)]",
+  busy: "bg-[var(--bpdm-destructive)]",
+  away: "bg-[var(--bpdm-warning)]",
 };
 
 // deterministic, pleasant tint per name — so initials avatars aren't all grey.
 // The tint background is unchanged; the initials text uses a theme-aware "strong"
 // value (darker on light, bright on dark) so it reads ≥4.5:1 on the pale tint.
 export const avatarPalette = [
-  "bg-[color-mix(in_srgb,var(--info)_20%,transparent)] text-info-strong",
-  "bg-[color-mix(in_srgb,var(--success)_20%,transparent)] text-success-strong",
-  "bg-[color-mix(in_srgb,var(--accent)_22%,transparent)] text-[var(--avatar-orange)]",
-  "bg-[color-mix(in_srgb,#8b5cf6_22%,transparent)] text-[var(--avatar-violet)]",
-  "bg-[color-mix(in_srgb,#ec4899_22%,transparent)] text-[var(--avatar-pink)]",
-  "bg-[color-mix(in_srgb,#14b8a6_22%,transparent)] text-[var(--avatar-teal)]",
+  "bg-[color-mix(in_srgb,var(--bpdm-info)_20%,transparent)] text-[var(--bpdm-info-strong)]",
+  "bg-[color-mix(in_srgb,var(--bpdm-success)_20%,transparent)] text-[var(--bpdm-success-strong)]",
+  "bg-[color-mix(in_srgb,var(--bpdm-accent)_22%,transparent)] text-[var(--bpdm-avatar-orange)]",
+  "bg-[color-mix(in_srgb,#8b5cf6_22%,transparent)] text-[var(--bpdm-avatar-violet)]",
+  "bg-[color-mix(in_srgb,#ec4899_22%,transparent)] text-[var(--bpdm-avatar-pink)]",
+  "bg-[color-mix(in_srgb,#14b8a6_22%,transparent)] text-[var(--bpdm-avatar-teal)]",
 ];
 
 /** Up to two uppercase initials from a name. */

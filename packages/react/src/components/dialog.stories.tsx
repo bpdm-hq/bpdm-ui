@@ -133,7 +133,7 @@ export function Example() {
             </DialogClose>
           }
         >
-          <p className="text-sm text-muted-foreground">Dialog body content.</p>
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Dialog body content.</p>
         </Dialog>
       ))}
     </div>
@@ -161,7 +161,7 @@ export function Example() {
             </DialogClose>
           }
         >
-          <p className="text-sm text-muted-foreground">Dialog body content.</p>
+          <p className="text-sm text-[var(--bpdm-muted-foreground)]">Dialog body content.</p>
         </Dialog>
       ))}
     </div>
@@ -372,7 +372,7 @@ export function Example() {
         </DialogClose>
       }
     >
-      <div className="space-y-3 text-sm text-muted-foreground">
+      <div className="space-y-3 text-sm text-[var(--bpdm-muted-foreground)]">
         {Array.from({ length: 14 }, (_, i) => (
           <p key={i}>
             {i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -397,7 +397,7 @@ export function Example() {
         </DialogClose>
       }
     >
-      <div className="space-y-3 text-sm text-muted-foreground">
+      <div className="space-y-3 text-sm text-[var(--bpdm-muted-foreground)]">
         {Array.from({ length: 14 }, (_, i) => (
           <p key={i}>
             {i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -429,7 +429,7 @@ export function Example() {
         description="Its open state lives in the parent."
         footer={<Button onClick={() => setOpen(false)}>Close</Button>}
       >
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[var(--bpdm-muted-foreground)]">
           Useful when opening from a menu, after an async action, etc.
         </p>
       </Dialog>
@@ -452,7 +452,7 @@ export function Example() {
             description="Its open state lives in the parent."
             footer={<Button onClick={() => setOpen(false)}>Close</Button>}
           >
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--bpdm-muted-foreground)]">
               Useful when opening from a menu, after an async action, etc.
             </p>
           </Dialog>

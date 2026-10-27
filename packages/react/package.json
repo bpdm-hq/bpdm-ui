@@ -1,6 +1,6 @@
 {
   "name": "@bpdm/ui",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A modern, themeable, accessible React component library — Radix primitives, Tailwind 4, and a warm amber design system.",
   "type": "module",
   "license": "MIT",
@@ -430,7 +430,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup && node scripts/add-use-client.mjs && cp node_modules/@bpdm/tokens/tokens.css dist/styles.css",
+    "build": "tsup && node scripts/add-use-client.mjs && node scripts/build-styles.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -466,14 +466,15 @@
     "class-variance-authority": "^0.7.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@bpdm/tokens": "workspace:*",
     "@eslint/js": "^10.0.1",
     "@size-limit/preset-small-lib": "^12.1.0",
-    "@axe-core/playwright": "^4.12.1",
     "@storybook/addon-a11y": "^10.4.6",
     "@storybook/addon-docs": "^10.4.4",
     "@storybook/react-vite": "^10.4.4",
     "@storybook/test-runner": "^0.24.4",
+    "@tailwindcss/postcss": "4.3.1",
     "@tailwindcss/vite": "^4.3.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -484,12 +485,13 @@
     "@vitejs/plugin-react": "^6.0.2",
     "concurrently": "^10.0.3",
     "eslint": "^10.5.0",
-    "http-server": "^14.1.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
+    "http-server": "^14.1.1",
     "jsdom": "^29.1.1",
     "lucide-react": "^1.17.0",
     "playwright": "^1.61.1",
+    "postcss": "^8.5.23",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "size-limit": "^12.1.0",
