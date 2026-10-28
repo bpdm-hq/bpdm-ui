@@ -8,6 +8,8 @@ import {
   DataTableUsageDemo,
   DataTableSizesDemo,
   DataTableStripedDemo,
+  DataTableSeparatorsDemo,
+  DataTablePresetDemo,
   DataTableCustomizeDemo,
   DataTableEditableDemo,
   DataTableStickyDemo,
@@ -241,12 +243,33 @@ export class SizedTables {
   </Tab>
 </Tabs>
 
+## Presets
+
+`preset` picks a whole look in one word, setting sensible defaults for several style
+props at once. Any individual prop you also pass overrides the preset, so a preset is a
+starting point rather than a lock-in.
+
+- **`lined`** (default): soft horizontal row dividers.
+- **`card`**: spaced, rounded card rows with inset column separators, no header line, flat.
+- **`grid`**: full cell gridlines (a spreadsheet look).
+- **`plain`**: flat and minimal, with no dividers, shadow or hover.
+
+Switch the preset below, the live table and the code snippet update together:
+
+<DataTablePresetDemo />
+
+A preset only sets defaults, so you override any prop on top:
+
+```tsx
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} preset="card" hoverable={false} />
+```
+
 ## Borders & striping
 
-The table is **borderless by default**: just a clean header rule and soft row
-dividers, so it sits naturally on any page. Add `striped` for zebra rows, or opt
-into an outlined card with `frame` (outer border) and `bordered` (column gridlines).
-The preview toggles the three looks with our `Tabs`.
+These are the **individual style flags** that the [presets](#presets) bundle, for when
+you want to mix your own look rather than pick a named one. On the borderless default,
+add `striped` for zebra rows, or opt into an outlined card with `frame` (outer border)
+and `bordered` (column gridlines). For a ready-made combination, use a `preset` instead.
 
 <Preview>
   <DataTableStripedDemo />
@@ -274,9 +297,8 @@ const columns: DataTableColumn<Member>[] = [
 export function BorderTables() {
   return (
     <Tabs
-      defaultValue="borderless"
+      defaultValue="striped"
       items={[
-        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} /> },
         { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} striped /> },
         { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={members} rowKey={(r) => r.id} frame bordered /> },
       ]}
@@ -300,7 +322,6 @@ type Member = { id: string; name: string; role: string; tasks: number };
   templateUrl: './border-tables.html',
 })
 export class BorderTables {
-  readonly borderless = viewChild.required<TemplateRef<unknown>>('borderless');
   readonly striped = viewChild.required<TemplateRef<unknown>>('striped');
   readonly outlined = viewChild.required<TemplateRef<unknown>>('outlined');
 
@@ -317,7 +338,6 @@ export class BorderTables {
   ];
 
   readonly tabs = computed<TabItem[]>(() => [
-    { value: 'borderless', label: 'Borderless', content: this.borderless() },
     { value: 'striped', label: 'Striped', content: this.striped() },
     { value: 'outlined', label: 'Outlined', content: this.outlined() },
   ]);
@@ -325,15 +345,81 @@ export class BorderTables {
 ```
 
 ```html title="border-tables.html"
-<bpdm-tabs [items]="tabs()" defaultValue="borderless" />
+<bpdm-tabs [items]="tabs()" defaultValue="striped" />
 
-<ng-template #borderless><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" /></ng-template>
 <ng-template #striped><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" striped /></ng-template>
 <ng-template #outlined><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" frame bordered /></ng-template>
 ```
 
   </Tab>
 </Tabs>
+
+## Column separators & header line
+
+`columnSeparators` draws a **subtle inset vertical line between every column**, in both
+the header and the body. It is lighter than `bordered` (which draws full-height cell
+gridlines) and takes its colour from the `--bpdm-table-separator` token.
+`stickyHeaderShadow={false}` removes the thin divider line under the header. The
+[`card` preset](#presets) bundles both of these with spaced rows; use these flags
+directly when you want just one of them.
+
+<Preview>
+  <DataTableSeparatorsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-separators.tsx"
+<DataTable columns={columns} data={members} rowKey={(r) => r.id} columnSeparators />
+
+{/* no divider line under the header */}
+<DataTable
+  columns={columns}
+  data={members}
+  rowKey={(r) => r.id}
+  columnSeparators
+  stickyHeaderShadow={false}
+/>
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```html title="data-table-separators.html"
+<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" columnSeparators />
+
+<!-- no divider line under the header -->
+<bpdm-data-table
+  [columns]="columns"
+  [data]="members"
+  [rowKey]="rowKey"
+  columnSeparators
+  [stickyHeaderShadow]="false"
+/>
+```
+
+  </Tab>
+</Tabs>
+
+### Table tokens
+
+Every table surface and state is a token, so you recolour the table from your theme
+without touching a single component class. All default to the active theme:
+
+```css
+:root {
+  /* structure */
+  --bpdm-table-separator: #e6e9ec; /* inset column separators */
+  --bpdm-table-row-bg: #f6f8f9; /* spaced-row (card) fill */
+  --bpdm-table-header-bg: #ffffff; /* sticky / framed header surface */
+
+  /* row states (used by normal AND frozen cells) */
+  --bpdm-table-row-hover-bg: #f2f6f4; /* hover */
+  --bpdm-table-row-selected-bg: #e7f1ec; /* selected */
+  --bpdm-table-stripe-bg: #f6f7f8; /* striped alternate rows */
+}
+```
 
 ## Sorting
 
@@ -1797,6 +1883,21 @@ Style the table to fit your product. Three hooks cover most needs:
 - **`rowClassName`**: a string, or a function `(row, i) => string` for **conditional** rows
   (e.g. flag a deactivated user with a destructive tint).
 - **`column.className`**: classes on a column's header **and** cells, to accent a key column.
+- **`classNames`**: a per-slot object for precise overrides without reaching into the
+  internal `data-bpdm-slot` elements from CSS. Each entry merges with the flat prop above:
+
+  ```tsx
+  <DataTable
+    classNames={{
+      root: 'rounded-2xl',
+      header: 'bg-slate-50',
+      headerCell: 'uppercase tracking-wide',
+      cell: 'py-4',
+    }}
+  />
+  ```
+
+  In Angular: `[classNames]="{ root: 'rounded-2xl', header: 'bg-slate-50' }"`.
 
 These compose with `cellClassName` (every body cell) and `className` (the table). Below,
 the header is tinted, the **Tasks** column is accented, and disabled members are flagged.
@@ -2285,8 +2386,10 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 | `data` | `T[]` |, | **Required.** Row data. |
 | `rowKey` | `(row, i) => Key` | index | Stable key (needed for selection/expansion across sorting). |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Cell density. |
+| `preset` | `'lined' \| 'card' \| 'grid' \| 'plain'` | `'lined'` | A named look that sets defaults for several style props at once. Any prop you also pass overrides it. |
 | `striped` | `boolean` | `false` | Zebra striping on alternate rows. |
 | `bordered` | `boolean` | `false` | Vertical dividers between columns. |
+| `columnSeparators` | `boolean` | `false` | Subtle inset vertical separators between columns (header + body), lighter than `bordered`. Colour: `--bpdm-table-separator`. |
 | `frame` | `boolean` | `false` | Outer border + rounded container (outlined card). |
 | `divided` | `boolean` | `true` | Horizontal dividers between rows. |
 | `elevated` | `boolean` | `true` | Soft drop shadow so the table gently floats. Set `false` for a flat, flush table (e.g. nested inside your own card). |
@@ -2294,8 +2397,10 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 | `headerClassName` | `string` |, | Classes on every header cell. |
 | `cellClassName` | `string` |, | Classes on every body cell. |
 | `rowClassName` | `string \| (row, i) => string` |, | Per-row classes, string or a function for conditional styling. See [Custom styling](#custom-styling). |
+| `classNames` | `{ root, table, header, headerCell, row, cell }` |, | Per-slot class overrides, merged with the flat `*ClassName` props. A clean alternative to targeting the internal `data-bpdm-slot` elements in CSS. |
 | `rowSpacing` | `number` |, | Vertical gap (px) between rows, renders rows as separated, rounded filled blocks (no dividers). |
 | `stickyHeader` | `boolean` | `false` | Keep the header visible while the body scrolls (pair with `maxHeight`). |
+| `stickyHeaderShadow` | `boolean` | `true` | Thin divider line under a sticky or framed header. Set `false` to remove it. |
 | `maxHeight` | `number \| string` |, | Cap the height → the body scrolls vertically inside the table. |
 | `emptyContent` | `ReactNode` (Angular `string`) | `'No data'` | Shown when `data` is empty. |
 | `onRowClick` | `(row, i) => void` |, | Make rows clickable (adds pointer cursor + hover). |
