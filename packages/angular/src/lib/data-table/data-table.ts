@@ -37,6 +37,7 @@ import {
   nextDirection,
   pageList,
   type RowClassFn,
+  type DataTableClassNames,
   type RowClickFn,
   type RowKeyFn,
   type RowPredicate,
@@ -94,10 +95,25 @@ interface BodyRow<T> extends RenderRow<T> {
  * Custom cells use an `<ng-template>` referenced from the column's `cell`; plain
  * value columns use `accessor`. Mirrors the React `DataTable`.
  */
+// Named looks. A preset sets the baseline for several style inputs; any input the
+// caller passes explicitly wins over it. `lined` equals the built-in defaults, so an
+// unset preset changes nothing.
+const DATA_TABLE_PRESETS = {
+  lined: { divided: true, bordered: false, elevated: true, hoverable: true, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined as number | undefined },
+  card: { divided: false, bordered: false, elevated: false, hoverable: true, stickyHeaderShadow: false, columnSeparators: true, rowSpacing: 4 as number | undefined },
+  grid: { divided: true, bordered: true, elevated: true, hoverable: true, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined as number | undefined },
+  plain: { divided: false, bordered: false, elevated: false, hoverable: false, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined as number | undefined },
+} as const;
+
 @Component({
   selector: "bpdm-data-table",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: "block w-full min-w-0 max-w-full", "data-bpdm": "", "data-bpdm-slot": "data-table" },
+  host: {
+    class: "block w-full min-w-0 max-w-full",
+    "data-bpdm": "",
+    "data-bpdm-slot": "data-table",
+    "[class]": "classNames()?.root ?? ''",
+  },
   imports: [NgTemplateOutlet, BpdmButton, BpdmCheckbox, BpdmMultiSelect, BpdmColumnFilterMenu, BpdmColumnPinMenu],
   template: `
     @let cols = orderedColumns();
@@ -230,7 +246,7 @@ interface BodyRow<T> extends RenderRow<T> {
         >
           <table [attr.aria-label]="label() || null" [class]="tableClass()" [style.border-spacing]="rowSpacing() ? '0 ' + rowSpacing() + 'px' : null">
             <thead data-bpdm-slot="data-table-header">
-              <tr #headRow>
+              <tr #headRow [class]="classNames()?.header ?? ''">
                 @if (reorderableRows()) {
                   <th scope="col" [class]="leadHeadClass(false)"
                     [style.position]="stickyHeader() ? 'sticky' : null"
@@ -517,19 +533,46 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   readonly data = input<T[]>([]);
   readonly rowKey = input<RowKeyFn<T> | undefined>(undefined);
   readonly size = input<"sm" | "md" | "lg">("md");
+  /**
+   * A named look that sets defaults for several style inputs at once (`lined` default,
+   * `card`, `grid`, `plain`). Any individual input you also pass overrides the preset.
+   */
+  readonly preset = input<"lined" | "card" | "grid" | "plain">("lined");
+  private readonly presetValues = computed(
+    () => DATA_TABLE_PRESETS[this.preset()] ?? DATA_TABLE_PRESETS.lined,
+  );
   readonly striped = input(false, { transform: booleanAttribute });
-  readonly bordered = input(false, { transform: booleanAttribute });
+  readonly borderedInput = input<boolean | undefined, unknown>(undefined, { alias: "bordered", transform: booleanAttribute });
+  readonly bordered = computed(() => this.borderedInput() ?? this.presetValues().bordered);
   readonly frame = input(false, { transform: booleanAttribute });
   /** Soft drop shadow so the table gently floats. Default true; false = flat/flush. */
-  readonly elevated = input(true, { transform: booleanAttribute });
-  readonly divided = input(true, { transform: booleanAttribute });
+  readonly elevatedInput = input<boolean | undefined, unknown>(undefined, { alias: "elevated", transform: booleanAttribute });
+  readonly elevated = computed(() => this.elevatedInput() ?? this.presetValues().elevated);
+  readonly dividedInput = input<boolean | undefined, unknown>(undefined, { alias: "divided", transform: booleanAttribute });
+  readonly divided = computed(() => this.dividedInput() ?? this.presetValues().divided);
   readonly cellClassName = input<string>("");
   /** Extra classes on every header cell — e.g. to tint/colour the header row. */
   readonly headerClassName = input<string>("");
   readonly rowClassName = input<string | RowClassFn<T> | undefined>(undefined);
-  readonly rowSpacing = input<number | undefined>(undefined);
-  readonly hoverable = input(true, { transform: booleanAttribute });
+  /** Per-slot class overrides (root, table, header, headerCell, row, cell). */
+  readonly classNames = input<DataTableClassNames | undefined>(undefined);
+  readonly rowSpacingInput = input<number | undefined>(undefined, { alias: "rowSpacing" });
+  readonly rowSpacing = computed(() => this.rowSpacingInput() ?? this.presetValues().rowSpacing);
+  readonly hoverableInput = input<boolean | undefined, unknown>(undefined, { alias: "hoverable", transform: booleanAttribute });
+  readonly hoverable = computed(() => this.hoverableInput() ?? this.presetValues().hoverable);
   readonly stickyHeader = input(false, { transform: booleanAttribute });
+  /**
+   * Draw the thin divider line under a sticky or framed header. Default true. Set
+   * false for a header with no underline, e.g. when matching a host table that has none.
+   */
+  readonly stickyHeaderShadowInput = input<boolean | undefined, unknown>(undefined, { alias: "stickyHeaderShadow", transform: booleanAttribute });
+  readonly stickyHeaderShadow = computed(() => this.stickyHeaderShadowInput() ?? this.presetValues().stickyHeaderShadow);
+  /**
+   * Subtle inset vertical separators between columns, in both the header and the body.
+   * Lighter than `bordered` and coloured by the `--bpdm-table-separator` token. Default false.
+   */
+  readonly columnSeparatorsInput = input<boolean | undefined, unknown>(undefined, { alias: "columnSeparators", transform: booleanAttribute });
+  readonly columnSeparators = computed(() => this.columnSeparatorsInput() ?? this.presetValues().columnSeparators);
   readonly maxHeight = input<number | string | undefined>(undefined);
   readonly emptyContent = input<string>("No data");
   readonly onRowClick = input<RowClickFn<T> | undefined>(undefined);
@@ -1372,7 +1415,11 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     );
   }
   protected tableClass(): string {
-    return cn("w-full text-[var(--bpdm-card-foreground)]", this.rowSpacing() ? "border-separate" : "border-collapse");
+    return cn(
+      "w-full text-[var(--bpdm-card-foreground)]",
+      this.rowSpacing() ? "border-separate" : "border-collapse",
+      this.classNames()?.table,
+    );
   }
   protected scrollMaxHeight(): string | null {
     const mh = this.maxHeight();
@@ -1391,8 +1438,8 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
     return cn(
       this.cellPad(),
       "w-[1%]",
-      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-[var(--bpdm-card)]" : "bg-transparent",
-      "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+      (this.frame() || (canPin && this.hasLeftPin()) || this.stickyHeader()) ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
+      this.stickyHeaderShadow() && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
       canPin && this.bordered() && "border-e border-[var(--bpdm-border)]",
       canPin && this.hasLeftPin() ? "z-20" : this.stickyHeader() && "z-10",
       this.headerClassName(),
@@ -1411,12 +1458,15 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // framed/pinned/sticky headers sit on the card surface (clean header +
       // divider, not a heavy grey band) and stay opaque so scrolling rows never
       // bleed through; otherwise transparent
-      this.frame() || col.pin || this.stickyHeader() ? "bg-[var(--bpdm-card)]" : "bg-transparent",
-      "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+      this.frame() || col.pin || this.stickyHeader() ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
+      this.stickyHeaderShadow() && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
       this.bordered() && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
+      this.columnSeparators() &&
+        "relative after:pointer-events-none after:absolute after:inset-y-[6px] after:end-0 after:w-px after:bg-[var(--bpdm-table-separator)] last:after:hidden",
       col.pin ? "z-20" : this.stickyHeader() && "z-10",
-      col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
-      col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
+      !this.columnSeparators() && col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
+      !this.columnSeparators() && col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
+      this.classNames()?.headerCell,
       this.headerClassName(),
       col.className,
     );
@@ -1433,9 +1483,13 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
   private readonly pinnedBg = computed(() =>
     cn(
-      "bg-[var(--bpdm-card)]",
-      this.hoverable() && "group-hover:bg-[color-mix(in_srgb,var(--bpdm-primary)_4%,var(--bpdm-card))]",
-      "group-data-[selected]:bg-[color-mix(in_srgb,var(--bpdm-primary)_10%,var(--bpdm-card))]",
+      // opaque base so horizontally-scrolled cells never show through: spaced rows
+      // share the row band fill, otherwise the card surface.
+      this.rowSpacing() ? "bg-[var(--bpdm-table-row-bg)]" : "bg-[var(--bpdm-card)]",
+      // hover / selected reuse the same tokens as the row, so a frozen column
+      // highlights identically to the rest of the row.
+      this.hoverable() && "group-hover:bg-[var(--bpdm-table-row-hover-bg)]",
+      "group-data-[selected]:bg-[var(--bpdm-table-row-selected-bg)]",
     ),
   );
   protected readonly leadBodyClass = computed(() =>
@@ -1448,9 +1502,14 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       ALIGN_CLASS[align],
       col.numeric && "tabular-nums",
       this.bordered() && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
+      this.columnSeparators() &&
+        "relative after:pointer-events-none after:absolute after:inset-y-[6px] after:end-0 after:w-px after:bg-[var(--bpdm-table-separator)] last:after:hidden",
       col.pin && `z-10 ${this.pinnedBg()}`,
-      col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
-      col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
+      // the heavy frozen-edge border is replaced by the inset separator when
+      // columnSeparators is on, so the frozen column never shows a doubled line
+      !this.columnSeparators() && col.id === this.lastLeftId() && "border-e border-[var(--bpdm-border)]",
+      !this.columnSeparators() && col.id === this.firstRightId() && "border-s border-[var(--bpdm-border)]",
+      this.classNames()?.cell,
       this.cellClassName(),
       col.className,
     );
@@ -1488,16 +1547,17 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
       // borderless tables get a closing rule under the last row
       // (framed tables are closed by the container border)
       this.divided() && !this.rowSpacing() && !this.frame() && isLast && "border-b border-[var(--bpdm-border)]",
-      this.rowSpacing() && "bg-[var(--bpdm-muted)]/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
-      this.striped() && "even:bg-[var(--bpdm-muted)]/40",
+      this.rowSpacing() && "bg-[var(--bpdm-table-row-bg)] [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
+      this.striped() && "even:bg-[var(--bpdm-table-stripe-bg)]",
       // bpdm signature: a warm amber focus language — soft amber hover, and
       // selected rows get an amber tint + an inline-start accent bar (RTL flips it)
-      this.hoverable() && "hover:bg-[var(--bpdm-primary)]/[0.04]",
-      this.selectedSet().has(rr.key) && "bg-[var(--bpdm-primary)]/10 shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
+      this.hoverable() && "hover:bg-[var(--bpdm-table-row-hover-bg)]",
+      this.selectedSet().has(rr.key) && "bg-[var(--bpdm-table-row-selected-bg)] shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
       this.hoverable() && this.selectedSet().has(rr.key) && "hover:bg-[var(--bpdm-primary)]/[0.14]",
       t?.key === rr.key && t.pos === "before" && "shadow-[inset_0_2px_0_var(--bpdm-primary)]",
       t?.key === rr.key && t.pos === "after" && "shadow-[inset_0_-2px_0_var(--bpdm-primary)]",
       this.clickable() && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--bpdm-ring)]",
+      this.classNames()?.row,
       extra,
     );
   }

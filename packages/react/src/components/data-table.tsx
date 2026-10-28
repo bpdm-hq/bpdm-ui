@@ -250,6 +250,27 @@ export interface DataTableColumn<T> {
   className?: string;
 }
 
+/**
+ * Per-slot class overrides. A cleaner alternative to reaching into the component's
+ * internal `data-bpdm-slot` elements from your own CSS: pass a class for the exact
+ * part you want to restyle. Each entry is merged with (not replaced by) the matching
+ * flat prop, so `classNames.cell` and `cellClassName` both apply.
+ */
+export interface DataTableClassNames {
+  /** The outer container element. */
+  root?: string;
+  /** The `<table>` element. */
+  table?: string;
+  /** The header row (the `<thead>`'s `<tr>`). */
+  header?: string;
+  /** Every header cell (`<th>`). Merged with `headerClassName`. */
+  headerCell?: string;
+  /** Every body row (`<tr>`). Merged with `rowClassName`. */
+  row?: string;
+  /** Every body cell (`<td>`). Merged with `cellClassName`. */
+  cell?: string;
+}
+
 export interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
@@ -257,6 +278,17 @@ export interface DataTableProps<T> {
   rowKey?: (row: T, index: number) => React.Key;
   /** Cell density. Default "md". */
   size?: "sm" | "md" | "lg";
+  /**
+   * A named look that sets sensible defaults for several style props at once, so you
+   * pick one word instead of composing them. Default `"lined"` (the built-in look).
+   * Any individual prop you also pass overrides the preset.
+   *
+   * - `lined`  — soft horizontal row dividers (the default).
+   * - `card`   — spaced, rounded card rows with inset column separators, no header line, flat.
+   * - `grid`   — full cell gridlines (a spreadsheet look).
+   * - `plain`  — flat and minimal: no dividers, shadow or hover.
+   */
+  preset?: "lined" | "card" | "grid" | "plain";
   /** Zebra striping on alternate rows. */
   striped?: boolean;
   /** Vertical dividers between columns. */
@@ -276,16 +308,29 @@ export interface DataTableProps<T> {
   headerClassName?: string;
   /** Extra classes per body row — a string, or a fn for conditional styling. */
   rowClassName?: string | ((row: T, index: number) => string);
+  /** Per-slot class overrides (root, table, header, headerCell, row, cell). */
+  classNames?: DataTableClassNames;
   /**
    * Vertical gap (px) between rows. Renders rows as separated filled blocks
-   * (rounded, no dividers). Each row gets a default `bg-[var(--bpdm-muted)]/50` fill —
-   * override the colour with `rowClassName`.
+   * (rounded, no dividers). Each row gets the `--bpdm-table-row-bg` token as its fill —
+   * override that token, or use `rowClassName`, to recolour.
    */
   rowSpacing?: number;
   /** Highlight the row under the cursor. Default true. */
   hoverable?: boolean;
   /** Keep the header visible while the body scrolls (pair with `maxHeight`). */
   stickyHeader?: boolean;
+  /**
+   * Draw the thin divider line under a sticky or framed header. Default true. Set
+   * false for a header with no underline, e.g. when matching a host table that has none.
+   */
+  stickyHeaderShadow?: boolean;
+  /**
+   * Subtle inset vertical separators between columns, in both the header and the body.
+   * Lighter than `bordered` (which draws full-height cell borders) and coloured by the
+   * `--bpdm-table-separator` token. Default false.
+   */
+  columnSeparators?: boolean;
   /** Cap the height → the body scrolls vertically inside the table. */
   maxHeight?: number | string;
   /** Shown when `data` is empty. Default: "No data". */
@@ -1199,6 +1244,7 @@ interface DataTableRowProps<T> {
   columns: DataTableColumn<T>[];
   padCls: string;
   bordered: boolean;
+  columnSeparators: boolean;
   striped: boolean;
   divided: boolean;
   frame: boolean;
@@ -1250,6 +1296,7 @@ function DataTableRowInner<T>({
   columns,
   padCls,
   bordered,
+  columnSeparators,
   striped,
   divided,
   frame,
@@ -1312,13 +1359,13 @@ function DataTableRowInner<T>({
           // (framed tables are closed by the container border)
           divided && !rowSpacing && !frame && isLast && "border-b border-[var(--bpdm-border)]",
           rowSpacing &&
-            "bg-[var(--bpdm-muted)]/50 [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
-          striped && "even:bg-[var(--bpdm-muted)]/40",
+            "bg-[var(--bpdm-table-row-bg)] [&>td:first-child]:rounded-l-lg [&>td:last-child]:rounded-r-lg",
+          striped && "even:bg-[var(--bpdm-table-stripe-bg)]",
           // bpdm signature: a warm amber focus language — soft amber hover,
           // and selected rows get an amber tint + a left accent bar
-          hoverable && "hover:bg-[var(--bpdm-primary)]/[0.04]",
+          hoverable && "hover:bg-[var(--bpdm-table-row-hover-bg)]",
           selected &&
-            "bg-[var(--bpdm-primary)]/10 shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
+            "bg-[var(--bpdm-table-row-selected-bg)] shadow-[inset_3px_0_0_0_var(--bpdm-primary)] rtl:shadow-[inset_-3px_0_0_0_var(--bpdm-primary)]",
           hoverable && selected && "hover:bg-[var(--bpdm-primary)]/[0.14]",
           // insertion line while reordering rows
           isDropBefore && "shadow-[inset_0_2px_0_var(--bpdm-primary)]",
@@ -1445,9 +1492,15 @@ function DataTableRowInner<T>({
                 alignClass[align],
                 col.numeric && "tabular-nums",
                 bordered && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
+                columnSeparators &&
+                  "relative after:pointer-events-none after:absolute after:inset-y-[6px] after:end-0 after:w-px after:bg-[var(--bpdm-table-separator)] last:after:hidden",
                 col.pin && `z-10 ${pinnedBg}`,
-                col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
-                col.id === firstRightId && "border-s border-[var(--bpdm-border)]",
+                // the heavy frozen-edge border is replaced by the inset separator when
+                // columnSeparators is on, so the frozen column never shows a doubled line
+                !columnSeparators && col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
+                !columnSeparators &&
+                  col.id === firstRightId &&
+                  "border-s border-[var(--bpdm-border)]",
                 cellClassName,
                 col.className,
               )}
@@ -1480,6 +1533,16 @@ function DataTableRowInner<T>({
 // `React.memo` drops the generic call signature — cast back so JSX keeps inferring T.
 const DataTableRow = React.memo(DataTableRowInner) as typeof DataTableRowInner;
 
+// Named looks. A preset sets the baseline for several style props; any prop the
+// caller passes explicitly wins over it. `lined` equals the built-in defaults, so an
+// unset preset changes nothing.
+const DATA_TABLE_PRESETS = {
+  lined: { divided: true, bordered: false, elevated: true, hoverable: true, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined },
+  card: { divided: false, bordered: false, elevated: false, hoverable: true, stickyHeaderShadow: false, columnSeparators: true, rowSpacing: 4 },
+  grid: { divided: true, bordered: true, elevated: true, hoverable: true, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined },
+  plain: { divided: false, bordered: false, elevated: false, hoverable: false, stickyHeaderShadow: true, columnSeparators: false, rowSpacing: undefined },
+} as const;
+
 /**
  * Data-driven table. Describe `columns` and pass `data`; everything else
  * (density, striping, borders, sticky header, vertical/horizontal scroll, empty
@@ -1497,16 +1560,20 @@ export function DataTable<T>({
   rowKey,
   size = "md",
   striped = false,
-  bordered = false,
+  bordered: borderedInput,
   frame = false,
-  elevated = true,
-  divided = true,
+  elevated: elevatedInput,
+  divided: dividedInput,
   cellClassName,
   headerClassName,
   rowClassName,
-  rowSpacing,
-  hoverable = true,
+  classNames,
+  rowSpacing: rowSpacingInput,
+  hoverable: hoverableInput,
   stickyHeader = false,
+  stickyHeaderShadow: stickyHeaderShadowInput,
+  columnSeparators: columnSeparatorsInput,
+  preset = "lined",
   maxHeight,
   emptyContent = "No data",
   onRowClick,
@@ -1546,6 +1613,17 @@ export function DataTable<T>({
   getRowLabel,
   className,
 }: DataTableProps<T>) {
+  // Resolve preset-controlled props: an explicitly-passed prop wins, otherwise the
+  // preset supplies the value (default preset `lined` == the built-in look).
+  const _preset = DATA_TABLE_PRESETS[preset] ?? DATA_TABLE_PRESETS.lined;
+  const bordered = borderedInput ?? _preset.bordered;
+  const elevated = elevatedInput ?? _preset.elevated;
+  const divided = dividedInput ?? _preset.divided;
+  const hoverable = hoverableInput ?? _preset.hoverable;
+  const stickyHeaderShadow = stickyHeaderShadowInput ?? _preset.stickyHeaderShadow;
+  const columnSeparators = columnSeparatorsInput ?? _preset.columnSeparators;
+  const rowSpacing = rowSpacingInput ?? _preset.rowSpacing;
+
   const t = React.useMemo(
     () => ({ ...DEFAULT_DATA_TABLE_MESSAGES, ...messages }),
     [messages],
@@ -2175,11 +2253,15 @@ export function DataTable<T>({
   const pinnedBg = React.useMemo(
     () =>
       cn(
-        "bg-[var(--bpdm-card)]",
-        hoverable && "group-hover:bg-[color-mix(in_srgb,var(--bpdm-primary)_4%,var(--bpdm-card))]",
-        "group-data-[selected]:bg-[color-mix(in_srgb,var(--bpdm-primary)_10%,var(--bpdm-card))]",
+        // opaque base so horizontally-scrolled cells never show through: spaced rows
+        // share the row band fill, otherwise the card surface.
+        rowSpacing ? "bg-[var(--bpdm-table-row-bg)]" : "bg-[var(--bpdm-card)]",
+        // hover / selected reuse the same tokens as the row, so a frozen column
+        // highlights identically to the rest of the row.
+        hoverable && "group-hover:bg-[var(--bpdm-table-row-hover-bg)]",
+        "group-data-[selected]:bg-[var(--bpdm-table-row-selected-bg)]",
       ),
-    [hoverable],
+    [hoverable, rowSpacing],
   );
 
   // sticky positioning for a data column (used by both th and td). Depends on the
@@ -2286,7 +2368,7 @@ export function DataTable<T>({
   };
 
   return (
-    <div data-bpdm="" data-bpdm-slot="data-table" className="w-full min-w-0 max-w-full">
+    <div data-bpdm="" data-bpdm-slot="data-table" className={cn("w-full min-w-0 max-w-full", classNames?.root)}>
       <div aria-live="polite" role="status" className="sr-only">
         {liveMessage}
       </div>
@@ -2491,19 +2573,20 @@ export function DataTable<T>({
         className={cn(
           "w-full text-[var(--bpdm-card-foreground)]",
           rowSpacing ? "border-separate" : "border-collapse",
+          classNames?.table,
         )}
         style={rowSpacing ? { borderSpacing: `0 ${rowSpacing}px` } : undefined}
       >
         <thead data-bpdm-slot="data-table-header">
-          <tr ref={headRef}>
+          <tr ref={headRef} className={classNames?.header}>
             {reorderableRows && (
               <th
                 scope="col"
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  frame || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
-                  "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                  frame || stickyHeader ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
+                  stickyHeaderShadow && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
                   stickyHeader && "sticky top-0 z-10",
                   headerClassName,
                 )}
@@ -2522,8 +2605,8 @@ export function DataTable<T>({
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
-                  "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
+                  stickyHeaderShadow && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
                   bordered && "border-e border-[var(--bpdm-border)]",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
@@ -2543,8 +2626,9 @@ export function DataTable<T>({
                 className={cn(
                   padCls,
                   "w-[1%]",
-                  "text-[var(--bpdm-muted-foreground)] shadow-[inset_0_-1px_0_var(--bpdm-border)]",
-                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
+                  "text-[var(--bpdm-muted-foreground)]",
+                  stickyHeaderShadow && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                  frame || hasLeftPin || stickyHeader ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
                   bordered && "border-e border-[var(--bpdm-border)]",
                   hasLeftPin ? "z-20" : stickyHeader && "z-10",
                   headerClassName,
@@ -2629,13 +2713,20 @@ export function DataTable<T>({
                     // framed/pinned/sticky headers sit on the card surface (clean
                     // header + divider, not a heavy grey band) and stay opaque so
                     // scrolling rows never bleed through; otherwise transparent
-                    frame || col.pin || stickyHeader ? "bg-[var(--bpdm-card)]" : "bg-transparent",
-                    // keep a divider line under the header even when it is sticky
-                    "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
+                    frame || col.pin || stickyHeader ? "bg-[var(--bpdm-table-header-bg)]" : "bg-transparent",
+                    // divider line under the header, even when sticky; opt out with stickyHeaderShadow={false}
+                    stickyHeaderShadow && "shadow-[inset_0_-1px_0_var(--bpdm-border)]",
                     bordered && "border-e border-[var(--bpdm-border)]/55 last:border-e-0",
+                    columnSeparators &&
+                      "relative after:pointer-events-none after:absolute after:inset-y-[6px] after:end-0 after:w-px after:bg-[var(--bpdm-table-separator)] last:after:hidden",
                     col.pin ? "z-20" : stickyHeader && "z-10",
-                    col.id === lastLeftId && "border-e border-[var(--bpdm-border)]",
-                    col.id === firstRightId && "border-s border-[var(--bpdm-border)]",
+                    !columnSeparators &&
+                      col.id === lastLeftId &&
+                      "border-e border-[var(--bpdm-border)]",
+                    !columnSeparators &&
+                      col.id === firstRightId &&
+                      "border-s border-[var(--bpdm-border)]",
+                    classNames?.headerCell,
                     headerClassName,
                     col.className,
                   )}
@@ -2776,6 +2867,7 @@ export function DataTable<T>({
                   columns={orderedColumns}
                   padCls={padCls}
                   bordered={bordered}
+                  columnSeparators={columnSeparators}
                   striped={striped}
                   divided={divided}
                   frame={frame}
@@ -2794,12 +2886,11 @@ export function DataTable<T>({
                   expanderLeft={expanderLeft}
                   selectionLeft={selectionLeft}
                   colCount={colCount}
-                  cellClassName={cellClassName}
-                  rowClassNameValue={
-                    typeof rowClassName === "function"
-                      ? rowClassName(row, rowIndex)
-                      : rowClassName
-                  }
+                  cellClassName={cn(cellClassName, classNames?.cell)}
+                  rowClassNameValue={cn(
+                    typeof rowClassName === "function" ? rowClassName(row, rowIndex) : rowClassName,
+                    classNames?.row,
+                  )}
                   panelId={panelId}
                   pinStyleFor={pinStyleFor}
                   toggleRow={toggleRow}

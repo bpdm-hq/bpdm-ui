@@ -36,6 +36,23 @@
      so the highlight stays perceivable (that opt-out is your a11y call). */
   --bpdm-option-active-bg: color-mix(in oklab, var(--bpdm-primary) 10%, transparent);
   --bpdm-option-active-bar: var(--bpdm-ring);
+
+  /* Data Table overridable component tokens. `--bpdm-table-separator` colours the
+     optional inset column separators (the `columnSeparators` prop). `--bpdm-table-row-bg`
+     is the opaque fill for spaced rows (`rowSpacing`), used by the row and its pinned
+     cells so a frozen column never breaks the row band. Both follow the active theme and
+     can be overridden to match a host design. */
+  --bpdm-table-separator: var(--bpdm-border);
+  --bpdm-table-row-bg: color-mix(in srgb, var(--bpdm-muted) 50%, var(--bpdm-card));
+
+  /* Stateful row + header surfaces. Defaults reproduce the built-in look (a soft
+     brand wash on hover/selected, a faint muted stripe, a card-surface header), and
+     each is a plain opaque colour so it works on pinned/frozen cells too. Override
+     any of them to recolour that state without touching component internals. */
+  --bpdm-table-row-hover-bg: color-mix(in srgb, var(--bpdm-primary) 4%, var(--bpdm-card));
+  --bpdm-table-row-selected-bg: color-mix(in srgb, var(--bpdm-primary) 10%, var(--bpdm-card));
+  --bpdm-table-stripe-bg: color-mix(in srgb, var(--bpdm-muted) 40%, var(--bpdm-card));
+  --bpdm-table-header-bg: var(--bpdm-card);
 }
 
 /* LIGHT · Warm Paper (default) */

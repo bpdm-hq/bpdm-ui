@@ -12,6 +12,27 @@ export type RowPredicate<T> = (row: T) => boolean;
 /** Per-row class function for conditional styling. */
 export type RowClassFn<T> = (row: T, index: number) => string;
 
+/**
+ * Per-slot class overrides. A cleaner alternative to reaching into the component's
+ * internal `data-bpdm-slot` elements from your own CSS. Each entry is merged with
+ * (not replaced by) the matching flat input (`cellClassName`, `headerClassName`,
+ * `rowClassName`).
+ */
+export interface DataTableClassNames {
+  /** The host / outer container element. */
+  root?: string;
+  /** The `<table>` element. */
+  table?: string;
+  /** The header row (the `<thead>`'s `<tr>`). */
+  header?: string;
+  /** Every header cell (`<th>`). Merged with `headerClassName`. */
+  headerCell?: string;
+  /** Every body row (`<tr>`). Merged with `rowClassName`. */
+  row?: string;
+  /** Every body cell (`<td>`). Merged with `cellClassName`. */
+  cell?: string;
+}
+
 /** One column's sort direction. */
 export type SortDirection = "asc" | "desc";
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { type Key, type ReactNode, useState } from 'react';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import {
   DataTable,
   type DataTableColumn,
@@ -344,13 +345,98 @@ export function DataTableStripedDemo() {
     <Tabs
       className="w-full self-start"
       listClassName="mb-2"
-      defaultValue="borderless"
+      defaultValue="striped"
       items={[
-        { value: 'borderless', label: 'Borderless', content: <DataTable columns={columns} data={data} rowKey={key} /> },
         { value: 'striped', label: 'Striped', content: <DataTable columns={columns} data={data} rowKey={key} striped /> },
         { value: 'outlined', label: 'Outlined', content: <DataTable columns={columns} data={data} rowKey={key} frame bordered /> },
       ]}
     />
+  );
+}
+
+export function DataTableSeparatorsDemo() {
+  const data = MEMBERS.slice(0, 4);
+  return (
+    <Tabs
+      className="w-full self-start"
+      listClassName="mb-2"
+      defaultValue="separators"
+      items={[
+        {
+          value: 'separators',
+          label: 'Column separators',
+          content: <DataTable columns={columns} data={data} rowKey={key} columnSeparators />,
+        },
+        {
+          value: 'no-line',
+          label: 'No header line',
+          content: (
+            <DataTable
+              columns={columns}
+              data={data}
+              rowKey={key}
+              columnSeparators
+              stickyHeaderShadow={false}
+            />
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+const PRESET_NAMES = ['lined', 'card', 'grid', 'plain'] as const;
+type PresetName = (typeof PRESET_NAMES)[number];
+
+const presetCode = (p: PresetName, fw: 'react' | 'angular') =>
+  fw === 'react'
+    ? `<DataTable columns={columns} data={members} rowKey={(r) => r.id} preset="${p}" />`
+    : `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" preset="${p}" />`;
+
+/** Interactive playground: the preset tab drives BOTH the live table and the code. */
+export function DataTablePresetDemo() {
+  const data = MEMBERS.slice(0, 4);
+  const [preset, setPreset] = useState<PresetName>('lined');
+  const [fw, setFw] = useState<'react' | 'angular'>('react');
+
+  const pill = (active: boolean) =>
+    `rounded-md px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
+      active
+        ? 'bg-fd-primary/10 text-fd-primary'
+        : 'text-fd-muted-foreground hover:text-fd-foreground'
+    }`;
+
+  return (
+    <div className="not-prose my-4 flex flex-col gap-4 rounded-xl border border-fd-border bg-fd-card p-4">
+      <div className="flex flex-wrap items-center gap-1 border-b border-fd-border pb-2">
+        {PRESET_NAMES.map((p) => (
+          <button key={p} type="button" onClick={() => setPreset(p)} className={pill(preset === p)}>
+            {p}
+          </button>
+        ))}
+      </div>
+
+      <DataTable columns={columns} data={data} rowKey={key} preset={preset} />
+
+      <div className="flex items-center gap-1">
+        {(['react', 'angular'] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => setFw(f)}
+            className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+              fw === f
+                ? 'bg-fd-primary/10 text-fd-primary'
+                : 'text-fd-muted-foreground hover:text-fd-foreground'
+            }`}
+          >
+            {f === 'react' ? 'React' : 'Angular'}
+          </button>
+        ))}
+      </div>
+
+      <DynamicCodeBlock lang={fw === 'react' ? 'tsx' : 'html'} code={presetCode(preset, fw)} />
+    </div>
   );
 }
 
