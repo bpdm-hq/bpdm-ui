@@ -41,6 +41,26 @@ export interface SelectOptionGroup {
 }
 export type SelectItems = Array<SelectOption | SelectOptionGroup>;
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface SelectClassNames {
+  /** The trigger button. */
+  trigger?: string;
+  /** The selected-value text inside the trigger. */
+  value?: string;
+  /** The dropdown panel. */
+  content?: string;
+  /** The search input (when `searchable`). */
+  search?: string;
+  /** The empty-state message. */
+  empty?: string;
+  /** The scrollable option list. */
+  list?: string;
+  /** A group heading. */
+  group?: string;
+  /** Each option row. */
+  option?: string;
+}
+
 const isGroup = (x: SelectOption | SelectOptionGroup): x is SelectOptionGroup =>
   Array.isArray((x as SelectOptionGroup).options);
 
@@ -121,7 +141,7 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span data-bpdm-slot="select-value" class="truncate" [class.text-[var(--bpdm-muted-foreground)]]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
+      <span data-bpdm-slot="select-value" [class]="cls('truncate', 'value')" [class.text-[var(--bpdm-muted-foreground)]]="!selectedLabel()" [attr.title]="selectedLabel() || placeholder()">
         {{ selectedLabel() || placeholder() }}
       </span>
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 opacity-60 transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)]" [class.rotate-180]="open()">
@@ -134,11 +154,11 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
         @if (searchable()) {
           <div class="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-            <input #search data-bpdm-slot="select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" class="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none" />
+            <input #search data-bpdm-slot="select-search" [value]="query()" (input)="onSearch($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" role="combobox" aria-expanded="true" aria-autocomplete="list" [attr.aria-controls]="listboxId" [attr.aria-activedescendant]="activeDescId()" [class]="cls('h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none', 'search')" />
           </div>
         }
         @if (rows().length === 0) {
-          <div data-bpdm-slot="select-empty" class="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{{ emptyText() }}</div>
+          <div data-bpdm-slot="select-empty" [class]="cls('px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]', 'empty')">{{ emptyText() }}</div>
         } @else {
           <cdk-virtual-scroll-viewport
             #viewport
@@ -150,11 +170,11 @@ export function filterSelectRows(all: SelectRow[], query: string): SelectRow[] {
             [attr.aria-activedescendant]="searchable() ? null : activeDescId()"
             [itemSize]="36"
             [style.height.px]="viewportHeight()"
-            class="overflow-auto px-1 focus:outline-none"
+            [class]="cls('overflow-auto px-1 focus:outline-none', 'list')"
           >
             <ng-container *cdkVirtualFor="let r of rows(); let i = index">
               @if (r.kind === "group") {
-                <div data-bpdm-slot="select-group" aria-hidden="true" class="flex h-9 items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)]">{{ r.label }}</div>
+                <div data-bpdm-slot="select-group" aria-hidden="true" [class]="cls('flex h-9 items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)]', 'group')">{{ r.label }}</div>
               } @else {
                 <button
                   type="button"
@@ -203,6 +223,8 @@ export class BpdmSelect implements OnDestroy, ControlValueAccessor {
   protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
+  /** Per-slot class overrides (trigger, value, content, search, empty, list, group, option). */
+  readonly classNames = input<SelectClassNames | undefined>(undefined);
   readonly id = input("");
   /** Accessible name for the trigger + option list — pass a translated string. */
   readonly ariaLabel = input("", { alias: "aria-label" });
@@ -244,9 +266,14 @@ export class BpdmSelect implements OnDestroy, ControlValueAccessor {
   });
 
   protected readonly triggerClass = computed(() =>
-    cn(SELECT_TRIGGER_BASE, SELECT_TRIGGER_SIZE[this.size()], "group", this.classInput()),
+    cn(SELECT_TRIGGER_BASE, SELECT_TRIGGER_SIZE[this.size()], "group", this.classInput(), this.classNames()?.trigger),
   );
-  protected readonly panelClass = computed(() => FIELD_PANEL);
+  protected readonly panelClass = computed(() => cn(FIELD_PANEL, this.classNames()?.content));
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof SelectClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected optionClass(i: number): string {
     return cn(
@@ -256,6 +283,7 @@ export class BpdmSelect implements OnDestroy, ControlValueAccessor {
       // alone was ~1.05:1. RTL-safe (logical shadow mirror), jitter-free (inset).
       i === this.active() &&
         "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
+      this.classNames()?.option,
     );
   }
 
