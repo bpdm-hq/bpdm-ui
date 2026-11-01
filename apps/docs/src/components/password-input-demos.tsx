@@ -70,3 +70,20 @@ export function PasswordInputStatesDemo() {
     </div>
   );
 }
+
+export function PasswordInputSlotsDemo() {
+  return (
+    <Frame>
+      <PasswordInput
+        defaultValue="Abc123!x"
+        placeholder="Create a password"
+        classNames={{
+          root: 'rounded-xl',
+          field: 'font-mono',
+          toggle: 'text-primary',
+          meter: 'mt-3',
+        }}
+      />
+    </Frame>
+  );
+}

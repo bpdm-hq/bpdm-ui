@@ -102,6 +102,26 @@ export function StatusTimelineOppositeDemo() {
   );
 }
 
+// Per-slot styling: one classNames object restyles root / item / marker / content / opposite
+export function StatusTimelineSlotsDemo() {
+  return (
+    <WideBox>
+      <Center>
+        <StatusTimeline
+          items={DATED}
+          classNames={{
+            root: 'rounded-xl border border-fd-border bg-fd-card p-4',
+            item: 'py-1',
+            marker: 'ring-4 ring-primary/15',
+            content: 'font-medium text-primary',
+            opposite: 'text-xs text-fd-muted-foreground',
+          }}
+        />
+      </Center>
+    </WideBox>
+  );
+}
+
 // Custom markers (icon + colour) + clickable steps
 function Rocket() {
   return (

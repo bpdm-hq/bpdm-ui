@@ -2,13 +2,22 @@
 
 All notable changes to the bpdm design system packages are recorded here.
 
-## 0.3.0 (2026-10-28)
+## 0.3.0 (2026-10-29)
 
-New ways to restyle the DataTable from props and tokens instead of CSS overrides.
-Additive and backward-compatible: every default is unchanged.
+Per-slot styling across the library, plus new DataTable looks and tokens. Restyle any
+part of a component from props instead of CSS overrides. Additive and
+backward-compatible: every default is unchanged.
 
 ### Added
 
+- **`classNames` slot object on every monolithic component.** Each component now
+  accepts a `classNames` object with one key per internal part, so you can restyle a
+  specific slot without targeting its `data-bpdm-slot` element from CSS. Each entry
+  merges with the component's own classes. Covered: Select, MultiSelect, TreeSelect,
+  Calendar, DatePicker, StatCard, StatusTimeline, Toast (per toast **and** Toaster-wide
+  defaults), PickList, NumberInput, MoneyInput, InputOtp, SecureField, PasswordInput,
+  Avatar and AvatarGroup — joining DataTable from the same release. Each exports a
+  matching `*ClassNames` type, identical in React and Angular.
 - **DataTable `preset` prop** (`lined` default, `card`, `grid`, `plain`): one name sets
   the baseline for several style props at once, and any individual prop overrides it.
 - **DataTable `columnSeparators` and `stickyHeaderShadow` props**: inset vertical

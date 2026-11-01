@@ -12,6 +12,7 @@ import { BpdmPopover } from "../popover/popover";
 import {
   BpdmCalendar,
   type CalendarCaptionLayout,
+  type CalendarClassNames,
   type CalendarDayShape,
   type CalendarMessages,
   type CalendarMode,
@@ -23,6 +24,20 @@ import {
   fmtValue,
   sameDay,
 } from "./date-utils";
+
+/** Per-slot class overrides for `<bpdm-date-picker>`. */
+export interface DatePickerClassNames {
+  /** The trigger button that shows the formatted value. */
+  trigger?: string;
+  /** Each range quick-preset button in the side rail. */
+  preset?: string;
+  /** The clear (×) button shown when a value is set. */
+  clear?: string;
+  /** The popover panel wrapping the calendar. */
+  content?: string;
+  /** Forwarded to the inner `<bpdm-calendar>`'s own slots. */
+  calendar?: CalendarClassNames;
+}
 
 /**
  * `<bpdm-date-picker>` — date (or range) picker: a trigger showing the formatted
@@ -51,7 +66,7 @@ import {
         [bpdmPopoverOpen]="open()"
         (bpdmPopoverOpenChange)="onOpenChange($event)"
         bpdmPopoverAlign="start"
-        [bpdmPopoverClass]="'w-auto p-0 ' + contentClassName()"
+        [bpdmPopoverClass]="panelClass()"
         [id]="id() || null"
         [disabled]="disabledInput()"
         [attr.aria-invalid]="invalid() ? 'true' : null"
@@ -71,7 +86,7 @@ import {
           data-bpdm-slot="date-picker-clear"
           [attr.aria-label]="messages().clear || 'Clear'"
           (click)="clear($event)"
-          class="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
+          [class]="cls('absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]', 'clear')"
         >
           <svg viewBox="0 0 24 24" fill="none" class="size-3.5" aria-hidden="true">
             <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -111,6 +126,7 @@ import {
               [toYear]="toYear()"
               [locale]="locale()"
               [messages]="messages()"
+              [classNames]="classNames()?.calendar"
             />
           </div>
         } @else {
@@ -129,6 +145,7 @@ import {
             [toYear]="toYear()"
             [locale]="locale()"
             [messages]="messages()"
+            [classNames]="classNames()?.calendar"
           />
         }
         @if (confirm()) {
@@ -188,6 +205,13 @@ export class BpdmDatePicker {
   readonly locale = input<string | undefined>(undefined);
   /** Override control labels (screen-reader text) for i18n; forwarded to the calendar. */
   readonly messages = input<CalendarMessages>({});
+  /** Per-slot class overrides (trigger, preset, clear, content, and the inner calendar). */
+  readonly classNames = input<DatePickerClassNames | undefined>(undefined);
+
+  /** Merge a slot's base class with its matching `classNames` override. */
+  protected cls(base: string, key: keyof DatePickerClassNames): string {
+    return cn(base, this.classNames()?.[key] as string | undefined);
+  }
 
   protected readonly cn = cn;
   protected readonly open = signal(false);
@@ -224,7 +248,12 @@ export class BpdmDatePicker {
       "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-3 text-start text-sm transition-colors hover:border-[var(--bpdm-ring)]/60 focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
       this.showClear() ? "pe-9" : "pe-3",
       this.classInput(),
+      this.classNames()?.trigger,
     ),
+  );
+
+  protected readonly panelClass = computed(() =>
+    cn("w-auto p-0", this.contentClassName(), this.classNames()?.content),
   );
 
   protected onOpenChange(o: boolean): void {
@@ -265,6 +294,7 @@ export class BpdmDatePicker {
     return cn(
       "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
       active ? "bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
+      this.classNames()?.preset,
     );
   }
 }

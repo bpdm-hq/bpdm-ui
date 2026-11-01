@@ -10,6 +10,7 @@ import {
   PickListFilterDemo,
   PickListTransferDemo,
   PickListLockedDemo,
+  PickListSlotsDemo,
   PickListI18nDemo,
 } from '@/components/pick-list-demos';
 import { Preview } from '@/components/preview';
@@ -528,6 +529,90 @@ export class Features {
 | `sourceLabel` / `targetLabel` | `string` | `source list` / `target list` | Fallback accessible name for a list with no visible header. |
 | `transferAnnouncement` | `(count, listLabel) => string` | `"{count} item(s) moved to {listLabel}"` | Polite live-region text after a transfer. |
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the Pick List as a whole. To restyle
+**individual parts** without reaching into the internal `data-bpdm-slot` elements from
+CSS, pass a `classNames` object — one key per slot: `root` (the flex container),
+`sourceList` (the source panel), `targetList` (the target panel) and `transfer` (the
+middle transfer-controls group). Each entry merges with the component's own classes, so
+you override only what you name.
+
+<Preview>
+  <PickListSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pick-list-slots.tsx"
+import { useState } from 'react';
+import { PickList } from '@bpdm/ui/pick-list';
+
+const FEATURES = ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'];
+
+export function Features() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <PickList
+      value={value}
+      onChange={setValue}
+      itemKey={(s) => s}
+      renderItem={(s) => s}
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      classNames={{
+        root: 'rounded-xl border bg-card p-3',
+        sourceList: 'rounded-lg bg-muted/40',
+        targetList: 'rounded-lg ring-1 ring-primary/30',
+        transfer: 'rounded-lg bg-muted/40',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pick-list-slots.ts"
+import { Component, signal } from '@angular/core';
+import { BpdmPickList, type PickListClassNames, type PickListValue } from '@bpdm/ng';
+
+@Component({
+  selector: 'features',
+  imports: [BpdmPickList],
+  template: `
+    <bpdm-pick-list
+      [(value)]="value"
+      [itemKey]="itemKey"
+      [itemTemplate]="row"
+      sourceHeader="Available"
+      targetHeader="Enabled"
+      [classNames]="slots"
+    >
+      <ng-template #row let-item>{{ item }}</ng-template>
+    </bpdm-pick-list>
+  `,
+})
+export class Features {
+  readonly itemKey = (s: string) => s;
+  readonly slots: PickListClassNames = {
+    root: 'rounded-xl border bg-card p-3',
+    sourceList: 'rounded-lg bg-muted/40',
+    targetList: 'rounded-lg ring-1 ring-primary/30',
+    transfer: 'rounded-lg bg-muted/40',
+  };
+  readonly value = signal<PickListValue<string>>({
+    source: ['Analytics', 'Billing', 'Webhooks', 'SSO', 'Audit log', 'API keys'],
+    target: [],
+  });
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `PickList` / `<bpdm-pick-list>`
@@ -546,8 +631,10 @@ export class Features {
 | `onTransfer` (Angular `transfer`) | `(moved, to) => void` / `{ moved, to }` | — | Fires after a transfer with the moved items and destination (`"source"` \| `"target"`). |
 | `messages` | `Partial<PickListMessages>` | — | Override any user-facing / screen-reader string — see [Internationalization](#internationalization). |
 | `className` | `string` (Angular `class`) | — | Extra classes. |
+| `classNames` | `PickListClassNames` | — | Per-slot class overrides: `{ root, sourceList, targetList, transfer }`. Each merges with the component's own classes. |
 
 `filterPlaceholder` likewise overrides `messages.filterPlaceholder` when set.
+`PickListClassNames`: `{ root, sourceList, targetList, transfer }`.
 
 ## Accessibility
 

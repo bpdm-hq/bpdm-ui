@@ -12,6 +12,7 @@ import {
   SelectBigDemo,
   SelectSizesDemo,
   SelectStatesDemo,
+  SelectSlotsDemo,
 } from '@/components/select-demos';
 import { Preview } from '@/components/preview';
 
@@ -480,6 +481,119 @@ export class SelectControlledComponent {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the trigger as a whole. To restyle **individual
+parts** without reaching into the internal `data-bpdm-slot` elements from CSS, pass a
+`classNames` object — one key per slot: `trigger`, `value`, `content`, `search`, `empty`,
+`list`, `group` and `option`. Each entry merges with the component's own classes, so you
+override only what you name.
+
+<Preview>
+  <SelectSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="select-slots.tsx"
+import { Select } from '@bpdm/ui/select';
+
+const CITIES = [
+  {
+    label: '🇩🇪 Germany',
+    options: [
+      { value: 'berlin', label: 'Berlin' },
+      { value: 'frankfurt', label: 'Frankfurt' },
+      { value: 'hamburg', label: 'Hamburg' },
+      { value: 'munich', label: 'Munich' },
+    ],
+  },
+  {
+    label: '🇺🇸 USA',
+    options: [
+      { value: 'nyc', label: 'New York' },
+      { value: 'la', label: 'Los Angeles' },
+      { value: 'chicago', label: 'Chicago' },
+    ],
+  },
+];
+
+export function BrandedSelect() {
+  return (
+    <Select
+      searchable
+      options={CITIES}
+      defaultValue="berlin"
+      placeholder="Select a city"
+      classNames={{
+        trigger: 'rounded-xl border-2',
+        value: 'font-mono uppercase tracking-wide',
+        content: 'rounded-xl',
+        search: 'bg-muted',
+        group: 'uppercase tracking-wide text-primary',
+        option: 'rounded-md',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="select-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmSelect, type SelectClassNames, type SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'branded-select',
+  imports: [BpdmSelect],
+  template: `
+    <bpdm-select
+      [options]="cities"
+      searchable
+      defaultValue="berlin"
+      placeholder="Select a city"
+      [classNames]="slots"
+    />
+  `,
+})
+export class BrandedSelect {
+  readonly cities: SelectItems = [
+    {
+      label: '🇩🇪 Germany',
+      options: [
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'frankfurt', label: 'Frankfurt' },
+        { value: 'hamburg', label: 'Hamburg' },
+        { value: 'munich', label: 'Munich' },
+      ],
+    },
+    {
+      label: '🇺🇸 USA',
+      options: [
+        { value: 'nyc', label: 'New York' },
+        { value: 'la', label: 'Los Angeles' },
+        { value: 'chicago', label: 'Chicago' },
+      ],
+    },
+  ];
+
+  readonly slots: SelectClassNames = {
+    trigger: 'rounded-xl border-2',
+    value: 'font-mono uppercase tracking-wide',
+    content: 'rounded-xl',
+    search: 'bg-muted',
+    group: 'uppercase tracking-wide text-primary',
+    option: 'rounded-md',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
@@ -496,10 +610,13 @@ export class SelectControlledComponent {
 | `aria-invalid` | `boolean` | — | Error state (destructive border). |
 | `id` | `string` | — | Trigger id (for `<label>` association / testing). |
 | `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + option list. |
+| `classNames` | `SelectClassNames` | — | Per-slot class overrides: `{ trigger, value, content, search, empty, list, group, option }`. Each merges with the component's own classes. |
 
 `maxHeight` (px) caps the scrollable list. In React, `contentClassName` styles the dropdown
 panel. Both frameworks accept `aria-label` / `aria-describedby` (forwarded to the trigger and used
 to name the listbox).
+
+`SelectClassNames`: `{ trigger, value, content, search, empty, list, group, option }`.
 
 ## Forms
 

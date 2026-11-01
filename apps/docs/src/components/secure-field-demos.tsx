@@ -61,3 +61,22 @@ export function SecureFieldStatesDemo() {
     </div>
   );
 }
+
+export function SecureFieldSlotsDemo() {
+  return (
+    <Frame>
+      <SecureField
+        copyable
+        unmaskedTail={4}
+        defaultValue={API_KEY}
+        placeholder="API key"
+        classNames={{
+          root: 'rounded-xl border-2',
+          field: 'font-mono tracking-wide',
+          toggle: 'text-primary',
+          copy: 'text-primary',
+        }}
+      />
+    </Frame>
+  );
+}

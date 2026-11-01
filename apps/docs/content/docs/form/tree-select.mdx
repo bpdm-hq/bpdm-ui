@@ -9,6 +9,7 @@ import {
   TreeSelectSearchableDemo,
   TreeSelectCountDemo,
   TreeSelectStatesDemo,
+  TreeSelectSlotsDemo,
 } from '@/components/tree-select-demos';
 import { Preview } from '@/components/preview';
 
@@ -269,6 +270,121 @@ export class StatesComponent {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the trigger as a whole. To restyle **individual
+parts** without reaching into the internal `data-bpdm-slot` elements from CSS, pass a
+`classNames` object — one key per slot: `trigger`, `chip`, `clear`, `content`, `selectAll`,
+`search`, `empty`, `group`, `tree` and `item`. Each entry merges with the component's own
+classes, so you override only what you name.
+
+<Preview>
+  <TreeSelectSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="tree-select-slots.tsx"
+import { TreeSelect } from '@bpdm/ui/tree-select';
+
+const TREE = [
+  {
+    value: 'frontend',
+    label: 'Frontend',
+    children: [
+      { value: 'react', label: 'React' },
+      { value: 'angular', label: 'Angular' },
+      { value: 'vue', label: 'Vue' },
+    ],
+  },
+  {
+    value: 'backend',
+    label: 'Backend',
+    children: [
+      { value: 'node', label: 'Node.js' },
+      { value: 'go', label: 'Go' },
+      { value: 'rust', label: 'Rust' },
+    ],
+  },
+];
+
+export function BrandedTreeSelect() {
+  return (
+    <TreeSelect
+      searchable
+      options={TREE}
+      defaultValue={['react', 'vue']}
+      placeholder="Select technologies"
+      classNames={{
+        trigger: 'rounded-xl border-2',
+        chip: 'rounded-full uppercase tracking-wide',
+        selectAll: 'uppercase tracking-wide text-primary',
+        search: 'bg-muted',
+        tree: 'rounded-lg bg-muted/40',
+        item: 'rounded-md',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="tree-select-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmTreeSelect, type TreeSelectClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'branded-tree-select',
+  imports: [BpdmTreeSelect],
+  template: `
+    <bpdm-tree-select
+      [options]="tree"
+      searchable
+      [defaultValue]="['react', 'vue']"
+      placeholder="Select technologies"
+      [classNames]="slots"
+    />
+  `,
+})
+export class BrandedTreeSelect {
+  readonly tree = [
+    {
+      value: 'frontend',
+      label: 'Frontend',
+      children: [
+        { value: 'react', label: 'React' },
+        { value: 'angular', label: 'Angular' },
+        { value: 'vue', label: 'Vue' },
+      ],
+    },
+    {
+      value: 'backend',
+      label: 'Backend',
+      children: [
+        { value: 'node', label: 'Node.js' },
+        { value: 'go', label: 'Go' },
+        { value: 'rust', label: 'Rust' },
+      ],
+    },
+  ];
+
+  readonly slots: TreeSelectClassNames = {
+    trigger: 'rounded-xl border-2',
+    chip: 'rounded-full uppercase tracking-wide',
+    selectAll: 'uppercase tracking-wide text-primary',
+    search: 'bg-muted',
+    tree: 'rounded-lg bg-muted/40',
+    item: 'rounded-md',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
@@ -288,6 +404,9 @@ export class StatesComponent {
 | `id` | `string` | — | Trigger id (for `<label>` association / testing). |
 | `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + tree. |
 | `messages` | `{ expand, collapse, selectAll, clearAll, selected(count) }` | English | Override the built-in labels + count text for i18n. |
+| `classNames` | `TreeSelectClassNames` | — | Per-slot class overrides: `{ trigger, chip, clear, content, selectAll, search, empty, group, tree, item }`. Each merges with the component's own classes. |
+
+`TreeSelectClassNames`: `{ trigger, chip, clear, content, selectAll, search, empty, group, tree, item }`.
 
 ## Forms
 

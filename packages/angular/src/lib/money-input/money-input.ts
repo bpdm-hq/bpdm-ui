@@ -14,6 +14,16 @@ import { type FieldSize, WRAP_FIELD_BASE, WRAP_FIELD_SIZE } from "../internal/fi
 const PARTIAL_NEG = /^-?\d*\.?\d*$/;
 const PARTIAL_POS = /^\d*\.?\d*$/;
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface MoneyInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner text field. */
+  field?: string;
+  /** The currency symbol. */
+  symbol?: string;
+}
+
 /**
  * `<bpdm-money-input>` — currency + locale-aware money input. The displayed
  * value is grouped per locale (e.g. en-IN → 1,00,000) with the currency symbol
@@ -34,7 +44,7 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
   template: `
     <div [class]="wrapClass()" [attr.aria-invalid]="ariaInvalid() ? 'true' : null" data-bpdm="" data-bpdm-slot="money-input">
       @if (symbolBefore()) {
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">{{ symbol() }}</span>
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" [class]="cls('shrink-0 select-none text-[var(--bpdm-muted-foreground)]', 'symbol')">{{ symbol() }}</span>
       }
       <input
         [id]="id() || null"
@@ -54,10 +64,10 @@ const PARTIAL_POS = /^\d*\.?\d*$/;
         (focus)="onFocus($any($event.target))"
         (blur)="onBlur()"
         (input)="onInput($any($event.target).value)"
-        class="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
+        [class]="cls('w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed', 'field')"
       />
       @if (!symbolBefore()) {
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" class="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">{{ symbol() }}</span>
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" [class]="cls('shrink-0 select-none text-[var(--bpdm-muted-foreground)]', 'symbol')">{{ symbol() }}</span>
       }
     </div>
   `,
@@ -79,6 +89,8 @@ export class BpdmMoneyInput {
   readonly required = input(false, { transform: booleanAttribute });
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, field, symbol). */
+  readonly classNames = input<MoneyInputClassNames | undefined>(undefined);
   readonly id = input<string>("");
   /** Native `name` for form submission, forwarded to the inner `<input>`. */
   readonly name = input<string>("");
@@ -153,8 +165,14 @@ export class BpdmMoneyInput {
       WRAP_FIELD_SIZE[this.size()],
       this.disabled() && "cursor-not-allowed opacity-50",
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof MoneyInputClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected onFocus(el: HTMLInputElement): void {
     this.focused.set(true);

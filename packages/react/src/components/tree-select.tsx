@@ -62,7 +62,33 @@ function filterTree(
   return { nodes: rec(nodes), expand };
 }
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface TreeSelectClassNames {
+  /** The trigger control. */
+  trigger?: string;
+  /** Each selected-value chip in the trigger. */
+  chip?: string;
+  /** The clear-all button in the trigger. */
+  clear?: string;
+  /** The dropdown panel. */
+  content?: string;
+  /** The "Select all" control. */
+  selectAll?: string;
+  /** The search input (when `searchable`). */
+  search?: string;
+  /** The empty-state message. */
+  empty?: string;
+  /** A child-group wrapper. */
+  group?: string;
+  /** The scrollable tree container. */
+  tree?: string;
+  /** Each treeitem row. */
+  item?: string;
+}
+
 export interface TreeSelectProps extends VariantProps<typeof triggerVariants> {
+  /** Per-slot class overrides (trigger, chip, clear, content, selectAll, search, empty, group, tree, item). */
+  classNames?: TreeSelectClassNames;
   options: TreeNode[];
   value?: string[];
   defaultValue?: string[];
@@ -123,6 +149,7 @@ export function TreeSelect({
   disabled,
   className,
   contentClassName,
+  classNames,
   "aria-invalid": ariaInvalid,
   id,
   "aria-label": ariaLabel,
@@ -345,6 +372,7 @@ export function TreeSelect({
         key={node.value}
         data-bpdm-slot="tree-select-item"
         id={itemId(node.value)}
+        className={cn(classNames?.item)}
         role="treeitem"
         aria-level={depth + 1}
         aria-setsize={setsize}
@@ -405,7 +433,7 @@ export function TreeSelect({
           </button>
         </div>
         {hasChildren && isOpen && (
-          <div data-bpdm-slot="tree-select-group" role="group">
+          <div data-bpdm-slot="tree-select-group" role="group" className={cn(classNames?.group)}>
             {node.children!.map((c, i) => renderNode(c, depth + 1, i + 1, node.children!.length))}
           </div>
         )}
@@ -436,7 +464,7 @@ export function TreeSelect({
             }
           }}
           data-bpdm="" data-bpdm-slot="tree-select-trigger"
-          className={cn(triggerVariants({ size }), "group", className)}
+          className={cn(triggerVariants({ size }), "group", className, classNames?.trigger)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
             {selectedLeaves.length === 0 ? (
@@ -449,7 +477,10 @@ export function TreeSelect({
                   <span
                     key={i}
                     data-bpdm-slot="tree-select-chip"
-                    className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs"
+                    className={cn(
+                      "inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs",
+                      classNames?.chip,
+                    )}
                   >
                     <span className="truncate">{o.label}</span>
                   </span>
@@ -470,7 +501,10 @@ export function TreeSelect({
                   setSelected([]);
                 }}
                 data-bpdm-slot="tree-select-clear"
-                className="grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]"
+                className={cn(
+                  "grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]",
+                  classNames?.clear,
+                )}
               >
                 <FieldClearX />
               </button>
@@ -497,6 +531,7 @@ export function TreeSelect({
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
+            classNames?.content,
           )}
         >
           {(searchable || (selectAll && allVisibleLeaves.length > 0)) && (
@@ -513,6 +548,7 @@ export function TreeSelect({
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]",
                     !searchable && "w-full",
+                    classNames?.selectAll,
                   )}
                 >
                   <span
@@ -541,14 +577,17 @@ export function TreeSelect({
                     placeholder={searchPlaceholder}
                     aria-label={searchPlaceholder}
                     data-bpdm-slot="tree-select-search"
-                    className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
+                    className={cn(
+                      "h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none",
+                      classNames?.search,
+                    )}
                   />
                 </>
               )}
             </div>
           )}
           {visibleTree.length === 0 ? (
-            <div data-bpdm-slot="tree-select-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{emptyText}</div>
+            <div data-bpdm-slot="tree-select-empty" className={cn("px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]", classNames?.empty)}>{emptyText}</div>
           ) : (
             <div
               ref={treeRef}
@@ -561,7 +600,7 @@ export function TreeSelect({
               onKeyDown={onTreeKeyDown}
               style={{ maxHeight }}
               data-bpdm-slot="tree-select-tree"
-              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
+              className={cn("min-h-0 flex-1 overflow-auto p-1 focus:outline-none", classNames?.tree)}
             >
               {visibleTree.map((n, i) => renderNode(n, 0, i + 1, visibleTree.length))}
             </div>

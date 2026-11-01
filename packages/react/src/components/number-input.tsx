@@ -6,6 +6,14 @@ type Size = "sm" | "md" | "lg";
 type ButtonLayout = "stacked" | "horizontal";
 type Numeric = string | number;
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface NumberInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner text field. */
+  field?: string;
+}
+
 export interface NumberInputProps
   extends Omit<
     React.ComponentProps<"input">,
@@ -28,6 +36,8 @@ export interface NumberInputProps
   onValueChange?: (value: string) => void;
   /** Override the stepper button labels (screen-reader text) for i18n. */
   messages?: { increase?: string; decrease?: string };
+  /** Per-slot class overrides (root, field). */
+  classNames?: NumberInputClassNames;
 }
 
 const DEFAULT_MESSAGES = { increase: "Increase", decrease: "Decrease" };
@@ -127,6 +137,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       disabled,
       onValueChange,
       messages,
+      classNames,
       onKeyDown,
       ...props
     },
@@ -212,6 +223,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             "w-full min-w-0 border-0 bg-transparent text-[var(--bpdm-foreground)] tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
             buttonLayout === "horizontal" ? "text-center" : "text-start",
             d.text,
+            classNames?.field,
           )}
           {...props}
         />
@@ -229,6 +241,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           "inline-flex items-stretch overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] shadow-sm focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)]",
           d.h,
           className,
+          classNames?.root,
         )}
       >
         {buttonLayout === "horizontal" && (

@@ -88,6 +88,29 @@ export function ToastActionDemo() {
   );
 }
 
+export function ToastSlotsDemo() {
+  return (
+    <Button
+      variant="secondary"
+      appearance="outline"
+      onClick={() =>
+        toast.success('Deployment complete', {
+          description: 'Build #482 is live in production.',
+          action: { label: 'View log', onClick: () => {} },
+          classNames: {
+            toast: 'rounded-2xl border-2',
+            title: 'uppercase tracking-wide text-xs',
+            description: 'italic',
+            action: 'rounded-full',
+          },
+        })
+      }
+    >
+      Styled toast
+    </Button>
+  );
+}
+
 export function ToastPromiseDemo() {
   const deploy = () => new Promise<void>((resolve) => setTimeout(resolve, 1800));
   return (

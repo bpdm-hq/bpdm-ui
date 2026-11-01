@@ -66,6 +66,30 @@ function filterTree(nodes: TreeNode[], q: string): { nodes: TreeNode[]; expand: 
   return { nodes: rec(nodes), expand };
 }
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface TreeSelectClassNames {
+  /** The trigger control. */
+  trigger?: string;
+  /** Each selected-value chip in the trigger. */
+  chip?: string;
+  /** The clear-all button in the trigger. */
+  clear?: string;
+  /** The dropdown panel. */
+  content?: string;
+  /** The "Select all" control. */
+  selectAll?: string;
+  /** The search input (when `searchable`). */
+  search?: string;
+  /** The empty-state message. */
+  empty?: string;
+  /** A child-group wrapper. */
+  group?: string;
+  /** The scrollable tree container. */
+  tree?: string;
+  /** Each treeitem row. */
+  item?: string;
+}
+
 /** Per-instance counter for a stable tree id (aria-controls). */
 let treeUid = 0;
 
@@ -110,7 +134,7 @@ let treeUid = 0;
           <span>{{ t().selected(selectedLeaves().length) }}</span>
         } @else {
           @for (o of chips(); track o.value) {
-            <span data-bpdm-slot="tree-select-chip" class="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs">
+            <span data-bpdm-slot="tree-select-chip" [class]="cls('inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs', 'chip')">
               <span class="truncate">{{ o.label }}</span>
             </span>
           }
@@ -121,7 +145,7 @@ let treeUid = 0;
       </div>
       <div class="flex shrink-0 items-center gap-1">
         @if (selectedLeaves().length > 0 && !isDisabled()) {
-          <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" class="grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]">
+          <button type="button" data-bpdm-slot="tree-select-clear" [attr.aria-label]="t().clearAll" tabindex="-1" (pointerdown)="$event.stopPropagation()" (click)="$event.stopPropagation(); clearAll()" [class]="cls('grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)]', 'clear')">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
           </button>
         }
@@ -134,7 +158,7 @@ let treeUid = 0;
         @if (searchable() || (selectAll() && visibleLeaves().length > 0)) {
           <div class="flex shrink-0 items-center gap-2 border-b border-[var(--bpdm-border)] px-3">
             @if (selectAll() && visibleLeaves().length > 0) {
-              <button type="button" data-bpdm-slot="tree-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]'">
+              <button type="button" data-bpdm-slot="tree-select-select-all" role="checkbox" [attr.aria-checked]="allSel() ? 'true' : someSel() ? 'mixed' : 'false'" (click)="toggleAll()" [attr.aria-label]="t().selectAll" [attr.title]="t().selectAll" [class]="cls(searchable() ? 'flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]' : 'flex w-full shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]', 'selectAll')">
                 <span [class]="boxClass(allSel() || someSel())">
                   @if (allSel()) {
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-3.5"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -148,12 +172,12 @@ let treeUid = 0;
             }
             @if (searchable()) {
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-              <input #search data-bpdm-slot="tree-select-search" [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" class="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none" />
+              <input #search data-bpdm-slot="tree-select-search" [value]="query()" (input)="query.set($any($event.target).value)" [attr.placeholder]="searchPlaceholder()" [attr.aria-label]="searchPlaceholder()" [class]="cls('h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none', 'search')" />
             }
           </div>
         }
         @if (visibleTree().length === 0) {
-          <div data-bpdm-slot="tree-select-empty" class="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{{ emptyText() }}</div>
+          <div data-bpdm-slot="tree-select-empty" [class]="cls('px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]', 'empty')">{{ emptyText() }}</div>
         } @else {
           <div
             #tree
@@ -165,7 +189,7 @@ let treeUid = 0;
             tabindex="0"
             [attr.aria-activedescendant]="activeDescId()"
             (keydown)="onTreeKeydown($event)"
-            class="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
+            [class]="cls('min-h-0 flex-1 overflow-auto p-1 focus:outline-none', 'tree')"
             [style.maxHeight.px]="maxHeight()"
           >
             @for (n of visibleTree(); track n.value; let i = $index) {
@@ -180,6 +204,7 @@ let treeUid = 0;
       <div
         data-bpdm-slot="tree-select-item"
         [attr.id]="itemId(n.value)"
+        [class]="cls('', 'item')"
         role="treeitem"
         [attr.aria-level]="depth + 1"
         [attr.aria-setsize]="size"
@@ -209,7 +234,7 @@ let treeUid = 0;
           </button>
         </div>
         @if (n.children?.length && isExpanded(n)) {
-          <div data-bpdm-slot="tree-select-group" role="group">
+          <div data-bpdm-slot="tree-select-group" role="group" [class]="cls('', 'group')">
             @for (c of n.children; track c.value; let i = $index) {
               <ng-container [ngTemplateOutlet]="nodeTpl" [ngTemplateOutletContext]="{ $implicit: c, depth: depth + 1, pos: i + 1, size: n.children.length }" />
             }
@@ -243,6 +268,8 @@ export class BpdmTreeSelect implements OnDestroy, ControlValueAccessor {
   protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   readonly ariaInvalid = input(false, { alias: "aria-invalid", transform: booleanAttribute });
   readonly classInput = input("", { alias: "class" });
+  /** Per-slot class overrides (trigger, chip, clear, content, selectAll, search, empty, group, tree, item). */
+  readonly classNames = input<TreeSelectClassNames | undefined>(undefined);
   readonly id = input("");
   /** Accessible name for the trigger + tree — pass a translated string. */
   readonly ariaLabel = input("", { alias: "aria-label" });
@@ -353,9 +380,14 @@ export class BpdmTreeSelect implements OnDestroy, ControlValueAccessor {
   });
 
   protected readonly triggerClass = computed(() =>
-    cn(FIELD_TRIGGER_BASE, FIELD_TRIGGER_SIZE[this.size()], "group", this.classInput()),
+    cn(FIELD_TRIGGER_BASE, FIELD_TRIGGER_SIZE[this.size()], "group", this.classInput(), this.classNames()?.trigger),
   );
-  protected readonly panelClass = computed(() => FIELD_PANEL);
+  protected readonly panelClass = computed(() => cn(FIELD_PANEL, this.classNames()?.content));
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof TreeSelectClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected boxClass(on: boolean): string {
     return cn(

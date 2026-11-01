@@ -12,6 +12,7 @@ import {
   ToastPromiseDemo,
   ToastDurationDemo,
   ToastDismissDemo,
+  ToastSlotsDemo,
 } from '@/components/toast-demos';
 import { Preview } from '@/components/preview';
 
@@ -688,6 +689,122 @@ export class App {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+Restyle a toast's parts without targeting the internal `data-bpdm-slot` elements from
+CSS. There are two levels, and they merge:
+
+- **Per toast** — pass `classNames` in the toast options to style a single toast:
+  `{ toast, title, description, action, close }`.
+- **Per app** — pass `classNames` on `<Toaster>` (Angular `<bpdm-toaster>`) to set
+  defaults for **every** toast, plus `viewport` for the region itself:
+  `{ viewport, toast, title, description, action, close }`. A per-call `classNames`
+  merges on top of these defaults.
+
+<Preview>
+  <ToastSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="toast-slots.tsx"
+import { toast, Toaster } from '@bpdm/ui/toast';
+import { Button } from '@bpdm/ui/button';
+
+// 1. Per toast — style just this one.
+export function DeployButton() {
+  return (
+    <Button
+      onClick={() =>
+        toast.success('Deployment complete', {
+          description: 'Build #482 is live in production.',
+          action: { label: 'View log', onClick: () => {} },
+          classNames: {
+            toast: 'rounded-2xl border-2',
+            title: 'uppercase tracking-wide text-xs',
+            description: 'italic',
+            action: 'rounded-full',
+          },
+        })
+      }
+    >
+      Deploy
+    </Button>
+  );
+}
+
+// 2. Per app — defaults for every toast + the viewport.
+export function AppToaster() {
+  return (
+    <Toaster
+      position="bottom-right"
+      classNames={{
+        viewport: 'gap-4',
+        toast: 'rounded-2xl',
+        title: 'font-semibold',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="toast-slots.ts"
+import { Component, inject } from '@angular/core';
+import { BpdmToast, BpdmButton, type ToasterClassNames } from '@bpdm/ng';
+
+// 1. Per toast — style just this one.
+@Component({
+  selector: 'deploy-button',
+  imports: [BpdmButton],
+  template: `<button bpdmButton (click)="deploy()">Deploy</button>`,
+})
+export class DeployButton {
+  private toast = inject(BpdmToast);
+  deploy() {
+    this.toast.success('Deployment complete', {
+      description: 'Build #482 is live in production.',
+      action: { label: 'View log', onClick: () => {} },
+      classNames: {
+        toast: 'rounded-2xl border-2',
+        title: 'uppercase tracking-wide text-xs',
+        description: 'italic',
+        action: 'rounded-full',
+      },
+    });
+  }
+}
+```
+
+```html title="app.html"
+<!-- 2. Per app — defaults for every toast + the viewport. -->
+<bpdm-toaster position="bottom-right" [classNames]="toastSlots" />
+```
+
+```ts title="app.ts"
+import { Component } from '@angular/core';
+import { BpdmToaster, type ToasterClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-root',
+  imports: [BpdmToaster],
+  templateUrl: './app.html',
+})
+export class App {
+  readonly toastSlots: ToasterClassNames = {
+    viewport: 'gap-4',
+    toast: 'rounded-2xl',
+    title: 'font-semibold',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `toast(title, options?)` / `BpdmToast`
@@ -741,6 +858,7 @@ Both frameworks share the same options object.
 | `dismissible` | `boolean` | `true` | Show the close button. |
 | `onDismiss` | `() => void` | — | Fires when the toast closes. |
 | `id` | `string` | auto | Reuse to update an existing toast in place. |
+| `classNames` | `ToastClassNames` | — | Per-slot overrides for this toast: `{ toast, title, description, action, close }`. Merged over the Toaster defaults. |
 
 ### Toaster
 
@@ -755,6 +873,7 @@ Both frameworks share the same options object.
 | `duration` | `number` | `4000` | Default auto-dismiss for all toasts. |
 | `messages` | `Partial<ToastMessages>` | English | Override the translatable strings (see below). |
 | `className` | `string` | — | Extra classes on the viewport. |
+| `classNames` | `ToasterClassNames` | — | Per-slot defaults for the viewport + every toast: `{ viewport, toast, title, description, action, close }`. |
 
   </Tab>
   <Tab value="Angular">
@@ -767,6 +886,7 @@ input.
 | `[position]` | `ToastPosition` | `bottom-right` | Dock corner (six options). |
 | `[duration]` | `number` | `4000` | Default auto-dismiss for all toasts. |
 | `[messages]` | `Partial<ToastMessages>` | English | Override the translatable strings (see below). |
+| `[classNames]` | `ToasterClassNames` | — | Per-slot defaults for the viewport + every toast: `{ viewport, toast, title, description, action, close }`. |
 
   </Tab>
 </Tabs>

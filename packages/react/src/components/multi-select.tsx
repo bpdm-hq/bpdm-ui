@@ -18,7 +18,33 @@ const ITEM_H = 36;
 const GROUP_H = 30;
 
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface MultiSelectClassNames {
+  /** The trigger container. */
+  trigger?: string;
+  /** Each selected-value chip in the trigger. */
+  chip?: string;
+  /** The clear-all button in the trigger. */
+  clear?: string;
+  /** The dropdown panel. */
+  content?: string;
+  /** The "Select all" row. */
+  selectAll?: string;
+  /** The search input (when `searchable`). */
+  search?: string;
+  /** The empty-state message. */
+  empty?: string;
+  /** The scrollable option list. */
+  list?: string;
+  /** A group heading. */
+  group?: string;
+  /** Each option row. */
+  option?: string;
+}
+
 export interface MultiSelectProps extends VariantProps<typeof triggerVariants> {
+  /** Per-slot class overrides (trigger, chip, clear, content, selectAll, search, empty, list, group, option). */
+  classNames?: MultiSelectClassNames;
   options: SelectItems;
   value?: string[];
   defaultValue?: string[];
@@ -77,6 +103,7 @@ export function MultiSelect({
   disabled,
   className,
   contentClassName,
+  classNames,
   "aria-invalid": ariaInvalid,
   id,
   "aria-label": ariaLabel,
@@ -253,7 +280,7 @@ export function MultiSelect({
             }
           }}
           data-bpdm="" data-bpdm-slot="multi-select-trigger"
-          className={cn(triggerVariants({ size }), "group", className)}
+          className={cn(triggerVariants({ size }), "group", className, classNames?.trigger)}
         >
           <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
             {selected.length === 0 ? (
@@ -266,7 +293,10 @@ export function MultiSelect({
                   <span
                     key={o.value}
                     data-bpdm-slot="multi-select-chip"
-                    className="inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs"
+                    className={cn(
+                      "inline-flex max-w-[140px] shrink-0 items-center gap-1 rounded-[calc(var(--bpdm-radius)-4px)] bg-[var(--bpdm-muted)] px-1.5 py-0.5 text-xs",
+                      classNames?.chip,
+                    )}
                   >
                     <span className="truncate">{o.label}</span>
                     <button
@@ -307,7 +337,10 @@ export function MultiSelect({
                   clearAll();
                 }}
                 data-bpdm-slot="multi-select-clear"
-                className="grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
+                className={cn(
+                  "grid size-4 cursor-pointer place-items-center rounded-full text-[var(--bpdm-muted-foreground)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
+                  classNames?.clear,
+                )}
               >
                 <FieldClearX />
               </button>
@@ -333,6 +366,7 @@ export function MultiSelect({
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
+            classNames?.content,
           )}
         >
           {(searchable || (selectAll && filteredItemValues.length > 0)) && (
@@ -349,6 +383,7 @@ export function MultiSelect({
                   className={cn(
                     "flex shrink-0 cursor-pointer items-center gap-2 py-2 text-sm font-medium text-[var(--bpdm-foreground)]",
                     !searchable && "w-full",
+                    classNames?.selectAll,
                   )}
                 >
                   <span
@@ -382,7 +417,10 @@ export function MultiSelect({
                     aria-autocomplete="list"
                     aria-activedescendant={activeId}
                     data-bpdm-slot="multi-select-search"
-                    className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
+                    className={cn(
+                      "h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none",
+                      classNames?.search,
+                    )}
                   />
                 </>
               )}
@@ -390,7 +428,7 @@ export function MultiSelect({
           )}
 
           {rows.length === 0 ? (
-            <div data-bpdm-slot="multi-select-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">{emptyText}</div>
+            <div data-bpdm-slot="multi-select-empty" className={cn("px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]", classNames?.empty)}>{emptyText}</div>
           ) : (
             <div
               ref={(el) => {
@@ -405,7 +443,7 @@ export function MultiSelect({
               aria-activedescendant={searchable ? undefined : activeId}
               style={{ maxHeight }}
               data-bpdm-slot="multi-select-list"
-              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
+              className={cn("min-h-0 flex-1 overflow-auto p-1 focus:outline-none", classNames?.list)}
             >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
                 {virtualizer.getVirtualItems().map((vi) => {
@@ -419,7 +457,10 @@ export function MultiSelect({
                         key={`g-${vi.index}`}
                         aria-hidden="true"
                         data-bpdm-slot="multi-select-group"
-                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)] [&_img]:size-4 [&_svg]:size-4"
+                        className={cn(
+                          "absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)] [&_img]:size-4 [&_svg]:size-4",
+                          classNames?.group,
+                        )}
                         {...common}
                       >
                         {r.icon}
@@ -449,6 +490,7 @@ export function MultiSelect({
                         // shadow mirror), jitter-free (inset shadow takes no layout space).
                         isActive &&
                           "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
+                        classNames?.option,
                       )}
                       {...common}
                     >

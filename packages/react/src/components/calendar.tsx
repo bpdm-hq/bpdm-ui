@@ -47,6 +47,22 @@ function buildGrid(viewDate: Date, weekStartsOn: number) {
 
 export type DateRange = { from: Date | null; to: Date | null };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface CalendarClassNames {
+  /** Each month block. */
+  month?: string;
+  /** The caption/header row (nav + title). */
+  header?: string;
+  /** The day grid. */
+  grid?: string;
+  /** The weekday-label row. */
+  weekdays?: string;
+  /** Each week row. */
+  week?: string;
+  /** Each day cell. */
+  day?: string;
+}
+
 export interface CalendarProps {
   /** "single" → a Date; "range" → a { from, to }. Default "single". */
   mode?: "single" | "range";
@@ -74,6 +90,8 @@ export interface CalendarProps {
   /** Override the control labels (screen-reader text) for i18n. */
   messages?: CalendarMessages;
   className?: string;
+  /** Per-slot class overrides (month, header, grid, weekdays, week, day). */
+  classNames?: CalendarClassNames;
 }
 
 export interface CalendarMessages {
@@ -128,6 +146,7 @@ export function Calendar({
   locale,
   messages,
   className,
+  classNames,
 }: CalendarProps) {
   const t = { ...DEFAULT_CALENDAR_MESSAGES, ...messages };
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -325,9 +344,9 @@ export function Calendar({
     const isFirst = index === 0;
     const isLast = index === months - 1;
     return (
-      <div key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`} data-bpdm-slot="calendar-month" className="w-[17rem]">
+      <div key={`${monthDate.getFullYear()}-${monthDate.getMonth()}`} data-bpdm-slot="calendar-month" className={cn("w-[17rem]", classNames?.month)}>
         {/* header — kept OUTSIDE role="grid" so its nav + selects aren't grid rows */}
-        <div data-bpdm-slot="calendar-header" className="mb-2 flex items-center justify-between px-1">
+        <div data-bpdm-slot="calendar-header" className={cn("mb-2 flex items-center justify-between px-1", classNames?.header)}>
           <button
             type="button"
             aria-label={t.previousMonth}
@@ -397,9 +416,9 @@ export function Calendar({
           aria-multiselectable={mode === "range" ? true : undefined}
           onKeyDown={onKeyDown}
           data-bpdm-slot="calendar-grid"
-          className="flex flex-col gap-0.5 outline-none"
+          className={cn("flex flex-col gap-0.5 outline-none", classNames?.grid)}
         >
-          <div role="row" data-bpdm-slot="calendar-weekdays" className="grid grid-cols-7">
+          <div role="row" data-bpdm-slot="calendar-weekdays" className={cn("grid grid-cols-7", classNames?.weekdays)}>
             {headers.map((w, i) => (
               <div
                 key={i}
@@ -412,7 +431,7 @@ export function Calendar({
             ))}
           </div>
           {Array.from({ length: 6 }, (_, wk) => (
-            <div key={wk} role="row" data-bpdm-slot="calendar-week" className="grid grid-cols-7">
+            <div key={wk} role="row" data-bpdm-slot="calendar-week" className={cn("grid grid-cols-7", classNames?.week)}>
               {grid.slice(wk * 7, wk * 7 + 7).map((d) => {
                 const outside = d.getMonth() !== monthDate.getMonth();
                 const selected = isSelected(d);
@@ -457,6 +476,7 @@ export function Calendar({
                     selected &&
                       "bg-[var(--bpdm-primary)] font-semibold text-[var(--bpdm-primary-foreground)] hover:bg-[var(--bpdm-primary)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
                     disabledDay && "pointer-events-none text-[var(--bpdm-muted-foreground)]/30 line-through",
+                    classNames?.day,
                   )}
                     >
                       {d.getDate()}
@@ -545,7 +565,21 @@ export const defaultRangePresets: DateRangePreset[] = [
   },
 ];
 
-export interface DatePickerProps extends Omit<CalendarProps, "className"> {
+/** Per-slot class overrides for {@link DatePicker}. */
+export interface DatePickerClassNames {
+  /** The trigger button that shows the formatted value. */
+  trigger?: string;
+  /** Each range quick-preset button in the side rail. */
+  preset?: string;
+  /** The clear (×) button shown when a value is set. */
+  clear?: string;
+  /** The popover panel wrapping the calendar. */
+  content?: string;
+  /** Forwarded to the inner {@link Calendar}'s own slots. */
+  calendar?: CalendarClassNames;
+}
+
+export interface DatePickerProps extends Omit<CalendarProps, "className" | "classNames"> {
   /** Range-mode quick presets shown beside the calendar (e.g. defaultRangePresets). */
   presets?: DateRangePreset[];
   placeholder?: string;
@@ -565,6 +599,8 @@ export interface DatePickerProps extends Omit<CalendarProps, "className"> {
   className?: string;
   /** Classes on the popover panel. */
   contentClassName?: string;
+  /** Per-slot class overrides (trigger, preset, clear, content, and the inner calendar). */
+  classNames?: DatePickerClassNames;
 }
 
 const rangeComplete = (v: Date | DateRange | null, mode: "single" | "range") =>
@@ -589,6 +625,7 @@ export function DatePicker({
   id,
   className,
   contentClassName,
+  classNames,
   numberOfMonths,
   presets,
   ...calendarProps
@@ -635,6 +672,7 @@ export function DatePicker({
       value={calValue}
       onChange={pick}
       numberOfMonths={monthsToShow}
+      classNames={classNames?.calendar}
       {...calendarProps}
     />
   );
@@ -645,7 +683,7 @@ export function DatePicker({
         open={open}
         onOpenChange={handleOpenChange}
         align="start"
-        className={cn("w-auto p-0", contentClassName)}
+        className={cn("w-auto p-0", contentClassName, classNames?.content)}
         trigger={
           <button
             type="button"
@@ -657,6 +695,7 @@ export function DatePicker({
               "group inline-flex h-10 w-full min-w-[14rem] cursor-pointer items-center gap-2 rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] ps-3 text-start text-sm transition-colors hover:border-[var(--bpdm-ring)]/60 focus-visible:border-[var(--bpdm-ring)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--bpdm-ring)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-[var(--bpdm-destructive)] aria-[invalid=true]:focus-visible:ring-[var(--bpdm-destructive)]",
               showClear ? "pe-9" : "pe-3",
               className,
+              classNames?.trigger,
             )}
           >
             <CalendarDays className="size-4 shrink-0 text-[var(--bpdm-muted-foreground)]" aria-hidden="true" />
@@ -683,6 +722,7 @@ export function DatePicker({
                       className={cn(
                         "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]",
                         active ? "bg-[var(--bpdm-muted)] font-medium text-[var(--bpdm-foreground)]" : "text-[var(--bpdm-muted-foreground)]",
+                        classNames?.preset,
                       )}
                     >
                       {p.label}
@@ -722,7 +762,10 @@ export function DatePicker({
           aria-label={messages?.clear ?? "Clear"}
           onClick={() => commit(mode === "single" ? null : { from: null, to: null })}
           data-bpdm-slot="date-picker-clear"
-          className="absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] [&_svg]:size-3.5"
+          className={cn(
+            "absolute end-2 top-1/2 z-10 inline-flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--bpdm-muted-foreground)]/70 transition-colors hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] [&_svg]:size-3.5",
+            classNames?.clear,
+          )}
         >
           <X aria-hidden="true" />
         </button>

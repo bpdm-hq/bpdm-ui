@@ -44,6 +44,18 @@ const DEFAULT_LABELS: Record<number, string[]> = {
   5: ["Very weak", "Weak", "Fair", "Good", "Strong"],
 };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface PasswordInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner input element. */
+  field?: string;
+  /** The reveal (eye) toggle button. */
+  toggle?: string;
+  /** The strength-meter container. */
+  meter?: string;
+}
+
 export interface PasswordInputProps
   extends Omit<
       React.ComponentProps<"input">,
@@ -63,6 +75,8 @@ export interface PasswordInputProps
   labels?: string[];
   /** Override the reveal-toggle labels (screen-reader text) for i18n. */
   messages?: { show?: string; hide?: string };
+  /** Per-slot class overrides (root, field, toggle, meter). */
+  classNames?: PasswordInputClassNames;
 }
 
 const DEFAULT_MESSAGES = { show: "Show password", hide: "Hide password" };
@@ -93,6 +107,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
       "aria-invalid": ariaInvalid,
       "aria-describedby": ariaDescribedBy,
       messages,
+      classNames,
       ...props
     },
     ref,
@@ -131,7 +146,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     [ariaDescribedBy, showMeter ? meterId : undefined].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div data-bpdm="" data-bpdm-slot="password-input" className={cn("w-full", className)}>
+    <div data-bpdm="" data-bpdm-slot="password-input" className={cn("w-full", className, classNames?.root)}>
       <div className={cn(wrapVariants({ size }), disabled && "cursor-not-allowed opacity-50")}>
         <input
           ref={ref}
@@ -143,7 +158,10 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           aria-describedby={describedBy}
           onChange={(e) => setVal(e.target.value)}
           data-bpdm-slot="password-input-field"
-          className="w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed"
+          className={cn(
+            "w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed",
+            classNames?.field,
+          )}
         />
         <button
           type="button"
@@ -152,14 +170,17 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
           data-bpdm-slot="password-input-toggle"
-          className="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none"
+          className={cn(
+            "grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none",
+            classNames?.toggle,
+          )}
         >
           <Eye off={revealed} />
         </button>
       </div>
 
       {showMeter && (
-        <div data-bpdm-slot="password-input-meter" className="mt-2">
+        <div data-bpdm-slot="password-input-meter" className={cn("mt-2", classNames?.meter)}>
           <div className="flex gap-1" aria-hidden>
             {Array.from({ length: levels }, (_, i) => (
               <span

@@ -17,6 +17,16 @@ const wrapVariants = cva(
   },
 );
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface MoneyInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner text field. */
+  field?: string;
+  /** The currency symbol. */
+  symbol?: string;
+}
+
 export interface MoneyInputProps
   extends Omit<
       React.ComponentProps<"input">,
@@ -33,6 +43,8 @@ export interface MoneyInputProps
   /** Called with the raw (unformatted) numeric string on every change. */
   onValueChange?: (value: string) => void;
   allowNegative?: boolean;
+  /** Per-slot class overrides (root, field, symbol). */
+  classNames?: MoneyInputClassNames;
 }
 
 /**
@@ -57,6 +69,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
     size,
     disabled,
     className,
+    classNames,
     "aria-invalid": ariaInvalid,
     onFocus,
     onBlur,
@@ -134,10 +147,11 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
         wrapVariants({ size }),
         disabled && "cursor-not-allowed opacity-50",
         className,
+        classNames?.root,
       )}
     >
       {symbolBefore && (
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className={cn("shrink-0 select-none text-[var(--bpdm-muted-foreground)]", classNames?.symbol)}>
           {symbol}
         </span>
       )}
@@ -167,10 +181,10 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(fu
           if (v === "" || pattern.test(v)) setRaw(v);
         }}
         data-bpdm-slot="money-input-field"
-        className="w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed"
+        className={cn("w-full min-w-0 bg-transparent text-end tabular-nums focus:outline-none disabled:cursor-not-allowed", classNames?.field)}
       />
       {!symbolBefore && (
-        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className="shrink-0 select-none text-[var(--bpdm-muted-foreground)]">
+        <span aria-hidden="true" data-bpdm-slot="money-input-symbol" className={cn("shrink-0 select-none text-[var(--bpdm-muted-foreground)]", classNames?.symbol)}>
           {symbol}
         </span>
       )}
