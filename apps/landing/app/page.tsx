@@ -5,6 +5,8 @@ import { HeroPreview } from "./hero-preview";
 
 const DOCS = "https://docs.ui.bpdm.dev/docs";
 const REPO = "https://github.com/bpdm-hq/bpdm-ui";
+// Current published release — bump on each @bpdm/ui release.
+const VERSION = "0.3.0";
 
 const STATS = [
   { value: "38", label: "components" },
@@ -28,9 +30,14 @@ export default function Home() {
     <>
       <header className="nav">
         <div className="wrap nav-inner">
-          <a className="brand-mark" href="/">
-            <span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span>
-          </a>
+          <div className="nav-brand">
+            <a className="brand-mark" href="/">
+              <span className="b">&lt;</span>bpdm<span className="b">/ui</span><span className="b"> /&gt;</span>
+            </a>
+            <a className="ver-pill" href={`${DOCS}/changelog`} title="View the changelog">
+              v{VERSION}
+            </a>
+          </div>
           <nav className="nav-links">
             <a className="hide-sm" href="#showcase">Showcase</a>
             <a className="hide-sm" href="#components">Components</a>

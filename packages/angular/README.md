@@ -21,6 +21,7 @@ design system, four built-in themes, and one consistent motion language.
 - **Standalone & modern** — standalone directives/components, signal inputs, zoneless-ready.
 - **Accessible by default** — native elements enhanced via attribute directives; Angular CDK for focus, keyboard, ARIA and overlays.
 - **Themeable** — components read semantic CSS variables; switch the whole UI with one `data-theme`, or override variables to match your brand.
+- **Per-slot styling** — every component takes a `classNames` object with one key per internal part, so you can restyle any slot from props without reaching into its internals from CSS.
 - **Four built-in themes** — `paper` & `mist` (light), `charcoal` & `slate` (dark).
 - **One motion language** — shared easing/duration tokens; honors `prefers-reduced-motion`.
 - **Tree-shakeable** — standalone + FESM + `sideEffects: false`; only the components you import ship.
