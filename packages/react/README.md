@@ -23,6 +23,7 @@ built-in themes (light & dark), and one consistent motion language.
 - **38 components** across forms, selection, data display, overlays, feedback, and navigation.
 - **Accessible by default** — keyboard, focus, and ARIA handled via Radix primitives (`role`, `aria-*`, roving focus); built following **WCAG 2.1 AA** + WAI-ARIA patterns and checked with `axe` on every release. (A design goal, not a conformance claim — see the [accessibility notes](https://docs.ui.bpdm.dev/docs/getting-started/accessibility).)
 - **Themeable** — every component reads semantic CSS variables; switch the whole UI with one `data-theme` attribute, or override variables to match your brand.
+- **Per-slot styling** — every component takes a `classNames` object with one key per internal part, so you can restyle any slot from props without reaching into its internals from CSS.
 - **Four built-in themes** — `paper` & `mist` (light), `charcoal` & `slate` (dark).
 - **One motion language** — shared easing/duration tokens drive every transition; honors `prefers-reduced-motion`.
 - **Typed** — full TypeScript types and prop-level autocomplete.

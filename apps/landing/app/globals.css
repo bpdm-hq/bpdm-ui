@@ -55,6 +55,9 @@ a { color: inherit; }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 3.75rem; }
 .brand-mark { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none; }
 .brand-mark .b { color: var(--primary); }
+.nav-brand { display: flex; align-items: center; gap: 0.6rem; }
+.ver-pill { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.72rem; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--primary); text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent); background: color-mix(in srgb, var(--primary) 12%, transparent); transition: background 0.2s var(--ease), border-color 0.2s var(--ease); }
+.ver-pill:hover { background: color-mix(in srgb, var(--primary) 20%, transparent); border-color: color-mix(in srgb, var(--primary) 50%, transparent); }
 .nav-links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9rem; }
 .nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s var(--ease); }
 .nav-links a:hover { color: var(--fg); }
