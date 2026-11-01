@@ -12,6 +12,7 @@ import {
   NumberInputAffixDemo,
   NumberInputPrecisionDemo,
   NumberInputStatesDemo,
+  NumberInputSlotsDemo,
 } from '@/components/number-input-demos';
 import { Preview } from '@/components/preview';
 
@@ -343,6 +344,58 @@ export class States {}
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the control as a whole. To restyle its
+**individual parts** without reaching into the internal `data-bpdm-slot` elements from
+CSS, pass a `classNames` object — one key per slot: `root` (the outer wrapper) and
+`field` (the inner text field). Each entry merges with the component's own classes, so
+you override only what you name.
+
+<Preview>
+  <NumberInputSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="number-input-slots.tsx"
+import { NumberInput } from '@bpdm/ui/number-input';
+
+export function Quantity() {
+  return (
+    <NumberInput
+      defaultValue="9"
+      min="0"
+      classNames={{ root: 'rounded-xl', field: 'font-mono' }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="number-input-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmNumberInput, type NumberInputClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'quantity',
+  imports: [BpdmNumberInput],
+  template: `<bpdm-number-input defaultValue="9" min="0" [classNames]="slots" />`,
+})
+export class Quantity {
+  readonly slots: NumberInputClassNames = {
+    root: 'rounded-xl',
+    field: 'font-mono',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `NumberInput` / `bpdm-number-input`
@@ -364,6 +417,9 @@ Values accept a `string` or `number`; strings are recommended to preserve precis
 | `messages` | `{ increase, decrease }` | English | Override the stepper button labels (screen-reader text) — see [Internationalization](/docs/getting-started/i18n). |
 | `disabled` | `boolean` | `false` | Disable the field and steppers. |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+| `classNames` | `NumberInputClassNames` | — | Per-slot class overrides: `{ root, field }`. Each merges with the component's own classes. |
+
+`NumberInputClassNames`: `{ root, field }`.
 
 ## Accessibility
 

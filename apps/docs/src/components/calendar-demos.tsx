@@ -72,6 +72,21 @@ export function CalendarInlineDemo() {
   );
 }
 
+export function CalendarSlotsDemo() {
+  return (
+    <Center>
+      <Calendar
+        defaultValue={SAMPLE}
+        classNames={{
+          header: 'px-2',
+          weekdays: 'text-primary',
+          day: 'rounded-md',
+        }}
+      />
+    </Center>
+  );
+}
+
 export function CalendarConstraintsDemo() {
   return (
     <Field>

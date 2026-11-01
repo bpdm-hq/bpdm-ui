@@ -36,6 +36,18 @@ const SIZE = avatarSize;
 const STATUS_COLOR = avatarStatusColor;
 const initialsOf = avatarInitials;
 
+/** Per-slot class overrides for {@link Avatar}. */
+export interface AvatarClassNames {
+  /** The root element. */
+  root?: string;
+  /** The loaded image. */
+  image?: string;
+  /** The initials / icon fallback. */
+  fallback?: string;
+  /** The presence-status dot. */
+  status?: string;
+}
+
 export interface AvatarProps {
   /** Image URL. Falls back to initials, then the icon, if it fails to load. */
   src?: string;
@@ -55,6 +67,8 @@ export interface AvatarProps {
   /** Override the translatable strings (status dot labels). */
   messages?: Partial<AvatarMessages>;
   className?: string;
+  /** Per-slot class overrides (root, image, fallback, status). */
+  classNames?: AvatarClassNames;
 }
 
 /**
@@ -79,6 +93,7 @@ export const Avatar = React.forwardRef<
       ring = false,
       messages,
       className,
+      classNames,
     },
     ref,
   ) => {
@@ -97,6 +112,7 @@ export const Avatar = React.forwardRef<
           "relative inline-flex shrink-0 select-none items-center justify-center overflow-visible",
           SIZE[size],
           className,
+          classNames?.root,
         )}
       >
         <span
@@ -111,7 +127,10 @@ export const Avatar = React.forwardRef<
               src={src}
               alt={alt ?? name ?? ""}
               data-bpdm-slot="avatar-image"
-              className="size-full object-cover animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
+              className={cn(
+                "size-full object-cover animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
+                classNames?.image,
+              )}
             />
           )}
           <AvatarPrimitive.Fallback
@@ -125,6 +144,7 @@ export const Avatar = React.forwardRef<
               "flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]",
               tint,
               "[&_svg]:size-[55%]",
+              classNames?.fallback,
             )}
           >
             {initials || icon || <DefaultUserIcon />}
@@ -141,6 +161,7 @@ export const Avatar = React.forwardRef<
               // ~28% of the avatar, nudged onto the lower-inline-end edge
               "size-[28%] min-h-2 min-w-2",
               shape === "circle" ? "bottom-[6%] end-[6%]" : "-bottom-0.5 -end-0.5",
+              classNames?.status,
             )}
             aria-label={t[status]}
           />
@@ -165,6 +186,14 @@ function DefaultUserIcon() {
   );
 }
 
+/** Per-slot class overrides for {@link AvatarGroup}. */
+export interface AvatarGroupClassNames {
+  /** The group row. */
+  root?: string;
+  /** The `+N` overflow tile. */
+  overflow?: string;
+}
+
 export interface AvatarGroupProps {
   children: React.ReactNode;
   /** Show at most this many avatars; the rest collapse into a "+N" tile. */
@@ -178,20 +207,22 @@ export interface AvatarGroupProps {
    */
   messages?: Partial<AvatarMessages>;
   className?: string;
+  /** Per-slot class overrides (root, overflow). */
+  classNames?: AvatarGroupClassNames;
 }
 
 /**
  * Overlapping stack of avatars with a `+N` overflow tile. Each avatar lifts on
  * hover so the one under the cursor comes forward.
  */
-export function AvatarGroup({ children, max, size = "md", messages, className }: AvatarGroupProps) {
+export function AvatarGroup({ children, max, size = "md", messages, className, classNames }: AvatarGroupProps) {
   const all = React.Children.toArray(children).filter(React.isValidElement);
   const shown = max ? all.slice(0, max) : all;
   const overflow = all.length - shown.length;
   const t = React.useMemo(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...messages }), [messages]);
 
   return (
-    <div data-bpdm="" data-bpdm-slot="avatar-group" className={cn("flex items-center", className)}>
+    <div data-bpdm="" data-bpdm-slot="avatar-group" className={cn("flex items-center", className, classNames?.root)}>
       {shown.map((child, i) => {
         const el = child as React.ReactElement<AvatarProps>;
         return React.cloneElement(el, {
@@ -215,6 +246,7 @@ export function AvatarGroup({ children, max, size = "md", messages, className }:
           className={cn(
             "relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--bpdm-muted)] font-semibold text-[var(--bpdm-muted-foreground)] ring-2 ring-[var(--bpdm-background)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1",
             SIZE[size],
+            classNames?.overflow,
           )}
         >
           +{overflow}

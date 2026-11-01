@@ -27,6 +27,22 @@ export type CalendarMode = "single" | "range";
 export type CalendarDayShape = "circle" | "square";
 export type CalendarCaptionLayout = "buttons" | "dropdown";
 
+/** Per-slot class overrides for `<bpdm-calendar>`. */
+export interface CalendarClassNames {
+  /** Each month column. */
+  month?: string;
+  /** The month header (nav + caption / dropdowns). */
+  header?: string;
+  /** The grid wrapper (`role="grid"`). */
+  grid?: string;
+  /** The weekday-header row. */
+  weekdays?: string;
+  /** Each week row. */
+  week?: string;
+  /** Each day button. */
+  day?: string;
+}
+
 export interface CalendarMessages {
   calendar?: string;
   previousMonth?: string;
@@ -91,9 +107,9 @@ interface MonthView {
   template: `
     <div role="group" data-bpdm="" data-bpdm-slot="calendar" [attr.aria-label]="t().calendar" [class]="rootClass()">
       @for (m of months(); track m.key) {
-        <div data-bpdm-slot="calendar-month" class="w-[17rem]">
+        <div data-bpdm-slot="calendar-month" [class]="cls('w-[17rem]', 'month')">
           <!-- header — kept OUTSIDE role="grid" so its nav + selects aren't grid rows -->
-          <div data-bpdm-slot="calendar-header" class="mb-2 flex items-center justify-between px-1">
+          <div data-bpdm-slot="calendar-header" [class]="cls('mb-2 flex items-center justify-between px-1', 'header')">
             <button
               type="button"
               [attr.aria-label]="t().previousMonth"
@@ -161,15 +177,15 @@ interface MonthView {
             [attr.aria-label]="m.label"
             [attr.aria-multiselectable]="mode() === 'range' ? true : null"
             (keydown)="onKeyDown($event)"
-            class="flex flex-col gap-0.5 outline-none"
+            [class]="cls('flex flex-col gap-0.5 outline-none', 'grid')"
           >
-            <div role="row" data-bpdm-slot="calendar-weekdays" class="grid grid-cols-7">
+            <div role="row" data-bpdm-slot="calendar-weekdays" [class]="cls('grid grid-cols-7', 'weekdays')">
               @for (w of headers(); track $index) {
                 <div role="columnheader" [attr.aria-label]="longHeaders()[$index]" class="grid h-8 place-items-center text-xs font-medium text-[var(--bpdm-muted-foreground)]">{{ w }}</div>
               }
             </div>
             @for (week of m.weeks; track $index) {
-              <div role="row" data-bpdm-slot="calendar-week" class="grid grid-cols-7">
+              <div role="row" data-bpdm-slot="calendar-week" [class]="cls('grid grid-cols-7', 'week')">
                 @for (d of week; track d.key) {
                   <div role="gridcell" [attr.aria-selected]="d.selected" [class]="d.wrapperClass">
                     <button
@@ -222,6 +238,13 @@ export class BpdmCalendar {
   readonly locale = input<string | undefined>(undefined);
   /** Override the control labels (screen-reader text) for i18n. */
   readonly messages = input<CalendarMessages>({});
+  /** Per-slot class overrides (month, header, grid, weekdays, week, day). */
+  readonly classNames = input<CalendarClassNames | undefined>(undefined);
+
+  /** Merge a slot's base class with its matching `classNames` override. */
+  protected cls(base: string, key: keyof CalendarClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   private readonly host = inject(ElementRef<HTMLElement>);
   // day (getTime) to move real DOM focus onto after the next render (keyboard nav)
@@ -396,6 +419,7 @@ export class BpdmCalendar {
           selected &&
             "bg-[var(--bpdm-primary)] font-semibold text-[var(--bpdm-primary-foreground)] hover:bg-[var(--bpdm-primary)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]",
           disabledDay && "pointer-events-none text-[var(--bpdm-muted-foreground)]/30 line-through",
+          this.classNames()?.day,
         );
 
         return {

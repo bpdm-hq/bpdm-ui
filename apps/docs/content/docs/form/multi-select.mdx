@@ -11,6 +11,7 @@ import {
   MultiSelectGroupedDemo,
   MultiSelectBigDemo,
   MultiSelectStatesDemo,
+  MultiSelectSlotsDemo,
 } from '@/components/multi-select-demos';
 import { Preview } from '@/components/preview';
 
@@ -420,6 +421,117 @@ export class ControlledMultiComponent {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the trigger as a whole. To restyle **individual
+parts** without reaching into the internal `data-bpdm-slot` elements from CSS, pass a
+`classNames` object — one key per slot: `trigger`, `chip`, `clear`, `content`, `selectAll`,
+`search`, `empty`, `list`, `group` and `option`. Each entry merges with the component's own
+classes, so you override only what you name.
+
+<Preview>
+  <MultiSelectSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="multi-select-slots.tsx"
+import { MultiSelect } from '@bpdm/ui/multi-select';
+
+const CITIES = [
+  {
+    label: 'Europe',
+    options: [
+      { value: 'lon', label: 'London' },
+      { value: 'par', label: 'Paris' },
+      { value: 'ber', label: 'Berlin' },
+    ],
+  },
+  {
+    label: 'Americas',
+    options: [
+      { value: 'nyc', label: 'New York' },
+      { value: 'sf', label: 'San Francisco' },
+      { value: 'tor', label: 'Toronto' },
+    ],
+  },
+];
+
+export function BrandedMultiSelect() {
+  return (
+    <MultiSelect
+      searchable
+      options={CITIES}
+      defaultValue={['lon', 'par']}
+      placeholder="Select cities"
+      classNames={{
+        trigger: 'rounded-xl border-2',
+        chip: 'rounded-full uppercase tracking-wide',
+        selectAll: 'uppercase tracking-wide text-primary',
+        search: 'bg-muted',
+        group: 'uppercase tracking-wide text-primary',
+        option: 'rounded-md',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="multi-select-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmMultiSelect, type MultiSelectClassNames, type SelectItems } from '@bpdm/ng';
+
+@Component({
+  selector: 'branded-multi-select',
+  imports: [BpdmMultiSelect],
+  template: `
+    <bpdm-multi-select
+      [options]="cities"
+      searchable
+      [defaultValue]="['lon', 'par']"
+      placeholder="Select cities"
+      [classNames]="slots"
+    />
+  `,
+})
+export class BrandedMultiSelect {
+  readonly cities: SelectItems = [
+    {
+      label: 'Europe',
+      options: [
+        { value: 'lon', label: 'London' },
+        { value: 'par', label: 'Paris' },
+        { value: 'ber', label: 'Berlin' },
+      ],
+    },
+    {
+      label: 'Americas',
+      options: [
+        { value: 'nyc', label: 'New York' },
+        { value: 'sf', label: 'San Francisco' },
+        { value: 'tor', label: 'Toronto' },
+      ],
+    },
+  ];
+
+  readonly slots: MultiSelectClassNames = {
+    trigger: 'rounded-xl border-2',
+    chip: 'rounded-full uppercase tracking-wide',
+    selectAll: 'uppercase tracking-wide text-primary',
+    search: 'bg-muted',
+    group: 'uppercase tracking-wide text-primary',
+    option: 'rounded-md',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 | Prop | Type | Default | Description |
@@ -439,8 +551,11 @@ export class ControlledMultiComponent {
 | `id` | `string` | — | Trigger id (for `<label>` association / testing). |
 | `aria-label` / `aria-describedby` | `string` | — | Accessible name / description for the trigger + option list. |
 | `messages` | `{ selectAll, clearAll, remove(label), selected(count) }` | English | Override the built-in labels + count text for i18n. |
+| `classNames` | `MultiSelectClassNames` | — | Per-slot class overrides: `{ trigger, chip, clear, content, selectAll, search, empty, list, group, option }`. Each merges with the component's own classes. |
 
 `maxHeight` (px) caps the list; in React `contentClassName` styles the panel.
+
+`MultiSelectClassNames`: `{ trigger, chip, clear, content, selectAll, search, empty, list, group, option }`.
 
 ## Forms
 

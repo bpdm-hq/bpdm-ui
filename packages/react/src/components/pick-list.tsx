@@ -60,6 +60,18 @@ export const defaultPickListMessages: PickListMessages = {
     `${count} ${count === 1 ? "item" : "items"} moved to ${listLabel}`,
 };
 
+/** Per-slot class overrides for {@link PickList}. */
+export interface PickListClassNames {
+  /** The root flex container. */
+  root?: string;
+  /** The source list panel. */
+  sourceList?: string;
+  /** The target list panel. */
+  targetList?: string;
+  /** The transfer-controls group. */
+  transfer?: string;
+}
+
 export interface PickListProps<T> {
   /** Controlled lists. */
   value?: PickListValue<T>;
@@ -87,6 +99,8 @@ export interface PickListProps<T> {
   /** Override any user-facing / screen-reader string for i18n. */
   messages?: Partial<PickListMessages>;
   className?: string;
+  /** Per-slot class overrides (root, sourceList, targetList, transfer). */
+  classNames?: PickListClassNames;
 }
 
 /**
@@ -113,6 +127,7 @@ export function PickList<T>({
   isItemDisabled,
   messages,
   className,
+  classNames,
 }: PickListProps<T>) {
   const t = React.useMemo(
     () => ({ ...defaultPickListMessages, ...messages }),
@@ -193,6 +208,7 @@ export function PickList<T>({
       className={cn(
         "flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch",
         className,
+        classNames?.root,
       )}
     >
       {reorder && (
@@ -206,7 +222,7 @@ export function PickList<T>({
       )}
 
       <SelectableList
-        className="flex-1"
+        className={cn("flex-1", classNames?.sourceList)}
         items={source}
         keyOf={itemKey}
         renderItem={renderItem}
@@ -225,7 +241,7 @@ export function PickList<T>({
 
       {/* transfer controls — a row on mobile, a column on lg+. The horizontal
           arrows flip under RTL so "toward target" always points at the target. */}
-      <div ref={transferRef} role="group" aria-label={t.transferGroup} data-bpdm-slot="pick-list-transfer" className="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+      <div ref={transferRef} role="group" aria-label={t.transferGroup} data-bpdm-slot="pick-list-transfer" className={cn("flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center", classNames?.transfer)}>
         <ControlButton label={t.moveToTarget} disabled={sourceSel.size === 0} onClick={toTarget}>
           <ChevronRight className="rtl:-scale-x-100" />
         </ControlButton>
@@ -241,7 +257,7 @@ export function PickList<T>({
       </div>
 
       <SelectableList
-        className="flex-1"
+        className={cn("flex-1", classNames?.targetList)}
         items={target}
         keyOf={itemKey}
         renderItem={renderItem}

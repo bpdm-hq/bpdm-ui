@@ -50,3 +50,20 @@ export function InputOtpStatesDemo() {
     </Center>
   );
 }
+
+export function InputOtpSlotsDemo() {
+  return (
+    <Center>
+      <InputOtp
+        length={6}
+        integerOnly
+        name="code"
+        classNames={{
+          root: 'gap-1.5',
+          slot: 'rounded-lg border-2 font-mono',
+          input: 'sr-only',
+        }}
+      />
+    </Center>
+  );
+}

@@ -17,6 +17,7 @@ import {
   CalendarSquareDemo,
   CalendarConfirmDemo,
   CalendarInlineConfirmDemo,
+  CalendarSlotsDemo,
 } from '@/components/calendar-demos';
 import { Preview } from '@/components/preview';
 
@@ -704,6 +705,87 @@ export class BookingComponent {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+To restyle **individual parts** without targeting the internal `data-bpdm-slot`
+elements from CSS, pass a `classNames` object. `Calendar` takes
+`{ month, header, grid, weekdays, week, day }`. `DatePicker` takes
+`{ trigger, preset, clear, content, calendar }` — and its `calendar` key is itself a
+`CalendarClassNames`, forwarded to the calendar inside the popover. Each entry merges
+with the component's own classes.
+
+<Preview>
+  <CalendarSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="calendar-slots.tsx"
+import { Calendar, DatePicker } from '@bpdm/ui/calendar';
+
+// Inline calendar — style the grid parts directly.
+export function BrandedCalendar() {
+  return (
+    <Calendar
+      classNames={{
+        header: 'px-2',
+        weekdays: 'text-primary',
+        day: 'rounded-md',
+      }}
+    />
+  );
+}
+
+// DatePicker — style the trigger, and the calendar inside via `calendar`.
+export function BrandedPicker() {
+  return (
+    <DatePicker
+      classNames={{
+        trigger: 'rounded-xl border-2',
+        calendar: { weekdays: 'text-primary', day: 'rounded-md' },
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="calendar-slots.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmCalendar,
+  BpdmDatePicker,
+  type CalendarClassNames,
+  type DatePickerClassNames,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'branded-calendar',
+  imports: [BpdmCalendar, BpdmDatePicker],
+  template: `
+    <bpdm-calendar [classNames]="calendarSlots" />
+    <bpdm-date-picker [classNames]="pickerSlots" />
+  `,
+})
+export class BrandedCalendar {
+  readonly calendarSlots: CalendarClassNames = {
+    header: 'px-2',
+    weekdays: 'text-primary',
+    day: 'rounded-md',
+  };
+  readonly pickerSlots: DatePickerClassNames = {
+    trigger: 'rounded-xl border-2',
+    calendar: { weekdays: 'text-primary', day: 'rounded-md' },
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 `Calendar` (React) / `<bpdm-calendar>` renders the month grid; `DatePicker` /
@@ -726,6 +808,7 @@ export class BookingComponent {
 | `locale` | `string` (BCP 47) | runtime default | Month / weekday names + date formatting. |
 | `messages` | `{ calendar, previousMonth, nextMonth, month, year, clear, cancel, apply }` | English | Override control labels for i18n. |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes. |
+| `classNames` | `CalendarClassNames` | — | Per-slot overrides: `{ month, header, grid, weekdays, week, day }`. Each merges with the component's own classes. |
 
 ### `DatePicker` / `bpdm-date-picker` — adds
 
@@ -740,6 +823,7 @@ export class BookingComponent {
 | `id` | `string` | — | Trigger id (for `<label>` association). |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the trigger. |
 | `contentClassName` | `string` | — | Extra classes on the popover panel. |
+| `classNames` | `DatePickerClassNames` | — | Per-slot overrides: `{ trigger, preset, clear, content, calendar }`. `calendar` is a `CalendarClassNames` forwarded to the popover calendar. |
 
 <Callout title="`disabled` vs `disabledInput`">
   `disabled` is the per-day predicate inherited from `Calendar` — `(date) => boolean` — used to grey

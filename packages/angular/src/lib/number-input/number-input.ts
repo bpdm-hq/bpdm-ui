@@ -16,6 +16,14 @@ export type NumberInputSize = "sm" | "md" | "lg";
 export type NumberInputButtonLayout = "stacked" | "horizontal";
 type Numeric = string | number;
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface NumberInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner text field. */
+  field?: string;
+}
+
 const dims: Record<NumberInputSize, { h: string; btn: string; text: string }> = {
   sm: { h: "h-8", btn: "w-8", text: "text-sm" },
   md: { h: "h-10", btn: "w-10", text: "text-sm" },
@@ -158,6 +166,8 @@ export class BpdmNumberInput {
   readonly suffix = input<string>("");
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, field). */
+  readonly classNames = input<NumberInputClassNames | undefined>(undefined);
   readonly id = input<string>("");
   /** Native `name` for form submission, forwarded to the inner `<input>`. */
   readonly name = input<string>("");
@@ -228,6 +238,7 @@ export class BpdmNumberInput {
       "inline-flex items-stretch overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-input)] bg-[var(--bpdm-background)] shadow-sm focus-within:border-[var(--bpdm-ring)] focus-within:ring-1 focus-within:ring-[var(--bpdm-ring)]",
       this.dims().h,
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
   protected readonly fieldClass = computed(() =>
@@ -241,6 +252,7 @@ export class BpdmNumberInput {
       "w-full min-w-0 border-0 bg-transparent text-[var(--bpdm-foreground)] tabular-nums focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
       this.buttonLayout() === "horizontal" ? "text-center" : "text-start",
       this.dims().text,
+      this.classNames()?.field,
     ),
   );
 

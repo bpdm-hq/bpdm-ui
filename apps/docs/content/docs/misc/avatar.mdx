@@ -12,6 +12,7 @@ import {
   AvatarShapesDemo,
   AvatarStatusDemo,
   AvatarGroupDemo,
+  AvatarSlotsDemo,
   AvatarBadgeDemo,
 } from '@/components/avatar-demos';
 import { Preview } from '@/components/preview';
@@ -550,6 +551,102 @@ export class Team {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (Angular `class`) styles the avatar root. To restyle **individual parts**
+without targeting the internal `data-bpdm-slot` elements from CSS, pass a `classNames`
+object. `Avatar` takes `{ root, image, fallback, status }`; `AvatarGroup` takes
+`{ root, overflow }` (the `+N` tile). Each entry merges with the component's own classes.
+
+<Preview>
+  <AvatarSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="avatar-slots.tsx"
+import { Avatar, AvatarGroup } from '@bpdm/ui/avatar';
+
+const people = [
+  { name: 'Aria Lindqvist', src: '/aria.svg' },
+  { name: 'Theo Brandt', src: '/theo.svg' },
+  { name: 'Lena Cho', src: '/lena.svg' },
+  { name: 'Mateo Silva', src: '/mateo.svg' },
+];
+
+export function Team() {
+  return (
+    <div className="flex flex-col gap-6">
+      <Avatar
+        name="Aria Lindqvist"
+        src="/aria.svg"
+        size="lg"
+        status="online"
+        classNames={{
+          root: 'rounded-full ring-2 ring-primary ring-offset-2 ring-offset-background',
+          image: 'grayscale',
+          status: 'ring-4',
+        }}
+      />
+      <AvatarGroup max={4} classNames={{ overflow: 'bg-primary/15 text-primary' }}>
+        {people.map((p) => (
+          <Avatar key={p.name} name={p.name} src={p.src} />
+        ))}
+      </AvatarGroup>
+    </div>
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="avatar-slots.ts"
+import { Component } from '@angular/core';
+import {
+  BpdmAvatar,
+  BpdmAvatarGroup,
+  type AvatarClassNames,
+  type AvatarGroupClassNames,
+  type AvatarGroupUser,
+} from '@bpdm/ng';
+
+@Component({
+  selector: 'team',
+  imports: [BpdmAvatar, BpdmAvatarGroup],
+  template: `
+    <div class="flex flex-col gap-6">
+      <bpdm-avatar
+        name="Aria Lindqvist"
+        src="/aria.svg"
+        size="lg"
+        status="online"
+        [classNames]="avatarSlots"
+      />
+      <bpdm-avatar-group [users]="people" [max]="4" [classNames]="groupSlots" />
+    </div>
+  `,
+})
+export class Team {
+  readonly avatarSlots: AvatarClassNames = {
+    root: 'rounded-full ring-2 ring-primary ring-offset-2 ring-offset-background',
+    image: 'grayscale',
+    status: 'ring-4',
+  };
+  readonly groupSlots: AvatarGroupClassNames = { overflow: 'bg-primary/15 text-primary' };
+  readonly people: AvatarGroupUser[] = [
+    { name: 'Aria Lindqvist', src: '/aria.svg' },
+    { name: 'Theo Brandt', src: '/theo.svg' },
+    { name: 'Lena Cho', src: '/lena.svg' },
+    { name: 'Mateo Silva', src: '/mateo.svg' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `Avatar` / `<bpdm-avatar>`
@@ -567,6 +664,7 @@ export class Team {
 | `ring` | `boolean` | `false` | Draw a background-coloured ring around the avatar (used by `AvatarGroup`). Angular: `[ring]`. |
 | `messages` | `Partial<AvatarMessages>` | English | Override the translatable strings — the status dot labels (see below). Angular: `[messages]`. |
 | `className` | `string` | — | **React** — extra classes on the root. Angular: use `class`. |
+| `classNames` | `AvatarClassNames` | — | Per-slot overrides: `{ root, image, fallback, status }`. Each merges with the component's own classes. |
 
 ### `AvatarGroup` / `<bpdm-avatar-group>`
 
@@ -578,6 +676,7 @@ export class Team {
 | `size` | `AvatarSize` | `md` | Applied to every avatar and the overflow tile. |
 | `messages` | `Partial<AvatarMessages>` | English | Override the translatable strings — the `+N` overflow label + status dot labels; forwarded to child avatars (see below). Angular: `[messages]`. |
 | `className` | `string` | — | **React** — extra classes on the wrapper. Angular: use `class`. |
+| `classNames` | `AvatarGroupClassNames` | — | Per-slot overrides: `{ root, overflow }` (the `+N` tile). Each merges with the component's own classes. |
 
 ### `NotificationBadge` / `<bpdm-notification-badge>`
 

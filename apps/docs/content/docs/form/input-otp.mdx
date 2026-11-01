@@ -10,6 +10,7 @@ import {
   InputOtpGroupedDemo,
   InputOtpSizesDemo,
   InputOtpStatesDemo,
+  InputOtpSlotsDemo,
 } from '@/components/input-otp-demos';
 import { Preview } from '@/components/preview';
 
@@ -279,6 +280,74 @@ export class StatesComponent {}
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the group as a whole. To restyle **individual
+parts** without reaching into the internal `data-bpdm-slot` elements from CSS, pass a
+`classNames` object — one key per slot: `root` (the outer group wrapper), `slot` (each
+character cell) and `input` (the hidden form input emitted when `name` is set). Each
+entry merges with the component's own classes, so you override only what you name.
+
+<Preview>
+  <InputOtpSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="input-otp-slots.tsx"
+import { InputOtp } from '@bpdm/ui/input-otp';
+
+export function StyledCode() {
+  return (
+    <InputOtp
+      length={6}
+      integerOnly
+      name="code"
+      aria-label="Verification code"
+      classNames={{
+        root: 'gap-1.5',
+        slot: 'rounded-lg border-2 font-mono',
+        input: 'sr-only',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="input-otp-slots.component.ts"
+import { Component } from '@angular/core';
+import { BpdmInputOtp, type InputOtpClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-styled-code',
+  standalone: true,
+  imports: [BpdmInputOtp],
+  template: `
+    <bpdm-input-otp
+      [length]="6"
+      integerOnly
+      name="code"
+      aria-label="Verification code"
+      [classNames]="slots"
+    />
+  `,
+})
+export class StyledCodeComponent {
+  readonly slots: InputOtpClassNames = {
+    root: 'gap-1.5',
+    slot: 'rounded-lg border-2 font-mono',
+    input: 'sr-only',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `InputOtp` / `bpdm-input-otp`
@@ -306,6 +375,9 @@ The value is a plain string of the entered characters (`""` when empty).
 | `aria-describedby` | `string` | — | IDs of describing elements (help / error text). |
 | `cellLabel` | `(index, length) => string` | `Character N of M` | Per-cell screen-reader label — override for i18n. See [Internationalization](/docs/getting-started/i18n). |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the group. |
+| `classNames` | `InputOtpClassNames` | — | Per-slot class overrides: `{ root, slot, input }`. Each merges with the component's own classes. |
+
+`InputOtpClassNames`: `{ root, slot, input }`.
 
 ## Accessibility
 

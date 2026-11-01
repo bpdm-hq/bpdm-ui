@@ -10,6 +10,7 @@ import {
   StatusTimelineFailureDemo,
   StatusTimelineAlignDemo,
   StatusTimelineOppositeDemo,
+  StatusTimelineSlotsDemo,
   StatusTimelineCustomDemo,
   StatusTimelineHorizontalDemo,
   StatusTimelineRichDemo,
@@ -723,6 +724,80 @@ export class DeployTimeline {
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the timeline as a whole. To restyle
+**individual parts** without reaching into the internal `data-bpdm-slot` elements from
+CSS, pass a `classNames` object — one key per slot: `root` (the `<ol>`), `item` (each
+`<li>`), `marker` (the status marker), `content` (the content cell) and `opposite` (the
+across-the-line cell). Each entry merges with the component's own classes, so you
+override only what you name.
+
+<Preview>
+  <StatusTimelineSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="status-timeline-slots.tsx"
+import { StatusTimeline, type TimelineItem } from '@bpdm/ui/status-timeline';
+
+const steps: TimelineItem[] = [
+  { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+  { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+  { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+  { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
+];
+
+export function StyledTimeline() {
+  return (
+    <StatusTimeline
+      items={steps}
+      classNames={{
+        root: 'rounded-xl border bg-card p-4',
+        item: 'py-1',
+        marker: 'ring-4 ring-primary/15',
+        content: 'font-medium text-primary',
+        opposite: 'text-xs text-muted-foreground',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="status-timeline-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmStatusTimeline, type StatusTimelineClassNames, type TimelineItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'styled-timeline',
+  imports: [BpdmStatusTimeline],
+  template: `<bpdm-status-timeline [items]="steps" [classNames]="slots" />`,
+})
+export class StyledTimeline {
+  readonly slots: StatusTimelineClassNames = {
+    root: 'rounded-xl border bg-card p-4',
+    item: 'py-1',
+    marker: 'ring-4 ring-primary/15',
+    content: 'font-medium text-primary',
+    opposite: 'text-xs text-muted-foreground',
+  };
+  readonly steps: TimelineItem[] = [
+    { title: 'Submitted', status: 'complete', opposite: '15 Oct, 10:30' },
+    { title: 'Under review', status: 'complete', opposite: '15 Oct, 14:00' },
+    { title: 'Approved', status: 'current', opposite: '16 Oct, 09:15' },
+    { title: 'Published', status: 'pending', opposite: '16 Oct, 11:00' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatusTimeline` / `<bpdm-status-timeline>`
@@ -739,6 +814,9 @@ export class DeployTimeline {
 | `renderOpposite` (Angular `oppositeTemplate`) | `(item, index) => ReactNode` / `TemplateRef` | — | Render the whole opposite cell yourself (vertical layouts). |
 | `messages` | `Partial<StatusTimelineMessages>` | — | Override the visually-hidden status labels announced to screen readers (i18n). |
 | `className` | `string` (Angular `class`) | — | Extra classes on the timeline. |
+| `classNames` | `StatusTimelineClassNames` | — | Per-slot class overrides: `{ root, item, marker, content, opposite }`. Each merges with the component's own classes. |
+
+`StatusTimelineClassNames`: `{ root, item, marker, content, opposite }`.
 
 ### `StatusTimelineMessages`
 

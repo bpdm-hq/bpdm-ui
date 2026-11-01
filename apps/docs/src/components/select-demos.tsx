@@ -107,3 +107,24 @@ export function SelectStatesDemo() {
     </div>
   );
 }
+
+export function SelectSlotsDemo() {
+  return (
+    <Box>
+      <Select
+        searchable
+        options={CITIES}
+        defaultValue="berlin"
+        placeholder="Select a city"
+        classNames={{
+          trigger: 'rounded-xl border-2',
+          value: 'font-mono uppercase tracking-wide',
+          content: 'rounded-xl',
+          search: 'bg-muted',
+          group: 'uppercase tracking-wide text-primary',
+          option: 'rounded-md',
+        }}
+      />
+    </Box>
+  );
+}

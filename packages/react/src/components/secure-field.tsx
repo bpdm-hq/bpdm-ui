@@ -62,6 +62,18 @@ function maskValue(formatted: string, tail: number) {
     .join("");
 }
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface SecureFieldClassNames {
+  /** The field wrapper. */
+  root?: string;
+  /** The inner input element. */
+  field?: string;
+  /** The reveal (eye) toggle button. */
+  toggle?: string;
+  /** The copy-to-clipboard button. */
+  copy?: string;
+}
+
 export interface SecureFieldProps
   extends Omit<
       React.ComponentProps<"input">,
@@ -81,6 +93,8 @@ export interface SecureFieldProps
   copyable?: boolean;
   /** Override the control labels + copy announcement (screen-reader text) for i18n. */
   messages?: { reveal?: string; hide?: string; copy?: string; copied?: string };
+  /** Per-slot class overrides (root, field, toggle, copy). */
+  classNames?: SecureFieldClassNames;
 }
 
 const DEFAULT_MESSAGES = {
@@ -117,6 +131,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
       onFocus,
       onBlur,
       messages,
+      classNames,
       ...props
     },
     ref,
@@ -168,6 +183,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
         wrapVariants({ size }),
         disabled && "cursor-not-allowed opacity-50",
         className,
+        classNames?.root,
       )}
     >
       <input
@@ -191,7 +207,10 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
         }}
         onChange={onChange}
         data-bpdm-slot="secure-field-field"
-        className="w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed"
+        className={cn(
+          "w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed",
+          classNames?.field,
+        )}
       />
       {copyable && (
         <button
@@ -200,7 +219,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
           disabled={disabled || !raw}
           onClick={copy}
           data-bpdm-slot="secure-field-copy"
-          className={cn(btn)}
+          className={cn(btn, classNames?.copy)}
         >
           <CopyIcon done={copied} />
         </button>
@@ -213,7 +232,7 @@ export const SecureField = React.forwardRef<HTMLInputElement, SecureFieldProps>(
           disabled={disabled}
           onClick={() => setRevealed((r) => !r)}
           data-bpdm-slot="secure-field-toggle"
-          className={cn(btn)}
+          className={cn(btn, classNames?.toggle)}
         >
           <Eye off={revealed} />
         </button>

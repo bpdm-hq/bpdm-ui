@@ -19,6 +19,20 @@ export const DEFAULT_STAT_CARD_MESSAGES: StatCardMessages = {
   loading: "loading",
 };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface StatCardClassNames {
+  /** The card container. */
+  root?: string;
+  /** The label text. */
+  label?: string;
+  /** The big value text. */
+  value?: string;
+  /** The delta row (change + caption). */
+  delta?: string;
+  /** The icon badge. */
+  icon?: string;
+}
+
 export interface StatCardProps {
   label: string;
   /** Pre-formatted value (e.g. "$124,592" or a node). */
@@ -38,6 +52,8 @@ export interface StatCardProps {
   locale?: string;
   /** Override screen-reader / loading text for i18n. */
   messages?: Partial<StatCardMessages>;
+  /** Per-slot class overrides (root, label, value, delta, icon). */
+  classNames?: StatCardClassNames;
   className?: string;
 }
 
@@ -73,6 +89,7 @@ export function StatCard({
   loading = false,
   locale,
   messages,
+  classNames,
   className,
 }: StatCardProps) {
   const t = { ...DEFAULT_STAT_CARD_MESSAGES, ...messages };
@@ -89,6 +106,7 @@ export function StatCard({
         className={cn(
           "flex items-center justify-between gap-4 rounded-2xl border border-[var(--bpdm-border)] bg-[var(--bpdm-card)] p-5 shadow-sm",
           className,
+          classNames?.root,
         )}
       >
         <div className="min-w-0 flex-1 space-y-2.5">
@@ -134,17 +152,18 @@ export function StatCard({
         "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-[var(--bpdm-card-foreground)] shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
         accent ? "border-transparent" : "border-[var(--bpdm-border)] bg-[var(--bpdm-card)]",
         className,
+        classNames?.root,
       )}
     >
       <div className="min-w-0">
-        <p id={labelId} data-bpdm-slot="stat-card-label" className="m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]">
+        <p id={labelId} data-bpdm-slot="stat-card-label" className={cn("m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]", classNames?.label)}>
           {label}
         </p>
-        <p data-bpdm-slot="stat-card-value" className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">
+        <p data-bpdm-slot="stat-card-value" className={cn("mt-1.5 text-2xl font-semibold tracking-tight tabular-nums", classNames?.value)}>
           {value}
         </p>
         {hasDelta && (
-          <div data-bpdm-slot="stat-card-delta" className="mt-1.5 flex items-center gap-1.5 text-sm">
+          <div data-bpdm-slot="stat-card-delta" className={cn("mt-1.5 flex items-center gap-1.5 text-sm", classNames?.delta)}>
             <span
               role="img"
               aria-label={deltaSr}
@@ -166,6 +185,7 @@ export function StatCard({
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5",
             !accent && "bg-[var(--bpdm-muted)] text-[var(--bpdm-muted-foreground)]",
+            classNames?.icon,
           )}
         >
           {icon}

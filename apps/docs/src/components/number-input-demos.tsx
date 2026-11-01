@@ -97,3 +97,16 @@ export function NumberInputStatesDemo() {
     </div>
   );
 }
+
+// Per-slot styling: one classNames object restyles root + field
+export function NumberInputSlotsDemo() {
+  return (
+    <div className="flex justify-center">
+      <NumberInput
+        defaultValue="9"
+        min="0"
+        classNames={{ root: 'rounded-xl', field: 'font-mono' }}
+      />
+    </div>
+  );
+}

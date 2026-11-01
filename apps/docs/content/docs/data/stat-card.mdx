@@ -11,6 +11,7 @@ import {
   StatCardNoDeltaDemo,
   StatCardLoadingDemo,
   StatCardDashboardDemo,
+  StatCardSlotsDemo,
   StatCardI18nDemo,
 } from '@/components/stat-card-demos';
 import { Preview } from '@/components/preview';
@@ -307,6 +308,83 @@ export class Dashboard {}
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the card as a whole. To restyle **individual
+parts** without reaching into the internal `data-bpdm-slot` elements from CSS, pass a
+`classNames` object — one key per slot: `root`, `label`, `value`, `delta` and `icon`.
+Each entry merges with the component's own classes, so you override only what you name.
+
+<Preview>
+  <StatCardSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="stat-card-slots.tsx"
+import { StatCard } from '@bpdm/ui/stat-card';
+import { Users } from 'lucide-react';
+
+export function BrandedStat() {
+  return (
+    <StatCard
+      label="Active users"
+      value="8,420"
+      delta={3.1}
+      deltaLabel="vs last week"
+      icon={<Users />}
+      classNames={{
+        root: 'rounded-2xl border-2',
+        label: 'uppercase tracking-wide text-[0.65rem]',
+        value: 'font-mono',
+        delta: 'rounded-full bg-muted px-2',
+        icon: 'bg-primary/10 text-primary',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="stat-card-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmStatCard, type StatCardClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'branded-stat',
+  imports: [BpdmStatCard],
+  template: `
+    <bpdm-stat-card
+      label="Active users"
+      value="8,420"
+      [delta]="3.1"
+      deltaLabel="vs last week"
+      [classNames]="slots"
+    >
+      <svg bpdmStatCardIcon viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+      </svg>
+    </bpdm-stat-card>
+  `,
+})
+export class BrandedStat {
+  readonly slots: StatCardClassNames = {
+    root: 'rounded-2xl border-2',
+    label: 'uppercase tracking-wide text-[0.65rem]',
+    value: 'font-mono',
+    delta: 'rounded-full bg-muted px-2',
+    icon: 'bg-primary/10 text-primary',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `StatCard` / `<bpdm-stat-card>`
@@ -324,8 +402,10 @@ export class Dashboard {}
 | `locale` | `string` (BCP 47) | runtime default | Formats the delta number (decimal separator). |
 | `messages` | `Partial<StatCardMessages>` | English | Override the screen-reader / loading text for i18n (see below). |
 | `className` | `string` (Angular `class`) | — | Extra classes on the card. |
+| `classNames` | `StatCardClassNames` | — | Per-slot class overrides: `{ root, label, value, delta, icon }`. Each merges with the component's own classes. |
 
 `StatCardMessages`: `{ increased, decreased, noChange, loading }`.
+`StatCardClassNames`: `{ root, label, value, delta, icon }`.
 
 ## Accessibility
 

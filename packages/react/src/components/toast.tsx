@@ -30,6 +30,30 @@ export interface ToastAction {
   onClick: () => void;
 }
 
+/** Per-slot class overrides for a single toast. */
+export interface ToastClassNames {
+  /** The toast root. */
+  toast?: string;
+  /** The title line. */
+  title?: string;
+  /** The description line. */
+  description?: string;
+  /** The action button. */
+  action?: string;
+  /** The close (×) button. */
+  close?: string;
+}
+
+/**
+ * Per-slot class overrides for the {@link Toaster}: `viewport` styles the toast
+ * region, and the toast-level keys apply to every toast it renders (a per-call
+ * `classNames` on `toast(...)` still merges on top).
+ */
+export interface ToasterClassNames extends ToastClassNames {
+  /** The viewport that docks the toasts. */
+  viewport?: string;
+}
+
 export interface ToastOptions {
   description?: React.ReactNode;
   variant?: ToastVariant;
@@ -43,6 +67,8 @@ export interface ToastOptions {
   onDismiss?: () => void;
   /** Reuse an id to update an existing toast in place. */
   id?: string;
+  /** Per-slot class overrides for this toast (merged over the Toaster defaults). */
+  classNames?: ToastClassNames;
 }
 
 interface ToastRecord extends Omit<ToastOptions, "id"> {
@@ -219,6 +245,8 @@ export interface ToasterProps {
   /** Override the translatable strings (currently just the dismiss button label). */
   messages?: Partial<ToastMessages>;
   className?: string;
+  /** Per-slot class overrides applied to the viewport and every toast it renders. */
+  classNames?: ToasterClassNames;
 }
 
 /** Render once near the app root. Listens to the global store and renders toasts. */
@@ -227,6 +255,7 @@ export function Toaster({
   duration = 4000,
   messages,
   className,
+  classNames,
 }: ToasterProps) {
   const [list, setList] = React.useState<ToastRecord[]>(records);
   React.useEffect(() => {
@@ -250,6 +279,7 @@ export function Toaster({
           cfg={cfg}
           fallbackDuration={duration}
           dismissLabel={dismissLabel}
+          defaults={classNames}
         />
       ))}
       <ToastPrimitive.Viewport
@@ -260,6 +290,7 @@ export function Toaster({
           cfg.viewport,
           cfg.col,
           className,
+          classNames?.viewport,
         )}
       />
     </ToastPrimitive.Provider>
@@ -271,13 +302,17 @@ function ToastItem({
   cfg,
   fallbackDuration,
   dismissLabel,
+  defaults,
 }: {
   record: ToastRecord;
   cfg: (typeof POSITIONS)[ToastPosition];
   fallbackDuration: number;
   dismissLabel: string;
+  defaults?: ToasterClassNames;
 }) {
   const v = VARIANTS[record.variant ?? "default"];
+  // Toaster-level defaults first, then this toast's own per-call overrides.
+  const slot = (key: keyof ToastClassNames) => cn(defaults?.[key], record.classNames?.[key]);
   const sticky =
     record.loading || record.duration === Infinity || record.duration === 0;
   const dismissible = record.dismissible ?? !record.loading;
@@ -327,6 +362,7 @@ function ToastItem({
         "before:absolute before:inset-y-0 before:start-0 before:w-1 before:content-['']",
         v.accent,
         !sticky && "before:opacity-40",
+        slot("toast"),
       )}
     >
       {!sticky && (
@@ -342,11 +378,11 @@ function ToastItem({
       )}
       {leading}
       <div className="min-w-0 flex-1">
-        <ToastPrimitive.Title data-bpdm-slot="toast-title" className="text-sm font-semibold">
+        <ToastPrimitive.Title data-bpdm-slot="toast-title" className={cn("text-sm font-semibold", slot("title"))}>
           {record.title}
         </ToastPrimitive.Title>
         {record.description != null && (
-          <ToastPrimitive.Description data-bpdm-slot="toast-description" className="mt-1 text-sm text-[var(--bpdm-muted-foreground)]">
+          <ToastPrimitive.Description data-bpdm-slot="toast-description" className={cn("mt-1 text-sm text-[var(--bpdm-muted-foreground)]", slot("description"))}>
             {record.description}
           </ToastPrimitive.Description>
         )}
@@ -356,7 +392,7 @@ function ToastItem({
               <button
                 onClick={record.action.onClick}
                 data-bpdm-slot="toast-action"
-                className="inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
+                className={cn("inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]", slot("action"))}
               >
                 {record.action.label}
               </button>
@@ -368,7 +404,7 @@ function ToastItem({
         <ToastPrimitive.Close
           aria-label={dismissLabel}
           data-bpdm-slot="toast-close"
-          className="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100"
+          className={cn("absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100", slot("close"))}
         >
           <X className="size-3.5" />
         </ToastPrimitive.Close>

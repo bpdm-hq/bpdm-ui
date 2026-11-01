@@ -3,6 +3,16 @@ import { cn } from "@/lib/utils";
 
 type Size = "sm" | "md" | "lg";
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface InputOtpClassNames {
+  /** The outer group wrapper. */
+  root?: string;
+  /** Each character cell. */
+  slot?: string;
+  /** The hidden form input (when `name` is set). */
+  input?: string;
+}
+
 export interface InputOtpProps {
   /** Number of cells. */
   length?: number;
@@ -34,6 +44,8 @@ export interface InputOtpProps {
   "aria-describedby"?: string;
   /** Per-cell screen-reader label. Override for i18n. Default: `Character N of M`. */
   cellLabel?: (index: number, length: number) => string;
+  /** Per-slot class overrides (root, slot, input). */
+  classNames?: InputOtpClassNames;
 }
 
 const cellSize: Record<Size, string> = {
@@ -95,6 +107,7 @@ export function InputOtp({
   "aria-label": ariaLabel = "One-time code",
   "aria-describedby": ariaDescribedBy,
   cellLabel = (index: number, len: number) => `Character ${index + 1} of ${len}`,
+  classNames,
 }: InputOtpProps) {
   const refs = React.useRef<(HTMLInputElement | null)[]>([]);
   const isControlled = value !== undefined;
@@ -205,12 +218,19 @@ export function InputOtp({
               isLast && "rounded-e-[var(--bpdm-radius)]",
             )
           : "rounded-[var(--bpdm-radius)]",
+        classNames?.slot,
       )}
     />
   );
 
   const hiddenField = name ? (
-    <input data-bpdm-slot="input-otp-input" type="hidden" name={name} value={cells.join("")} />
+    <input
+      data-bpdm-slot="input-otp-input"
+      type="hidden"
+      name={name}
+      value={cells.join("")}
+      className={cn(classNames?.input)}
+    />
   ) : null;
 
   if (!isGrouped) {
@@ -221,7 +241,7 @@ export function InputOtp({
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
         data-bpdm="" data-bpdm-slot="input-otp"
-        className={cn("flex flex-wrap items-center gap-2", className)}
+        className={cn("flex flex-wrap items-center gap-2", className, classNames?.root)}
       >
         {cells.map((_, i) => renderCell(i, false, false))}
         {hiddenField}
@@ -239,7 +259,7 @@ export function InputOtp({
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
       data-bpdm="" data-bpdm-slot="input-otp"
-      className={cn("flex flex-wrap items-center gap-3", className)}
+      className={cn("flex flex-wrap items-center gap-3", className, classNames?.root)}
     >
       {sizes.map((sz, g) => {
         const start = offset;

@@ -47,6 +47,20 @@ export const DEFAULT_STATUS_TIMELINE_MESSAGES: StatusTimelineMessages = {
   failed: "Failed",
 };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface StatusTimelineClassNames {
+  /** The timeline list (`<ol>`). */
+  root?: string;
+  /** Each step (`<li>`). */
+  item?: string;
+  /** The status marker. */
+  marker?: string;
+  /** The content cell. */
+  content?: string;
+  /** The opposite cell (vertical layouts). */
+  opposite?: string;
+}
+
 export interface StatusTimelineProps {
   items: TimelineItem[];
   /** Orientation — "vertical" (default) or "horizontal". */
@@ -68,6 +82,8 @@ export interface StatusTimelineProps {
   renderContent?: (item: TimelineItem, index: number) => React.ReactNode;
   /** Render the whole opposite cell yourself (vertical layouts). */
   renderOpposite?: (item: TimelineItem, index: number) => React.ReactNode;
+  /** Per-slot class overrides (root, item, marker, content, opposite). */
+  classNames?: StatusTimelineClassNames;
   className?: string;
 }
 
@@ -143,6 +159,7 @@ export function StatusTimeline({
   renderMarker,
   renderContent,
   renderOpposite,
+  classNames,
   className,
 }: StatusTimelineProps) {
   const horizontal = layout === "horizontal";
@@ -176,17 +193,17 @@ export function StatusTimeline({
 
   const marker = (item: TimelineItem, status: TimelineStatus, placement: string) =>
     renderMarker ? (
-      <span data-bpdm-slot="status-timeline-marker" className={cn("relative z-10 flex shrink-0 items-center justify-center", placement)}>
+      <span data-bpdm-slot="status-timeline-marker" className={cn("relative z-10 flex shrink-0 items-center justify-center", placement, classNames?.marker)}>
         {renderMarker(item, status)}
       </span>
     ) : (
-      <Marker item={item} status={status} className={placement} />
+      <Marker item={item} status={status} className={cn(placement, classNames?.marker)} />
     );
 
   // Horizontal
   if (horizontal) {
     return (
-      <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("m-0 flex list-none overflow-x-auto p-0", className)}>
+      <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("m-0 flex list-none overflow-x-auto p-0", className, classNames?.root)}>
         {items.map((item, i) => {
           const status = item.status ?? "pending";
           const last = i === items.length - 1;
@@ -202,6 +219,7 @@ export function StatusTimeline({
               className={cn(
                 "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
                 interactive && interactiveClasses,
+                classNames?.item,
               )}
             >
               {statusLabel(status)}
@@ -219,7 +237,7 @@ export function StatusTimeline({
 
               {marker(item, status, "row-start-2")}
 
-              <div data-bpdm-slot="status-timeline-content" className={cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", !renderContent && "text-center")}>
+              <div data-bpdm-slot="status-timeline-content" className={cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", !renderContent && "text-center", classNames?.content)}>
                 {renderContent ? (
                   renderContent(item, i)
                 ) : (
@@ -246,7 +264,7 @@ export function StatusTimeline({
   const centered = alternate || showOpposite; // center the line so both sides are usable
 
   return (
-    <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("relative m-0 list-none p-0", className)}>
+    <ol aria-label={label} data-bpdm="" data-bpdm-slot="status-timeline" className={cn("relative m-0 list-none p-0", className, classNames?.root)}>
       {items.map((item, i) => {
         const status = item.status ?? "pending";
         const last = i === items.length - 1;
@@ -267,6 +285,7 @@ export function StatusTimeline({
               centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
               !centered && align === "right" && "flex-row-reverse",
               interactive && interactiveClasses,
+              classNames?.item,
             )}
           >
             {statusLabel(status)}
@@ -301,6 +320,7 @@ export function StatusTimeline({
                 // default-structure spacing/alignment (skipped for custom content)
                 !renderContent && "min-h-10",
                 !renderContent && !contentRight && "text-end",
+                classNames?.content,
               )}
             >
               {renderContent ? (
@@ -335,6 +355,7 @@ export function StatusTimeline({
                     : "col-start-3 row-start-1 justify-self-start",
                   !renderOpposite && "flex min-h-6 items-center text-sm text-[var(--bpdm-muted-foreground)]",
                   !renderOpposite && (contentRight ? "text-end" : "text-start"),
+                  classNames?.opposite,
                 )}
               >
                 {renderOpposite ? renderOpposite(item, i) : item.opposite}

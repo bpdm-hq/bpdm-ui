@@ -43,7 +43,29 @@ const ITEM_H = 36;
 const GROUP_H = 30;
 
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface SelectClassNames {
+  /** The trigger button. */
+  trigger?: string;
+  /** The selected-value text inside the trigger. */
+  value?: string;
+  /** The dropdown panel. */
+  content?: string;
+  /** The search input (when `searchable`). */
+  search?: string;
+  /** The empty-state message. */
+  empty?: string;
+  /** The scrollable option list. */
+  list?: string;
+  /** A group heading. */
+  group?: string;
+  /** Each option row. */
+  option?: string;
+}
+
 export interface SelectProps extends VariantProps<typeof triggerVariants> {
+  /** Per-slot class overrides (trigger, value, content, search, empty, list, group, option). */
+  classNames?: SelectClassNames;
   options: SelectItems;
   value?: string;
   defaultValue?: string;
@@ -84,6 +106,7 @@ export function Select({
   disabled,
   className,
   contentClassName,
+  classNames,
   "aria-invalid": ariaInvalid,
   id,
   "aria-label": ariaLabel,
@@ -290,11 +313,15 @@ export function Select({
           aria-invalid={ariaInvalid}
           disabled={disabled}
           data-bpdm="" data-bpdm-slot="select-trigger"
-          className={cn(triggerVariants({ size }), "group", className)}
+          className={cn(triggerVariants({ size }), "group", className, classNames?.trigger)}
         >
           <span
             data-bpdm-slot="select-value"
-            className={cn("truncate", !selectedLabel && "text-[var(--bpdm-muted-foreground)]")}
+            className={cn(
+              "truncate",
+              !selectedLabel && "text-[var(--bpdm-muted-foreground)]",
+              classNames?.value,
+            )}
             title={selectedLabel ?? placeholder}
           >
             {selectedLabel ?? placeholder}
@@ -324,6 +351,7 @@ export function Select({
             "z-50 flex w-[var(--radix-popover-trigger-width)] flex-col overflow-hidden rounded-[var(--bpdm-radius)] border border-[var(--bpdm-border)] bg-[var(--bpdm-popover)] text-[var(--bpdm-popover-foreground)] shadow-md",
             "origin-[var(--radix-popover-content-transform-origin)] data-[state=open]:animate-[bpdm-pop-in_var(--bpdm-duration-fast)_var(--bpdm-ease-out)] data-[state=closed]:animate-[bpdm-pop-out_var(--bpdm-duration-fast)_ease-in]",
             contentClassName,
+            classNames?.content,
           )}
         >
           {searchable && (
@@ -341,13 +369,22 @@ export function Select({
                 aria-autocomplete="list"
                 aria-activedescendant={activeId}
                 data-bpdm-slot="select-search"
-                className="h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none"
+                className={cn(
+                  "h-9 w-full bg-transparent text-sm text-[var(--bpdm-foreground)] placeholder:text-[var(--bpdm-muted-foreground)] focus:outline-none",
+                  classNames?.search,
+                )}
               />
             </div>
           )}
 
           {rows.length === 0 ? (
-            <div data-bpdm-slot="select-empty" className="px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]">
+            <div
+              data-bpdm-slot="select-empty"
+              className={cn(
+                "px-3 py-6 text-center text-sm text-[var(--bpdm-muted-foreground)]",
+                classNames?.empty,
+              )}
+            >
               {emptyText}
             </div>
           ) : (
@@ -363,7 +400,7 @@ export function Select({
               aria-activedescendant={searchable ? undefined : activeId}
               style={{ maxHeight }}
               data-bpdm-slot="select-list"
-              className="min-h-0 flex-1 overflow-auto p-1 focus:outline-none"
+              className={cn("min-h-0 flex-1 overflow-auto p-1 focus:outline-none", classNames?.list)}
             >
               <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
                 {virtualizer.getVirtualItems().map((vi) => {
@@ -380,7 +417,10 @@ export function Select({
                         key={`g-${vi.index}`}
                         aria-hidden="true"
                         data-bpdm-slot="select-group"
-                        className="absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)] [&_img]:size-4 [&_svg]:size-4"
+                        className={cn(
+                          "absolute start-0 top-0 flex w-full items-center gap-2 px-2 text-sm font-semibold text-[var(--bpdm-foreground)] [&_img]:size-4 [&_svg]:size-4",
+                          classNames?.group,
+                        )}
                         {...common}
                       >
                         {r.icon}
@@ -410,6 +450,7 @@ export function Select({
                         // shadow mirror), jitter-free (inset shadow takes no layout space).
                         isActive &&
                           "bg-[var(--bpdm-option-active-bg)] font-medium shadow-[inset_2px_0_0_0_var(--bpdm-option-active-bar)] rtl:shadow-[inset_-2px_0_0_0_var(--bpdm-option-active-bar)]",
+                        classNames?.option,
                       )}
                       {...common}
                     >

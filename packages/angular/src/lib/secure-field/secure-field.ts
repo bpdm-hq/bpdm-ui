@@ -14,6 +14,18 @@ import { type FieldSize, WRAP_FIELD_BASE, WRAP_FIELD_SIZE } from "../internal/fi
 
 export type SecureFieldFormat = "grouped" | "none";
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface SecureFieldClassNames {
+  /** The field wrapper. */
+  root?: string;
+  /** The inner input element. */
+  field?: string;
+  /** The reveal (eye) toggle button. */
+  toggle?: string;
+  /** The copy-to-clipboard button. */
+  copy?: string;
+}
+
 function groupCard(digits: string): string {
   return digits.match(/.{1,4}/g)?.join(" ") ?? "";
 }
@@ -54,6 +66,7 @@ function maskValue(formatted: string, tail: number): string {
         [id]="id() || null"
         type="text"
         autocomplete="off"
+        [class]="cls('w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed', 'field')"
         data-bpdm-slot="secure-field-field"
         data-1p-ignore
         data-lpignore="true"
@@ -68,7 +81,6 @@ function maskValue(formatted: string, tail: number): string {
         (focus)="focused.set(true)"
         (blur)="focused.set(false)"
         (input)="onInput($any($event.target).value)"
-        class="w-full min-w-0 bg-transparent tracking-wide tabular-nums focus:outline-none disabled:cursor-not-allowed"
       />
       @if (copyable()) {
         <button
@@ -77,7 +89,7 @@ function maskValue(formatted: string, tail: number): string {
           data-bpdm-slot="secure-field-copy"
           [disabled]="disabled() || !current()"
           (click)="copy()"
-          [class]="btnClass"
+          [class]="cls(btnClass, 'copy')"
         >
           @if (copied()) {
             <svg viewBox="0 0 16 16" fill="none" class="size-4 text-[var(--bpdm-success)] animate-[bpdm-indicator-in_var(--bpdm-duration-base)_var(--bpdm-ease-overshoot)]" aria-hidden="true">
@@ -99,7 +111,7 @@ function maskValue(formatted: string, tail: number): string {
           data-bpdm-slot="secure-field-toggle"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
-          [class]="btnClass"
+          [class]="cls(btnClass, 'toggle')"
         >
           <svg viewBox="0 0 20 20" fill="none" class="size-4" aria-hidden="true">
             <path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10Z" stroke="currentColor" stroke-width="1.5" />
@@ -145,6 +157,13 @@ export class BpdmSecureField {
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
   /** Override the control labels + copy announcement (screen-reader text) for i18n. */
   readonly messages = input<{ reveal?: string; hide?: string; copy?: string; copied?: string }>({});
+  /** Per-slot class overrides (root, field, toggle, copy). */
+  readonly classNames = input<SecureFieldClassNames | undefined>(undefined);
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof SecureFieldClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected readonly t = computed(() => ({
     reveal: "Reveal",
@@ -185,6 +204,7 @@ export class BpdmSecureField {
       WRAP_FIELD_SIZE[this.size()],
       this.disabled() && "cursor-not-allowed opacity-50",
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
 

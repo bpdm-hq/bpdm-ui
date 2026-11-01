@@ -38,6 +38,30 @@ export interface ToastAction {
   onClick: () => void;
 }
 
+/** Per-slot class overrides for a single toast. */
+export interface ToastClassNames {
+  /** The toast root. */
+  toast?: string;
+  /** The title line. */
+  title?: string;
+  /** The description line. */
+  description?: string;
+  /** The action button. */
+  action?: string;
+  /** The close (X) button. */
+  close?: string;
+}
+
+/**
+ * Per-slot class overrides for `<bpdm-toaster>`: `viewport` styles the toast
+ * region, and the toast-level keys apply to every toast it renders (a per-call
+ * `classNames` on the toast options still merges on top).
+ */
+export interface ToasterClassNames extends ToastClassNames {
+  /** The viewport that docks the toasts. */
+  viewport?: string;
+}
+
 export interface ToastOptions {
   /** Secondary line under the title. */
   description?: string;
@@ -55,6 +79,8 @@ export interface ToastOptions {
   id?: string;
   /** Override the leading icon with a template; pass `null` to hide it. */
   icon?: TemplateRef<unknown> | null;
+  /** Per-slot class overrides for this toast (merged over the Toaster defaults). */
+  classNames?: ToastClassNames;
 }
 
 export interface ToastPromiseMessages<T> {
@@ -324,9 +350,9 @@ const SWIPE_THRESHOLD = 45;
     }
 
     <div class="min-w-0 flex-1">
-      <p data-bpdm-slot="toast-title" class="m-0 text-sm font-semibold">{{ record().title }}</p>
+      <p data-bpdm-slot="toast-title" [class]="slotCls('m-0 text-sm font-semibold', 'title')">{{ record().title }}</p>
       @if (record().description != null) {
-        <p data-bpdm-slot="toast-description" class="m-0 mt-1 text-sm text-[var(--bpdm-muted-foreground)]">{{ record().description }}</p>
+        <p data-bpdm-slot="toast-description" [class]="slotCls('m-0 mt-1 text-sm text-[var(--bpdm-muted-foreground)]', 'description')">{{ record().description }}</p>
       }
       @if (record().action; as action) {
         <div class="mt-2.5">
@@ -334,7 +360,7 @@ const SWIPE_THRESHOLD = 45;
             type="button"
             data-bpdm-slot="toast-action"
             (click)="onAction(action)"
-            class="inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]"
+            [class]="slotCls('inline-flex h-7 items-center rounded-md border border-[var(--bpdm-border)] bg-transparent px-2.5 text-xs font-medium transition-colors hover:bg-[var(--bpdm-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)]', 'action')"
           >
             {{ action.label }}
           </button>
@@ -348,7 +374,7 @@ const SWIPE_THRESHOLD = 45;
         data-bpdm-slot="toast-close"
         [attr.aria-label]="dismissLabel()"
         (click)="beginClose()"
-        class="absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100"
+        [class]="slotCls('absolute end-2 top-2 inline-flex size-6 items-center justify-center rounded-md text-[var(--bpdm-muted-foreground)]/70 opacity-0 transition-opacity hover:bg-[var(--bpdm-muted)] hover:text-[var(--bpdm-foreground)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] group-hover:opacity-100', 'close')"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-3.5" aria-hidden="true">
           <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -362,6 +388,13 @@ export class BpdmToastItem {
   readonly cfg = input.required<PositionConfig>();
   readonly fallbackDuration = input(4000);
   readonly dismissLabel = input("Dismiss");
+  /** Toaster-level per-slot defaults, merged under this toast's own `classNames`. */
+  readonly defaults = input<ToasterClassNames | undefined>(undefined);
+
+  /** Toaster defaults first, then this toast's own per-call overrides. */
+  protected slotCls(base: string, key: keyof ToastClassNames): string {
+    return cn(base, this.defaults()?.[key], this.record().classNames?.[key]);
+  }
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(BpdmToast);
@@ -402,6 +435,8 @@ export class BpdmToastItem {
       "before:absolute before:inset-y-0 before:start-0 before:w-1 before:content-['']",
       this.v().accent,
       !this.sticky() && "before:opacity-40",
+      this.defaults()?.toast,
+      this.record().classNames?.toast,
     ),
   );
   protected readonly countdownClass = computed(() =>
@@ -587,6 +622,7 @@ export class BpdmToastItem {
                 [cfg]="cfg()"
                 [fallbackDuration]="duration()"
                 [dismissLabel]="msg().dismiss"
+                [defaults]="classNames()"
               />
             </li>
           }
@@ -602,6 +638,8 @@ export class BpdmToaster {
   readonly duration = input(4000);
   /** Localizable strings (currently just the close button aria-label). */
   readonly messages = input<Partial<ToastMessages>>({});
+  /** Per-slot class overrides for the viewport and every toast it renders. */
+  readonly classNames = input<ToasterClassNames | undefined>(undefined);
 
   private readonly service = inject(BpdmToast);
   private readonly overlay = inject(Overlay);
@@ -623,6 +661,7 @@ export class BpdmToaster {
       "pointer-events-none fixed z-[100] m-0 flex w-[min(24rem,calc(100vw-2rem))] list-none flex-col gap-3 p-4 outline-none",
       this.cfg().viewport,
       this.cfg().col,
+      this.classNames()?.viewport,
     ),
   );
 

@@ -106,6 +106,36 @@ export function AvatarGroupDemo() {
   );
 }
 
+export function AvatarSlotsDemo() {
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <Row>
+        <Avatar
+          name="Aria Lindqvist"
+          src={PEOPLE[0].src}
+          size="lg"
+          status="online"
+          classNames={{
+            root: 'rounded-full ring-2 ring-primary ring-offset-2 ring-offset-background',
+            image: 'grayscale',
+            status: 'ring-4',
+          }}
+        />
+        <Avatar
+          name="Theo Brandt"
+          size="lg"
+          classNames={{ fallback: 'bg-primary/15 text-primary' }}
+        />
+      </Row>
+      <AvatarGroup max={4} classNames={{ overflow: 'bg-primary/15 text-primary' }}>
+        {PEOPLE.map((p) => (
+          <Avatar key={p.name} name={p.name} src={p.src} />
+        ))}
+      </AvatarGroup>
+    </div>
+  );
+}
+
 export function AvatarBadgeDemo() {
   return (
     <Row>

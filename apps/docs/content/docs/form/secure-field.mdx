@@ -10,6 +10,7 @@ import {
   SecureFieldFormatDemo,
   SecureFieldSizesDemo,
   SecureFieldStatesDemo,
+  SecureFieldSlotsDemo,
 } from '@/components/secure-field-demos';
 import { Preview } from '@/components/preview';
 
@@ -286,6 +287,70 @@ export class StatesComponent {}
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the field wrapper as a whole. To restyle
+**individual parts** without reaching into the internal `data-bpdm-slot` elements from
+CSS, pass a `classNames` object — one key per slot: `root` (the field wrapper), `field`
+(the inner input), `toggle` (the reveal/eye button) and `copy` (the copy-to-clipboard
+button). Each entry merges with the component's own classes, so you override only what
+you name.
+
+<Preview>
+  <SecureFieldSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="secure-field-slots.tsx"
+import { SecureField } from '@bpdm/ui/secure-field';
+
+export function StyledKey() {
+  return (
+    <SecureField
+      copyable
+      unmaskedTail={4}
+      placeholder="API key"
+      classNames={{
+        root: 'rounded-xl border-2',
+        field: 'font-mono tracking-wide',
+        toggle: 'text-primary',
+        copy: 'text-primary',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="secure-field-slots.component.ts"
+import { Component } from '@angular/core';
+import { BpdmSecureField, type SecureFieldClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'app-styled-key',
+  standalone: true,
+  imports: [BpdmSecureField],
+  template: `
+    <bpdm-secure-field copyable [unmaskedTail]="4" placeholder="API key" [classNames]="slots" />
+  `,
+})
+export class StyledKeyComponent {
+  readonly slots: SecureFieldClassNames = {
+    root: 'rounded-xl border-2',
+    field: 'font-mono tracking-wide',
+    toggle: 'text-primary',
+    copy: 'text-primary',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `SecureField` / `bpdm-secure-field`
@@ -311,6 +376,9 @@ masked display.
 | `id` | `string` | — | Field id (for `<label>` association). |
 | `placeholder` | `string` | — | Placeholder shown when empty. |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+| `classNames` | `SecureFieldClassNames` | — | Per-slot class overrides: `{ root, field, toggle, copy }`. Each merges with the component's own classes. |
+
+`SecureFieldClassNames`: `{ root, field, toggle, copy }`.
 
 In **React**, `SecureField` forwards its `ref` to the underlying `<input>` and spreads any other
 native `<input>` prop (`required`, `readOnly`, `data-*`, `onBlur`, …) onto it. In **Angular**,

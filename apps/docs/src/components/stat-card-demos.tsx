@@ -108,6 +108,27 @@ export function StatCardDashboardDemo() {
   );
 }
 
+export function StatCardSlotsDemo() {
+  return (
+    <Box>
+      <StatCard
+        label="Active users"
+        value="8,420"
+        delta={3.1}
+        deltaLabel="vs last week"
+        icon={<Users />}
+        classNames={{
+          root: 'rounded-2xl border-2',
+          label: 'uppercase tracking-wide text-[0.65rem]',
+          value: 'font-mono',
+          delta: 'rounded-full bg-muted px-2',
+          icon: 'bg-primary/10 text-primary',
+        }}
+      />
+    </Box>
+  );
+}
+
 const de = { increased: 'Gestiegen', decreased: 'Gesunken', noChange: 'Keine Änderung', loading: 'wird geladen' };
 
 export function StatCardI18nDemo() {

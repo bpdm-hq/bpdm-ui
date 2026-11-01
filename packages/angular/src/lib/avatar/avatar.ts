@@ -35,6 +35,18 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
   more: "{count} more",
 };
 
+/** Per-slot class overrides for `<bpdm-avatar>`. */
+export interface AvatarClassNames {
+  /** The root element. */
+  root?: string;
+  /** The loaded image. */
+  image?: string;
+  /** The initials / icon fallback. */
+  fallback?: string;
+  /** The presence-status dot. */
+  status?: string;
+}
+
 /**
  * `<bpdm-avatar>` — an image with a graceful fallback to initials (auto-tinted
  * from the name) and then a person icon. Circle or square, six sizes, an optional
@@ -63,11 +75,12 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
           (error)="failed.set(true)"
           data-bpdm-slot="avatar-image"
           class="size-full object-cover animate-[bpdm-fade-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)]"
+          [class]="cls('', 'image')"
         />
       } @else {
         <span
           class="flex size-full items-center justify-center font-semibold animate-[bpdm-pop-in_var(--bpdm-duration-base)_var(--bpdm-ease-out)] [&_svg]:size-[55%]"
-          [class]="tint()"
+          [class]="cls(tint(), 'fallback')"
           data-bpdm-slot="avatar-fallback"
           [attr.role]="name() ? 'img' : null"
           [attr.aria-label]="name() || null"
@@ -88,7 +101,7 @@ export const DEFAULT_AVATAR_MESSAGES: AvatarMessages = {
       <span
         role="img"
         class="absolute z-10 rounded-full ring-2 ring-[var(--bpdm-background)] size-[28%] min-h-2 min-w-2"
-        [class]="statusDotClass()"
+        [class]="cls(statusDotClass(), 'status')"
         data-bpdm-slot="avatar-status"
         [attr.aria-label]="statusLabel()"
       ></span>
@@ -112,6 +125,13 @@ export class BpdmAvatar {
   /** Override the translatable strings (status dot labels). */
   readonly messages = input<Partial<AvatarMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, image, fallback, status). */
+  readonly classNames = input<AvatarClassNames | undefined>(undefined);
+
+  /** Merge a slot's base class with its matching `classNames` override. */
+  protected cls(base: string, key: keyof AvatarClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected readonly t = computed(() => ({ ...DEFAULT_AVATAR_MESSAGES, ...this.messages() }));
   protected readonly statusLabel = computed(() => {
@@ -141,6 +161,7 @@ export class BpdmAvatar {
       "relative inline-flex shrink-0 select-none items-center justify-center overflow-visible",
       avatarSize[this.size()],
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
 }
@@ -149,6 +170,14 @@ export interface AvatarGroupUser {
   name?: string;
   src?: string;
   status?: AvatarStatus;
+}
+
+/** Per-slot class overrides for `<bpdm-avatar-group>`. */
+export interface AvatarGroupClassNames {
+  /** The group row. */
+  root?: string;
+  /** The `+N` overflow tile. */
+  overflow?: string;
 }
 
 /**
@@ -160,7 +189,7 @@ export interface AvatarGroupUser {
   selector: "bpdm-avatar-group",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BpdmAvatar],
-  host: { "data-bpdm": "", "data-bpdm-slot": "avatar-group", class: "flex items-center" },
+  host: { "data-bpdm": "", "data-bpdm-slot": "avatar-group", "[class]": "rootClass()" },
   template: `
     @for (u of shown(); track $index) {
       <bpdm-avatar
@@ -180,7 +209,7 @@ export interface AvatarGroupUser {
         [attr.aria-label]="overflowLabel()"
         data-bpdm-slot="avatar-group-overflow"
         class="relative -ms-2.5 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--bpdm-muted)] font-semibold text-[var(--bpdm-muted-foreground)] ring-2 ring-[var(--bpdm-background)] transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:z-10 hover:-translate-y-1"
-        [class]="sizeClass()"
+        [class]="cls(sizeClass(), 'overflow')"
       >+{{ overflow() }}</span>
     }
   `,
@@ -196,7 +225,17 @@ export class BpdmAvatarGroup {
    * tile.
    */
   readonly messages = input<Partial<AvatarMessages>>({});
+  /** Per-slot class overrides (root, overflow). */
+  readonly classNames = input<AvatarGroupClassNames | undefined>(undefined);
 
+  /** Merge a slot's base class with its matching `classNames` override. */
+  protected cls(base: string, key: keyof AvatarGroupClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
+
+  protected readonly rootClass = computed(() =>
+    cn("flex items-center", this.classNames()?.root),
+  );
   protected readonly shown = computed(() => {
     const m = this.max();
     return m ? this.users().slice(0, m) : this.users();

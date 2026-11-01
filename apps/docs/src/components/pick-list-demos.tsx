@@ -118,6 +118,29 @@ export function PickListLockedDemo() {
   );
 }
 
+// Per-slot styling: one classNames object restyles root / sourceList / targetList / transfer
+export function PickListSlotsDemo() {
+  const [value, setValue] = useState({ source: FEATURES, target: [] as string[] });
+  return (
+    <Stage>
+      <PickList
+        value={value}
+        onChange={setValue}
+        itemKey={(s) => s}
+        renderItem={(s) => s}
+        sourceHeader="Available"
+        targetHeader="Enabled"
+        classNames={{
+          root: 'rounded-xl border border-fd-border bg-fd-card p-3',
+          sourceList: 'rounded-lg bg-fd-muted/40',
+          targetList: 'rounded-lg ring-1 ring-primary/30',
+          transfer: 'rounded-lg bg-fd-muted/40',
+        }}
+      />
+    </Stage>
+  );
+}
+
 // German labels + RTL container: every string comes from `messages`, and the
 // transfer arrows flip so "toward target" still points at the target pane.
 export function PickListI18nDemo() {

@@ -14,6 +14,16 @@ import { cn } from "@bpdm/variants";
 
 export type InputOtpSize = "sm" | "md" | "lg";
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface InputOtpClassNames {
+  /** The outer group wrapper. */
+  root?: string;
+  /** Each character cell. */
+  slot?: string;
+  /** The hidden form input (when `name` is set). */
+  input?: string;
+}
+
 const cellSize: Record<InputOtpSize, string> = {
   sm: "size-9 text-sm",
   md: "size-11 text-base",
@@ -76,7 +86,7 @@ const BASE_CELL =
         [attr.aria-describedby]="ariaDescribedby() || null"
         data-bpdm=""
         data-bpdm-slot="input-otp"
-        class="flex flex-wrap items-center gap-3"
+        [class]="cls('flex flex-wrap items-center gap-3', 'root')"
       >
         @for (group of groups(); track groupIndex; let groupIndex = $index) {
           @if (groupIndex > 0) {
@@ -107,7 +117,7 @@ const BASE_CELL =
           </div>
         }
         @if (name()) {
-          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" />
+          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" [class]="cls('', 'input')" />
         }
       </div>
     } @else {
@@ -118,7 +128,7 @@ const BASE_CELL =
         [attr.aria-describedby]="ariaDescribedby() || null"
         data-bpdm=""
         data-bpdm-slot="input-otp"
-        class="flex flex-wrap items-center gap-2"
+        [class]="cls('flex flex-wrap items-center gap-2', 'root')"
       >
         @for (cell of groups()[0]; track cell.i) {
           <input
@@ -142,7 +152,7 @@ const BASE_CELL =
           />
         }
         @if (name()) {
-          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" />
+          <input type="hidden" data-bpdm-slot="input-otp-input" [attr.name]="name()" [value]="cells().join('')" [class]="cls('', 'input')" />
         }
       </div>
     }
@@ -175,6 +185,8 @@ export class BpdmInputOtp {
   readonly id = input<string>("");
   readonly ariaLabel = input<string>("One-time code", { alias: "aria-label" });
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
+  /** Per-slot class overrides (root, slot, input). */
+  readonly classNames = input<InputOtpClassNames | undefined>(undefined);
   /** Per-cell screen-reader label. Override for i18n. Default: `Character N of M`. */
   readonly cellLabel = input<(index: number, length: number) => string>(
     (index, len) => `Character ${index + 1} of ${len}`,
@@ -217,6 +229,11 @@ export class BpdmInputOtp {
     return out;
   });
 
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof InputOtpClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
+
   protected cellClass(cell: OtpCell): string {
     return cn(
       BASE_CELL,
@@ -229,6 +246,7 @@ export class BpdmInputOtp {
             cell.isLast && "rounded-e-[var(--bpdm-radius)]",
           )
         : "rounded-[var(--bpdm-radius)]",
+      this.classNames()?.slot,
     );
   }
 

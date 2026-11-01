@@ -74,3 +74,20 @@ export function MoneyInputStatesDemo() {
     </Stack>
   );
 }
+
+export function MoneyInputSlotsDemo() {
+  return (
+    <Stack>
+      <MoneyInput
+        currency="USD"
+        locale="en-US"
+        defaultValue="42.00"
+        classNames={{
+          root: 'rounded-xl border-2',
+          field: 'font-mono',
+          symbol: 'font-semibold text-primary',
+        }}
+      />
+    </Stack>
+  );
+}

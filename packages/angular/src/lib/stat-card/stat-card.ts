@@ -19,6 +19,20 @@ export const DEFAULT_STAT_CARD_MESSAGES: StatCardMessages = {
   loading: "loading",
 };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface StatCardClassNames {
+  /** The card container. */
+  root?: string;
+  /** The label text. */
+  label?: string;
+  /** The big value text. */
+  value?: string;
+  /** The delta row (change + caption). */
+  delta?: string;
+  /** The icon badge. */
+  icon?: string;
+}
+
 let statCardUid = 0;
 
 /**
@@ -60,10 +74,10 @@ let statCardUid = 0;
       <div class="size-12 shrink-0 animate-pulse rounded-full bg-[var(--bpdm-muted)]"></div>
     } @else {
     <div class="min-w-0">
-      <p data-bpdm-slot="stat-card-label" [id]="labelId" class="m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]">{{ label() }}</p>
-      <p data-bpdm-slot="stat-card-value" class="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{{ value() }}</p>
+      <p data-bpdm-slot="stat-card-label" [id]="labelId" [class]="cls('m-0 truncate text-sm text-[var(--bpdm-muted-foreground)]', 'label')">{{ label() }}</p>
+      <p data-bpdm-slot="stat-card-value" [class]="cls('mt-1.5 text-2xl font-semibold tracking-tight tabular-nums', 'value')">{{ value() }}</p>
       @if (hasDelta()) {
-        <div data-bpdm-slot="stat-card-delta" class="mt-1.5 flex items-center gap-1.5 text-sm">
+        <div data-bpdm-slot="stat-card-delta" [class]="cls('mt-1.5 flex items-center gap-1.5 text-sm', 'delta')">
           <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaColor()" role="img" [attr.aria-label]="deltaSr()">
             @if (!neutral()) {
               <svg viewBox="0 0 12 12" fill="none" class="size-3" aria-hidden="true">
@@ -90,7 +104,7 @@ let statCardUid = 0;
       data-bpdm-slot="stat-card-icon"
       [style.background-color]="badgeBg()"
       [style.color]="accent() || null"
-      class="grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5 empty:hidden"
+      [class]="cls('grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-overshoot)] group-hover:scale-110 [&_svg]:size-5 empty:hidden', 'icon')"
       [class.bg-[var(--bpdm-muted)]]="!accent()"
       [class.text-[var(--bpdm-muted-foreground)]]="!accent()"
     >
@@ -118,8 +132,15 @@ export class BpdmStatCard {
   /** Override screen-reader / loading text for i18n. */
   readonly messages = input<Partial<StatCardMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, label, value, delta, icon). */
+  readonly classNames = input<StatCardClassNames | undefined>(undefined);
 
   protected readonly labelId = `bpdm-stat-${++statCardUid}`;
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof StatCardClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected readonly t = computed<StatCardMessages>(() => ({
     ...DEFAULT_STAT_CARD_MESSAGES,
@@ -150,6 +171,7 @@ export class BpdmStatCard {
       "group flex items-center justify-between gap-4 rounded-2xl border p-5 text-[var(--bpdm-card-foreground)] shadow-sm transition-[transform,box-shadow] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] hover:-translate-y-0.5 hover:shadow-md",
       this.accent() && !this.loading() ? "border-transparent" : "border-[var(--bpdm-border)] bg-[var(--bpdm-card)]",
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
   protected readonly cardBg = computed(() =>

@@ -99,3 +99,24 @@ export function MultiSelectStatesDemo() {
     </div>
   );
 }
+
+export function MultiSelectSlotsDemo() {
+  return (
+    <Box>
+      <MultiSelect
+        searchable
+        options={CITIES}
+        defaultValue={['lon', 'par']}
+        placeholder="Select cities"
+        classNames={{
+          trigger: 'rounded-xl border-2',
+          chip: 'rounded-full uppercase tracking-wide',
+          selectAll: 'uppercase tracking-wide text-primary',
+          search: 'bg-muted',
+          group: 'uppercase tracking-wide text-primary',
+          option: 'rounded-md',
+        }}
+      />
+    </Box>
+  );
+}

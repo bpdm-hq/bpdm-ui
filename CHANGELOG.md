@@ -2,6 +2,42 @@
 
 All notable changes to the bpdm design system packages are recorded here.
 
+## 0.3.0 (2026-10-29)
+
+Per-slot styling across the library, plus new DataTable looks and tokens. Restyle any
+part of a component from props instead of CSS overrides. Additive and
+backward-compatible: every default is unchanged.
+
+### Added
+
+- **`classNames` slot object on every monolithic component.** Each component now
+  accepts a `classNames` object with one key per internal part, so you can restyle a
+  specific slot without targeting its `data-bpdm-slot` element from CSS. Each entry
+  merges with the component's own classes. Covered: Select, MultiSelect, TreeSelect,
+  Calendar, DatePicker, StatCard, StatusTimeline, Toast (per toast **and** Toaster-wide
+  defaults), PickList, NumberInput, MoneyInput, InputOtp, SecureField, PasswordInput,
+  Avatar and AvatarGroup — joining DataTable from the same release. Each exports a
+  matching `*ClassNames` type, identical in React and Angular.
+- **DataTable `preset` prop** (`lined` default, `card`, `grid`, `plain`): one name sets
+  the baseline for several style props at once, and any individual prop overrides it.
+- **DataTable `columnSeparators` and `stickyHeaderShadow` props**: inset vertical
+  separators between columns, and a toggle for the header's underline.
+- **DataTable `classNames` slot object** (`root`, `table`, `header`, `headerCell`,
+  `row`, `cell`), merged with the flat `*ClassName` props.
+- **Six DataTable tokens**: `--bpdm-table-separator`, `--bpdm-table-row-bg`,
+  `--bpdm-table-row-hover-bg`, `--bpdm-table-row-selected-bg`, `--bpdm-table-stripe-bg`,
+  `--bpdm-table-header-bg`. Defaults reproduce the current look.
+
+### Fixed
+
+- Frozen (pinned) DataTable columns now share the spaced-row fill and the hover and
+  selected tokens, so a frozen column no longer breaks the row band or highlights
+  differently.
+
+### Packages
+
+`@bpdm/ui`, `@bpdm/ng` and `@bpdm/tokens` go to 0.3.0. `@bpdm/variants` is unchanged at 0.2.0.
+
 ## 0.2.0 (2026-10-27)
 
 A collision-free, self-contained styling model. This is a breaking change for

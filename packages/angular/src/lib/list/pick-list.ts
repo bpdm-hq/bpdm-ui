@@ -15,6 +15,18 @@ export interface PickListValue<T> {
   target: T[];
 }
 
+/** Per-slot class overrides for `<bpdm-pick-list>`. */
+export interface PickListClassNames {
+  /** The root flex container. */
+  root?: string;
+  /** The source list panel. */
+  sourceList?: string;
+  /** The target list panel. */
+  targetList?: string;
+  /** The transfer-controls group. */
+  transfer?: string;
+}
+
 /**
  * Every user-facing / screen-reader string in the Pick List, for i18n. Pass a
  * `Partial<PickListMessages>` via `[messages]` to override any subset; the rest
@@ -92,7 +104,7 @@ export const defaultPickListMessages: PickListMessages = {
       }
 
       <bpdm-selectable-list
-        class="flex-1"
+        [class]="cls('flex-1', 'sourceList')"
         [items]="source()"
         [keyOf]="itemKey()"
         [itemTemplate]="itemTemplate()"
@@ -112,7 +124,7 @@ export const defaultPickListMessages: PickListMessages = {
 
       <!-- transfer controls — a row on mobile, a column on lg+. The horizontal
            arrows flip under RTL so "toward target" always points at the target. -->
-      <div data-transfer-group data-bpdm-slot="pick-list-transfer" role="group" [attr.aria-label]="t().transferGroup" class="flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center">
+      <div data-transfer-group data-bpdm-slot="pick-list-transfer" role="group" [attr.aria-label]="t().transferGroup" [class]="cls('flex flex-row justify-center gap-1.5 lg:flex-col lg:justify-start lg:self-center', 'transfer')">
         <button type="button" [attr.aria-label]="t().moveToTarget" [attr.title]="t().moveToTarget" [class]="btn" [disabled]="sourceSel().size === 0" (click)="toTarget()">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="rtl:-scale-x-100"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
@@ -128,7 +140,7 @@ export const defaultPickListMessages: PickListMessages = {
       </div>
 
       <bpdm-selectable-list
-        class="flex-1"
+        [class]="cls('flex-1', 'targetList')"
         [items]="target()"
         [keyOf]="itemKey()"
         [itemTemplate]="itemTemplate()"
@@ -183,6 +195,13 @@ export class BpdmPickList<T = unknown> {
   /** Override any user-facing / screen-reader string for i18n. */
   readonly messages = input<Partial<PickListMessages>>({});
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, sourceList, targetList, transfer). */
+  readonly classNames = input<PickListClassNames | undefined>(undefined);
+
+  /** Merge a slot's base class with its matching `classNames` override. */
+  protected cls(base: string, key: keyof PickListClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   /** Fired after a transfer, with the moved items and which list they landed in. */
   readonly transfer = output<{ moved: T[]; to: "source" | "target" }>();
@@ -200,7 +219,11 @@ export class BpdmPickList<T = unknown> {
   protected readonly source = computed(() => this.lists().source);
   protected readonly target = computed(() => this.lists().target);
   protected readonly rootClass = computed(() =>
-    cn("flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch", this.classInput()),
+    cn(
+      "flex flex-col items-stretch gap-2 lg:flex-row lg:items-stretch",
+      this.classInput(),
+      this.classNames()?.root,
+    ),
   );
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);

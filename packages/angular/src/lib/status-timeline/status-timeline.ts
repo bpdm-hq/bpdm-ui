@@ -61,6 +61,20 @@ export const DEFAULT_STATUS_TIMELINE_MESSAGES: StatusTimelineMessages = {
   failed: "Failed",
 };
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface StatusTimelineClassNames {
+  /** The timeline list (`<ol>`). */
+  root?: string;
+  /** Each step (`<li>`). */
+  item?: string;
+  /** The status marker. */
+  marker?: string;
+  /** The content cell. */
+  content?: string;
+  /** The opposite cell (vertical layouts). */
+  opposite?: string;
+}
+
 interface TimelineRow {
   item: TimelineItem;
   index: number;
@@ -209,6 +223,8 @@ export class BpdmStatusTimeline {
   /** Make each step interactive (role/tabindex + `(itemClick)`). */
   readonly interactive = input(false, { transform: booleanAttribute });
   readonly classInput = input<string>("", { alias: "class" });
+  /** Per-slot class overrides (root, item, marker, content, opposite). */
+  readonly classNames = input<StatusTimelineClassNames | undefined>(undefined);
 
   readonly itemClick = output<{ item: TimelineItem; index: number }>();
 
@@ -228,6 +244,7 @@ export class BpdmStatusTimeline {
     cn(
       this.horizontal() ? "m-0 flex list-none overflow-x-auto p-0" : "relative m-0 list-none p-0",
       this.classInput(),
+      this.classNames()?.root,
     ),
   );
 
@@ -266,18 +283,19 @@ export class BpdmStatusTimeline {
         opposite: item.opposite,
         color: item.color,
         last,
-        dotClass: cn(DOT_BASE, item.color ? "text-white" : DOT_BY_STATUS[status]),
+        dotClass: cn(DOT_BASE, item.color ? "text-white" : DOT_BY_STATUS[status], this.classNames()?.marker),
         titleClass: cn("text-sm font-medium", muted ? "text-[var(--bpdm-muted-foreground)]" : "text-[var(--bpdm-foreground)]"),
       };
 
       if (horizontal) {
         const contentTop = alternate ? i % 2 === 0 : align !== "bottom";
-        const contentPlacement = cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start");
+        const contentPlacement = cn("min-w-0", contentTop ? "row-start-1 self-end" : "row-start-3 self-start", this.classNames()?.content);
         return {
           ...base,
           liClass: cn(
             "relative grid min-w-24 flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-y-2 px-2",
             interactive && INTERACTIVE,
+            this.classNames()?.item,
           ),
           lineClass: cn(
             // logical `start-1/2` so the connector runs toward the next marker in LTR and RTL
@@ -285,7 +303,7 @@ export class BpdmStatusTimeline {
             status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
           ),
           dotClass: cn(base.dotClass, "row-start-2"),
-          markerWrapClass: cn(MARKER_WRAP, "row-start-2"),
+          markerWrapClass: cn(MARKER_WRAP, "row-start-2", this.classNames()?.marker),
           contentPlacement,
           contentClass: cn(contentPlacement, "text-center"),
           titleRowClass: "",
@@ -304,10 +322,12 @@ export class BpdmStatusTimeline {
             ? "col-start-3 row-start-1 justify-self-start"
             : "col-start-1 row-start-1 justify-self-end"
           : "flex-1",
+        this.classNames()?.content,
       );
       const oppositePlacement = cn(
         "min-w-0",
         contentRight ? "col-start-1 row-start-1 justify-self-end" : "col-start-3 row-start-1 justify-self-start",
+        this.classNames()?.opposite,
       );
       return {
         ...base,
@@ -318,6 +338,7 @@ export class BpdmStatusTimeline {
           centered ? "grid grid-cols-[1fr_auto_1fr] items-start gap-3" : "flex items-start gap-3",
           !centered && align === "right" && "flex-row-reverse",
           interactive && INTERACTIVE,
+          this.classNames()?.item,
         ),
         lineClass: cn(
           // extend past the box into the margin gap to reach the next dot;
@@ -331,7 +352,7 @@ export class BpdmStatusTimeline {
           status === "complete" ? "bg-[var(--bpdm-success)]/40" : "bg-[var(--bpdm-border)]",
         ),
         dotClass: cn(base.dotClass, markerPlacement),
-        markerWrapClass: cn(MARKER_WRAP, markerPlacement),
+        markerWrapClass: cn(MARKER_WRAP, markerPlacement, this.classNames()?.marker),
         contentPlacement,
         contentClass: cn(contentPlacement, "min-h-10", !contentRight && "text-end"),
         titleRowClass: cn("flex min-h-6 items-center justify-between gap-2", !contentRight && "flex-row-reverse"),

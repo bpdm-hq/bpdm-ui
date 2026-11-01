@@ -31,6 +31,18 @@ const DEFAULT_LABELS: Record<number, string[]> = {
 /** Per-instance counter for a stable strength-meter id (aria-describedby). */
 let meterUid = 0;
 
+/** Per-slot class overrides, a clean alternative to targeting `data-bpdm-slot` in CSS. */
+export interface PasswordInputClassNames {
+  /** The outer wrapper. */
+  root?: string;
+  /** The inner input element. */
+  field?: string;
+  /** The reveal (eye) toggle button. */
+  toggle?: string;
+  /** The strength-meter container. */
+  meter?: string;
+}
+
 /**
  * `<bpdm-password-input>` — password input with a show/hide toggle and an
  * optional strength meter (segmented bar + label: Weak / Fair / Good / Strong).
@@ -62,7 +74,7 @@ let meterUid = 0;
           [attr.aria-describedby]="describedBy()"
           [attr.aria-invalid]="ariaInvalid() ? 'true' : null"
           (input)="value.set($any($event.target).value)"
-          class="w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed"
+          [class]="cls('w-full min-w-0 bg-transparent focus:outline-none disabled:cursor-not-allowed', 'field')"
         />
         <button
           type="button"
@@ -71,7 +83,7 @@ let meterUid = 0;
           data-bpdm-slot="password-input-toggle"
           [disabled]="disabled()"
           (click)="revealed.set(!revealed())"
-          class="grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none"
+          [class]="cls('grid size-6 shrink-0 cursor-pointer place-items-center rounded-[calc(var(--bpdm-radius)-4px)] text-[var(--bpdm-muted-foreground)] transition-colors hover:text-[var(--bpdm-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bpdm-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bpdm-background)] disabled:pointer-events-none', 'toggle')"
         >
           <svg viewBox="0 0 20 20" fill="none" class="size-4" aria-hidden="true">
             <path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10Z" stroke="currentColor" stroke-width="1.5" />
@@ -84,7 +96,7 @@ let meterUid = 0;
       </div>
 
       @if (showMeter()) {
-        <div data-bpdm-slot="password-input-meter" class="mt-2">
+        <div data-bpdm-slot="password-input-meter" [class]="cls('mt-2', 'meter')">
           <div class="flex gap-1" aria-hidden="true">
             @for (i of segments(); track i) {
               <span [class]="'h-1 flex-1 rounded-full transition-colors ' + (i < filled() ? barColor() : 'bg-[var(--bpdm-muted)]')"></span>
@@ -124,6 +136,13 @@ export class BpdmPasswordInput {
   readonly ariaDescribedby = input<string>("", { alias: "aria-describedby" });
   /** Override the reveal-toggle labels (screen-reader text) for i18n. */
   readonly messages = input<{ show?: string; hide?: string }>({});
+  /** Per-slot class overrides (root, field, toggle, meter). */
+  readonly classNames = input<PasswordInputClassNames | undefined>(undefined);
+
+  /** Merge a slot's base classes with the matching `classNames` override. */
+  protected cls(base: string, key: keyof PasswordInputClassNames): string {
+    return cn(base, this.classNames()?.[key]);
+  }
 
   protected readonly t = computed(() => ({
     show: "Show password",
@@ -181,7 +200,7 @@ export class BpdmPasswordInput {
     Array.from({ length: this.levels() }, (_, i) => i),
   );
 
-  protected readonly rootClass = computed(() => cn("w-full", this.classInput()));
+  protected readonly rootClass = computed(() => cn("w-full", this.classInput(), this.classNames()?.root));
   protected readonly wrapClass = computed(() =>
     cn(
       WRAP_FIELD_BASE,

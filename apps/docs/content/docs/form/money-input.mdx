@@ -10,6 +10,7 @@ import {
   MoneyInputPrecisionDemo,
   MoneyInputSizesDemo,
   MoneyInputStatesDemo,
+  MoneyInputSlotsDemo,
 } from '@/components/money-input-demos';
 import { Preview } from '@/components/preview';
 
@@ -246,6 +247,66 @@ export class States {}
   </Tab>
 </Tabs>
 
+## Per-slot styling
+
+`className` (or Angular `class`) styles the field wrapper as a whole. To restyle
+**individual parts** without reaching into the internal `data-bpdm-slot` elements from
+CSS, pass a `classNames` object — one key per slot: `root` (the outer wrapper), `field`
+(the inner text input) and `symbol` (the currency adornment). Each entry merges with the
+component's own classes, so you override only what you name.
+
+<Preview>
+  <MoneyInputSlotsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="money-input-slots.tsx"
+import { MoneyInput } from '@bpdm/ui/money-input';
+
+export function PricedField() {
+  return (
+    <MoneyInput
+      currency="USD"
+      locale="en-US"
+      defaultValue="42.00"
+      classNames={{
+        root: 'rounded-xl border-2',
+        field: 'font-mono',
+        symbol: 'font-semibold text-primary',
+      }}
+    />
+  );
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="money-input-slots.ts"
+import { Component } from '@angular/core';
+import { BpdmMoneyInput, type MoneyInputClassNames } from '@bpdm/ng';
+
+@Component({
+  selector: 'priced-field',
+  imports: [BpdmMoneyInput],
+  template: `
+    <bpdm-money-input currency="USD" locale="en-US" defaultValue="42.00" [classNames]="slots" />
+  `,
+})
+export class PricedField {
+  readonly slots: MoneyInputClassNames = {
+    root: 'rounded-xl border-2',
+    field: 'font-mono',
+    symbol: 'font-semibold text-primary',
+  };
+}
+```
+
+  </Tab>
+</Tabs>
+
 ## API
 
 ### `MoneyInput` / `bpdm-money-input`
@@ -268,6 +329,9 @@ The stored value is always a raw numeric string (e.g. `"1234.50"`); only the dis
 | `aria-label` / `aria-describedby` | `string` | — | Accessible name / description, forwarded to the `<input>`. |
 | `id` | `string` | — | Field id (for `<label>` association). |
 | `className` *(React)* / `class` *(Angular)* | `string` | — | Extra classes on the wrapper. |
+| `classNames` | `MoneyInputClassNames` | — | Per-slot class overrides: `{ root, field, symbol }`. Each merges with the component's own classes. |
+
+`MoneyInputClassNames`: `{ root, field, symbol }`.
 
 In **React**, `MoneyInput` forwards its `ref` to the underlying `<input>` and spreads any other
 native `<input>` prop (`required`, `autoComplete`, `data-*`, `onFocus`, `onBlur`, …) onto it, so it

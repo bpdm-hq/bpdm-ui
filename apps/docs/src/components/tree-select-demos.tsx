@@ -66,3 +66,24 @@ export function TreeSelectStatesDemo() {
     </div>
   );
 }
+
+export function TreeSelectSlotsDemo() {
+  return (
+    <Box>
+      <TreeSelect
+        searchable
+        options={TREE}
+        defaultValue={['react', 'vue']}
+        placeholder="Select technologies"
+        classNames={{
+          trigger: 'rounded-xl border-2',
+          chip: 'rounded-full uppercase tracking-wide',
+          selectAll: 'uppercase tracking-wide text-primary',
+          search: 'bg-muted',
+          tree: 'rounded-lg bg-muted/40',
+          item: 'rounded-md',
+        }}
+      />
+    </Box>
+  );
+}
