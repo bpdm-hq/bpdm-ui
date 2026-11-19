@@ -36,6 +36,14 @@ export function TabsPillDemo() {
   );
 }
 
+export function TabsPillLineDemo() {
+  return (
+    <Box>
+      <Tabs items={ITEMS} defaultValue="overview" variant="pill-line" />
+    </Box>
+  );
+}
+
 export function TabsFullWidthDemo() {
   return (
     <Box>

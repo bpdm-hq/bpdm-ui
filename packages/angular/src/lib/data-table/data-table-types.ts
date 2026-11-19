@@ -97,6 +97,9 @@ export interface CursorPagination {
 
 export type DataTablePagination = ClientPagination | ServerPagination | CursorPagination;
 
+/** Column-width strategy for the DataTable. See the `layout` input. */
+export type DataTableLayout = "auto" | "fixed";
+
 /** Context handed to a column's `cell` / `footer` template. */
 export interface CellContext<T> {
   $implicit: T;

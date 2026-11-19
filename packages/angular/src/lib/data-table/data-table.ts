@@ -38,6 +38,7 @@ import {
   pageList,
   type RowClassFn,
   type DataTableClassNames,
+  type DataTableLayout,
   type RowClickFn,
   type RowKeyFn,
   type RowPredicate,
@@ -286,6 +287,7 @@ const DATA_TABLE_PRESETS = {
                     (dragend)="dragColId.set(null)"
                     [attr.aria-sort]="ariaSort(col)"
                     [style.width]="colWidth(col)"
+                    [style.min-width]="colMinWidth(col)"
                     [style.position]="thPosition(col)"
                     [style.inset-inline-start.px]="col.pin === 'left' ? pinPx().left[col.id] : null"
                     [style.inset-inline-end.px]="col.pin === 'right' ? pinPx().right[col.id] : null"
@@ -573,6 +575,17 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
    */
   readonly columnSeparatorsInput = input<boolean | undefined, unknown>(undefined, { alias: "columnSeparators", transform: booleanAttribute });
   readonly columnSeparators = computed(() => this.columnSeparatorsInput() ?? this.presetValues().columnSeparators);
+  /**
+   * How declared column `width`s are treated. `"auto"` (widths are a hint, the table
+   * fits its container) or `"fixed"` (each column is held at least its `width` and the
+   * table scrolls horizontally). Defaults to `"fixed"` when any column has an explicit
+   * `width`, otherwise `"auto"` — so declared widths are honoured with no extra config.
+   */
+  readonly layout = input<DataTableLayout | undefined>(undefined);
+  /** Whether declared column widths are being held (see `layout`). */
+  readonly honorWidths = computed(
+    () => (this.layout() ?? (this.orderedColumns().some((c) => c.width != null) ? "fixed" : "auto")) === "fixed",
+  );
   readonly maxHeight = input<number | string | undefined>(undefined);
   readonly emptyContent = input<string>("No data");
   readonly onRowClick = input<RowClickFn<T> | undefined>(undefined);
@@ -1416,7 +1429,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   }
   protected tableClass(): string {
     return cn(
-      "w-full text-[var(--bpdm-card-foreground)]",
+      // size to the columns (so declared widths survive and the body scrolls) when
+      // honouring widths, otherwise fill the container
+      this.honorWidths() ? "w-max min-w-full" : "w-full",
+      "text-[var(--bpdm-card-foreground)]",
       this.rowSpacing() ? "border-separate" : "border-collapse",
       this.classNames()?.table,
     );
@@ -1430,6 +1446,10 @@ export class BpdmDataTable<T = unknown> implements OnDestroy {
   protected colWidth(col: DataTableColumn<T>): string | null {
     if (col.width === undefined) return null;
     return typeof col.width === "number" ? `${col.width}px` : col.width;
+  }
+  /** Hold the column at least its declared width when honouring widths (see `layout`). */
+  protected colMinWidth(col: DataTableColumn<T>): string | null {
+    return this.honorWidths() ? this.colWidth(col) : null;
   }
   protected thPosition(col: DataTableColumn<T>): string | null {
     return col.pin || this.stickyHeader() ? "sticky" : null;

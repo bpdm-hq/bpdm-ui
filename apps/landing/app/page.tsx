@@ -6,7 +6,7 @@ import { HeroPreview } from "./hero-preview";
 const DOCS = "https://docs.ui.bpdm.dev/docs";
 const REPO = "https://github.com/bpdm-hq/bpdm-ui";
 // Current published release — bump on each @bpdm/ui release.
-const VERSION = "0.3.0";
+const VERSION = "0.3.2";
 
 const STATS = [
   { value: "38", label: "components" },

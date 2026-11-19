@@ -323,6 +323,25 @@ export function DataTableUsageDemo() {
   );
 }
 
+// Explicit per-column widths that sum wider than the (narrowed) container, to show
+// the table holding each width and scrolling horizontally rather than shrinking columns.
+const widthColumns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name, width: 200 },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, width: 240 },
+  { id: 'role', header: 'Role', accessor: (r) => r.role, width: 120 },
+  { id: 'team', header: 'Team', accessor: (r) => r.team, width: 160 },
+  { id: 'country', header: 'Country', accessor: (r) => `${r.flag} ${r.country}`, width: 150 },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, width: 90 },
+];
+
+export function DataTableWidthsDemo() {
+  return (
+    <div className="max-w-xl">
+      <DataTable columns={widthColumns} data={MEMBERS.slice(0, 4)} rowKey={key} />
+    </div>
+  );
+}
+
 export function DataTableSizesDemo() {
   const data = MEMBERS.slice(0, 4);
   return (
