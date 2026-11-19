@@ -2,7 +2,7 @@
 
 All notable changes to the bpdm design system packages are recorded here.
 
-## 0.3.2 (2026-11-02)
+## 0.3.2 (2026-11-19)
 
 The DataTable now honours declared column widths by default, so matching a fixed-width
 host table no longer needs a CSS escape hatch.
