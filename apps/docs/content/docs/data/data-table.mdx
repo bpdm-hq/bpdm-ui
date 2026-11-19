@@ -6,6 +6,7 @@ description: A fully data-driven table, sorting, selection, pagination, filterin
 import { Tab, Tabs } from '@/components/framework-tabs';
 import {
   DataTableUsageDemo,
+  DataTableWidthsDemo,
   DataTableSizesDemo,
   DataTableStripedDemo,
   DataTableSeparatorsDemo,
@@ -238,6 +239,74 @@ export class SizedTables {
 <ng-template #sm><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="sm" /></ng-template>
 <ng-template #md><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="md" /></ng-template>
 <ng-template #lg><bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" size="lg" /></ng-template>
+```
+
+  </Tab>
+</Tabs>
+
+## Column widths
+
+Give a column a `width` (a number of pixels or a CSS string). By default the table
+**honours** it: each column is held at least its declared width and the table scrolls
+horizontally when the columns together exceed the container, instead of shrinking a
+narrow column to its content. Columns without a `width` size to their content.
+
+The `layout` prop controls this. It defaults to `"fixed"` as soon as any column has a
+`width`, so you usually don't set it; pass `layout="auto"` to opt back into the fluid
+behaviour (widths treated as a hint, the table always fits its container).
+
+<Preview>
+  <DataTableWidthsDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="data-table-widths.tsx"
+import { DataTable, type DataTableColumn } from '@bpdm/ui/data-table';
+
+type Member = { id: string; name: string; email: string; role: string; team: string; tasks: number };
+
+const columns: DataTableColumn<Member>[] = [
+  { id: 'name', header: 'Name', accessor: (r) => r.name, width: 200 },
+  { id: 'email', header: 'Email', accessor: (r) => r.email, width: 240 },
+  { id: 'role', header: 'Role', accessor: (r) => r.role, width: 120 },
+  { id: 'team', header: 'Team', accessor: (r) => r.team, width: 160 },
+  { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, width: 90 },
+];
+
+export function TeamTable({ members }: { members: Member[] }) {
+  // Widths honoured + horizontal scroll by default. Add layout="auto" to opt out.
+  return <DataTable columns={columns} data={members} rowKey={(r) => r.id} />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="data-table-widths.ts"
+import { Component } from '@angular/core';
+import { BpdmDataTable, type DataTableColumn } from '@bpdm/ng';
+
+interface Member { id: string; name: string; email: string; role: string; team: string; tasks: number }
+
+@Component({
+  selector: 'team-table',
+  imports: [BpdmDataTable],
+  // Widths honoured + horizontal scroll by default. Add [layout]="'auto'" to opt out.
+  template: `<bpdm-data-table [columns]="columns" [data]="members" [rowKey]="rowKey" />`,
+})
+export class TeamTable {
+  readonly rowKey = (r: Member) => r.id;
+  readonly members: Member[] = [];
+  readonly columns: DataTableColumn<Member>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name, width: 200 },
+    { id: 'email', header: 'Email', accessor: (r) => r.email, width: 240 },
+    { id: 'role', header: 'Role', accessor: (r) => r.role, width: 120 },
+    { id: 'team', header: 'Team', accessor: (r) => r.team, width: 160 },
+    { id: 'tasks', header: 'Tasks', numeric: true, accessor: (r) => r.tasks, width: 90 },
+  ];
+}
 ```
 
   </Tab>
@@ -2390,6 +2459,7 @@ outputs (`(xxxChange)` / `(xxx)`); the last column notes any Angular-specific na
 | `striped` | `boolean` | `false` | Zebra striping on alternate rows. |
 | `bordered` | `boolean` | `false` | Vertical dividers between columns. |
 | `columnSeparators` | `boolean` | `false` | Subtle inset vertical separators between columns (header + body), lighter than `bordered`. Colour: `--bpdm-table-separator`. |
+| `layout` | `'auto' \| 'fixed'` | `'fixed'` when any column has a `width`, else `'auto'` | How declared column `width`s are treated. `'fixed'` holds each column at least its `width` and scrolls horizontally; `'auto'` treats widths as a hint and fits the container. See [Column widths](#column-widths). |
 | `frame` | `boolean` | `false` | Outer border + rounded container (outlined card). |
 | `divided` | `boolean` | `true` | Horizontal dividers between rows. |
 | `elevated` | `boolean` | `true` | Soft drop shadow so the table gently floats. Set `false` for a flat, flush table (e.g. nested inside your own card). |
@@ -2491,7 +2561,7 @@ default `'between'`) is shared by all three.
 | `cell` | `(row, i) => ReactNode` (Angular `TemplateRef`) |, | Custom cell renderer, overrides `accessor`. Angular uses an `<ng-template>`. |
 | `footer` | `ReactNode \| (rows) => ReactNode` (Angular `string \| (rows) => string \| TemplateRef`) |, | Footer/summary cell; a function receives the filtered rows to compute an aggregate. |
 | `align` | `'left' \| 'center' \| 'right'` | `'left'` | Horizontal alignment of header + cells. |
-| `width` | `number \| string` |, | Fixed column width, e.g. `120` or `'20%'`. |
+| `width` | `number \| string` |, | Column width, e.g. `120` or `'20%'`. Honoured by default — the column is held at least this wide and the table scrolls horizontally (see [Column widths](#column-widths) and the `layout` prop). |
 | `numeric` | `boolean` | `false` | Right-align + tabular figures (money / counts). |
 | `pin` | `'left' \| 'right'` |, | Freeze the column to an edge while the table scrolls horizontally. |
 | `disablePinning` | `boolean` | `false` | Hide the per-column pin menu for this column even when `pinnable` is on. |

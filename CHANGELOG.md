@@ -2,6 +2,29 @@
 
 All notable changes to the bpdm design system packages are recorded here.
 
+## 0.3.2 (2026-11-02)
+
+The DataTable now honours declared column widths by default, so matching a fixed-width
+host table no longer needs a CSS escape hatch.
+
+### Changed
+
+- **DataTable honours column `width`.** When any column declares a `width`, the table now
+  holds each column at **least** that width and scrolls horizontally, instead of
+  auto-shrinking narrow columns to their content. A new **`layout`** prop
+  (`"auto" | "fixed"`) controls this: it defaults to `"fixed"` when any column has a
+  `width`, otherwise `"auto"` (the previous fluid behaviour). Columns without a `width`
+  still size to content. Backward-compatible: a table with no declared widths is unchanged.
+- **Tabs `pill` variant restyled as a segmented control**, plus a new **`pill-line`**
+  variant. The `pill` active tab was a solid filled block that read like a button; it is
+  now a light card chip floating on a soft muted track, so the selection reads as a
+  switch. `pill-line` is a new middle-ground look: a pill highlight on the active tab
+  above a baseline divider (the underline's baseline, with a pill instead of a line).
+
+### Packages
+
+`@bpdm/ui` and `@bpdm/ng` go to 0.3.2. `@bpdm/tokens` (0.3.0) and `@bpdm/variants` (0.2.0) are unchanged.
+
 ## 0.3.0 (2026-10-29)
 
 Per-slot styling across the library, plus new DataTable looks and tokens. Restyle any

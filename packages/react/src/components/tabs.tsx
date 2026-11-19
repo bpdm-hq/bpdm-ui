@@ -11,7 +11,7 @@ export const TabsRoot = TabsPrimitive.Root;
 export const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & {
-    variant?: "underline" | "pill";
+    variant?: "underline" | "pill" | "pill-line";
     /** Underline track spans the full row ("full") or only the tabs ("content"). */
     baseline?: "full" | "content";
     /** Let the row scroll horizontally when the tabs overflow (many tabs). */
@@ -25,10 +25,15 @@ export const TabsList = React.forwardRef<
       "relative flex items-center gap-1",
       // vertical: stack the tabs; the underline track runs down the inline-end edge
       "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
-      variant === "underline" &&
+      // underline + pill-line share the baseline divider under the tab row
+      (variant === "underline" || variant === "pill-line") &&
         "border-b border-[var(--bpdm-border)] data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e",
+      // pill: a segmented-control track — a soft muted rail the active chip floats on,
+      // so the selection reads as a switch rather than a button
+      variant === "pill" &&
+        "w-fit rounded-[var(--bpdm-radius)] bg-[var(--bpdm-muted)]/60 p-1 data-[orientation=vertical]:w-auto",
       // content → shrink the list so the baseline ends with the last tab
-      variant === "underline" && baseline === "content" && "w-fit",
+      (variant === "underline" || variant === "pill-line") && baseline === "content" && "w-fit",
       // scroll the row when tabs overflow: keep tabs at natural width (no squeeze),
       // smooth scroll, and hide the scrollbar (arrow-key focus still scrolls into view)
       scrollable &&
@@ -51,7 +56,11 @@ const triggerVariants = cva(
         // uses its own inline-end border.
         underline:
           "-mb-px border-b-2 border-transparent px-3 py-2.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:border-[var(--bpdm-primary-strong)]/60 data-[state=inactive]:enabled:hover:text-[var(--bpdm-primary-strong)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-primary-strong)] data-[state=active]:border-[var(--bpdm-primary-strong)] data-[orientation=vertical]:mb-0 data-[orientation=vertical]:-me-px data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2 data-[orientation=vertical]:data-[state=active]:border-[var(--bpdm-primary-strong)]",
-        pill: "relative z-10 rounded-lg px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)] data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/60 data-[orientation=vertical]:data-[state=active]:bg-[var(--bpdm-muted)]",
+        pill: "relative z-10 rounded-[calc(var(--bpdm-radius)-2px)] px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)] data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/50 data-[orientation=vertical]:data-[state=active]:bg-[var(--bpdm-card)] data-[orientation=vertical]:data-[state=active]:shadow-sm data-[orientation=vertical]:data-[state=active]:ring-1 data-[orientation=vertical]:data-[state=active]:ring-[var(--bpdm-border)]/50",
+        // pill highlight sitting above a baseline divider; the active marker is a soft
+        // muted chip (horizontal uses the sliding indicator, vertical its own background)
+        "pill-line":
+          "relative z-10 rounded-[calc(var(--bpdm-radius)-2px)] px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-foreground)] data-[orientation=vertical]:data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/50 data-[orientation=vertical]:data-[state=active]:bg-[var(--bpdm-muted)]",
       },
     },
     defaultVariants: { variant: "underline" },
@@ -105,8 +114,12 @@ export interface TabsProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** "underline" (line indicator) or "pill" (filled active). Default "underline". */
-  variant?: "underline" | "pill";
+  /**
+   * "underline" (line indicator), "pill" (segmented control — active chip on a soft
+   * track), or "pill-line" (a pill-highlighted active tab above a baseline divider).
+   * Default "underline".
+   */
+  variant?: "underline" | "pill" | "pill-line";
   /** Underline track spans the full row ("full") or only the tabs ("content"). Default "full". */
   baseline?: "full" | "content";
   /** Tabs stretch to fill the row width equally. */
@@ -231,7 +244,12 @@ export function Tabs({
         "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
         variant === "underline"
           ? "-bottom-px h-0.5 bg-[var(--bpdm-primary-strong)]" // sit on the baseline (like the tab's -mb-px border), flush not floating
-          : "inset-y-0 z-0 rounded-lg bg-[var(--bpdm-muted)]",
+          : variant === "pill"
+            ? // segmented-control thumb: a light card chip that floats on the track with a
+              // soft shadow + hairline — a selected segment, not a filled button
+              "inset-y-1 z-0 rounded-[calc(var(--bpdm-radius)-2px)] bg-[var(--bpdm-card)] shadow-sm ring-1 ring-[var(--bpdm-border)]/50"
+            : // pill-line: a soft muted chip floating above the baseline divider
+              "inset-y-1 z-0 rounded-[calc(var(--bpdm-radius)-2px)] bg-[var(--bpdm-muted)]",
       )}
     />
   ) : null;
@@ -277,7 +295,7 @@ export function Tabs({
       {scrollable ? (
         // inline chevrons flank a fade-masked scroll row; the underline moves to the
         // wrapper so it stays solid edge-to-edge
-        <div className={cn("flex items-center", variant === "underline" && "border-b border-[var(--bpdm-border)]")}>
+        <div className={cn("flex items-center", (variant === "underline" || variant === "pill-line") && "border-b border-[var(--bpdm-border)]")}>
           <button
             type="button"
             aria-hidden

@@ -271,6 +271,9 @@ export interface DataTableClassNames {
   cell?: string;
 }
 
+/** Column-width strategy for the DataTable. See the `layout` prop. */
+export type DataTableLayout = "auto" | "fixed";
+
 export interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
@@ -331,6 +334,17 @@ export interface DataTableProps<T> {
    * `--bpdm-table-separator` token. Default false.
    */
   columnSeparators?: boolean;
+  /**
+   * How declared column `width`s are treated.
+   * - `"auto"` — widths are a hint; columns size to content and the table fits its
+   *   container (no horizontal scroll until content forces it).
+   * - `"fixed"` — each column is held at **least** its declared `width`; the table
+   *   keeps those widths and scrolls horizontally instead of shrinking columns to fit.
+   *
+   * Defaults to `"fixed"` when any column has an explicit `width`, otherwise `"auto"`,
+   * so declared widths are honoured without any extra configuration.
+   */
+  layout?: DataTableLayout;
   /** Cap the height → the body scrolls vertically inside the table. */
   maxHeight?: number | string;
   /** Shown when `data` is empty. Default: "No data". */
@@ -1573,6 +1587,7 @@ export function DataTable<T>({
   stickyHeader = false,
   stickyHeaderShadow: stickyHeaderShadowInput,
   columnSeparators: columnSeparatorsInput,
+  layout,
   preset = "lined",
   maxHeight,
   emptyContent = "No data",
@@ -2171,6 +2186,12 @@ export function DataTable<T>({
     [effectiveColumns, hiddenIds],
   );
 
+  // Honour declared column widths when asked, or whenever any column sets one: each
+  // column is held at least its `width` (so it never shrinks to content) and the table
+  // sizes to its columns and scrolls horizontally, rather than squashing to the container.
+  const honorWidths =
+    (layout ?? (orderedColumns.some((c) => c.width != null) ? "fixed" : "auto")) === "fixed";
+
   React.useEffect(() => {
     const el = scrollEl;
     if (!el) return;
@@ -2571,7 +2592,10 @@ export function DataTable<T>({
       <table
         aria-label={label}
         className={cn(
-          "w-full text-[var(--bpdm-card-foreground)]",
+          // size to the columns (so declared widths survive and the body scrolls)
+          // when honouring widths, otherwise fill the container
+          honorWidths ? "w-max min-w-full" : "w-full",
+          "text-[var(--bpdm-card-foreground)]",
           rowSpacing ? "border-separate" : "border-collapse",
           classNames?.table,
         )}
@@ -2697,7 +2721,9 @@ export function DataTable<T>({
                           : "none"
                   }
                   style={{
-                    ...(col.width !== undefined ? { width: col.width } : {}),
+                    ...(col.width !== undefined
+                      ? { width: col.width, ...(honorWidths ? { minWidth: col.width } : {}) }
+                      : {}),
                     ...pinStyleFor(col),
                     ...(stickyHeader ? { position: "sticky", top: 0 } : {}),
                   }}

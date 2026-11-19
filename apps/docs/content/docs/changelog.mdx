@@ -3,7 +3,15 @@ title: Changelog
 description: Notable changes and releases for the bpdm/ui React and Angular component libraries.
 ---
 
-Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.3.0**, Angular `@bpdm/ng` **0.3.0**, Web Components `@bpdm/wc` **0.1.0**, tokens `@bpdm/tokens` **0.3.0** and variants `@bpdm/variants` **0.2.0**; Scheduler `@bpdm/scheduler` **0.2.1** (React) and `@bpdm/ng-scheduler` **0.1.0** (Angular).
+Notable changes to bpdm/ui. Current release: React `@bpdm/ui` **0.3.2**, Angular `@bpdm/ng` **0.3.2**, Web Components `@bpdm/wc` **0.1.0**, tokens `@bpdm/tokens` **0.3.0** and variants `@bpdm/variants` **0.2.0**; Scheduler `@bpdm/scheduler` **0.2.1** (React) and `@bpdm/ng-scheduler` **0.1.0** (Angular).
+
+## 0.3.2: DataTable honours column widths (November 2026)
+
+Matching a fixed-width host table no longer needs a CSS escape hatch.
+
+- **DataTable honours column `width`.** When any column declares a `width`, the table now holds each column at **least** that width and scrolls horizontally, instead of auto-shrinking narrow columns to their content. Columns without a `width` still size to content.
+- **New `layout` prop** (`"auto" | "fixed"`): defaults to `"fixed"` when any column has a `width`, otherwise `"auto"` (the previous fluid behaviour). Set it explicitly to override. Backward-compatible — a table with no declared widths is unchanged.
+- **Tabs `pill` variant restyled as a segmented control**, plus a new **`pill-line`** variant. The `pill` active tab (previously a solid filled block that read like a button) is now a light card chip floating on a soft muted track. `pill-line` is a new look: a pill highlight on the active tab above a baseline divider.
 
 ## 0.3.0: Per-slot styling across the library (October 2026)
 

@@ -1,12 +1,13 @@
 ---
 title: Tabs
-description: Accessible tabs (roving focus, arrow keys) — underline or pill, horizontal or vertical, full-width, icons; data-driven or composed, in React (@bpdm/ui) and Angular (@bpdm/ng).
+description: Accessible tabs (roving focus, arrow keys) — underline, pill or pill-line, horizontal or vertical, full-width, icons; data-driven or composed, in React (@bpdm/ui) and Angular (@bpdm/ng).
 ---
 
 import { Tab, Tabs } from '@/components/framework-tabs';
 import {
   TabsUsageDemo,
   TabsPillDemo,
+  TabsPillLineDemo,
   TabsFullWidthDemo,
   TabsBaselineDemo,
   TabsIconsDemo,
@@ -20,7 +21,7 @@ import {
 import { Preview } from '@/components/preview';
 
 The **Tabs** switch between panels. Built for accessibility — roving focus and
-arrow-key navigation — with two looks (**underline** and **pill**), optional icons,
+arrow-key navigation — with three looks (**underline**, **pill** and **pill-line**), optional icons,
 full-width layout, and disabled tabs. Lay them out **horizontally** (default) or
 **vertically**, and activate **automatically** (arrow to select) or **manually**
 (arrow to focus, Enter/Space to select). Data-driven via `items`, controlled or
@@ -92,8 +93,9 @@ export class WorkspaceTabs {
 
 ## Pill variant
 
-`variant="pill"` swaps the underline indicator for a filled active tab — good for
-compact, segmented switches.
+`variant="pill"` turns the tabs into a segmented control: the tabs sit on a soft
+track and the active tab is a light card chip that floats on it — a selected segment,
+not a button. Good for compact, in-page switches.
 
 <Preview>
   <TabsPillDemo />
@@ -129,6 +131,57 @@ import { BpdmTabs, type TabItem } from '@bpdm/ng';
   template: `<bpdm-tabs [items]="items" defaultValue="overview" variant="pill" />`,
 })
 export class PillTabs {
+  readonly items: TabItem[] = [
+    { value: 'overview', label: 'Overview' },
+    { value: 'activity', label: 'Activity' },
+    { value: 'settings', label: 'Settings' },
+  ];
+}
+```
+
+  </Tab>
+</Tabs>
+
+### Pill on a baseline
+
+`variant="pill-line"` keeps the baseline divider of the underline style but marks the
+active tab with a soft pill highlight instead of a line — a bit more emphasis than
+`underline`, without the enclosed track of `pill`.
+
+<Preview>
+  <TabsPillLineDemo />
+</Preview>
+
+<Tabs groupId="framework" items={['React', 'Angular']}>
+  <Tab value="React">
+
+```tsx title="pill-line.tsx"
+import { Tabs, type TabItem } from '@bpdm/ui/tabs';
+
+const items: TabItem[] = [
+  { value: 'overview', label: 'Overview' },
+  { value: 'activity', label: 'Activity' },
+  { value: 'settings', label: 'Settings' },
+];
+
+export function PillLineTabs() {
+  return <Tabs items={items} defaultValue="overview" variant="pill-line" />;
+}
+```
+
+  </Tab>
+  <Tab value="Angular">
+
+```ts title="pill-line.ts"
+import { Component } from '@angular/core';
+import { BpdmTabs, type TabItem } from '@bpdm/ng';
+
+@Component({
+  selector: 'pill-line-tabs',
+  imports: [BpdmTabs],
+  template: `<bpdm-tabs [items]="items" defaultValue="overview" variant="pill-line" />`,
+})
+export class PillLineTabs {
   readonly items: TabItem[] = [
     { value: 'overview', label: 'Overview' },
     { value: 'activity', label: 'Activity' },
@@ -719,7 +772,7 @@ export class GermanTabs {
 | --- | --- | --- | --- |
 | `items` | `TabItem[]` | — | **Required.** The tabs. |
 | `value` / `defaultValue` / `onValueChange` | `string` | — | Active tab — controlled or uncontrolled. Angular: `[(value)]`. |
-| `variant` | `underline \| pill` | `underline` | Indicator style. |
+| `variant` | `underline \| pill \| pill-line` | `underline` | Indicator style: a line, a segmented-control pill on a track, or a pill highlight on a baseline divider. |
 | `baseline` | `full \| content` | `full` | Underline track width (underline variant). |
 | `orientation` | `horizontal \| vertical` | `horizontal` | Lay the tabs out in a row or a column; sets `aria-orientation` and the arrow-key axis. |
 | `activationMode` | `automatic \| manual` | `automatic` | `automatic` selects on arrow; `manual` moves focus only and selects on Enter/Space. |

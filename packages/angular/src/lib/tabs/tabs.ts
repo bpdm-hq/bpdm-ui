@@ -18,7 +18,7 @@ import {
 } from "@angular/core";
 import { cn } from "@bpdm/variants";
 
-export type TabsVariant = "underline" | "pill";
+export type TabsVariant = "underline" | "pill" | "pill-line";
 export type TabsBaseline = "full" | "content";
 export type TabsOrientation = "horizontal" | "vertical";
 export type TabsActivationMode = "automatic" | "manual";
@@ -42,7 +42,10 @@ const TRIGGER_VARIANT: Record<TabsVariant, string> = {
   // vertical adds its own per-tab marker back in `triggerClass`
   underline:
     "-mb-px border-b-2 border-transparent px-3 py-2.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:border-[var(--bpdm-primary-strong)]/60 data-[state=inactive]:enabled:hover:text-[var(--bpdm-primary-strong)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-primary-strong)]",
-  pill: "relative z-10 rounded-lg px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)]",
+  pill: "relative z-10 rounded-[calc(var(--bpdm-radius)-2px)] px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:text-[var(--bpdm-foreground)]",
+  // pill highlight above a baseline divider; the active marker is a soft muted chip
+  "pill-line":
+    "relative z-10 rounded-[calc(var(--bpdm-radius)-2px)] px-3 py-1.5 text-[var(--bpdm-muted-foreground)] data-[state=inactive]:enabled:hover:text-[var(--bpdm-foreground)] data-[state=active]:font-semibold data-[state=active]:text-[var(--bpdm-foreground)]",
 };
 
 /**
@@ -203,20 +206,29 @@ export class BpdmTabs {
   // the non-scrollable case structurally identical (no extra box)
   protected readonly wrapClass = computed(() =>
     this.scrollable()
-      ? cn("flex items-center", this.variant() === "underline" && "border-b border-[var(--bpdm-border)]")
+      ? cn(
+          "flex items-center",
+          (this.variant() === "underline" || this.variant() === "pill-line") &&
+            "border-b border-[var(--bpdm-border)]",
+        )
       : "contents",
   );
 
   protected readonly listClass = computed(() => {
-    const underline = this.variant() === "underline";
+    const v = this.variant();
+    const pill = v === "pill";
+    const hasBaseline = v === "underline" || v === "pill-line";
     const vertical = this.orientation() === "vertical";
     const scroll = this.scrollable();
     return cn(
       "relative flex items-center gap-1",
       vertical && "flex-col items-stretch",
-      // underline border sits on the list normally; when scrollable it moves to the wrapper
-      underline && !scroll && (vertical ? "border-e border-[var(--bpdm-border)]" : "border-b border-[var(--bpdm-border)]"),
-      underline && this.baseline() === "content" && "w-fit",
+      // underline + pill-line share the baseline divider; when scrollable it moves to the wrapper
+      hasBaseline && !scroll && (vertical ? "border-e border-[var(--bpdm-border)]" : "border-b border-[var(--bpdm-border)]"),
+      hasBaseline && this.baseline() === "content" && "w-fit",
+      // pill: a segmented-control track the active chip floats on (reads as a switch, not a button)
+      pill && "w-fit rounded-[var(--bpdm-radius)] bg-[var(--bpdm-muted)]/60 p-1",
+      pill && vertical && "w-auto",
       this.fullWidth() && "w-full",
       // scroll the row when tabs overflow: natural-width tabs, hidden scrollbar
       scroll &&
@@ -228,13 +240,15 @@ export class BpdmTabs {
 
   protected readonly triggerClass = computed(() => {
     const vertical = this.orientation() === "vertical";
-    const underline = this.variant() === "underline";
+    const v = this.variant();
     // vertical keeps a per-tab active marker; horizontal uses the sliding indicator
     const verticalActive = !vertical
       ? ""
-      : underline
+      : v === "underline"
         ? "mb-0 -me-px border-b-0 border-e-2 data-[state=active]:border-[var(--bpdm-primary-strong)]"
-        : "data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/60 data-[state=active]:bg-[var(--bpdm-muted)]";
+        : v === "pill"
+          ? "data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/50 data-[state=active]:bg-[var(--bpdm-card)] data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-[var(--bpdm-border)]/50"
+          : "data-[state=inactive]:enabled:hover:bg-[var(--bpdm-muted)]/50 data-[state=active]:bg-[var(--bpdm-muted)]";
     return cn(
       TRIGGER_BASE,
       vertical && "justify-start",
@@ -249,7 +263,11 @@ export class BpdmTabs {
       "pointer-events-none absolute left-0 opacity-0 transition-[transform,width,opacity] duration-[var(--bpdm-duration-base)] ease-[var(--bpdm-ease-out)] motion-reduce:transition-none",
       this.variant() === "underline"
         ? "-bottom-px h-0.5 bg-[var(--bpdm-primary-strong)]" // sit on the baseline (like the tab's -mb-px border), flush not floating
-        : "inset-y-0 z-0 rounded-lg bg-[var(--bpdm-muted)]",
+        : this.variant() === "pill"
+          ? // segmented-control thumb: a light card chip floating on the track (a selected segment, not a button)
+            "inset-y-1 z-0 rounded-[calc(var(--bpdm-radius)-2px)] bg-[var(--bpdm-card)] shadow-sm ring-1 ring-[var(--bpdm-border)]/50"
+          : // pill-line: a soft muted chip floating above the baseline divider
+            "inset-y-1 z-0 rounded-[calc(var(--bpdm-radius)-2px)] bg-[var(--bpdm-muted)]",
     ),
   );
 
